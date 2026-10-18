@@ -44,7 +44,6 @@ export function vistaFicha(p, volver) {
         ${p._editada ? `<span class="tag ed">${p._editada === "local" ? "Editada en este celular" : "Corregida"}</span>` : ""}
       </div>
     </div>
-    ${hermanas.length > 1 ? `<nav class="serie" aria-label="Otras proyecciones de ${esc(r?.nombre)}">${hermanas.map((h) => `<a class="chip${h.id === p.id ? " on" : ""}" href="#p-${h.id}">${esc(h.nombre)}</a>`).join("")}</nav>` : ""}
 
     ${sec("Factores técnicos", () => `<dl class="tabla">${[...FACTORES, ...FACTORES_EXTRA].filter(([k]) => p.factores?.[k] || (p.factores && k in p.factores && p.factores[k] === null))
       .map(([k, n]) => `<div class="it"><dt>${m(n)}</dt><dd>${p.factores[k] === null ? "" : m(p.factores[k])}</dd></div>`).join("")}</dl>`)}
@@ -68,6 +67,8 @@ export function vistaFicha(p, volver) {
     ${p.revision?.length ? `<aside class="revisar"><h4>Para revisar</h4>${p.revision.map((n) => `<p>${esc(n)}</p>`).join("")}</aside>` : ""}
 
     ${terminos.length ? `<details class="sec glos"><summary><span>Términos de esta ficha</span>${icono.chev}</summary><div class="body"><dl class="terms">${terminos.map((t) => `<div><dt>${esc(t.termino)}</dt><dd>${definicionHTML(t)}</dd></div>`).join("")}</dl></div></details>` : ""}
+
+    ${hermanas.length > 1 ? `<details class="sec"><summary><span>Otras proyecciones de ${esc(r?.nombre)} (${hermanas.length - 1})</span>${icono.chev}</summary><div class="body"><nav class="serie" aria-label="Otras proyecciones de ${esc(r?.nombre)}">${hermanas.map((h) => `<a class="chip${h.id === p.id ? " on" : ""}" href="#p-${h.id}">${esc(h.nombre)}</a>`).join("")}</nav></div></details>` : ""}
 
     <div class="pie-ficha">
       ${edicion.activa() ? `<a class="btn" href="#editar-${p.id}">✎<span>Editar esta ficha</span></a>` : ""}

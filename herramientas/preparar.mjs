@@ -16,6 +16,12 @@ const regiones = CAPITULOS.flatMap((c) => c.regiones);
 const proyecciones = CAPITULOS.flatMap((c) => c.proyecciones);
 const problemas = validarDatos({ capitulos: CAPITULOS, regiones, proyecciones, glosario: GLOSARIO });
 
+// cada región del manual tiene que estar en un solo botón del menú principal
+const { GRUPOS } = await import(pathToFileURL(join(raiz, "js/menu.js")));
+const enMenu = GRUPOS.flatMap((g) => g.regiones);
+for (const r of regiones) if (!enMenu.includes(r.id)) problemas.push(`Región sin botón en el menú (js/menu.js): ${r.id}`);
+enMenu.forEach((id, i) => { if (enMenu.indexOf(id) !== i || !regiones.some((r) => r.id === id)) problemas.push(`Región repetida o inexistente en js/menu.js: ${id}`); });
+
 // archivos de datos que existen pero no están en el índice
 const enIndice = readFileSync(join(raiz, "datos/indice.js"), "utf8");
 for (const f of readdirSync(join(raiz, "datos"))) if (/^cap\d+.*\.js$/.test(f) && !enIndice.includes(f)) problemas.push(`datos/${f} no está importado en datos/indice.js`);

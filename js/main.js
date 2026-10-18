@@ -1,14 +1,15 @@
 // Arranque y navegación por #hash:
-// #  inicio · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #calc · #calc-<proyección> · #ajustes
+// #  inicio · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #calc · #calc-<proyección> · #ajustes
 import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { favoritos, preferencias, aplicarPreferencias } from "./almacen.js";
-import { estado, capAbiertos, vistaInicio, vistaRegion, vistaFavoritos, vistaAjustes } from "./vistas.js";
+import { estado, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
 import { mostrarTermino } from "./glosario.js";
 import { ampliar } from "./imagenes.js";
 import { pwa } from "./pwa.js";
 import { edicion, vistaEditar, leerFormulario } from "./edicion.js";
+import { grupoPorId, grupoDeRegion } from "./menu.js";
 
 const app = document.getElementById("app");
 aplicarPreferencias();
@@ -21,6 +22,10 @@ const historial = [];
 function ruta() {
   const h = decodeURIComponent(location.hash || "#");
   if (h.startsWith("#p-") && proyeccionPorId[h.slice(3)]) return { tipo: "ficha", p: proyeccionPorId[h.slice(3)] };
+  if (h.startsWith("#g-")) {
+    const fav = h.endsWith("-fav"), id = h.slice(3, fav ? -4 : undefined);
+    if (grupoPorId[id]) return { tipo: "grupo", g: grupoPorId[id], fav };
+  }
   if (h.startsWith("#r-")) {
     const fav = h.endsWith("-fav"), id = h.slice(3, fav ? -4 : undefined);
     if (regionPorId[id]) return { tipo: "region", r: regionPorId[id], fav };
@@ -33,7 +38,7 @@ function ruta() {
 }
 
 function volverA(r) {
-  if (r.tipo === "ficha") return historial.findLast((x) => !x.startsWith("#p-") && !x.startsWith("#calc")) || `#r-${r.p.region}`;
+  if (r.tipo === "ficha") return historial.findLast((x) => !x.startsWith("#p-") && !x.startsWith("#calc")) || `#g-${grupoDeRegion[r.p.region]?.id}`;
   if (r.tipo === "calc") return pantallaAnterior;
   if (r.tipo === "editar") return `#p-${r.p.id}`;
   return "#";
@@ -44,6 +49,7 @@ function render() {
   const vuelta = volverA(r);
   switch (r.tipo) {
     case "ficha": app.innerHTML = vistaFicha(r.p, vuelta); break;
+    case "grupo": app.innerHTML = vistaGrupo(r.g, r.fav); break;
     case "region": app.innerHTML = vistaRegion(r.r, r.fav); break;
     case "favoritos": app.innerHTML = vistaFavoritos(); break;
     case "ajustes": app.innerHTML = vistaAjustes(); break;
@@ -52,7 +58,15 @@ function render() {
     default: app.innerHTML = vistaInicio();
   }
   document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : "RadioGuía";
+  altoCabecera();
 }
+
+// la barra del buscador y la de filtros se pegan debajo de la cabecera, que puede ocupar dos renglones
+function altoCabecera() {
+  const top = app.querySelector(".top");
+  if (top) document.documentElement.style.setProperty("--top-h", top.offsetHeight + "px");
+}
+addEventListener("resize", altoCabecera);
 
 addEventListener("hashchange", (e) => {
   const antes = new URL(e.oldURL).hash || "#";
@@ -135,14 +149,6 @@ app.addEventListener("submit", async (e) => {
     catch (err) { edicion.configurarGithub(null); est.textContent = "No se pudo conectar: " + err.message; }
   }
 });
-
-// recordar qué capítulos quedaron desplegados en el inicio
-app.addEventListener("toggle", (e) => {
-  const d = e.target;
-  if (!d.dataset?.cap || ruta().tipo !== "inicio") return;
-  const n = Number(d.dataset.cap);
-  d.open ? capAbiertos.add(n) : capAbiertos.delete(n);
-}, true);
 
 pwa.iniciar(() => { if (["inicio", "ajustes"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());

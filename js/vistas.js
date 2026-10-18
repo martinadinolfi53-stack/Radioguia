@@ -4,6 +4,7 @@ import { favoritos, preferencias } from "./almacen.js";
 import { esc, icono, cabecera, botonFav } from "./util.js";
 import { panelEdicionAjustes } from "./edicion.js";
 import { pwa } from "./pwa.js";
+import { GRUPOS } from "./menu.js";
 
 export const estado = { q: "", qFav: "", filtro: {} }; // texto de búsqueda y filtro de categoría por región
 
@@ -29,20 +30,14 @@ function resultados(lista, q) {
   return `<p class="label">${res.length} ${res.length === 1 ? "resultado" : "resultados"}</p><div class="lista">${res.map((p) => filaProyeccion(p, true)).join("")}</div>`;
 }
 
-// menú desplegable de capítulos → regiones; "filtro" deja solo las proyecciones que cumplen (favoritos)
-export const capAbiertos = new Set(); // capítulos desplegados en el inicio, para que sigan abiertos al volver
+// menú principal: un botón por región, en orden (ver js/menu.js); "filtro" deja solo las proyecciones que cumplen (favoritos)
 function menuRegiones(filtro) {
   const fav = filtro !== todos;
-  return capitulos.map((c) => {
-    const regs = c.regiones.map((r) => ({ r, n: proyeccionesDe(r.id).filter(filtro).length })).filter((x) => x.n);
-    if (!regs.length) return "";
-    const total = regs.reduce((a, x) => a + x.n, 0);
-    return `<details class="cap" data-cap="${c.capitulo}" ${fav || capAbiertos.has(c.capitulo) ? "open" : ""}>
-      <summary><span class="num">${c.capitulo}</span><span class="t">${esc(c.titulo)}</span><span class="cnt">${total}</span>${icono.chev}</summary>
-      <div class="regs">${regs.map(({ r, n }) => `<a class="row reg" href="#r-${r.id}${fav ? "-fav" : ""}"><span class="t">${esc(r.nombre)}</span>
-        <span class="s">${r.detalle ? esc(r.detalle) + " · " : ""}${n} ${n === 1 ? "proyección" : "proyecciones"}</span>${icono.chev}</a>`).join("")}</div>
-    </details>`;
-  }).join("");
+  return `<div class="grupos">${GRUPOS.map((g) => {
+    const n = g.regiones.reduce((a, id) => a + proyeccionesDe(id).filter(filtro).length, 0);
+    return n ? `<a class="grupo" href="#g-${g.id}${fav ? "-fav" : ""}" style="--c:${g.color}"><span class="t">${esc(g.nombre)}</span>
+      <span class="s">${n} ${n === 1 ? "proyección" : "proyecciones"}</span>${icono.chev}</a>` : "";
+  }).join("")}</div>`;
 }
 const todos = () => true;
 
@@ -76,6 +71,30 @@ export function vistaRegion(r, soloFav) {
   </div></div>
   <main class="wrap">
     ${lista.length ? `<div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div>` : `<div class="vacio">No hay proyecciones en esta categoría.</div>`}
+  </main>`;
+}
+
+// índice de una región del menú: sus partes como subtítulos y las proyecciones de cada una
+export function vistaGrupo(g, soloFav) {
+  const de = (id) => proyeccionesDe(id).filter((p) => !soloFav || favoritos.tiene(p.id));
+  const todas = g.regiones.flatMap(de);
+  const cats = CATEGORIAS.filter((c) => todas.some((p) => p.categoria.includes(c)));
+  const f = estado.filtro[g.id];
+  const chip = (c, txt) => `<button class="chip${(f || "") === c ? " on" : ""}" data-filtro="${esc(g.id)}" data-cat="${esc(c)}">${esc(txt)}</button>`;
+  const partes = g.regiones.map((id) => {
+    const lista = de(id).filter((p) => !f || p.categoria.includes(f));
+    if (!lista.length) return "";
+    const r = regionPorId[id];
+    return `<section class="parte"><h2 class="sub"><span>${esc(r.nombre)}</span>${r.detalle ? `<small>${esc(r.detalle)}</small>` : ""}</h2>
+      <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></section>`;
+  }).join("");
+  return cabecera({ titulo: g.nombre, sub: `${soloFav ? "Favoritos · " : ""}${todas.length} ${todas.length === 1 ? "proyección" : "proyecciones"}`, atras: soloFav ? "#favoritos" : "#" }) + `
+  <div class="filtros"><div class="wrap filtros-row">
+    ${cats.length > 1 ? `<div class="chips" role="group" aria-label="Filtrar por proyección">${chip("", "Todas") + cats.map((c) => chip(c, c)).join("")}</div>` : ""}
+    <a class="btn-calc" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
+  </div></div>
+  <main class="wrap" style="--c:${g.color}">
+    ${partes || `<div class="vacio">No hay proyecciones en esta categoría.</div>`}
   </main>`;
 }
 

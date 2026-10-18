@@ -5,9 +5,9 @@
 // (o sobre el tablero), tiempo de exposición corto, colimación ajustada y protección del paciente.
 
 const CRIT_TEC = ["Densidad (brillo) y contraste óptimos.", "Bordes de partes blandas y trabeculación ósea nítidos, sin movimiento."];
-const RI_18x24 = "18 × 24 cm (8 × 10\"), vertical";
-const RI_24x30 = "24 × 30 cm (10 × 12\"), vertical";
-const DFRI = "100 cm (40\")";
+const RI_18x24 = "18 × 24 cm, vertical";
+const RI_24x30 = "24 × 30 cm, vertical";
+const DFRI = "100 cm";
 
 export default {
   capitulo: 2,
@@ -153,7 +153,7 @@ export default {
         "Mano en pronación completa, con los dedos un poco separados.",
       ],
       criterios: [
-        ["Estructuras que se ven", ["Mano, muñeca y unos 2,5 cm (1\") de antebrazo distal."]],
+        ["Estructuras que se ven", ["Mano, muñeca y unos 2,5 cm de antebrazo distal."]],
         ["Posicionamiento", ["Articulaciones interfalángicas y MCF abiertas.", "Mano sin rotar: diáfisis de metacarpianos y falanges de aspecto simétrico.", "Dedos un poco separados."]],
         ["Criterios técnicos", CRIT_TEC],
       ],
@@ -169,7 +169,7 @@ export default {
         "Todos los dedos un poco separados y paralelos al RI.",
       ],
       criterios: [
-        ["Estructuras que se ven", ["Mano, muñeca y unos 2,5 cm (1\") de antebrazo distal."]],
+        ["Estructuras que se ven", ["Mano, muñeca y unos 2,5 cm de antebrazo distal."]],
         ["Posicionamiento", ["Eje largo de dedos y metacarpianos paralelo al RI, con articulaciones abiertas.", "Las diáfisis del 3.º al 5.º metacarpiano no se superponen en su parte media."]],
         ["Criterios técnicos", CRIT_TEC],
       ],
@@ -177,7 +177,7 @@ export default {
     },
     {
       id: "mano-lateral", region: "mano", nombre: "Lateral de mano en abanico y en extensión", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\"), vertical", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes externos de la mano y la muñeca, incluyendo las hileras proximal y distal del carpo" },
+      factores: { ri: "18 × 24 cm, vertical", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes externos de la mano y la muñeca, incluyendo las hileras proximal y distal del carpo" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la 2.ª articulación MCF." },
       posicion: [
         "Sentado, mano sobre la mesa y codo flexionado, con protección sobre el regazo.",
@@ -186,7 +186,7 @@ export default {
         "Alternativa en extensión (dedos juntos y extendidos): se usa ante sospecha de cuerpo extraño o lesión de un metacarpiano.",
       ],
       criterios: [
-        ["Estructuras que se ven", ["Mano, muñeca y unos 2,5 cm (1\") de antebrazo distal.", "Articulaciones interfalángicas y MCF abiertas."]],
+        ["Estructuras que se ven", ["Mano, muñeca y unos 2,5 cm de antebrazo distal.", "Articulaciones interfalángicas y MCF abiertas."]],
         ["Posicionamiento", ["Dedos en lateral verdadera.", "Falanges y metacarpianos con superficies simétricas.", "Radio y cúbito distales superpuestos, igual que los metacarpianos."]],
         ["Criterios técnicos", CRIT_TEC],
       ],
@@ -195,7 +195,7 @@ export default {
     },
     {
       id: "manos-ap-oblicua-norgaard", region: "mano", nombre: "AP bilateral oblicua de manos", metodo: "Norgaard (posición del «receptor de pelota»)", categoria: ["Oblicuas", "Métodos especiales"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\") o 35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes externos de ambas manos y muñecas, incluyendo las hileras proximal y distal del carpo" },
+      factores: { ri: "24 × 30 cm o 35 × 43 cm, horizontal", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes externos de ambas manos y muñecas, incluyendo las hileras proximal y distal del carpo" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en el punto medio entre las 5.as articulaciones MCF de ambas manos." },
       posicion: [
         "Sentado al costado de la mesa, con ambos antebrazos y manos extendidos, palmas hacia arriba.",
@@ -285,7 +285,7 @@ export default {
     },
     {
       id: "muneca-desviacion-radial", region: "muneca", nombre: "PA de muñeca con desviación radial", categoria: ["PA"], tipo: "E",
-      factores: { ri: RI_18x24, dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, ajustada a la región del carpo (cuadrado de unos 7,5 cm o 3\")" },
+      factores: { ri: RI_18x24, dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, ajustada a la región del carpo (cuadrado de unos 7,5 cm)" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media del carpo." },
       posicion: [
         "Desde la PA de muñeca, llevar la mano con suavidad hacia el lado radial (desviación radial) todo lo que el paciente tolere.",
@@ -301,8 +301,8 @@ export default {
     },
     {
       id: "muneca-tunel-carpiano", region: "muneca", nombre: "Inferosuperior tangencial de muñeca (túnel carpiano)", metodo: "Gaynor-Hart", categoria: ["Tangenciales", "Métodos especiales"], tipo: "E",
-      factores: { ri: RI_18x24, dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Ajustada a la región del carpo (cuadrado de unos 7,5 cm o 3\")" },
-      rc: { direccion: "angulado", angulo: "25-30° respecto del eje largo de la palma", texto: "Angulado 25-30° respecto del eje largo de la cara palmar de la mano, centrado unos 2-3 cm (1\") distal a la base del 3.er metacarpiano." },
+      factores: { ri: RI_18x24, dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Ajustada a la región del carpo (cuadrado de unos 7,5 cm)" },
+      rc: { direccion: "angulado", angulo: "25-30° respecto del eje largo de la palma", texto: "Angulado 25-30° respecto del eje largo de la cara palmar de la mano, centrado unos 2-3 cm distal a la base del 3.er metacarpiano." },
       posicion: [
         "Sentado, mano sobre la mesa, con protección sobre el regazo.",
         "Muñeca en hiperextensión (flexión dorsal) todo lo que tolere; el paciente sostiene los dedos hacia atrás con la otra mano.",
@@ -321,7 +321,7 @@ export default {
     // ───────── Antebrazo ─────────
     {
       id: "antebrazo-ap", region: "antebrazo", nombre: "AP de antebrazo", categoria: ["AP"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical; o 30 × 35 cm (11 × 14\"), vertical, en pacientes más pequeños", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, con al menos 2,5 cm (1\") más allá de las articulaciones de la muñeca y del codo" },
+      factores: { ri: "35 × 43 cm, vertical; o 30 × 35 cm, vertical, en pacientes más pequeños", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, con al menos 2,5 cm más allá de las articulaciones de la muñeca y del codo" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en el punto medio del antebrazo." },
       posicion: [
         "Sentado al costado de la mesa, brazo extendido y mano en supinación, con protección sobre el regazo.",
@@ -337,7 +337,7 @@ export default {
     },
     {
       id: "antebrazo-lateral", region: "antebrazo", nombre: "Lateromedial de antebrazo", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical; o 30 × 35 cm (11 × 14\"), vertical, en pacientes más pequeños", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, con al menos 2,5 cm (1\") más allá de las articulaciones de la muñeca y del codo" },
+      factores: { ri: "35 × 43 cm, vertical; o 30 × 35 cm, vertical, en pacientes más pequeños", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, con al menos 2,5 cm más allá de las articulaciones de la muñeca y del codo" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en el punto medio del antebrazo." },
       posicion: [
         "Sentado al costado de la mesa, con protección sobre el regazo.",
@@ -392,7 +392,7 @@ export default {
     },
     {
       id: "codo-lateral", region: "codo", nombre: "Lateromedial de codo", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: RI_24x30, dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, con al menos unos 5 cm (2\") de antebrazo y de húmero" },
+      factores: { ri: RI_24x30, dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, con al menos unos 5 cm de antebrazo y de húmero" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media de la articulación del codo." },
       posicion: [
         "Codo flexionado 90°; bajar el hombro lo necesario para que antebrazo y húmero apoyen en un mismo plano sobre la mesa y el RI. Protección sobre el regazo.",

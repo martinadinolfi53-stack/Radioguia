@@ -13,7 +13,7 @@
 //    sínfisis del pubis, que a su vez queda 8-10 cm (3-4") distal a la EIAS.
 //    Ojo: la fig. 5.3 de esa misma página rotula «3-5 cm (1-2")» en lugar de 2,5-5 cm.
 
-const DFRI = "100 cm (40\")";
+const DFRI = "100 cm";
 const APNEA = "Apnea durante la exposición";
 const SIN_CRITERIOS = []; // el manual no trae página de criterios: se deja vacío para completar después
 const TEC_CADERA = ["Densidad (brillo) y contraste óptimos.", "Marcas trabeculares nítidas y bien visibles, sin movimiento."];
@@ -34,12 +34,12 @@ export default {
     // ───────── Fémur ─────────
     {
       id: "femur-ap", region: "femur", nombre: "AP de fémur", categoria: ["AP"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Larga y estrecha, hasta el área del fémur" },
+      factores: { ri: "35 × 43 cm, vertical", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Larga y estrecha, hasta el área del fémur" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al fémur, a la parte media del RI." },
       posicion: [
         "Decúbito supino, con el fémur centrado en la línea media de la mesa o del RI de la parrilla.",
         "Rotar hacia adentro toda la extremidad ≈5° para una AP de fémur medio y distal; 15° de rotación interna si la AP verdadera debe incluir la cadera.",
-        "Borde inferior del RI ≈5 cm (2\") por debajo de la rodilla para que la articulación entre bien (para el fémur proximal, ver AP unilateral de cadera, pág. 157).",
+        "Borde inferior del RI ≈5 cm por debajo de la rodilla para que la articulación entre bien (para el fémur proximal, ver AP unilateral de cadera, pág. 157).",
         "Cadera hacia el extremo del cátodo (efecto talón o anódico).",
         "Proteger los tejidos radiosensibles en hombres y mujeres.",
       ],
@@ -53,7 +53,7 @@ export default {
     },
     {
       id: "femur-lateral", region: "femur", nombre: "Lateral de fémur (mediolateral)", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Larga y estrecha, hasta el área del fémur" },
+      factores: { ri: "35 × 43 cm, vertical", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Larga y estrecha, hasta el área del fémur" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al fémur, a la parte media del RI." },
       posicion: [
         "Decúbito lateral, con la pierna sana llevada hacia atrás para no rotar de más.",
@@ -75,7 +75,7 @@ export default {
     },
     {
       id: "femur-lateral-haz-horizontal", region: "femur", nombre: "Lateral de fémur con haz horizontal: fémur medio y distal (traumatismo)", categoria: ["Perfil"], tipo: null,
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical (siguiendo el eje longitudinal del fémur)", dfri: DFRI, respiracion: null, parrilla: "Parrilla portátil", colimacion: "Estrecha a los cuatro lados, hasta el área de interés" },
+      factores: { ri: "35 × 43 cm, vertical (siguiendo el eje longitudinal del fémur)", dfri: DFRI, respiracion: null, parrilla: "Parrilla portátil", colimacion: "Estrecha a los cuatro lados, hasta el área de interés" },
       rc: { direccion: "horizontal", texto: "Horizontal y perpendicular al fémur, al punto medio del RI." },
       posicion: [
         "No mover al paciente de la posición de decúbito supino. Levantar con cuidado la pierna lesionada y poner un apoyo debajo de la rodilla y de la pierna.",
@@ -90,8 +90,8 @@ export default {
     // ───────── Fémures proximales (caderas) ─────────
     {
       id: "caderas-ap-bilateral", region: "caderas", nombre: "AP bilateral de caderas: fémures proximales", categoria: ["AP"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta los bordes de la pelvis y de las caderas" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, al punto medio entre las cabezas femorales (unos 2 cm [1\"] por encima de la sínfisis del pubis)." },
+      factores: { ri: "35 × 43 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta los bordes de la pelvis y de las caderas" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, al punto medio entre las cabezas femorales (unos 2 cm por encima de la sínfisis del pubis)." },
       posicion: [
         "Decúbito supino, alineado y centrado con el RC y el RI, con las dos piernas extendidas y la misma rotación interna de 15-20° (ver advertencia).",
         "Pelvis sin rotar: las dos EIAS a la misma distancia del tablero. Apoyo debajo de las rodillas para comodidad.",
@@ -103,8 +103,8 @@ export default {
     },
     {
       id: "caderas-ap-unilateral", region: "caderas", nombre: "AP unilateral de cadera: fémur proximal", categoria: ["AP"], tipo: "R",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, dirigido 2,5-5 cm (1-2\") distal a la parte media del cuello femoral, para que entre cualquier dispositivo ortopédico de cadera." },
+      factores: { ri: "24 × 30 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, dirigido 2,5-5 cm distal a la parte media del cuello femoral, para que entre cualquier dispositivo ortopédico de cadera." },
       posicion: [
         "Decúbito supino, pierna extendida y con rotación interna de 15-20° (sin traumatismo).",
         "Centrar el cuello femoral en el RC; se puede poner un apoyo debajo de las rodillas.",
@@ -122,7 +122,7 @@ export default {
     // ───────── Lateral de cadera ─────────
     {
       id: "cadera-lateral-rana-unilateral", region: "cadera-lateral", nombre: "Lateral unilateral de cadera en «posición de rana» (sin traumatismo)", metodo: "Cleaves modificado", categoria: ["Perfil", "Métodos especiales"], tipo: "R",
-      factores: { ri: "24 × 30 cm (10 × 12\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta el fémur proximal y la cadera" },
+      factores: { ri: "24 × 30 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta el fémur proximal y la cadera" },
       rc: { direccion: "perpendicular", texto: "Perpendicular, a la parte media del cuello o de la cabeza femoral (ver métodos de localización, pág. 151)." },
       posicion: [
         "Decúbito supino.",
@@ -139,8 +139,8 @@ export default {
     },
     {
       id: "cadera-lateral-rana-bilateral", region: "cadera-lateral", nombre: "AP bilateral de caderas en «posición de rana» (sin traumatismo)", metodo: "Cleaves modificado", categoria: ["AP", "Perfil", "Métodos especiales"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta la región de interés" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, a la altura de las cabezas femorales (≈7-8 cm [3\"] por debajo de las EIAS)." },
+      factores: { ri: "35 × 43 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta la región de interés" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, a la altura de las cabezas femorales (≈7-8 cm por debajo de las EIAS)." },
       posicion: [
         "Decúbito supino, centrado con el RC y el RI. Flexionar caderas y rodillas y abducir los dos fémures por igual hasta 40-45° respecto de la vertical, si se puede, con las plantas de los pies juntas.",
         "Pelvis sin rotar: EIAS a la misma distancia de la mesa.",
@@ -159,7 +159,7 @@ export default {
     },
     {
       id: "cadera-axiolateral-danelius-miller", region: "cadera-lateral", nombre: "Axiolateral inferosuperior de cadera (traumatismo)", metodo: "Danelius-Miller", categoria: ["Perfil", "Axiales", "Métodos especiales"], tipo: "R",
-      factores: { ri: "24 × 30 cm (RI paralelo al fémur) (10 × 12\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Parrilla portátil", colimacion: "A los cuatro lados, hasta el área del fémur proximal" },
+      factores: { ri: "24 × 30 cm (RI paralelo al fémur), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Parrilla portátil", colimacion: "A los cuatro lados, hasta el área del fémur proximal" },
       rc: { direccion: "horizontal", texto: "Horizontal, perpendicular al área del cuello femoral y al RI (ver métodos de localización, pág. 151)." },
       posicion: [
         "Decúbito supino, sin rotación de la pelvis.",
@@ -179,8 +179,8 @@ export default {
     // ───────── Pelvis ─────────
     {
       id: "pelvis-ap", region: "pelvis", nombre: "AP de pelvis", categoria: ["AP"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, incluyendo toda la pelvis" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, a mitad de camino entre las EIAS y la sínfisis del pubis (unos 5 cm [2\"] distal a las EIAS)." },
+      factores: { ri: "35 × 43 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, incluyendo toda la pelvis" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, a mitad de camino entre las EIAS y la sínfisis del pubis (unos 5 cm distal a las EIAS)." },
       posicion: [
         "Decúbito supino, pelvis centrada en la línea media y piernas extendidas.",
         "Pies, rodillas y piernas con la misma rotación interna de 15-20° (con cinta si hace falta). Apoyo debajo de las rodillas.",
@@ -201,7 +201,7 @@ export default {
     },
     {
       id: "pelvis-ap-axial-inlet", region: "pelvis", nombre: "AP axial de pelvis «inlet» (entrada)", categoria: ["AP", "Axiales"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
+      factores: { ri: "35 × 43 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
       rc: { direccion: "caudal", angulo: "40°", texto: "40° caudal, a la altura de las EIAS, en hombres y mujeres." },
       posicion: [
         "Decúbito supino, centrado en la línea media.",
@@ -217,8 +217,8 @@ export default {
     },
     {
       id: "pelvis-ap-axial-outlet", region: "pelvis", nombre: "AP axial de pelvis «outlet» (salida)", metodo: "Taylor", categoria: ["AP", "Axiales", "Métodos especiales"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
-      rc: { direccion: "cefálico", angulo: "20-35° (hombres); 30-45° (mujeres)", texto: "Hombres, 20-35° cefálico; mujeres, 30-45° cefálico. Centrado 2,5-5 cm (1-2\") por debajo de la sínfisis del pubis o de los trocánteres mayores." },
+      factores: { ri: "35 × 43 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
+      rc: { direccion: "cefálico", angulo: "20-35° (hombres); 30-45° (mujeres)", texto: "Hombres, 20-35° cefálico; mujeres, 30-45° cefálico. Centrado 2,5-5 cm por debajo de la sínfisis del pubis o de los trocánteres mayores." },
       posicion: [
         "Decúbito supino, centrado en la línea media.",
         "Pelvis sin rotar: EIAS a la misma distancia del tablero.",
@@ -235,8 +235,8 @@ export default {
     // ───────── Acetábulo ─────────
     {
       id: "acetabulo-oblicua-posterior-judet", region: "acetabulo", nombre: "Oblicua posterior de acetábulo", metodo: "Judet", categoria: ["Oblicuas", "Métodos especiales"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical, o 35 × 43 cm (14 × 17\"), horizontal si hay que ver las dos caderas en todas las proyecciones", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
-      rc: { direccion: "perpendicular", texto: "Cadera apoyada (abajo): perpendicular, 5 cm (2\") distal y 5 cm (2\") medial a la superficie inferior de la EIAS. Cadera elevada (arriba): perpendicular, 5 cm (2\") distal a la superficie superior de la EIAS." },
+      factores: { ri: "24 × 30 cm, vertical, o 35 × 43 cm, horizontal si hay que ver las dos caderas en todas las proyecciones", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
+      rc: { direccion: "perpendicular", texto: "Cadera apoyada (abajo): perpendicular, 5 cm distal y 5 cm medial a la superficie inferior de la EIAS. Cadera elevada (arriba): perpendicular, 5 cm distal a la superficie superior de la EIAS." },
       posicion: [
         "Oblicua posterior a 45°, centrando la cadera de arriba o la de abajo según lo que interese.",
         "Cuña de 45° debajo de la pierna elevada; brazos y piernas acomodados para sostener la posición.",
@@ -251,8 +251,8 @@ export default {
     },
     {
       id: "acetabulo-pa-oblicua-axial-teufel", region: "acetabulo", nombre: "PA oblicua axial de acetábulo", metodo: "Teufel", categoria: ["PA", "Oblicuas", "Axiales", "Métodos especiales"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Región del acetábulo y fémur proximal" },
-      rc: { direccion: "cefálico", angulo: "12°", texto: "12° cefálico. Cuando la región de interés está abajo (lado apoyado), dirigirlo 2,5 cm (1\") por encima del trocánter mayor y ≈5 cm (2\") lateral al plano sagital medio." },
+      factores: { ri: "24 × 30 cm, vertical", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Región del acetábulo y fémur proximal" },
+      rc: { direccion: "cefálico", angulo: "12°", texto: "12° cefálico. Cuando la región de interés está abajo (lado apoyado), dirigirlo 2,5 cm por encima del trocánter mayor y ≈5 cm lateral al plano sagital medio." },
       posicion: [
         "Semidecúbito prono, con el lado afectado hacia abajo.",
         "Rotar el cuerpo 35-40° en oblicua anterior.",

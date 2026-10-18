@@ -8,7 +8,7 @@
 // El índice del capítulo no marca ninguna proyección como (R) o (E): todas se cargan como "R" con una entrada de revisión.
 // La pág. 319 ("Notas sobre el procedimiento") es una hoja en blanco para anotaciones.
 
-const DFRI = "100 cm (40\")";
+const DFRI = "100 cm";
 const SIN_CRIT = []; // el manual no trae página de criterios: se deja vacío para completar después
 
 export default {
@@ -25,11 +25,11 @@ export default {
     // ───────── Tórax portátil ─────────
     {
       id: "port-torax-ap", region: "port-torax", nombre: "AP de tórax portátil (decúbito supino y posición semiincorporada)", categoria: ["AP"], tipo: null,
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal o vertical", dfri: "120-180 cm (48-72\"); usar la mayor DFRI posible", respiracion: "Exponer después de una segunda inspiración completa", parrilla: "Con o sin parrilla", colimacion: null },
-      rc: { direccion: "caudal", angulo: "3-5°", texto: "3-5° caudal respecto de la perpendicular al RI, para que el RC entre perpendicular al esternón (así las clavículas no tapan los vértices). Centrado 8-10 cm (3-4\") por debajo de la escotadura yugular, a la altura de T7." },
+      factores: { ri: "35 × 43 cm, horizontal o vertical", dfri: "120-180 cm; usar la mayor DFRI posible", respiracion: "Exponer después de una segunda inspiración completa", parrilla: "Con o sin parrilla", colimacion: null },
+      rc: { direccion: "caudal", angulo: "3-5°", texto: "3-5° caudal respecto de la perpendicular al RI, para que el RC entre perpendicular al esternón (así las clavículas no tapan los vértices). Centrado 8-10 cm por debajo de la escotadura yugular, a la altura de T7." },
       posicion: [
         "Cubrir el RI con una funda de plástico.",
-        "Centrar al paciente con el borde superior del RI unos 5 cm (2\") por encima de los hombros.",
+        "Centrar al paciente con el borde superior del RI unos 5 cm por encima de los hombros.",
         "Si el paciente está en decúbito supino, levantar el respaldo de la cama, si se puede, hasta dejarlo sentado o semierguido.",
         "Sin rotación.",
         "Si su estado lo permite, rotar los hombros hacia adelante.",
@@ -41,7 +41,7 @@ export default {
     // ───────── Abdomen portátil ─────────
     {
       id: "port-abdomen-ap-supino", region: "port-abdomen", nombre: "AP de abdomen portátil en decúbito supino (RUV)", categoria: ["AP"], tipo: null,
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical", dfri: DFRI, respiracion: "Exponer en espiración", parrilla: "Sí", colimacion: null },
+      factores: { ri: "35 × 43 cm, vertical", dfri: DFRI, respiracion: "Exponer en espiración", parrilla: "Sí", colimacion: null },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en el RI a la altura de la cresta ilíaca." },
       posicion: [
         "Cubrir el RI con una funda de plástico.",
@@ -53,11 +53,11 @@ export default {
     },
     {
       id: "port-abdomen-decubito-lateral", region: "port-abdomen", nombre: "Decúbito lateral de abdomen portátil", categoria: ["AP", "Decúbitos"], tipo: null,
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical (respecto de las estructuras anatómicas)", dfri: DFRI, respiracion: "Exponer en espiración", parrilla: "Sí", colimacion: null },
-      rc: { direccion: "horizontal", texto: "Horizontal, al centro del RI, 5 cm (2\") por encima de la cresta ilíaca." },
+      factores: { ri: "35 × 43 cm, vertical (respecto de las estructuras anatómicas)", dfri: DFRI, respiracion: "Exponer en espiración", parrilla: "Sí", colimacion: null },
+      rc: { direccion: "horizontal", texto: "Horizontal, al centro del RI, 5 cm por encima de la cresta ilíaca." },
       posicion: [
         "Paciente sobre el lado izquierdo (o el derecho si se indica), con apoyos para que no se hunda en una cama blanda.",
-        "Centro del RI 5 cm (2\") por encima de la cresta ilíaca, para incluir el diafragma.",
+        "Centro del RI 5 cm por encima de la cresta ilíaca, para incluir el diafragma.",
         "Sin rotación, y con el plano del RI perpendicular al RC.",
         "Usar marcador de decúbito.",
       ],
@@ -72,11 +72,11 @@ export default {
     // ───────── Pelvis y cadera portátil ─────────
     {
       id: "port-pelvis-cadera-ap", region: "port-pelvis-cadera", nombre: "AP de pelvis o de cadera portátil", categoria: ["AP"], tipo: null,
-      factores: { ri: "Pelvis: 35 × 43 cm (14 × 17\"), horizontal. Solo cadera: 24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: "Apnea durante la exposición", parrilla: "Sí", colimacion: null },
-      rc: { direccion: "perpendicular", texto: "Pelvis: perpendicular, a mitad de camino entre las EIAS y la sínfisis del pubis. AP de cadera: RC y RI centrados en la región de la cadera (5 cm [2\"] medial a la EIAS, a la altura del trocánter mayor)." },
+      factores: { ri: "Pelvis: 35 × 43 cm, horizontal. Solo cadera: 24 × 30 cm, vertical", dfri: DFRI, respiracion: "Apnea durante la exposición", parrilla: "Sí", colimacion: null },
+      rc: { direccion: "perpendicular", texto: "Pelvis: perpendicular, a mitad de camino entre las EIAS y la sínfisis del pubis. AP de cadera: RC y RI centrados en la región de la cadera (5 cm medial a la EIAS, a la altura del trocánter mayor)." },
       posicion: [
         "Cubrir el RI con una funda de plástico y deslizarlo debajo del paciente, centrado en sentido horizontal.",
-        "Pelvis: borde superior del RI ≈2,5 cm (1\") por encima de la cresta ilíaca.",
+        "Pelvis: borde superior del RI ≈2,5 cm por encima de la cresta ilíaca.",
         "Sin rotación: las EIAS a la misma distancia del RI.",
         "Rotar las dos piernas 15° hacia adentro solo si no se sospecha fractura de cadera.",
       ],
@@ -86,7 +86,7 @@ export default {
     },
     {
       id: "port-cadera-axiolateral-danelius", region: "port-pelvis-cadera", nombre: "Axiolateral de cadera portátil", metodo: "Danelius-Miller", categoria: ["Perfil", "Métodos especiales"], tipo: null,
-      factores: { ri: "24 × 30 cm (10 × 12\"), horizontal (eje largo del RI alineado con el eje largo del fémur)", dfri: DFRI, respiracion: "Apnea durante la exposición", parrilla: "Sí", colimacion: null },
+      factores: { ri: "24 × 30 cm, horizontal (eje largo del RI alineado con el eje largo del fémur)", dfri: DFRI, respiracion: "Apnea durante la exposición", parrilla: "Sí", colimacion: null },
       rc: { direccion: "horizontal", texto: "Horizontal, angulado lo necesario para quedar perpendicular al RI y al cuello femoral." },
       posicion: [
         "Poner toallas dobladas o un apoyo debajo de la cadera afectada.",
@@ -99,13 +99,13 @@ export default {
     },
     {
       id: "port-cadera-axiolateral-clements", region: "port-pelvis-cadera", nombre: "Axiolateral modificada de cadera y fémur proximal portátil", metodo: "Clements-Nakayama", categoria: ["Perfil", "Métodos especiales"], tipo: null,
-      factores: { ri: "24 × 30 cm (10 × 12\"), horizontal", dfri: DFRI, respiracion: null, parrilla: "Sí, alineada con el ángulo del RC para evitar el artefacto por corte de parrilla", colimacion: null },
+      factores: { ri: "24 × 30 cm, horizontal", dfri: DFRI, respiracion: null, parrilla: "Sí, alineada con el ángulo del RC para evitar el artefacto por corte de parrilla", colimacion: null },
       rc: { direccion: "angulado", angulo: "≈15-20° posterior", texto: "Ajustar el ángulo del RC en sentido mediolateral para que quede perpendicular al RI y centrado en el cuello femoral (≈15-20° hacia posterior respecto de la horizontal)." },
       posicion: [
         "Decúbito supino con el lado afectado cerca del borde de la mesa y las dos piernas totalmente extendidas.",
         "Almohada bajo la cabeza y brazos cruzados sobre la parte alta del tórax.",
         "Pierna en posición neutra (anatómica).",
-        "Apoyar el RI en la bandeja del Bucky extendida, de modo que su borde inferior quede ≈5 cm (2\") por debajo del nivel del tablero.",
+        "Apoyar el RI en la bandeja del Bucky extendida, de modo que su borde inferior quede ≈5 cm por debajo del nivel del tablero.",
         "Inclinar el RI ≈15° respecto de la vertical y alinearlo para que su cara quede perpendicular al RC, evitando el corte de parrilla.",
         "Centrar la línea central del RI con el RC proyectado.",
       ],

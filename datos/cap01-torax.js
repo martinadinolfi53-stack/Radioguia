@@ -15,13 +15,13 @@ export default {
     {
       id: "torax-pa", region: "torax", nombre: "PA de tórax", categoria: ["PA"], tipo: "R",
       factores: {
-        ri: "35 × 43 cm (14 × 17\"), vertical u horizontal",
-        dfri: "180 cm (72\")",
+        ri: "35 × 43 cm, vertical u horizontal",
+        dfri: "180 cm",
         respiracion: "Exponer al final de la segunda inspiración profunda",
         parrilla: "Sí",
         colimacion: "Borde superior hasta la vértebra prominente; a los lados, hasta los bordes de la piel",
       },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en T7: 18-20 cm (7-8\") por debajo de la vértebra prominente. Queda cerca de la altura del ángulo inferior de la escápula." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en T7: 18-20 cm por debajo de la vértebra prominente. Queda cerca de la altura del ángulo inferior de la escápula." },
       posicion: [
         "De pie, mentón elevado.",
         "Manos en las caderas con las palmas hacia afuera y hombros llevados hacia adelante.",
@@ -39,13 +39,13 @@ export default {
     {
       id: "torax-lateral", region: "torax", nombre: "Lateral de tórax", categoria: ["Perfil"], tipo: "R",
       factores: {
-        ri: "35 × 43 cm (14 × 17\"), vertical",
-        dfri: "180 cm (72\")",
+        ri: "35 × 43 cm, vertical",
+        dfri: "180 cm",
         respiracion: "Exponer al final de la segunda inspiración completa",
         parrilla: "Sí",
         colimacion: "Borde superior a la altura de la vértebra prominente; a los lados, hasta los bordes de la piel anterior y posterior",
       },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la mitad del tórax a la altura de T7. En un paciente medio, el RI y el RC suelen bajarse unos 2,5 cm (1\") respecto de la PA." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la mitad del tórax a la altura de T7. En un paciente medio, el RI y el RC suelen bajarse unos 2,5 cm respecto de la PA." },
       posicion: [
         "De pie, con el costado izquierdo apoyado en el RI, salvo que se pida lateral derecha.",
         "Brazos elevados y cruzados por encima de la cabeza, mentón hacia arriba.",
@@ -62,8 +62,8 @@ export default {
     {
       id: "torax-lateral-camilla", region: "torax", nombre: "Lateral de tórax en silla de ruedas o camilla", categoria: ["Perfil"], tipo: "R",
       factores: {
-        ri: "35 × 43 cm (14 × 17\"), horizontal",
-        dfri: "180 cm (72\")",
+        ri: "35 × 43 cm, horizontal",
+        dfri: "180 cm",
         respiracion: "Exponer al final de la segunda inspiración completa",
         parrilla: "Sí",
         colimacion: "Borde superior a la altura de la vértebra prominente; a los lados, hasta los bordes de la piel anterior y posterior",
@@ -86,13 +86,13 @@ export default {
     {
       id: "torax-decubito-lateral", region: "torax", nombre: "Decúbito lateral de tórax", categoria: ["AP"], tipo: "E",
       factores: {
-        ri: "35 × 43 cm (14 × 17\"), vertical respecto del paciente",
-        dfri: "180 cm (72\") con Bucky mural; 100-120 cm (40-44\") si se usa chasis con parrilla",
+        ri: "35 × 43 cm, vertical respecto del paciente",
+        dfri: "180 cm con Bucky mural; 100-120 cm si se usa chasis con parrilla",
         respiracion: "Al final de la segunda inspiración completa",
         parrilla: "Sí",
         colimacion: "Cuatro lados, hasta los campos pulmonares (borde superior del campo luminoso a la altura de la vértebra prominente)",
       },
-      rc: { direccion: "horizontal", texto: "Horizontal, dirigido a T7, 8-10 cm (3-4\") por debajo de la escotadura yugular." },
+      rc: { direccion: "horizontal", texto: "Horizontal, dirigido a T7, 8-10 cm por debajo de la escotadura yugular." },
       posicion: [
         "Acostado sobre un costado (derecho o izquierdo), con una almohadilla radiotransparente debajo.",
         "Trabar las ruedas de la camilla para que no se mueva.",
@@ -110,17 +110,17 @@ export default {
     {
       id: "torax-ap-lordotica", region: "torax", nombre: "AP lordótica de tórax", categoria: ["AP"], tipo: "E",
       factores: {
-        ri: "35 × 43 cm (14 × 17\"), vertical",
-        dfri: "180 cm (72\")",
+        ri: "35 × 43 cm, vertical",
+        dfri: "180 cm",
         respiracion: "Al final de la segunda inspiración completa",
         parrilla: "Sí",
         colimacion: "Cuatro lados, hasta los campos pulmonares (borde superior del campo luminoso a la altura de la vértebra prominente)",
       },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media del esternón, 9 cm (3-4\") por debajo de la escotadura yugular del manubrio." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media del esternón, 9 cm por debajo de la escotadura yugular del manubrio." },
       posicion: [
         "De pie a unos 30 cm (1 pie) del RI, de espaldas, apoyando la espalda en el Bucky mural.",
         "Manos en las caderas con las palmas hacia afuera y hombros hacia adelante.",
-        "Parte media del esternón y RI centrados respecto del RC; el borde superior del RI, 7-8 cm (3\") por encima de los hombros.",
+        "Parte media del esternón y RI centrados respecto del RC; el borde superior del RI, 7-8 cm por encima de los hombros.",
         "Si el paciente está muy débil o inestable, o no puede adoptar la postura lordótica de pie, se hace una AP semiaxial con el RC a 15-20° en dirección craneal.",
       ],
       criterios: [
@@ -133,13 +133,13 @@ export default {
     {
       id: "torax-oblicua-anterior", region: "torax", nombre: "Oblicua anterior de tórax (OAD y OAI)", categoria: ["Oblicuas"], tipo: "E",
       factores: {
-        ri: "35 × 43 cm (14 × 17\"), vertical",
-        dfri: "180 cm (72\")",
+        ri: "35 × 43 cm, vertical",
+        dfri: "180 cm",
         respiracion: "Al final de la segunda inspiración completa",
         parrilla: "Sí",
         colimacion: "Cuatro lados, hasta los campos pulmonares (borde superior del campo luminoso a la altura de la vértebra prominente)",
       },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado a la altura de T7 (8-10 cm [7-8\"] por debajo de la vértebra prominente)." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado a la altura de T7 (8-10 cm por debajo de la vértebra prominente)." },
       posicion: [
         "De pie, rotado 45°: para la OAD, la parte anterior del hombro derecho contra el soporte del RI; para la OAI, la del hombro izquierdo.",
         "Algunos estudios cardíacos piden la OAI con 60° de rotación respecto de la PA.",
@@ -154,14 +154,14 @@ export default {
         ["Criterios técnicos", ["Sin movimiento: diafragma y bordes costales nítidos.", "La trama vascular y los contornos costales se ven tenues a través del corazón."]],
         ["Notas", ["Las oblicuas anteriores muestran mejor el lado alejado del RI; las posteriores, el lado cercano.", "Una rotación menor (15-20°) ayuda a ver mejor zonas del pulmón ante una posible neumopatía."]],
       ],
-      revision: ["Centrado del RC: el manual dice \"8-10 cm [7-8\"]\" por debajo de la vértebra prominente. 7-8\" equivalen a 18-20 cm, que es el valor de la PA (pág. 4). Hay que confirmar cuál es el correcto."],
+      revision: ["Centrado del RC: el manual dice \"8-10 cm\" por debajo de la vértebra prominente, pero la misma medida, en la otra unidad que da el libro, equivale a 18-20 cm, que es el valor de la PA (pág. 4). Hay que confirmar cuál es el correcto."],
       fuente: { paginas: [11, 12] }, ilustracion: null, estado: "pendiente-revision",
     },
     {
       id: "via-aerea-ap-lateral", region: "via-aerea", nombre: "AP y lateral de vía aérea superior", categoria: ["AP", "Perfil"], tipo: "E",
       factores: {
-        ri: "24 × 30 cm (10 × 12\"), vertical",
-        dfri: "180 cm (72\")",
+        ri: "24 × 30 cm, vertical",
+        dfri: "180 cm",
         respiracion: "Exponer durante una inspiración lenta y profunda",
         parrilla: "Sí",
         colimacion: "Hasta las partes blandas del cuello",
@@ -185,8 +185,8 @@ export default {
     {
       id: "torax-ped-ap-mesa", region: "torax-pediatrico", nombre: "AP de tórax pediátrico (sobre la mesa)", categoria: ["AP"], tipo: "R",
       factores: {
-        ri: "18 × 24 cm o 24 × 30 cm (8 × 10\" o 10 × 12\"), horizontal",
-        dfri: "Mínimo 128-150 cm (50-60\"), con el tubo lo más alto posible",
+        ri: "18 × 24 cm o 24 × 30 cm, horizontal",
+        dfri: "Mínimo 128-150 cm, con el tubo lo más alto posible",
         respiracion: "Segunda inspiración completa; si el niño llora, disparar en inspiración completa",
         parrilla: "Sin parrilla, o con parrilla en sistemas digitales donde no se puede retirar",
         colimacion: "Estrecha a los cuatro lados, hasta los bordes externos del tórax",
@@ -195,7 +195,7 @@ export default {
       posicion: [
         "Decúbito supino, brazos y piernas extendidos, inmovilizados con cinta, bolsas de arena u otro sistema.",
         "Tórax sin rotación; protección gonadal sobre la pelvis.",
-        "RI y tórax centrados respecto del RC, con los hombros 5 cm (2\") por debajo del borde superior del RI.",
+        "RI y tórax centrados respecto del RC, con los hombros 5 cm por debajo del borde superior del RI.",
         "Si hace falta que ayude un padre o una madre: que sostenga los brazos del niño sobre la cabeza, inclinándola hacia atrás con una mano, y las piernas hacia abajo con la otra. Darle delantal y guantes plomados.",
       ],
       criterios: [
@@ -208,8 +208,8 @@ export default {
     {
       id: "torax-ped-pa-pigg", region: "torax-pediatrico", nombre: "PA de tórax pediátrico de pie (Pigg-O-Stat)", categoria: ["PA"], tipo: "R", metodo: "Pigg-O-Stat",
       factores: {
-        ri: "18 × 24 cm o 24 × 30 cm (8 × 10\" o 10 × 12\"), horizontal",
-        dfri: "Mínimo 180 cm (72\")",
+        ri: "18 × 24 cm o 24 × 30 cm, horizontal",
+        dfri: "Mínimo 180 cm",
         respiracion: "Inspiración completa; si el niño llora, disparar en inspiración completa",
         parrilla: "Sin parrilla, o con parrilla en sistemas donde no se puede retirar",
         colimacion: "Estrecha a los cuatro lados, hasta los bordes externos del tórax",
@@ -217,9 +217,9 @@ export default {
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la mitad de los campos pulmonares, a la altura de la línea mamilar (pezones)." },
       posicion: [
         "Sentado en el asiento, con las piernas pasadas por las aberturas.",
-        "Regular la altura del asiento para que los hombros queden 2,5 cm (≈1\") por debajo del borde superior del RI.",
+        "Regular la altura del asiento para que los hombros queden 2,5 cm por debajo del borde superior del RI.",
         "Brazos elevados; colocar las piezas laterales del dispositivo con suavidad pero firmes, para sostener brazos y cabeza.",
-        "Borde superior de la protección plomada, con los marcadores D e I, 2,5-5 cm (1-2\") por encima de la cresta ilíaca.",
+        "Borde superior de la protección plomada, con los marcadores D e I, 2,5-5 cm por encima de la cresta ilíaca.",
       ],
       criterios: [
         ["Estructuras que se ven", ["Pulmones completos, de los vértices a los ángulos costofrénicos."]],
@@ -231,8 +231,8 @@ export default {
     {
       id: "torax-ped-lateral-mesa", region: "torax-pediatrico", nombre: "Lateral de tórax pediátrico (sobre la mesa)", categoria: ["Perfil"], tipo: "R",
       factores: {
-        ri: "18 × 24 cm o 24 × 30 cm (8 × 10\" o 10 × 12\"), vertical",
-        dfri: "Mínimo 128-150 cm (50-60\"), con el tubo lo más alto posible",
+        ri: "18 × 24 cm o 24 × 30 cm, vertical",
+        dfri: "Mínimo 128-150 cm, con el tubo lo más alto posible",
         respiracion: "Segunda inspiración completa; si el niño llora, disparar en inspiración completa",
         parrilla: "Sin parrilla, o con parrilla en sistemas donde no se puede retirar",
         colimacion: "Estrecha a los cuatro lados, hasta los bordes externos del tórax",
@@ -254,8 +254,8 @@ export default {
     {
       id: "torax-ped-lateral-pigg", region: "torax-pediatrico", nombre: "Lateral de tórax pediátrico de pie (Pigg-O-Stat)", categoria: ["Perfil"], tipo: "R", metodo: "Pigg-O-Stat",
       factores: {
-        ri: "18 × 24 cm o 24 × 30 cm (8 × 10\" o 10 × 12\"), vertical",
-        dfri: "180 cm (72\")",
+        ri: "18 × 24 cm o 24 × 30 cm, vertical",
+        dfri: "180 cm",
         respiracion: "Inspiración completa; si el niño llora, sincronizar la exposición con la inspiración completa",
         parrilla: "Sin parrilla, o con parrilla en sistemas donde no se puede retirar",
         colimacion: "Estrecha a los cuatro lados, hasta los bordes externos del tórax",

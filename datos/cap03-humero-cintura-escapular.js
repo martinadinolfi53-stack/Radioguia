@@ -4,7 +4,7 @@
 // Advertencia general del capítulo (pág. 66): no rotar el miembro superior si se sospecha fractura o luxación,
 // salvo orden expresa del médico.
 
-const DFRI = "100 cm (40\")";
+const DFRI = "100 cm";
 const APNEA = "Apnea durante la exposición";
 const TEC_HOMBRO = ["Densidad (brillo) y contraste óptimos.", "Detalle de partes blandas y trabeculación ósea nítidos, sin movimiento."];
 const AVISO_TRAUMA = "No hacer esta proyección si se sospecha fractura o luxación.";
@@ -24,7 +24,7 @@ export default {
     // ───────── Húmero ─────────
     {
       id: "humero-ap", region: "humero", nombre: "AP de húmero", categoria: ["AP"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical; en pacientes pequeños, 30 × 35 cm (11 × 14\"), vertical", dfri: DFRI, respiracion: null, parrilla: "Sí si el grosor supera 10 cm; sin parrilla si es menor de 10 cm", colimacion: "A los lados, hasta los bordes de partes blandas del húmero y el hombro" },
+      factores: { ri: "35 × 43 cm, vertical; en pacientes pequeños, 30 × 35 cm, vertical", dfri: DFRI, respiracion: null, parrilla: "Sí si el grosor supera 10 cm; sin parrilla si es menor de 10 cm", colimacion: "A los lados, hasta los bordes de partes blandas del húmero y el hombro" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media del húmero." },
       posicion: [
         "De pie o en decúbito supino, con el húmero alineado con el eje largo del RI. Si hace falta, colocarlo en diagonal para incluir el codo y el hombro.",
@@ -40,7 +40,7 @@ export default {
     },
     {
       id: "humero-lateral-rotacion", region: "humero", nombre: "Lateral de húmero con rotación", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\") o 30 × 35 cm, vertical", dfri: DFRI, respiracion: null, parrilla: "Sí si el grosor supera 10 cm; sin parrilla si es menor de 10 cm", colimacion: "A los lados, hasta los bordes de partes blandas del húmero y el hombro" },
+      factores: { ri: "35 × 43 cm o 30 × 35 cm, vertical", dfri: DFRI, respiracion: null, parrilla: "Sí si el grosor supera 10 cm; sin parrilla si es menor de 10 cm", colimacion: "A los lados, hasta los bordes de partes blandas del húmero y el hombro" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media del húmero." },
       posicion: [
         "Se puede hacer en PA o AP, de pie o en decúbito supino.",
@@ -58,7 +58,7 @@ export default {
     },
     {
       id: "humero-lateral-trauma", region: "humero", nombre: "Lateral de húmero por traumatismo (medio y distal)", categoria: ["Perfil"], tipo: "E",
-      factores: { ri: "30 × 35 cm (11 × 14\"), horizontal, o 24 × 30 cm (10 × 12\"), horizontal", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, incluyendo las partes media y distal del húmero, el codo y el antebrazo proximal" },
+      factores: { ri: "30 × 35 cm, horizontal, o 24 × 30 cm, horizontal", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados, incluyendo las partes media y distal del húmero, el codo y el antebrazo proximal" },
       rc: { direccion: "horizontal", texto: "Horizontal y perpendicular al RI, centrado en el tercio distal del húmero." },
       posicion: [
         "Levantar el brazo con suavidad y poner un bloque de apoyo debajo. Si se puede, rotar la mano hasta una lateral verdadera del codo.",
@@ -72,7 +72,7 @@ export default {
     },
     {
       id: "humero-transtoracica", region: "humero", nombre: "Lateral transtorácica de húmero (traumatismo)", categoria: ["Perfil"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical", dfri: DFRI, respiracion: "Se prefiere la técnica ortostática (respiración suave), con un tiempo de exposición de al menos 3 segundos (idealmente 4-5)", parrilla: "Sí", colimacion: "Hasta los bordes de partes blandas, incluyendo todo el húmero" },
+      factores: { ri: "35 × 43 cm, vertical", dfri: DFRI, respiracion: "Se prefiere la técnica ortostática (respiración suave), con un tiempo de exposición de al menos 3 segundos (idealmente 4-5)", parrilla: "Sí", colimacion: "Hasta los bordes de partes blandas, incluyendo todo el húmero" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media de la diáfisis del húmero afectado." },
       posicion: [
         "En decúbito o de pie.",
@@ -90,8 +90,8 @@ export default {
     // ───────── Hombro ─────────
     {
       id: "hombro-ap-rotacion", region: "hombro", nombre: "AP de hombro con rotación externa e interna", categoria: ["AP"], tipo: "R",
-      factores: { ri: "24 × 30 cm (10 × 12\"), horizontal (o vertical para mostrar la parte proximal del húmero)", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada a los cuatro lados" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, dirigido 2,5 cm (1\") por debajo de la apófisis coracoides." },
+      factores: { ri: "24 × 30 cm, horizontal (o vertical para mostrar la parte proximal del húmero)", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada a los cuatro lados" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, dirigido 2,5 cm por debajo de la apófisis coracoides." },
       posicion: [
         "De pie (sentado o parado) o en decúbito supino, con el brazo en leve abducción.",
         "Rotar el tórax lo necesario para apoyar el hombro posterior en el RI.",
@@ -110,7 +110,7 @@ export default {
     },
     {
       id: "hombro-axial-lawrence", region: "hombro", nombre: "Axial inferosuperior de hombro", metodo: "Lawrence", categoria: ["Axiales", "Métodos especiales"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí, con las líneas horizontales y el RC en la línea central. A menudo se hace sin parrilla si el hombro es pequeño", colimacion: "Ajustada a los cuatro lados" },
+      factores: { ri: "18 × 24 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí, con las líneas horizontales y el RC en la línea central. A menudo se hace sin parrilla si el hombro es pequeño", colimacion: "Ajustada a los cuatro lados" },
       rc: { direccion: "angulado", angulo: "25-30° medial", texto: "Horizontal, angulado 25-30° hacia medial, apuntando a la axila. Menos ángulo si el brazo no llega a 90° de abducción. El tubo queda cerca de la mesa o camilla, a la altura de la axila." },
       posicion: [
         "Decúbito supino, con el hombro en el borde de la mesa o camilla y un apoyo debajo para centrarlo en el RI. Cabeza girada hacia el lado opuesto.",
@@ -128,7 +128,7 @@ export default {
     },
     {
       id: "hombro-transaxilar-hobbs", region: "hombro", nombre: "PA transaxilar de hombro", metodo: "Modificación de Hobbs", categoria: ["PA", "Métodos especiales"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada a los cuatro lados" },
+      factores: { ri: "18 × 24 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada a los cuatro lados" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la articulación glenohumeral." },
       posicion: [
         "En PA, en decúbito o de pie.",
@@ -144,7 +144,7 @@ export default {
     },
     {
       id: "hombro-axial-clements", region: "hombro", nombre: "Axial inferosuperior de hombro", metodo: "Modificación de Clements", categoria: ["Axiales", "Métodos especiales"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "No (se puede usar si el RC queda perpendicular a ella)", colimacion: "Ajustada a los cuatro lados" },
+      factores: { ri: "18 × 24 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "No (se puede usar si el RC queda perpendicular a ella)", colimacion: "Ajustada a los cuatro lados" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI. Si el paciente no logra 90° de abducción, angular el tubo 5-15° hacia la axila." },
       posicion: [
         "Decúbito lateral sobre el lado sano.",
@@ -160,8 +160,8 @@ export default {
     },
     {
       id: "hombro-grashey", region: "hombro", nombre: "Oblicua AP de hombro (cavidad glenoidea)", metodo: "Grashey", categoria: ["Oblicuas", "Métodos especiales"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Bordes superior y lateral del campo cerca de los bordes de partes blandas" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la articulación escapulohumeral: unos 5 cm (2\") por debajo y hacia medial del borde superolateral del hombro." },
+      factores: { ri: "18 × 24 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Bordes superior y lateral del campo cerca de los bordes de partes blandas" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la articulación escapulohumeral: unos 5 cm por debajo y hacia medial del borde superolateral del hombro." },
       posicion: [
         "De pie (preferible) o en decúbito supino.",
         "Oblicua de 35-45° hacia el lado a estudiar: el cuerpo de la escápula tiene que quedar paralelo al RI. Mano y brazo en rotación neutra.",
@@ -177,7 +177,7 @@ export default {
     },
     {
       id: "hombro-fisk", region: "hombro", nombre: "Tangencial del surco intertubercular (corredera bicipital)", metodo: "Modificación de Fisk", categoria: ["Tangenciales", "Métodos especiales"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "No", colimacion: "Ajustada a los cuatro lados, a la parte anterior de la cabeza humeral" },
+      factores: { ri: "18 × 24 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "No", colimacion: "Ajustada a los cuatro lados, a la parte anterior de la cabeza humeral" },
       rc: { direccion: "variable", texto: "En decúbito supino: tubo angulado 10-15° hacia posterior desde la horizontal, de modo que el haz entre tangencial al surco bicipital, con el RI vertical apoyado en la parte superior del hombro y perpendicular al RC. De pie: RC vertical, perpendicular al RI." },
       posicion: [
         "En decúbito supino o de pie. Palpar la cabeza humeral anterior para ubicar el surco.",
@@ -193,7 +193,7 @@ export default {
     },
     {
       id: "hombro-y-escapula-neer", region: "hombro", nombre: "Oblicua PA de hombro por traumatismo (lateral en Y de escápula)", metodo: "Neer", categoria: ["Oblicuas", "Métodos especiales"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada a los cuatro lados, al área de interés" },
+      factores: { ri: "24 × 30 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada a los cuatro lados, al área de interés" },
       rc: { direccion: "perpendicular", texto: "Y de escápula: perpendicular al RI, centrado en la articulación escapulohumeral. Método de Neer: angulado 10-15° caudal, en el borde superior de la cabeza humeral, para ver mejor la salida del supraespinoso." },
       posicion: [
         "De pie (preferible) o en decúbito.",
@@ -211,7 +211,7 @@ export default {
     },
     {
       id: "hombro-ap-neutra", region: "hombro", nombre: "AP de hombro en rotación neutra (traumatismo)", categoria: ["AP"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\"), horizontal (o vertical para incluir más húmero si la lesión llega a su mitad proximal)", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Cuatro lados, ajustada al área de interés" },
+      factores: { ri: "24 × 30 cm, horizontal (o vertical para incluir más húmero si la lesión llega a su mitad proximal)", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Cuatro lados, ajustada al área de interés" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, unos 2 cm (¾\") por debajo de la apófisis coracoides." },
       posicion: [
         "De pie (sentado o parado) o en decúbito supino, con el brazo en leve abducción.",
@@ -225,7 +225,7 @@ export default {
     },
     {
       id: "hombro-transtoracica-lawrence", region: "hombro", nombre: "Lateral transtorácica de hombro (traumatismo)", metodo: "Lawrence", categoria: ["Perfil", "Métodos especiales"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: "Exponer en inspiración completa; se prefiere la técnica ortostática (respiración suave) si el paciente colabora", parrilla: "Sí", colimacion: "Cuatro lados, ajustada al área de interés" },
+      factores: { ri: "24 × 30 cm, vertical", dfri: DFRI, respiracion: "Exponer en inspiración completa; se prefiere la técnica ortostática (respiración suave) si el paciente colabora", parrilla: "Sí", colimacion: "Cuatro lados, ajustada al área de interés" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, atravesando el tórax hasta el cuello quirúrgico. Si no se puede elevar el hombro sano, angular el RC 10-15° cefálico para que no se superponga." },
       posicion: [
         "De pie o en decúbito supino, con el brazo afectado apoyado en el RI, al costado y en rotación neutra.",
@@ -243,7 +243,7 @@ export default {
     },
     {
       id: "hombro-garth", region: "hombro", nombre: "AP axial oblicua apical de hombro (traumatismo)", metodo: "Garth", categoria: ["Axiales", "Oblicuas", "Métodos especiales"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Cuatro lados, ajustada al área de interés" },
+      factores: { ri: "24 × 30 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Cuatro lados, ajustada al área de interés" },
       rc: { direccion: "caudal", angulo: "45°", texto: "Angulado 45° caudal, dirigido a la cara medial de la articulación escapulohumeral." },
       posicion: [
         "De pie de preferencia (en decúbito si hace falta).",
@@ -261,8 +261,8 @@ export default {
     },
     {
       id: "hombro-ap-axial-apical", region: "hombro", nombre: "AP axial apical de hombro", categoria: ["Axiales"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\") o 24 × 30 cm (10 × 12\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta los bordes de partes blandas del hombro" },
-      rc: { direccion: "caudal", angulo: "30°", texto: "Angulado 30° caudal, entrando 1,25 cm (½\") por encima de la apófisis coracoides." },
+      factores: { ri: "18 × 24 cm o 24 × 30 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta los bordes de partes blandas del hombro" },
+      rc: { direccion: "caudal", angulo: "30°", texto: "Angulado 30° caudal, entrando 1,25 cm por encima de la apófisis coracoides." },
       posicion: [
         "De pie de preferencia.",
         "Sin rotación.",
@@ -280,7 +280,7 @@ export default {
     // ───────── Clavícula ─────────
     {
       id: "clavicula-ap-axial", region: "clavicula", nombre: "AP y AP axial de clavícula", categoria: ["AP", "Axiales"], tipo: "R",
-      factores: { ri: "24 × 30 cm (10 × 12\"), horizontal", dfri: DFRI, respiracion: "Exponer en inspiración completa", parrilla: "Sí", colimacion: "Hasta el área de la clavícula, asegurando que entren las articulaciones AC y esternoclavicular" },
+      factores: { ri: "24 × 30 cm, horizontal", dfri: DFRI, respiracion: "Exponer en inspiración completa", parrilla: "Sí", colimacion: "Hasta el área de la clavícula, asegurando que entren las articulaciones AC y esternoclavicular" },
       rc: { direccion: "variable", texto: "En la parte media de la clavícula. AP: perpendicular. AP axial: 15-30° cefálico; en hombros delgados hace falta 5-15° más que en hombros gruesos." },
       posicion: [
         "De pie o en decúbito.",
@@ -299,8 +299,8 @@ export default {
     // ───────── Escápula ─────────
     {
       id: "escapula-ap", region: "escapula", nombre: "AP de escápula", categoria: ["AP"], tipo: "R",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: "Respiración suave o apnea durante la exposición", parrilla: "Sí", colimacion: "Cuatro lados, hasta los bordes de la escápula" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, en la parte media de la escápula: unos 5 cm (2\") por debajo de la apófisis coracoides y unos 5 cm (2\") hacia medial del borde lateral del paciente." },
+      factores: { ri: "24 × 30 cm, vertical", dfri: DFRI, respiracion: "Respiración suave o apnea durante la exposición", parrilla: "Sí", colimacion: "Cuatro lados, hasta los bordes de la escápula" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, en la parte media de la escápula: unos 5 cm por debajo de la apófisis coracoides y unos 5 cm hacia medial del borde lateral del paciente." },
       posicion: [
         "De pie o en decúbito supino (de pie es preferible si hay dolor en la zona de la escápula).",
         "Abducir con suavidad el brazo 90°, si se puede, y supinar la mano: así las costillas se superponen menos a la escápula.",
@@ -315,7 +315,7 @@ export default {
     },
     {
       id: "escapula-lateral", region: "escapula", nombre: "Lateral de escápula (de pie o en decúbito)", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: null, colimacion: "Hasta la región escapular" },
+      factores: { ri: "24 × 30 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: null, colimacion: "Hasta la región escapular" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, en el borde medial (vertebral) de la escápula, a mitad de su altura." },
       posicion: [
         "De pie (preferible) o en decúbito.",
@@ -334,7 +334,7 @@ export default {
     // ───────── Articulaciones AC ─────────
     {
       id: "ac-pearson", region: "acromioclaviculares", nombre: "AP bilateral de articulaciones acromioclaviculares (con y sin pesos)", metodo: "Pearson", categoria: ["AP", "Métodos especiales"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal; o dos de 18 × 24 cm (8 × 10\"), horizontal, en hombros anchos", dfri: "100 cm (42\"); para estudios bilaterales en un único RI se recomienda 180 cm (72\")", respiracion: APNEA, parrilla: "Con o sin parrilla, según el tamaño de los hombros (se recomienda en los más anchos)", colimacion: "Campo horizontal, largo y estrecho" },
+      factores: { ri: "35 × 43 cm, horizontal; o dos de 18 × 24 cm, horizontal, en hombros anchos", dfri: "100 cm; para estudios bilaterales en un único RI se recomienda 180 cm", respiracion: APNEA, parrilla: "Con o sin parrilla, según el tamaño de los hombros (se recomienda en los más anchos)", colimacion: "Campo horizontal, largo y estrecho" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la escotadura yugular." },
       posicion: [
         "De pie si se puede, o sentado en una silla.",

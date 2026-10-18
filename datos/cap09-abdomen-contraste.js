@@ -9,13 +9,13 @@
 // En el índice del capítulo solo las proyecciones de abdomen llevan la marca (R)/(E); en los estudios con contraste
 // no hay marca y se cargan como "R" con una entrada de revisión.
 
-const DFRI = "100 cm (40\")";
-const RI_35x43_V = "35 × 43 cm (14 × 17\"), vertical";
-const RI_ESTOMAGO = "30 × 35 cm (11 × 14\") o 24 × 30 cm (10 × 12\"), vertical";
+const DFRI = "100 cm";
+const RI_35x43_V = "35 × 43 cm, vertical";
+const RI_ESTOMAGO = "30 × 35 cm o 24 × 30 cm, vertical";
 const ESPIRACION = "Exponer al final de la espiración";
 const ESPIRACION_COMPLETA = "Exponer al final de una espiración completa";
 const COLIM_RI = "Hasta los bordes externos del RI o hasta el área de interés";
-const COLIM_ESOF = "Hasta el área de interés (≈12-15 cm [5-6\"] de ancho)";
+const COLIM_ESOF = "Hasta el área de interés (≈12-15 cm de ancho)";
 const RESP_ESOF = "Con bario fluido, exponer durante la deglución (después de 3 o 4 sorbos). Con bario espeso, exponer enseguida después de tragar; en general el paciente no respira justo después de la deglución";
 const SIN_CRIT = []; // el manual no trae página de criterios: se deja vacío para completar después
 const TEC_ESTOMAGO = ["Densidad (brillo) y contraste óptimos para ver los pliegues gástricos sin sobreexponer otras estructuras.", "Bordes estructurales nítidos, sin movimiento."];
@@ -58,12 +58,12 @@ export default {
     {
       id: "abdomen-ap-bipedestacion", region: "abdomen", nombre: "AP de abdomen en bipedestación", categoria: ["AP"], tipo: "E",
       factores: { ri: RI_35x43_V, dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: "Hasta los bordes de las partes blandas del abdomen y el diafragma" },
-      rc: { direccion: "horizontal", texto: "Horizontal, al centro del RI (5 cm [2\"] por encima de la cresta ilíaca)." },
+      rc: { direccion: "horizontal", texto: "Horizontal, al centro del RI (5 cm por encima de la cresta ilíaca)." },
       posicion: [
         "El paciente tiene que estar de pie como mínimo 5 minutos antes de la exposición; mejor 10-20 minutos.",
         "De pie, espalda apoyada en el tablero o Bucky mural, brazos a los costados.",
         "Plano mediosagital alineado y centrado con la línea media, sin rotación.",
-        "Centro del RI unos 5 cm (2\") por encima de la cresta ilíaca, para incluir el diafragma (en pacientes esténicos, el borde superior del RI queda a la altura de la axila).",
+        "Centro del RI unos 5 cm por encima de la cresta ilíaca, para incluir el diafragma (en pacientes esténicos, el borde superior del RI queda a la altura de la axila).",
         "Usar marcador de posición en bipedestación.",
       ],
       criterios: [
@@ -75,13 +75,13 @@ export default {
     },
     {
       id: "abdomen-decubito-lateral", region: "abdomen", nombre: "Decúbito lateral (AP) de abdomen", categoria: ["AP", "Decúbitos"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: "Hasta los bordes de las partes blandas del abdomen y el diafragma" },
-      rc: { direccion: "horizontal", texto: "Horizontal, al centro del RI (unos 5 cm [2\"] por encima de la cresta ilíaca)." },
+      factores: { ri: "35 × 43 cm, horizontal", dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: "Hasta los bordes de las partes blandas del abdomen y el diafragma" },
+      rc: { direccion: "horizontal", texto: "Horizontal, al centro del RI (unos 5 cm por encima de la cresta ilíaca)." },
       posicion: [
         "El paciente tiene que estar en decúbito lateral como mínimo 5 minutos antes de la exposición; mejor 10-20 minutos.",
         "Trabar las ruedas de la camilla.",
         "Decúbito lateral sobre un tablero de decúbito o un apoyo que eleve la parte inferior del abdomen; rodillas algo flexionadas y brazos hacia arriba, cerca de la cabeza.",
-        "Acomodar paciente y camilla para que el centro del RI y del tablero mural (y el RC) quede unos 5 cm (2\") por encima de la cresta ilíaca, para incluir el diafragma.",
+        "Acomodar paciente y camilla para que el centro del RI y del tablero mural (y el RC) quede unos 5 cm por encima de la cresta ilíaca, para incluir el diafragma.",
         "Ajustar la altura del RI para que entre el borde superior del abdomen y se pueda detectar aire libre.",
         "Usar marcador de decúbito y una flecha que indique el lado de arriba.",
       ],
@@ -95,12 +95,12 @@ export default {
     },
     {
       id: "abdomen-decubito-dorsal", region: "abdomen", nombre: "Decúbito dorsal (lateral) de abdomen", categoria: ["Perfil", "Decúbitos"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: "Hasta los bordes superior e inferior de las partes blandas del abdomen" },
+      factores: { ri: "35 × 43 cm, horizontal", dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: "Hasta los bordes superior e inferior de las partes blandas del abdomen" },
       rc: { direccion: "horizontal", texto: "Horizontal, al centro del RI." },
       posicion: [
         "Decúbito supino sobre un tablero de decúbito o un apoyo que eleve la parte posterior del abdomen, con el costado contra la mesa o camilla y los brazos por encima de la cabeza.",
         "Fijar la camilla (trabar las ruedas).",
-        "Centro del RI y del tablero mural (y el RC) a la altura de la cresta ilíaca (5 cm [2\"] por encima de la cresta, para incluir el diafragma).",
+        "Centro del RI y del tablero mural (y el RC) a la altura de la cresta ilíaca (5 cm por encima de la cresta, para incluir el diafragma).",
         "Ajustar la altura del RI para que el plano mediocoronal coincida con su línea central.",
         "Incluir marcador de decúbito.",
       ],
@@ -109,15 +109,15 @@ export default {
         ["Posicionamiento", ["Sin rotación: alas ilíacas y diafragma simétricos.", "Se ven los espacios de las articulaciones intervertebrales y los cuerpos vertebrales."]],
         ["Criterios técnicos", ["Densidad (brillo) y contraste óptimos para ver tejidos blandos y columna lumbar.", "Se ven las partes blandas y el aire intraperitoneal que haya, en pacientes de tamaño medio, sin movimiento."]],
       ],
-      revision: ["Centrado: el manual dice que el centro del RI va \"al nivel de la cresta ilíaca\" y entre paréntesis \"5 cm [2\"] por encima de la cresta ilíaca\". Las dos indicaciones no coinciden; hay que confirmar cuál vale."],
+      revision: ["Centrado: el manual dice que el centro del RI va \"al nivel de la cresta ilíaca\" y entre paréntesis \"5 cm por encima de la cresta ilíaca\". Las dos indicaciones no coinciden; hay que confirmar cuál vale."],
       fuente: { paginas: [278, 279] }, ilustracion: null, estado: "pendiente-revision",
     },
 
     // ───────── Abdomen pediátrico ─────────
     {
       id: "abdomen-ped-ap-supino", region: "abdomen-pediatrico", nombre: "AP de abdomen pediátrico en decúbito supino (RUV)", categoria: ["AP"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\"), 24 × 30 cm (10 × 12\") o 30 × 35 cm (11 × 14\"), vertical (según el tamaño del paciente)", dfri: DFRI, respiracion: "Exponer en espiración o cuando el abdomen se mueva menos. Si el paciente llora, exponer en espiración completa", parrilla: "Pantalla si el grosor es menor de 10 cm; parrilla si es mayor de 10 cm", colimacion: "A los cuatro lados, hasta los bordes del abdomen" },
-      rc: { direccion: "perpendicular", texto: "Desde recién nacidos hasta 1 año: 2,5 cm (1\") por encima de la cresta ilíaca. Niños mayores: a la altura del ombligo." },
+      factores: { ri: "18 × 24 cm, 24 × 30 cm o 30 × 35 cm, vertical (según el tamaño del paciente)", dfri: DFRI, respiracion: "Exponer en espiración o cuando el abdomen se mueva menos. Si el paciente llora, exponer en espiración completa", parrilla: "Pantalla si el grosor es menor de 10 cm; parrilla si es mayor de 10 cm", colimacion: "A los cuatro lados, hasta los bordes del abdomen" },
+      rc: { direccion: "perpendicular", texto: "Desde recién nacidos hasta 1 año: 2,5 cm por encima de la cresta ilíaca. Niños mayores: a la altura del ombligo." },
       posicion: [
         "Lactante en decúbito supino, con los brazos inmovilizados por encima de la cabeza (venda elástica, cinta adhesiva o bolsas de arena).",
         "Piernas inmovilizadas con venda elástica o cinta y bolsas de arena.",
@@ -134,8 +134,8 @@ export default {
     },
     {
       id: "abdomen-ped-ap-bipedestacion", region: "abdomen-pediatrico", nombre: "AP de abdomen pediátrico en bipedestación", metodo: "Pigg-O-Stat", categoria: ["AP"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\"), 24 × 30 cm (10 × 12\") o 30 × 35 cm (11 × 14\"), vertical (según el tamaño del paciente)", dfri: DFRI, respiracion: "Exponer en espiración o cuando haya menos movimiento", parrilla: "Pantalla si el grosor es menor de 10 cm; parrilla si es mayor de 10 cm", colimacion: "A los cuatro lados, hasta los bordes del abdomen" },
-      rc: { direccion: "perpendicular", texto: "Desde recién nacidos hasta 1 año: 2,5 cm (1\") por encima del ombligo. Niños mayores: ≈2,5-5 cm (1-2\") por encima de la cresta ilíaca, según la altura del niño." },
+      factores: { ri: "18 × 24 cm, 24 × 30 cm o 30 × 35 cm, vertical (según el tamaño del paciente)", dfri: DFRI, respiracion: "Exponer en espiración o cuando haya menos movimiento", parrilla: "Pantalla si el grosor es menor de 10 cm; parrilla si es mayor de 10 cm", colimacion: "A los cuatro lados, hasta los bordes del abdomen" },
+      rc: { direccion: "perpendicular", texto: "Desde recién nacidos hasta 1 año: 2,5 cm por encima del ombligo. Niños mayores: ≈2,5-5 cm por encima de la cresta ilíaca, según la altura del niño." },
       posicion: [
         "Paciente sentado, con las piernas pasadas por las aberturas del dispositivo (la figura muestra un Pigg-O-Stat).",
         "Brazos por encima de la cabeza, con las piezas laterales del dispositivo bien ajustadas al cuerpo.",
@@ -154,12 +154,12 @@ export default {
     {
       id: "esofagograma-oad", region: "esofagograma", nombre: "Esofagograma: OAD", categoria: ["Oblicuas"], tipo: null,
       factores: { ri: RI_35x43_V, dfri: DFRI, respiracion: RESP_ESOF, parrilla: "Sí", colimacion: COLIM_ESOF },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI (≈5-8 cm [2-3\"] distal a la escotadura yugular, a la altura de T6)." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI (≈5-8 cm distal a la escotadura yugular, a la altura de T6)." },
       posicion: [
         "En decúbito o de pie; se prefiere el decúbito porque el esófago se llena más completo.",
         "Rotar 35-40° desde el decúbito prono hacia el lado derecho, con el brazo derecho abajo y el izquierdo arriba; el paciente sostiene el vaso con la mano izquierda y la pajita en la boca.",
         "Tórax centrado en la línea central.",
-        "Borde superior del RI ≈5 cm (2\") por encima del hombro.",
+        "Borde superior del RI ≈5 cm por encima del hombro.",
       ],
       criterios: [
         ["Estructuras que se ven", ["El esófago entre la columna vertebral y el corazón."]],
@@ -170,13 +170,13 @@ export default {
     },
     {
       id: "esofagograma-lateral", region: "esofagograma", nombre: "Esofagograma: lateral", categoria: ["Perfil"], tipo: null,
-      factores: { ri: RI_35x43_V, dfri: "100 cm (40\") o 180 cm (72\") si se hace en bipedestación", respiracion: RESP_ESOF, parrilla: "Sí", colimacion: COLIM_ESOF },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI (≈5-8 cm [2-3\"] distal a la escotadura yugular, a la altura de T6)." },
+      factores: { ri: RI_35x43_V, dfri: "100 cm o 180 cm si se hace en bipedestación", respiracion: RESP_ESOF, parrilla: "Sí", colimacion: COLIM_ESOF },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI (≈5-8 cm distal a la escotadura yugular, a la altura de T6)." },
       posicion: [
         "En decúbito o de pie; se prefiere el decúbito.",
         "Lateral derecha en decúbito, con el brazo y el hombro derechos hacia arriba y adelante (sosteniendo el vaso).",
         "Plano mediocoronal centrado en la línea central.",
-        "Borde superior del RI ≈5 cm (2\") por encima de la parte alta del hombro.",
+        "Borde superior del RI ≈5 cm por encima de la parte alta del hombro.",
       ],
       criterios: [
         ["Estructuras que se ven", ["Todo el esófago entre la columna torácica y el corazón."]],
@@ -187,12 +187,12 @@ export default {
     },
     {
       id: "esofagograma-ap-pa", region: "esofagograma", nombre: "Esofagograma: AP (PA)", categoria: ["AP", "PA"], tipo: null,
-      factores: { ri: RI_35x43_V, dfri: "100 cm (40\") o 180 cm (72\") si se hace en bipedestación", respiracion: "Con bario fluido, exponer durante la deglución (después de 3 o 4 sorbos). Con bario espeso, exponer enseguida después de tragar", parrilla: "Sí", colimacion: COLIM_ESOF },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI (≈8 cm [3\"] por debajo de la escotadura yugular, en T6)." },
+      factores: { ri: RI_35x43_V, dfri: "100 cm o 180 cm si se hace en bipedestación", respiracion: "Con bario fluido, exponer durante la deglución (después de 3 o 4 sorbos). Con bario espeso, exponer enseguida después de tragar", parrilla: "Sí", colimacion: COLIM_ESOF },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI (≈8 cm por debajo de la escotadura yugular, en T6)." },
       posicion: [
         "En decúbito supino o de pie; se prefiere el decúbito supino (de pie se puede obtener una PA).",
         "Paciente centrado en la línea media de la mesa.",
-        "Borde superior del RI ≈5 cm (2\") por encima de la parte alta del hombro.",
+        "Borde superior del RI ≈5 cm por encima de la parte alta del hombro.",
         "Brazo izquierdo al costado; sostiene el vaso con la mano derecha y la pajita en la boca.",
       ],
       criterios: SIN_CRIT,
@@ -202,8 +202,8 @@ export default {
     // ───────── Tracto digestivo superior (estómago) ─────────
     {
       id: "estomago-pa", region: "estomago", nombre: "Tracto digestivo superior (estómago): PA", categoria: ["PA"], tipo: null,
-      factores: { ri: "35 × 43 cm (14 × 17\"), 30 × 35 cm (11 × 14\") o 24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "perpendicular", texto: "Perpendicular. Esténico: ≈2,5-5 cm (1-2\") por encima del reborde costal inferior (nivel de L1) y ≈2,5 cm (1\") a la izquierda de la columna. Hiperesténico: 5 cm (2\") por encima de L1 y más cerca de la línea media. Asténico: ≈5 cm (2\") por debajo del nivel de T1 [sic] y más cerca de la línea media." },
+      factores: { ri: "35 × 43 cm, 30 × 35 cm o 24 × 30 cm, vertical", dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: COLIM_RI },
+      rc: { direccion: "perpendicular", texto: "Perpendicular. Esténico: ≈2,5-5 cm por encima del reborde costal inferior (nivel de L1) y ≈2,5 cm a la izquierda de la columna. Hiperesténico: 5 cm por encima de L1 y más cerca de la línea media. Asténico: ≈5 cm por debajo del nivel de T1 [sic] y más cerca de la línea media." },
       posicion: [
         "Decúbito prono, con los brazos arriba junto a la cabeza.",
         "Paciente y RI alineados y centrados con el RC.",
@@ -219,7 +219,7 @@ export default {
     {
       id: "estomago-oad", region: "estomago", nombre: "Tracto digestivo superior (estómago): OAD", categoria: ["Oblicuas"], tipo: null,
       factores: { ri: RI_ESTOMAGO, dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI. Esténico: ≈2,5-5 cm (1-2\") por encima de las costillas inferiores, a mitad de camino entre la columna y el borde abdominal lateral izquierdo (que queda arriba), con oblicuidad de 45-55°. Hiperesténico: 5 cm (2\") por encima de L1, más cerca de la línea media, oblicuidad ≈70°. Asténico: ≈5 cm (2\") por debajo de L1, oblicuidad ≈40°." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI. Esténico: ≈2,5-5 cm por encima de las costillas inferiores, a mitad de camino entre la columna y el borde abdominal lateral izquierdo (que queda arriba), con oblicuidad de 45-55°. Hiperesténico: 5 cm por encima de L1, más cerca de la línea media, oblicuidad ≈70°. Asténico: ≈5 cm por debajo de L1, oblicuidad ≈40°." },
       posicion: [
         "Semiprono, rotado 40-70° desde el decúbito prono, con el lado anterior derecho apoyado en la mesa.",
         "Brazo derecho abajo y brazo izquierdo arriba; flexionar un poco la cadera y la rodilla izquierdas.",
@@ -235,7 +235,7 @@ export default {
     {
       id: "estomago-lateral-derecha", region: "estomago", nombre: "Tracto digestivo superior (estómago): lateral derecha", categoria: ["Perfil"], tipo: null,
       factores: { ri: RI_ESTOMAGO, dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI. Esténico: en el reborde costal a la altura de L1 y 2,5-4 cm (1-1½\") por delante del plano mediocoronal (a mitad de camino entre el borde anterior de las vértebras y la cara anterior del abdomen). Hiperesténico: ≈5 cm (2\") por encima de L1. Asténico: ≈5 cm (2\") por debajo de L1." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI. Esténico: en el reborde costal a la altura de L1 y 2,5-4 cm por delante del plano mediocoronal (a mitad de camino entre el borde anterior de las vértebras y la cara anterior del abdomen). Hiperesténico: ≈5 cm por encima de L1. Asténico: ≈5 cm por debajo de L1." },
       posicion: [
         "Paciente acostado sobre el costado derecho, brazos arriba, caderas y rodillas algo flexionadas.",
         "Paciente y RI alineados y centrados con el RC.",
@@ -249,8 +249,8 @@ export default {
     },
     {
       id: "estomago-ap", region: "estomago", nombre: "Tracto digestivo superior (estómago): AP", categoria: ["AP"], tipo: null,
-      factores: { ri: "30 × 35 cm (11 × 14\") o 35 × 43 cm (14 × 17\"), vertical", dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, 2,5-5 cm (1-2\") a la izquierda del PMS. Esténico: a la altura de L1 (a mitad de camino entre la apófisis xifoides y el nivel de las costillas laterales inferiores). Hiperesténico: ≈5 cm (2\") por encima de L1. Asténico: ≈5 cm (2\") por debajo de L1 y más cerca de la línea media." },
+      factores: { ri: "30 × 35 cm o 35 × 43 cm, vertical", dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: COLIM_RI },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, 2,5-5 cm a la izquierda del PMS. Esténico: a la altura de L1 (a mitad de camino entre la apófisis xifoides y el nivel de las costillas laterales inferiores). Hiperesténico: ≈5 cm por encima de L1. Asténico: ≈5 cm por debajo de L1 y más cerca de la línea media." },
       posicion: [
         "Decúbito supino, brazos a los costados.",
         "Paciente y RI alineados y centrados con el RC.",
@@ -266,7 +266,7 @@ export default {
     {
       id: "estomago-opi", region: "estomago", nombre: "Tracto digestivo superior (estómago): OPI", categoria: ["Oblicuas"], tipo: null,
       factores: { ri: RI_ESTOMAGO, dfri: DFRI, respiracion: ESPIRACION, parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la mitad izquierda del abdomen. Esténico: en L1 (a mitad de camino entre la apófisis xifoides y el nivel de las costillas laterales inferiores), oblicuidad 45°. Hiperesténico: 5 cm (2\") por encima de L1, oblicuidad 60°. Asténico: ≈5 cm (2\") por debajo de L1 y más cerca de la línea media, oblicuidad 30°." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la mitad izquierda del abdomen. Esténico: en L1 (a mitad de camino entre la apófisis xifoides y el nivel de las costillas laterales inferiores), oblicuidad 45°. Hiperesténico: 5 cm por encima de L1, oblicuidad 60°. Asténico: ≈5 cm por debajo de L1 y más cerca de la línea media, oblicuidad 30°." },
       posicion: [
         "Semisupino, oblicuo 30-60° con el lado izquierdo abajo y la rodilla derecha algo flexionada (más rotación en hiperesténicos).",
         "Paciente y RI centrados con el RC.",
@@ -283,7 +283,7 @@ export default {
     {
       id: "intestino-delgado-pa", region: "intestino-delgado", nombre: "Intestino delgado: PA", categoria: ["PA"], tipo: null,
       factores: { ri: RI_35x43_V, dfri: DFRI, respiracion: ESPIRACION_COMPLETA, parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, al centro del RI: ≈5 cm (2\") por encima de la cresta ilíaca en las primeras exposiciones (15 o 30 minutos) y en la cresta ilíaca en las siguientes." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, al centro del RI: ≈5 cm por encima de la cresta ilíaca en las primeras exposiciones (15 o 30 minutos) y en la cresta ilíaca en las siguientes." },
       posicion: [
         "Se prefiere el decúbito prono (si hace falta, se puede hacer AP en decúbito supino).",
         "PMS alineado con la línea media de la mesa, sin rotación.",
@@ -319,7 +319,7 @@ export default {
     {
       id: "enema-opaco-oblicuas", region: "enema-opaco", nombre: "Enema opaco: OAD y OAI (OPD y OPI)", categoria: ["Oblicuas"], tipo: null,
       factores: { ri: RI_35x43_V, dfri: DFRI, respiracion: "Exponer en espiración", parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI: 2,5-5 cm (1-2\") por encima de la cresta ilíaca y 2,5 cm (1\") a la izquierda del PMS." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI: 2,5-5 cm por encima de la cresta ilíaca y 2,5 cm a la izquierda del PMS." },
       posicion: [
         "Semiprono (PA) o semisupino (AP), rotado 35-45°.",
         "Abdomen alineado y centrado en la línea media de la mesa.",
@@ -332,7 +332,7 @@ export default {
       ],
       notas: [
         "Habitualmente se hacen las dos oblicuas, derecha e izquierda.",
-        "Muchos pacientes necesitan un segundo RI centrado ≈5 cm (2\") más arriba para incluir la flexura cólica izquierda; esto pesa más en la OAI y la OPD (seguir el protocolo del servicio).",
+        "Muchos pacientes necesitan un segundo RI centrado ≈5 cm más arriba para incluir la flexura cólica izquierda; esto pesa más en la OAI y la OPD (seguir el protocolo del servicio).",
       ],
       fuente: { paginas: [298, 299] }, ilustracion: null, estado: "pendiente-revision",
     },
@@ -370,8 +370,8 @@ export default {
     },
     {
       id: "enema-opaco-ap-pa-axial", region: "enema-opaco", nombre: "Enema opaco: AP (PA) axial", categoria: ["Axiales", "AP", "PA"], tipo: null,
-      factores: { ri: "30 × 35 cm (11 × 14\"), vertical", dfri: DFRI, respiracion: "Exponer en espiración completa", parrilla: "Sí", colimacion: "Hasta el área de interés" },
-      rc: { direccion: "variable", angulo: "30-40°", texto: "AP axial: 30-40° cefálico, 5 cm (2\") por debajo de las EIAS. PA axial: 30-40° caudal, centrado para que salga a la altura de las EIAS. OPI axial: 5 cm (2\") por debajo y 5 cm (2\") medial a la EIAS derecha." },
+      factores: { ri: "30 × 35 cm, vertical", dfri: DFRI, respiracion: "Exponer en espiración completa", parrilla: "Sí", colimacion: "Hasta el área de interés" },
+      rc: { direccion: "variable", angulo: "30-40°", texto: "AP axial: 30-40° cefálico, 5 cm por debajo de las EIAS. PA axial: 30-40° caudal, centrado para que salga a la altura de las EIAS. OPI axial: 5 cm por debajo y 5 cm medial a la EIAS derecha." },
       posicion: [
         "Decúbito supino (AP) o prono (PA), paciente alineado y centrado en la línea media de la mesa.",
         "Alternativa oblicua: OPI u OAD, con el paciente oblicuo 30-40°.",
@@ -387,8 +387,8 @@ export default {
     // ───────── Urografía intravenosa ─────────
     {
       id: "urografia-ap", region: "urografia", nombre: "Urografía intravenosa (UIV): AP (PA) exploradora y serie", categoria: ["AP", "PA"], tipo: null,
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical; 30 × 35 cm (11 × 14\"), horizontal, para nefrotomografía", dfri: DFRI, respiracion: ESPIRACION_COMPLETA, parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI, a la altura de la cresta ilíaca, o 2,5-5 cm (1-2\") por encima de las crestas en pacientes de torso largo, sumando un segundo RI más chico en transversal para la vejiga, con la sínfisis del pubis en su borde inferior. Nefrograma: RC a mitad de camino entre el apéndice xifoides y la cresta ilíaca." },
+      factores: { ri: "35 × 43 cm, vertical; 30 × 35 cm, horizontal, para nefrotomografía", dfri: DFRI, respiracion: ESPIRACION_COMPLETA, parrilla: "Sí", colimacion: COLIM_RI },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI, a la altura de la cresta ilíaca, o 2,5-5 cm por encima de las crestas en pacientes de torso largo, sumando un segundo RI más chico en transversal para la vejiga, con la sínfisis del pubis en su borde inferior. Nefrograma: RC a mitad de camino entre el apéndice xifoides y la cresta ilíaca." },
       posicion: [
         "Decúbito supino, plano mediosagital alineado y centrado en la línea media de la mesa, con apoyo debajo de las rodillas y sin rotación.",
         "Incluir marcador de minutos cuando corresponda.",
@@ -423,7 +423,7 @@ export default {
     {
       id: "urografia-ap-posmiccional", region: "urografia", nombre: "UIV: AP en bipedestación (posmiccional)", categoria: ["AP"], tipo: null,
       factores: { ri: RI_35x43_V, dfri: DFRI, respiracion: ESPIRACION_COMPLETA, parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI (a la altura de las crestas ilíacas o ≈2,5 cm [1\"] más abajo, para incluir la vejiga)." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, al centro del RI (a la altura de las crestas ilíacas o ≈2,5 cm más abajo, para incluir la vejiga)." },
       posicion: [
         "De pie, plano mediosagital alineado y centrado en la línea media de la mesa, sin rotación.",
         "RI centrado en la cresta ilíaca, asegurando que entren la vejiga y la sínfisis del pubis.",
@@ -436,8 +436,8 @@ export default {
     // ───────── Cistografía ─────────
     {
       id: "cistografia-ap-axial", region: "cistografia", nombre: "Cistograma: AP axial", categoria: ["Axiales"], tipo: null,
-      factores: { ri: "30 × 35 cm (11 × 14\"), vertical", dfri: DFRI, respiracion: ESPIRACION_COMPLETA, parrilla: "Sí", colimacion: COLIM_RI },
-      rc: { direccion: "caudal", angulo: "10-15°", texto: "10-15° caudal, centrado ≈5 cm (2\") por encima de la sínfisis del pubis en el PMS (proyecta el pubis hacia abajo para ver mejor la vejiga)." },
+      factores: { ri: "30 × 35 cm, vertical", dfri: DFRI, respiracion: ESPIRACION_COMPLETA, parrilla: "Sí", colimacion: COLIM_RI },
+      rc: { direccion: "caudal", angulo: "10-15°", texto: "10-15° caudal, centrado ≈5 cm por encima de la sínfisis del pubis en el PMS (proyecta el pubis hacia abajo para ver mejor la vejiga)." },
       posicion: [
         "Decúbito supino, plano mediosagital alineado y centrado en la línea media de la mesa, piernas bien extendidas.",
         "RI centrado con el RC proyectado.",
@@ -451,8 +451,8 @@ export default {
     },
     {
       id: "cistografia-oblicuas", region: "cistografia", nombre: "Cistograma: oblicuas posteriores (OPD, OPI)", categoria: ["Oblicuas"], tipo: null,
-      factores: { ri: "30 × 35 cm (11 × 14\"), vertical", dfri: DFRI, respiracion: "Exponer en espiración", parrilla: "Sí", colimacion: "Hasta los bordes del RI o hasta el área de interés" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, ≈5 cm (2\") por encima de la sínfisis del pubis y 5 cm (2\") medial a la EIAS elevada." },
+      factores: { ri: "30 × 35 cm, vertical", dfri: DFRI, respiracion: "Exponer en espiración", parrilla: "Sí", colimacion: "Hasta los bordes del RI o hasta el área de interés" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, ≈5 cm por encima de la sínfisis del pubis y 5 cm medial a la EIAS elevada." },
       posicion: [
         "Semisupino, oblicuo 45-60° (a 60° se ve mejor la cara posterolateral de la vejiga y la unión UV).",
         "Flexionar el brazo y la pierna del lado elevado para sostener la posición.",
@@ -467,8 +467,8 @@ export default {
     },
     {
       id: "cistografia-lateral", region: "cistografia", nombre: "Cistograma: lateral opcional", categoria: ["Perfil"], tipo: "E",
-      factores: { ri: "30 × 35 cm (11 × 14\"), vertical", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: null },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, 5 cm (2\") por encima y por detrás de la sínfisis del pubis." },
+      factores: { ri: "30 × 35 cm, vertical", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: null },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, 5 cm por encima y por detrás de la sínfisis del pubis." },
       posicion: ["El manual no describe la posición para la lateral: solo la muestra en la figura 9.57."],
       criterios: SIN_CRIT,
       notas: ["El protocolo de rutina del cistograma puede no incluir la lateral por la elevada dosis gonadal."],

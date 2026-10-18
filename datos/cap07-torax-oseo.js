@@ -12,7 +12,7 @@
 // - Por encima del diafragma: menos exposición (cercana a tórax) y en inspiración. Por debajo: exposición cercana a
 //   abdomen y en espiración.
 
-const DFRI_COSTILLAS = "180 cm (72\") en bipedestación; 100 cm (40\") en decúbito";
+const DFRI_COSTILLAS = "180 cm en bipedestación; 100 cm en decúbito";
 const CRIT_COSTILLAS_AP = [
   ["Estructuras que se ven", ["Por encima del diafragma: costillas 1 a 10.", "Por debajo del diafragma: costillas 10 a 12."]],
   ["Posicionamiento", ["Sin rotación: bordes costales laterales a igual distancia de la columna."]],
@@ -38,8 +38,8 @@ export default {
     // ───────── Esternón ─────────
     {
       id: "esternon-oad", region: "esternon", nombre: "Oblicua anterior derecha (OAD) de esternón", categoria: ["Oblicuas"], tipo: "R",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical", dfri: "100 cm (40\")", respiracion: "Técnica ortostática con respiración (3-4 segundos) o apnea", parrilla: "Sí", colimacion: "Campo largo y estrecho en la zona del esternón" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular a la parte media del esternón: 2,5 cm (1\") a la izquierda de la línea media y a mitad de camino entre la escotadura yugular y la punta del xifoides." },
+      factores: { ri: "24 × 30 cm, vertical", dfri: "100 cm", respiracion: "Técnica ortostática con respiración (3-4 segundos) o apnea", parrilla: "Sí", colimacion: "Campo largo y estrecho en la zona del esternón" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular a la parte media del esternón: 2,5 cm a la izquierda de la línea media y a mitad de camino entre la escotadura yugular y la punta del xifoides." },
       posicion: [
         "De pie (se prefiere) o en decúbito semiprono, rotado 15-20° con el lado derecho hacia abajo.",
         "Un tórax delgado necesita un poco más de oblicuidad que uno grueso.",
@@ -55,13 +55,13 @@ export default {
     },
     {
       id: "esternon-lateral", region: "esternon", nombre: "Lateral de esternón", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "24 × 30 cm (10 × 12\") o 35 × 35 cm (14 × 14\"), vertical", dfri: "150-180 cm (60-72\"); 100 cm (40\") como mínimo", respiracion: "Exponer en inspiración completa", parrilla: "Sí", colimacion: "Campo largo y estrecho en la zona del esternón" },
+      factores: { ri: "24 × 30 cm o 35 × 35 cm, vertical", dfri: "150-180 cm; 100 cm como mínimo", respiracion: "Exponer en inspiración completa", parrilla: "Sí", colimacion: "Campo largo y estrecho en la zona del esternón" },
       rc: { direccion: "perpendicular", texto: "Perpendicular a la parte media del esternón." },
       posicion: [
         "De pie (se prefiere), sentado o parado, o en decúbito lateral con RC vertical. En traumatismo grave, decúbito supino con RC horizontal (transversal a la mesa).",
         "Brazos por encima de la cabeza o hombros llevados hacia atrás.",
         "Alinear el esternón con el RC en la línea media de la parrilla, la mesa o el Bucky vertical.",
-        "Borde superior del RI 4 cm (1,5\") por encima de la escotadura yugular.",
+        "Borde superior del RI 4 cm por encima de la escotadura yugular.",
       ],
       criterios: [
         ["Estructuras que se ven", ["Todo el esternón."]],
@@ -75,8 +75,8 @@ export default {
     // ───────── Articulaciones esternoclaviculares ─────────
     {
       id: "esternoclaviculares-pa", region: "esternoclaviculares", nombre: "PA de articulaciones esternoclaviculares (EC)", categoria: ["PA"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\"), horizontal", dfri: "100 cm (40\")", respiracion: "Apnea en espiración", parrilla: "Sí", colimacion: "Cuatro lados, hasta la zona de las articulaciones esternoclaviculares" },
-      rc: { direccion: "perpendicular", texto: "A nivel de T2-T3: perpendicular, sobre el PMS, unos 7 cm (3\") por debajo de la vértebra prominente (3 cm [1,5\"] por debajo de la escotadura yugular)." },
+      factores: { ri: "18 × 24 cm, horizontal", dfri: "100 cm", respiracion: "Apnea en espiración", parrilla: "Sí", colimacion: "Cuatro lados, hasta la zona de las articulaciones esternoclaviculares" },
+      rc: { direccion: "perpendicular", texto: "A nivel de T2-T3: perpendicular, sobre el PMS, unos 7 cm por debajo de la vértebra prominente (3 cm por debajo de la escotadura yugular)." },
       posicion: [
         "Decúbito prono o de pie, con el plano mediosagital centrado en el RC.",
         "Cabeza girada hacia un lado, sin rotar los hombros.",
@@ -91,8 +91,8 @@ export default {
     },
     {
       id: "esternoclaviculares-oblicua", region: "esternoclaviculares", nombre: "Oblicua anterior de articulaciones esternoclaviculares (OAD / OAI)", categoria: ["Oblicuas"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\"), horizontal", dfri: "100 cm (40\")", respiracion: "Apnea en espiración", parrilla: "Sí", colimacion: "Cuatro lados, hasta la zona de las articulaciones esternoclaviculares" },
-      rc: { direccion: "perpendicular", texto: "A nivel de T2-T3: perpendicular, unos 2,5-5 cm (1-2\") lateral al PMS (hacia el lado elevado) y unos 7 cm (3\") por debajo de la vértebra prominente." },
+      factores: { ri: "18 × 24 cm, horizontal", dfri: "100 cm", respiracion: "Apnea en espiración", parrilla: "Sí", colimacion: "Cuatro lados, hasta la zona de las articulaciones esternoclaviculares" },
+      rc: { direccion: "perpendicular", texto: "A nivel de T2-T3: perpendicular, unos 2,5-5 cm lateral al PMS (hacia el lado elevado) y unos 7 cm por debajo de la vértebra prominente." },
       posicion: [
         "Desde la PA, rotar el tórax 10-15° para sacar las vértebras de encima del esternón; así se ve mejor la parte inferior de la articulación EC.",
         "OAD: muestra la articulación EC derecha. OAI: muestra la izquierda.",
@@ -110,11 +110,11 @@ export default {
     // ───────── Costillas bilaterales ─────────
     {
       id: "costillas-ap-encima-diafragma", region: "costillas-bilaterales", nombre: "AP (o PA) de costillas bilaterales por encima del diafragma", categoria: ["AP", "PA"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal (o vertical para estudio unilateral o tórax estrecho)", dfri: "180 cm (72\") en bipedestación; 100-120 cm (40-48\") en decúbito", respiracion: "Exponer en inspiración (diafragma abajo)", parrilla: "Sí", colimacion: "Hasta la zona de interés" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI, 8-10 cm (3-4\") por debajo de la escotadura yugular (nivel de T7)." },
+      factores: { ri: "35 × 43 cm, horizontal (o vertical para estudio unilateral o tórax estrecho)", dfri: "180 cm en bipedestación; 100-120 cm en decúbito", respiracion: "Exponer en inspiración (diafragma abajo)", parrilla: "Sí", colimacion: "Hasta la zona de interés" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI, 8-10 cm por debajo de la escotadura yugular (nivel de T7)." },
       posicion: [
         "De pie (se prefiere) o en decúbito, con el plano mediosagital en la línea media de la mesa o Bucky vertical y del RC.",
-        "Borde superior del RI unos 4 cm (1,5\") por encima de los hombros.",
+        "Borde superior del RI unos 4 cm por encima de los hombros.",
         "Hombros hacia adelante, sin rotación.",
         "Tórax centrado a ambos lados en el RI.",
       ],
@@ -124,7 +124,7 @@ export default {
     },
     {
       id: "costillas-ap-debajo-diafragma", region: "costillas-bilaterales", nombre: "AP de costillas bilaterales por debajo del diafragma", categoria: ["AP"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal (o vertical para estudio unilateral o tórax estrecho)", dfri: DFRI_COSTILLAS, respiracion: "Exponer en espiración (diafragma en el punto más alto)", parrilla: "Sí", colimacion: "Hasta la zona de interés" },
+      factores: { ri: "35 × 43 cm, horizontal (o vertical para estudio unilateral o tórax estrecho)", dfri: DFRI_COSTILLAS, respiracion: "Exponer en espiración (diafragma en el punto más alto)", parrilla: "Sí", colimacion: "Hasta la zona de interés" },
       rc: { direccion: "perpendicular", texto: "Perpendicular, centrado en el RI, a mitad de camino entre la punta del xifoides y el borde costal inferior." },
       posicion: [
         "De pie (se prefiere) o en decúbito, con el PMS en la línea media de la mesa o Bucky vertical y del RI (y del RC).",
@@ -140,8 +140,8 @@ export default {
     // ───────── Costillas axilares ─────────
     {
       id: "costillas-axilares-oad-superiores", region: "costillas-axilares", nombre: "Oblicua anterior (OAD) de costillas axilares superiores", categoria: ["Oblicuas"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\") o 35 × 35 cm (14 × 14\"), vertical (ver nota)", dfri: DFRI_COSTILLAS, respiracion: "Por encima del diafragma: exponer en inspiración", parrilla: "Sí", colimacion: "Hasta la zona de interés" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, centrado en el RI, 18-20 cm (7-8\") por debajo de la vértebra prominente (T7)." },
+      factores: { ri: "35 × 43 cm o 35 × 35 cm, vertical (ver nota)", dfri: DFRI_COSTILLAS, respiracion: "Por encima del diafragma: exponer en inspiración", parrilla: "Sí", colimacion: "Hasta la zona de interés" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, centrado en el RI, 18-20 cm por debajo de la vértebra prominente (T7)." },
       posicion: [
         "De pie (se prefiere) o en decúbito si hace falta.",
         "Oblicua a 45°, rotando la columna para alejarla de la zona de interés.",
@@ -153,11 +153,11 @@ export default {
     },
     {
       id: "costillas-axilares-opi-inferiores", region: "costillas-axilares", nombre: "Oblicua posterior (OPI) de costillas axilares inferiores", categoria: ["Oblicuas"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical, o 35 × 35 cm (14 × 14\")", dfri: DFRI_COSTILLAS, respiracion: "Por debajo del diafragma: exponer en espiración", parrilla: "Sí", colimacion: "Hasta la zona de interés" },
+      factores: { ri: "35 × 43 cm, vertical, o 35 × 35 cm", dfri: DFRI_COSTILLAS, respiracion: "Por debajo del diafragma: exponer en espiración", parrilla: "Sí", colimacion: "Hasta la zona de interés" },
       rc: { direccion: "perpendicular", texto: "Perpendicular, centrado en el RI, a mitad de camino entre la apófisis xifoides y el borde costal inferior." },
       posicion: [
         "De pie o en decúbito (se prefiere en decúbito).",
-        "Borde superior del RI unos 4 cm (1,5\") por encima de los hombros.",
+        "Borde superior del RI unos 4 cm por encima de los hombros.",
         "Rotar 45° desde la AP. El brazo más cercano al RI, levantado y apoyado sobre la cabeza; la otra mano en la cintura, con el brazo separado del cuerpo.",
       ],
       criterios: CRIT_COSTILLAS_AXILARES,

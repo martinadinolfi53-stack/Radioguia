@@ -90,7 +90,7 @@ async function hash(txt) {
 
 // ---- formulario ----
 const DIRS = [["perpendicular", "Perpendicular"], ["cefálico", "Cefálico"], ["caudal", "Caudal"], ["horizontal", "Horizontal"], ["angulado", "Angulado"], ["variable", "Variable"], ["sin-dato", "Sin dato"]];
-const FACT = [["ri", "Tamaño del RI"], ["dfri", "DFRI"], ["respiracion", "Respiración"], ["parrilla", "Parrilla"], ["colimacion", "Colimación"]];
+const FACT = [["ri", "Tamaño del RI"], ["dfri", "DFRI"], ["respiracion", "Respiración"], ["parrilla", "Parrilla (Bucky)"], ["colimacion", "Colimación"]];
 const lineas = (arr) => (arr || []).join("\n");
 // criterios: una línea "## Título" abre un grupo; las siguientes son sus ítems
 const criteriosATexto = (cr) => (cr || []).map(([t, it]) => `## ${t}\n${it.join("\n")}`).join("\n\n");

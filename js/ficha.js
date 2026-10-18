@@ -19,7 +19,7 @@ const RC_FLECHA = {
   variable: '<path d="M16 3v22M9 18l7 7 7-7"/>',
 };
 const FACTORES = [["ri", "Tamaño del RI"], ["dfri", "DFRI"], ["respiracion", "Respiración"]];
-const FACTORES_EXTRA = [["parrilla", "Parrilla"], ["colimacion", "Colimación"]];
+const FACTORES_EXTRA = [["parrilla", "Parrilla (Bucky)"], ["colimacion", "Colimación"]];
 
 export function vistaFicha(p, volver) {
   const r = regionPorId[p.region];

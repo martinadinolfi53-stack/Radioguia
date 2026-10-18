@@ -8,14 +8,14 @@
 // Marcas topográficas (pág. 175): punta del xifoides T9-T10, borde costal inferior L2-L3, cresta ilíaca L4-L5,
 //   EIAS S1-S2, sínfisis del pubis; T7 a 8-10 cm por debajo de la escotadura yugular.
 
-const DFRI = "100 cm (40\")";
-const DFRI_LARGA = "150-180 cm (60-72\")";
-const DFRI_TRAUMA = "100-120 cm (40-48\")";
+const DFRI = "100 cm";
+const DFRI_LARGA = "150-180 cm";
+const DFRI_TRAUMA = "100-120 cm";
 const APNEA = "Apnea durante la exposición";
 const ESPIRACION_FINAL = "Exponer al final de la espiración";
-const RI_24x30 = "24 × 30 cm (10 × 12\"), vertical";
-const RI_35x43 = "35 × 43 cm (14 × 17\"), vertical";
-const RI_LUMBAR = "30 × 35 cm (11 × 14\"), vertical, o 35 × 43 cm (14 × 17\"), vertical";
+const RI_24x30 = "24 × 30 cm, vertical";
+const RI_35x43 = "35 × 43 cm, vertical";
+const RI_LUMBAR = "30 × 35 cm, vertical, o 35 × 43 cm, vertical";
 const SIN_CRITERIOS = []; // el manual no trae página de criterios: se deja vacío para completar después
 const TEC_BASE = "Contraste y densidad (brillo) óptimos, sin movimiento.";
 const AVISO_COLLARIN = "No retirar el collarín cervical salvo que lo indique el médico después de ver la lateral con haz horizontal.";
@@ -36,7 +36,7 @@ export default {
     // ───────── Columna cervical ─────────
     {
       id: "columna-cervical-ap-boca-abierta", region: "columna-cervical", nombre: "AP de C1-C2 con la boca abierta (atlas y axis)", categoria: ["AP"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta la región C1-C2" },
+      factores: { ri: "18 × 24 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta la región C1-C2" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, entrando por el centro de la boca abierta (a C1-C2)." },
       posicion: [
         "En decúbito supino o de pie, con el paciente centrado en el RC y en la línea central.",
@@ -57,8 +57,8 @@ export default {
     },
     {
       id: "columna-cervical-odontoides-fuchs", region: "columna-cervical", nombre: "AP de apófisis odontoides", metodo: "Fuchs", categoria: ["AP", "Métodos especiales"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta la región C1-C2" },
-      rc: { direccion: "angulado", angulo: "paralelo a la LMM", texto: "Paralelo a la LMM, entrando 2,5 cm (1\") posteroinferior a las puntas de las mastoides y los ángulos de la mandíbula." },
+      factores: { ri: "18 × 24 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta la región C1-C2" },
+      rc: { direccion: "angulado", angulo: "paralelo a la LMM", texto: "Paralelo a la LMM, entrando 2,5 cm posteroinferior a las puntas de las mastoides y los ángulos de la mandíbula." },
       posicion: [
         "En decúbito supino o de pie, con el PMS alineado con la línea central y sin rotación.",
         "Levantar el mentón hasta que la LMM quede casi perpendicular al RI; si no se puede levantar lo suficiente, puede hacer falta angular el RC algo hacia cefálico.",
@@ -74,7 +74,7 @@ export default {
     },
     {
       id: "columna-cervical-odontoides-judd", region: "columna-cervical", nombre: "PA de apófisis odontoides", metodo: "Judd", categoria: ["PA", "Métodos especiales"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\"), horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta la región C1-C2" },
+      factores: { ri: "18 × 24 cm, horizontal", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta la región C1-C2" },
       rc: { direccion: "angulado", angulo: "paralelo a la LMM", texto: "Con la misma alineación del RC que en el método de Fuchs: paralelo a la LMM." },
       posicion: [
         "En prono, con el mentón apoyado en el tablero de la mesa.",
@@ -88,7 +88,7 @@ export default {
     },
     {
       id: "columna-cervical-ap-axial", region: "columna-cervical", nombre: "AP axial de columna cervical", categoria: ["AP", "Axiales"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\") o 24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta la región anatómica de interés" },
+      factores: { ri: "18 × 24 cm o 24 × 30 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta la región anatómica de interés" },
       rc: { direccion: "cefálico", angulo: "15-20°", texto: "Angulado 15-20° cefálico, entrando por C5 (borde inferior del cartílago tiroides)." },
       posicion: [
         "En decúbito supino o de pie, con el plano mediosagital centrado en el RC y en la línea central del RI.",
@@ -104,7 +104,7 @@ export default {
     },
     {
       id: "columna-cervical-oblicuas", region: "columna-cervical", nombre: "Oblicuas de columna cervical (anteriores o posteriores)", categoria: ["Oblicuas"], tipo: "R",
-      factores: { ri: RI_24x30, dfri: "100-180 cm (40-72\"); se recomienda la mayor DFRI", respiracion: APNEA, parrilla: "Sí (opcional en pacientes pequeños y en niños)", colimacion: "Hasta la región de la columna C" },
+      factores: { ri: RI_24x30, dfri: "100-180 cm; se recomienda la mayor DFRI", respiracion: APNEA, parrilla: "Sí (opcional en pacientes pequeños y en niños)", colimacion: "Hasta la región de la columna C" },
       rc: { direccion: "variable", angulo: "15-20°", texto: "Oblicuas posteriores: 15-20° cefálico, entrando por C4. Oblicuas anteriores: hace falta un ángulo de 15-20° caudal." },
       posicion: [
         "Se prefiere de pie o sentado, con el torso y la cabeza girados 45° respecto del RI y la columna C alineada con el RC y la línea central del RI.",
@@ -123,11 +123,11 @@ export default {
     },
     {
       id: "columna-cervical-lateral-erguida", region: "columna-cervical", nombre: "Lateral de columna cervical (erguida)", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: RI_24x30, dfri: "150-180 cm (60-72\"); una DFRI mayor mejora la visualización de C7 porque los rayos divergen menos", respiracion: "Exponer en espiración completa", parrilla: "Sí (opcional en pacientes pequeños y en niños)", colimacion: "A los cuatro lados, hasta la región de la columna C" },
+      factores: { ri: RI_24x30, dfri: "150-180 cm; una DFRI mayor mejora la visualización de C7 porque los rayos divergen menos", respiracion: "Exponer en espiración completa", parrilla: "Sí (opcional en pacientes pequeños y en niños)", colimacion: "A los cuatro lados, hasta la región de la columna C" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, a la altura de C4 (borde superior del cartílago tiroides)." },
       posicion: [
         "Sentado o de pie, en lateral, con la columna C alineada y centrada respecto del RC y de la línea central del RI.",
-        "Borde superior del RI unos 3-5 cm (1-2\") por encima del MAE.",
+        "Borde superior del RI unos 3-5 cm por encima del MAE.",
         "Levantar un poco el mentón para que los ángulos de la mandíbula no tapen la columna.",
         "Relajar y bajar los dos hombros por igual; puede hacer falta poner pesas en ambas manos para ver C7.",
       ],
@@ -142,7 +142,7 @@ export default {
     {
       id: "columna-cervical-nadador", region: "columna-cervical", nombre: "Lateral cervicotorácica («del nadador»), región C5-T3", categoria: ["Perfil"], tipo: "R",
       factores: { ri: RI_24x30, dfri: DFRI_LARGA, respiracion: "Exponer en espiración completa o con técnica de respiración", parrilla: "Sí", colimacion: "Ajustada hasta el área de interés" },
-      rc: { direccion: "variable", angulo: "3-5° caudal (opcional)", texto: "Perpendicular, centrado en T1 (unos 2,5 cm [1\"] por encima de la escotadura yugular). Opcional: 3-5° caudal para separar los hombros en pacientes con poca flexibilidad." },
+      rc: { direccion: "variable", angulo: "3-5° caudal (opcional)", texto: "Perpendicular, centrado en T1 (unos 2,5 cm por encima de la escotadura yugular). Opcional: 3-5° caudal para separar los hombros en pacientes con poca flexibilidad." },
       posicion: [
         "Se prefiere de pie o sentado, con la columna C alineada con el RC y la línea central del RI.",
         "Levantar el brazo y el hombro del lado del RI y rotar ese hombro un poco hacia adelante o hacia atrás.",
@@ -154,7 +154,7 @@ export default {
         ["Posicionamiento", ["Cabezas humerales separadas de la columna C.", "Cuerpos vertebrales en perspectiva lateral."]],
         ["Criterios técnicos", ["Contraste y densidad (brillo) óptimos de la columna cervical baja y torácica alta, sin movimiento.", "Se ven la anatomía ósea y los bordes de partes blandas."]],
       ],
-      revision: ["Centrado en T1: aquí se indica «aproximadamente 2,5 cm (1\")» por encima de la escotadura yugular, pero en la serie de traumatismo (pág. 187) la misma referencia figura como «3 cm (1,5\")». Además, 1,5\" son unos 3,8 cm. ¿Cuál es el valor correcto?"],
+      revision: ["Centrado en T1: aquí se indica «aproximadamente 2,5 cm» por encima de la escotadura yugular, pero en la serie de traumatismo (pág. 187) la misma referencia figura como «3 cm». Además, la misma medida en la otra unidad que da el libro equivale a unos 3,8 cm. ¿Cuál es el valor correcto?"],
       fuente: { paginas: [183, 184] }, ilustracion: null, estado: "pendiente-revision",
     },
     {
@@ -178,7 +178,7 @@ export default {
     {
       id: "columna-cervical-trauma-lateral-horizontal", region: "columna-cervical", nombre: "Serie de traumatismo: lateral con haz horizontal", categoria: ["Perfil", "Decúbitos"], tipo: "E",
       factores: { ri: RI_24x30, dfri: DFRI_LARGA, respiracion: null, parrilla: "Con o sin parrilla", colimacion: null },
-      rc: { direccion: "horizontal", texto: "Horizontal y perpendicular, a C4 (borde superior del cartílago tiroides). Borde superior del RI unos 3-5 cm (1-2\") por encima del MAE." },
+      rc: { direccion: "horizontal", texto: "Horizontal y perpendicular, a C4 (borde superior del cartílago tiroides). Borde superior del RI unos 3-5 cm por encima del MAE." },
       posicion: ["Paciente en decúbito supino, con el collarín colocado; el RI se pone al costado del cuello y el haz entra de forma horizontal."],
       criterios: SIN_CRITERIOS,
       notas: [AVISO_COLLARIN],
@@ -205,7 +205,7 @@ export default {
     {
       id: "columna-cervical-trauma-cervicotoracica", region: "columna-cervical", nombre: "Serie de traumatismo: lateral cervicotorácica", categoria: ["Perfil"], tipo: "E",
       factores: { ri: RI_24x30, dfri: DFRI_TRAUMA, respiracion: null, parrilla: "Sí", colimacion: null },
-      rc: { direccion: "horizontal", texto: "RI centrado en T1 (aproximadamente 3 cm [1,5\"] por encima del nivel de la escotadura yugular)." },
+      rc: { direccion: "horizontal", texto: "RI centrado en T1 (aproximadamente 3 cm por encima del nivel de la escotadura yugular)." },
       posicion: [
         "Proyección opcional, si hace falta para ver C7.",
         "Levantar el hombro y el brazo del lado del RI y bajar el otro hombro.",
@@ -213,7 +213,7 @@ export default {
       criterios: SIN_CRITERIOS,
       notas: [AVISO_COLLARIN],
       revision: [
-        "Centrado en T1: aquí dice «3 cm (1,5\")» por encima de la escotadura yugular; en la lateral cervicotorácica de rutina (pág. 183) dice «2,5 cm (1\")». Además, 3 cm no equivalen a 1,5\" (unos 3,8 cm).",
+        "Centrado en T1: aquí dice «3 cm» por encima de la escotadura yugular; en la lateral cervicotorácica de rutina (pág. 183) dice «2,5 cm». Además, la misma medida en la otra unidad que da el libro equivale a unos 3,8 cm, no a 3 cm.",
       ],
       fuente: { paginas: [187] }, ilustracion: null, estado: "pendiente-revision",
     },
@@ -222,10 +222,10 @@ export default {
     {
       id: "columna-toracica-ap", region: "columna-toracica", nombre: "AP de columna torácica", categoria: ["AP"], tipo: "R",
       factores: { ri: RI_35x43, dfri: DFRI, respiracion: "Exponer en espiración, para lograr una densidad más pareja", parrilla: "Sí", colimacion: "Campo largo y estrecho, hasta la región de la columna T" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI, a la altura de T7 (como en una AP de tórax), 8-10 cm (3-4\") por debajo de la escotadura yugular." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI, a la altura de T7 (como en una AP de tórax), 8-10 cm por debajo de la escotadura yugular." },
       posicion: [
         "En decúbito supino, con la columna alineada y centrada en la línea media de la mesa o del RI. Flexionar caderas y rodillas para reducir la curvatura lordótica.",
-        "Borde superior del RI al menos 3 cm (1,5\") por encima de los hombros.",
+        "Borde superior del RI al menos 3 cm por encima de los hombros.",
         "Controlar que el tórax y la pelvis no estén rotados; proteger los tejidos radiosensibles.",
       ],
       criterios: [
@@ -242,11 +242,11 @@ export default {
     {
       id: "columna-toracica-lateral", region: "columna-toracica", nombre: "Lateral de columna torácica", categoria: ["Perfil"], tipo: "R",
       factores: { ri: RI_35x43, dfri: DFRI, respiracion: "Se recomienda técnica con respiración (mínimo de 2-3 segundos) o exponer en inspiración completa", parrilla: "Sí", colimacion: "Campo largo y estrecho, hasta la región de la columna T" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI, en T7 (8-10 cm [3-4\"] por debajo de la escotadura yugular o 18-21 cm [7-8\"] por debajo de la vértebra prominente)." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI, en T7 (8-10 cm por debajo de la escotadura yugular o 18-21 cm por debajo de la vértebra prominente)." },
       posicion: [
         "En decúbito lateral, con apoyo bajo la cintura, rodillas flexionadas y brazos levantados con los codos flexionados. Proteger los tejidos radiosensibles.",
         "Plano medioaxilar alineado y centrado con la línea media de la mesa o del RI.",
-        "Borde superior del RI al menos 3 cm (1,5\") por encima de los hombros; sin rotación.",
+        "Borde superior del RI al menos 3 cm por encima de los hombros; sin rotación.",
         "Si hace falta, poner apoyos bajo la parte baja de la espalda para que la columna quede casi paralela al tablero (una leve curvatura natural ayuda, porque acompaña la divergencia de los rayos).",
       ],
       criterios: [
@@ -264,11 +264,11 @@ export default {
     {
       id: "columna-toracica-oblicua", region: "columna-toracica", nombre: "Oblicua de columna torácica", categoria: ["Oblicuas"], tipo: "E",
       factores: { ri: RI_35x43, dfri: DFRI, respiracion: "Exponer al final de la espiración", parrilla: "Sí", colimacion: "Campo largo y estrecho, hasta la región de la columna T" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI, en T7 (8-10 cm [3-4\"] por debajo de la escotadura yugular o 5 cm [2\"] por debajo del ángulo esternal)." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI, en T7 (8-10 cm por debajo de la escotadura yugular o 5 cm por debajo del ángulo esternal)." },
       posicion: [
         "En decúbito lateral o de pie, con rotación posterior de 20° desde la lateral verdadera (OPD a 70°, según la figura 6.31).",
         "Columna alineada y centrada con la línea media de la mesa o del RI. El brazo más alejado del RI va detrás de la espalda; el más cercano, levantado y delante de la cabeza.",
-        "Borde superior del RI al menos 3 cm (1,5\") por encima de los hombros.",
+        "Borde superior del RI al menos 3 cm por encima de los hombros.",
       ],
       criterios: SIN_CRITERIOS,
       notas: [
@@ -281,8 +281,8 @@ export default {
     // ───────── Columna lumbar ─────────
     {
       id: "columna-lumbar-ap", region: "columna-lumbar", nombre: "AP (PA) de columna lumbar", categoria: ["AP", "PA"], tipo: "R",
-      factores: { ri: "30 × 35 cm (11 × 14\"), vertical, o 35 × 43 cm (14 × 17\"), vertical", dfri: DFRI, respiracion: ESPIRACION_FINAL, parrilla: "Sí", colimacion: "Campo largo y estrecho hasta la región de la columna L, incluyendo las articulaciones SI" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, a unos 4 cm (1½\") por encima de la cresta ilíaca (L3); con un RI de 35 × 43 cm, centrar en la cresta." },
+      factores: { ri: "30 × 35 cm, vertical, o 35 × 43 cm, vertical", dfri: DFRI, respiracion: ESPIRACION_FINAL, parrilla: "Sí", colimacion: "Campo largo y estrecho hasta la región de la columna L, incluyendo las articulaciones SI" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, a unos 4 cm por encima de la cresta ilíaca (L3); con un RI de 35 × 43 cm, centrar en la cresta." },
       posicion: [
         "En decúbito supino, con la columna alineada con la línea media de la mesa o de la parrilla.",
         "Flexionar caderas y rodillas para reducir la curvatura lordótica.",
@@ -300,7 +300,7 @@ export default {
     {
       id: "columna-lumbar-lateral", region: "columna-lumbar", nombre: "Lateral de columna lumbar", categoria: ["Perfil"], tipo: "R",
       factores: { ri: RI_LUMBAR, dfri: DFRI, respiracion: ESPIRACION_FINAL, parrilla: "Sí", colimacion: "Campo largo y estrecho hasta la región de la columna L" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, a unos 4 cm (1½\") por encima de la cresta ilíaca (L3), o en la cresta ilíaca (L4) si se usa un RI de 35 × 43 cm (14 × 17\")." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, a unos 4 cm por encima de la cresta ilíaca (L3), o en la cresta ilíaca (L4) si se usa un RI de 35 × 43 cm." },
       posicion: [
         "En decúbito lateral verdadero, con caderas y rodillas flexionadas y el plano medioaxilar alineado y centrado en la línea central.",
         "Poner apoyo bajo la cintura cuando haga falta para que toda la columna quede paralela al tablero, y otro entre las rodillas.",
@@ -320,8 +320,8 @@ export default {
     },
     {
       id: "columna-lumbar-lateral-l5-s1", region: "columna-lumbar", nombre: "Lateral de L5-S1", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta el área de interés" },
-      rc: { direccion: "variable", angulo: "5-8° caudal", texto: "Perpendicular al RI si toda la columna está paralela a la mesa; si no, 5-8° caudal (más habitual en mujeres), de modo que el RC quede paralelo al plano interilíaco. Centrado 3 cm (1,5\") por debajo de la cresta ilíaca y 5 cm (2\") por detrás de la EIAS." },
+      factores: { ri: "18 × 24 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta el área de interés" },
+      rc: { direccion: "variable", angulo: "5-8° caudal", texto: "Perpendicular al RI si toda la columna está paralela a la mesa; si no, 5-8° caudal (más habitual en mujeres), de modo que el RC quede paralelo al plano interilíaco. Centrado 3 cm por debajo de la cresta ilíaca y 5 cm por detrás de la EIAS." },
       posicion: [
         "En decúbito lateral verdadero, con caderas y rodillas flexionadas y el plano medioaxilar alineado con la línea media de la mesa o del RI y con el RC.",
         "Apoyo bajo la cintura cuando haga falta para que la columna quede paralela al tablero, y otro entre las rodillas.",
@@ -337,8 +337,8 @@ export default {
     },
     {
       id: "columna-lumbar-oblicua", region: "columna-lumbar", nombre: "Oblicuas de columna lumbar (posteriores o anteriores)", categoria: ["Oblicuas"], tipo: "R",
-      factores: { ri: "30 × 35 cm (11 × 14\"), vertical, o 24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta el área de interés" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, al cuerpo de L3, a la altura del borde costal inferior (2,5-5 cm [1-2\"] por encima de la cresta ilíaca) y 5 cm (2\") medial a la EIAS que queda arriba." },
+      factores: { ri: "30 × 35 cm, vertical, o 24 × 30 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta el área de interés" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, al cuerpo de L3, a la altura del borde costal inferior (2,5-5 cm por encima de la cresta ilíaca) y 5 cm medial a la EIAS que queda arriba." },
       posicion: [
         "Para las oblicuas posteriores o anteriores derecha e izquierda, girar el cuerpo 45°; en las posteriores, usar bloques triangulares bajo la pelvis y los hombros para sostener la posición.",
         "Columna alineada y centrada con el RC y la línea media de la mesa o del RI.",
@@ -354,13 +354,13 @@ export default {
     },
     {
       id: "columna-lumbar-ap-flexion-lateral", region: "columna-lumbar", nombre: "AP de columna lumbar con flexión lateral derecha e izquierda", categoria: ["AP"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical, o 35 × 90 cm (14 × 36\"), vertical", dfri: "100-150 cm (40-60\")", respiracion: ESPIRACION_FINAL, parrilla: "Sí", colimacion: "Incluir la zona de interés de la columna" },
+      factores: { ri: "35 × 43 cm, vertical, o 35 × 90 cm, vertical", dfri: "100-150 cm", respiracion: ESPIRACION_FINAL, parrilla: "Sí", colimacion: "Incluir la zona de interés de la columna" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI (centrar más arriba si interesa la columna torácica)." },
       posicion: [
         "En decúbito supino o de pie, con la columna centrada en el RC y en la línea media de la mesa o del RI.",
         "Hacer la máxima flexión lateral posible, primero a la derecha y después a la izquierda, sin inclinar la pelvis (la pelvis queda fija y actúa como fulcro).",
         "Controlar que no roten la pelvis ni el torso.",
-        "Borde inferior del RI 2,5-5 cm (1-2\") por debajo de la cresta ilíaca.",
+        "Borde inferior del RI 2,5-5 cm por debajo de la cresta ilíaca.",
       ],
       criterios: SIN_CRITERIOS,
       notas: [
@@ -377,10 +377,10 @@ export default {
         "En decúbito o de pie, con la columna centrada en la mesa.",
         "Apoyo bajo la cintura para que la columna quede paralela al tablero.",
         "Primer RI: máxima flexión hacia adelante; segundo RI: máxima extensión hacia atrás, manteniendo la lateral verdadera.",
-        "Borde inferior del RI 2,5-5 cm (1-2\") por debajo de la cresta ilíaca.",
+        "Borde inferior del RI 2,5-5 cm por debajo de la cresta ilíaca.",
       ],
       criterios: [
-        ["Estructuras que se ven", ["Hiperflexión e hiperextensión: vértebras torácicas y lumbares, incluyendo unos 3-5 cm (1-2\") de las crestas ilíacas; lateral de las vértebras lumbares."]],
+        ["Estructuras que se ven", ["Hiperflexión e hiperextensión: vértebras torácicas y lumbares, incluyendo unos 3-5 cm de las crestas ilíacas; lateral de las vértebras lumbares."]],
         ["Posicionamiento", ["Hiperflexión: lateral verdadera sin rotación; espacios entre las apófisis espinosas abiertos.", "Hiperextensión: lateral verdadera sin rotación; espacios entre las apófisis espinosas cerrados."]],
         ["Criterios técnicos", [TEC_BASE, "Detalle óseo nítido en cuerpos vertebrales, apófisis espinosas y espacios articulares intervertebrales."]],
       ],
@@ -391,11 +391,11 @@ export default {
     // ───────── Escoliosis ─────────
     {
       id: "columna-escoliosis-pa-ferguson", region: "columna-escoliosis", nombre: "PA: serie de escoliosis", metodo: "Ferguson", categoria: ["PA", "Métodos especiales"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical, o 35 × 90 cm (14 × 36\")", dfri: "100-150 cm (40-60\"); se recomienda la DFRI mayor", respiracion: "Exponer en espiración completa", parrilla: "Sí", colimacion: "Larga y estrecha, hasta la región de la columna vertebral" },
+      factores: { ri: "35 × 43 cm, vertical, o 35 × 90 cm", dfri: "100-150 cm; se recomienda la DFRI mayor", respiracion: "Exponer en espiración completa", parrilla: "Sí", colimacion: "Larga y estrecha, hasta la región de la columna vertebral" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al centro del RI." },
       posicion: [
-        "Primer RI: de pie o sentado, con la columna alineada y centrada en la línea media de la mesa o del RI, brazos a los costados, sin rotación de la pelvis ni del tórax. Borde inferior del RI 2,5-5 cm (1-2\") por debajo de la cresta ilíaca.",
-        "Segundo RI: poner un alza de 8-10 cm (3-4\") bajo el pie (o bajo las nalgas si está sentado) del lado convexo de la curva; así se distinguen las curvas primarias deformantes de las compensadoras.",
+        "Primer RI: de pie o sentado, con la columna alineada y centrada en la línea media de la mesa o del RI, brazos a los costados, sin rotación de la pelvis ni del tórax. Borde inferior del RI 2,5-5 cm por debajo de la cresta ilíaca.",
+        "Segundo RI: poner un alza de 8-10 cm bajo el pie (o bajo las nalgas si está sentado) del lado convexo de la curva; así se distinguen las curvas primarias deformantes de las compensadoras.",
         "Usar protección gonadal y mamaria.",
       ],
       criterios: SIN_CRITERIOS,
@@ -411,7 +411,7 @@ export default {
     {
       id: "columna-sacro-ap-axial", region: "columna-sacro-coccix", nombre: "AP axial de sacro", categoria: ["AP", "Axiales"], tipo: "R",
       factores: { ri: RI_24x30, dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área del sacro" },
-      rc: { direccion: "cefálico", angulo: "15°", texto: "Angulado 15° cefálico, dirigido a unos 5 cm (2\") por encima de la sínfisis del pubis." },
+      rc: { direccion: "cefálico", angulo: "15°", texto: "Angulado 15° cefálico, dirigido a unos 5 cm por encima de la sínfisis del pubis." },
       posicion: [
         "En decúbito supino, centrado en el RC y en la línea media de la mesa o del RI.",
         "Sin rotación de la pelvis: las dos EIAS a la misma distancia de la mesa.",
@@ -426,8 +426,8 @@ export default {
     },
     {
       id: "columna-coccix-ap-axial", region: "columna-sacro-coccix", nombre: "AP axial de cóccix", categoria: ["AP", "Axiales"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta el área del cóccix" },
-      rc: { direccion: "caudal", angulo: "10°", texto: "Angulado 10° caudal, centrado 5 cm (2\") por encima de la sínfisis del pubis." },
+      factores: { ri: "18 × 24 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Ajustada hasta el área del cóccix" },
+      rc: { direccion: "caudal", angulo: "10°", texto: "Angulado 10° caudal, centrado 5 cm por encima de la sínfisis del pubis." },
       posicion: [
         "En decúbito supino, con apoyo bajo las rodillas. Proteger los tejidos radiosensibles y las gónadas en los hombres.",
         "Plano mediosagital alineado y centrado en la línea media de la mesa o del RI, sin rotación.",
@@ -448,7 +448,7 @@ export default {
     {
       id: "columna-sacro-coccix-lateral", region: "columna-sacro-coccix", nombre: "Lateral de sacro y cóccix", categoria: ["Perfil"], tipo: "R",
       factores: { ri: RI_24x30, dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área del sacro" },
-      rc: { direccion: "perpendicular", texto: "Para el sacro: perpendicular, dirigido 8-10 cm (3-4\") por detrás de la EIAS que queda arriba." },
+      rc: { direccion: "perpendicular", texto: "Para el sacro: perpendicular, dirigido 8-10 cm por detrás de la EIAS que queda arriba." },
       posicion: [
         "En decúbito lateral, con caderas y rodillas flexionadas, en lateral verdadera.",
         "Centrar el sacro en el RC y en la línea media de la mesa o del RI (alinear paciente y RI con el RC bien centrado).",
@@ -467,8 +467,8 @@ export default {
     },
     {
       id: "columna-coccix-lateral", region: "columna-sacro-coccix", nombre: "Lateral de cóccix", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\"), vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta el área del sacro distal y el cóccix" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, 5 cm (2\") distal al nivel de la EIAS y 8-10 cm (3-4\") por detrás." },
+      factores: { ri: "18 × 24 cm, vertical", dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "Hasta el área del sacro distal y el cóccix" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, 5 cm distal al nivel de la EIAS y 8-10 cm por detrás." },
       posicion: [
         "En decúbito lateral, con caderas y rodillas flexionadas 90°, en lateral verdadera.",
         "Centrar el cóccix en el RC y en la línea media de la mesa o del RI (el cóccix es superficial, entre las nalgas, apenas por encima del trocánter mayor).",
@@ -491,7 +491,7 @@ export default {
     {
       id: "columna-sacroiliacas-ap-axial", region: "columna-sacroiliacas", nombre: "AP axial de articulaciones sacroilíacas", categoria: ["AP", "Axiales"], tipo: "R",
       factores: { ri: RI_24x30, dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
-      rc: { direccion: "cefálico", angulo: "30° (hombres) y 35° (mujeres)", texto: "Angulado 30° (hombres) o 35° (mujeres) cefálico, entrando unos 5 cm (2\") por debajo del nivel de las EIAS." },
+      rc: { direccion: "cefálico", angulo: "30° (hombres) y 35° (mujeres)", texto: "Angulado 30° (hombres) o 35° (mujeres) cefálico, entrando unos 5 cm por debajo del nivel de las EIAS." },
       posicion: [
         "En decúbito supino, centrado en la línea media de la mesa o del RI.",
         "Sin rotación de la pelvis: EIAS a la misma distancia del tablero.",
@@ -503,10 +503,10 @@ export default {
     {
       id: "columna-sacroiliacas-oblicua-posterior", region: "columna-sacroiliacas", nombre: "Oblicua posterior de articulaciones sacroilíacas", categoria: ["Oblicuas"], tipo: "R",
       factores: { ri: RI_24x30, dfri: DFRI, respiracion: APNEA, parrilla: "Sí", colimacion: "A los cuatro lados, hasta el área de interés" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular, 2,5 cm (1\") medial a la EIAS que queda arriba." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular, 2,5 cm medial a la EIAS que queda arriba." },
       posicion: [
         "Oblicua posterior de 25-30°, con el lado a estudiar levantado (usar un apoyo para sostener la posición).",
-        "Alinear la articulación SI elevada con el RC y la línea media de la mesa o del RI (2,5 cm [1\"] medial a la EIAS de arriba).",
+        "Alinear la articulación SI elevada con el RC y la línea media de la mesa o del RI (2,5 cm medial a la EIAS de arriba).",
         "Centrar el RI en el RC. Proteger los tejidos radiosensibles y las gónadas en los hombres.",
         "Se hace de los dos lados para comparar.",
       ],

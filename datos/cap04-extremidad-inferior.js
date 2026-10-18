@@ -7,10 +7,10 @@
 // radiosensibles en todos los estudios de extremidad inferior. Si se hacen varias exposiciones en un mismo RI,
 // colimar con cuidado y cubrir con plomo el resto del chasis.
 
-const DFRI = "100 cm (40\")";
-const RI_18x24_H = "18 × 24 cm (8 × 10\"), horizontal";
-const RI_18x24_V = "18 × 24 cm (8 × 10\"), vertical";
-const RI_24x30_V = "24 × 30 cm (10 × 12\"), vertical";
+const DFRI = "100 cm";
+const RI_18x24_H = "18 × 24 cm, horizontal";
+const RI_18x24_V = "18 × 24 cm, vertical";
+const RI_24x30_V = "24 × 30 cm, vertical";
 const PARRILLA_RODILLA = "Sí si el grosor supera 10 cm; sin parrilla si es menor de 10 cm";
 const TEC = ["Densidad (brillo) y contraste óptimos, sin movimiento.", "Partes blandas y trabeculación ósea nítidas."];
 const TEC_TOBILLO = ["Densidad y contraste (brillo) suficientes para ver tenuemente el peroné distal a través del astrágalo, sin movimiento.", "Bordes óseos y trabeculación ósea nítidos."];
@@ -103,7 +103,7 @@ export default {
     // ───────── Pie ─────────
     {
       id: "pie-ap-dorsoplantar", region: "pie", nombre: "AP dorsoplantar de pie", categoria: ["AP"], tipo: "R",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes del pie" },
+      factores: { ri: "24 × 30 cm, vertical", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes del pie" },
       rc: { direccion: "angulado", angulo: "10° posterior (hacia el talón)", texto: "Perpendicular a los metatarsianos, lo que equivale a unos 10° en dirección posterior (hacia el talón), centrado en la base del 3.er metatarsiano." },
       posicion: [
         "Decúbito supino o sentado, con la planta apoyada plana sobre el RI y alineada a lo largo de la zona que se expone.",
@@ -139,14 +139,14 @@ export default {
     },
     {
       id: "pie-lateral", region: "pie", nombre: "Lateral de pie (mediolateral o lateromedial)", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "18 × 24 cm (8 × 10\"), horizontal (hasta el pie) o 24 × 30 cm (10 × 12\"), horizontal para pies grandes", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes del pie y la parte distal del tobillo" },
+      factores: { ri: "18 × 24 cm, horizontal (hasta el pie) o 24 × 30 cm, horizontal para pies grandes", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes del pie y la parte distal del tobillo" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la zona de la base del tercer metatarsiano." },
       posicion: [
         "Mediolateral: decúbito sobre el lado afectado, con la rodilla flexionada y la pierna sana por detrás para no rotar de más.",
         "Si hace falta, poner un apoyo debajo de la rodilla y la pierna afectadas para que la planta quede perpendicular al RI y el pie en lateral verdadera.",
       ],
       criterios: [
-        ["Estructuras que se ven", ["Todo el pie, con unos 2,5 cm (1\") de tibia y peroné distales."]],
+        ["Estructuras que se ven", ["Todo el pie, con unos 2,5 cm de tibia y peroné distales."]],
         ["Posicionamiento", ["Lateral verdadera, con la articulación tibioastragalina abierta.", "Metatarsianos distales superpuestos."]],
         ["Criterios técnicos", TEC],
       ],
@@ -155,14 +155,14 @@ export default {
     },
     {
       id: "pie-ap-lateral-carga", region: "pie", nombre: "AP y lateral de pies en carga", categoria: ["AP", "Perfil"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\"), horizontal; 35 × 43 cm (14 × 17\"), horizontal para estudio bilateral", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Hasta los bordes cutáneos externos de los pies" },
+      factores: { ri: "24 × 30 cm, horizontal; 35 × 43 cm, horizontal para estudio bilateral", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Hasta los bordes cutáneos externos de los pies" },
       rc: { direccion: "variable", texto: "AP: 15° en dirección posterior (cefálica), a la altura de la base del 3.er metatarsiano y a mitad de camino entre los dos pies. Lateral: horizontal, hacia la base del 5.º metatarsiano." },
       posicion: [
         "AP: de pie, con el peso repartido por igual entre los dos pies, parado sobre el RI.",
         "Lateral: de pie, con todo el peso sobre los dos pies y el RI vertical entre ellos. Los pies se apoyan en bloques lo bastante altos como para usar un RC horizontal. Se radiografían el pie derecho y el izquierdo para comparar.",
       ],
       criterios: [
-        ["Estructuras que se ven", ["AP: los dos pies, con detalle de partes blandas.", "Lateral: todo el pie, con 2,5 cm (1\") de tibia y peroné distales."]],
+        ["Estructuras que se ven", ["AP: los dos pies, con detalle de partes blandas.", "Lateral: todo el pie, con 2,5 cm de tibia y peroné distales."]],
         ["Posicionamiento", ["AP: articulaciones tarsometatarsianas abiertas y separación parecida entre los metatarsianos 2.º a 4.º.", "Lateral: se ve desde el dorso hasta la planta, con las cabezas de los metatarsianos superpuestas."]],
         ["Criterios técnicos", ["Densidad (brillo) y contraste óptimos, sin movimiento.", "Partes blandas, bordes corticales y trabeculación ósea nítidos."]],
       ],
@@ -191,7 +191,7 @@ export default {
     {
       id: "calcaneo-lateral", region: "calcaneo", nombre: "Lateral (mediolateral) de calcáneo", categoria: ["Perfil"], tipo: "R",
       factores: { ri: RI_18x24_V, dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta el área del calcáneo, con la articulación del tobillo en el borde superior" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media del calcáneo, 2,5 cm (1\") por debajo del maléolo medial." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media del calcáneo, 2,5 cm por debajo del maléolo medial." },
       posicion: [
         "Decúbito sobre el lado afectado, rodilla flexionada y la pierna sana por detrás para no rotar de más.",
         "Si hace falta, poner un apoyo debajo de la rodilla y la pierna para lograr una lateral verdadera.",
@@ -281,7 +281,7 @@ export default {
     },
     {
       id: "tobillo-ap-estres", region: "tobillo", nombre: "AP de tobillo con sobrecarga o forzada (inversión y eversión)", categoria: ["AP"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\"), vertical, o 35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Hasta los bordes cutáneos laterales, incluyendo metatarsianos proximales y la parte distal de tibia y peroné" },
+      factores: { ri: "24 × 30 cm, vertical, o 35 × 43 cm, horizontal", dfri: DFRI, respiracion: null, parrilla: "No", colimacion: "Hasta los bordes cutáneos laterales, incluyendo metatarsianos proximales y la parte distal de tibia y peroné" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, a mitad de camino entre los maléolos." },
       posicion: [
         "Decúbito supino o sentado en la mesa, pierna extendida.",
@@ -296,11 +296,11 @@ export default {
     // ───────── Pierna ─────────
     {
       id: "pierna-ap", region: "pierna", nombre: "AP de pierna (tibia-peroné)", categoria: ["AP"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical; en diagonal solo si hace falta para incluir tobillo y rodilla", dfri: "DFRI mínima de 100 cm (40\"); se puede aumentar hasta 115-125 cm (44-48\")", respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes cutáneos, incluyendo las articulaciones de la rodilla y el tobillo" },
+      factores: { ri: "35 × 43 cm, vertical; en diagonal solo si hace falta para incluir tobillo y rodilla", dfri: "DFRI mínima de 100 cm; se puede aumentar hasta 115-125 cm", respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes cutáneos, incluyendo las articulaciones de la rodilla y el tobillo" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media de la pierna (parte media del RI)." },
       posicion: [
         "Decúbito supino, pierna extendida, sin rotación de rodilla, pierna ni tobillo.",
-        "Incluir como mínimo unos 3 cm (1-1,5\") más allá de las articulaciones de la rodilla y el tobillo, por la divergencia del haz.",
+        "Incluir como mínimo unos 3 cm más allá de las articulaciones de la rodilla y el tobillo, por la divergencia del haz.",
         "Rodilla hacia el extremo del cátodo, para aprovechar el efecto anódico (talón).",
       ],
       criterios: [
@@ -312,12 +312,12 @@ export default {
     },
     {
       id: "pierna-mediolateral", region: "pierna", nombre: "Mediolateral de pierna (tibia-peroné)", categoria: ["Perfil"], tipo: "R",
-      factores: { ri: "35 × 43 cm (14 × 17\"), vertical; en diagonal, o dos RI separados, para incluir las dos articulaciones", dfri: "DFRI mínima de 100 cm (40\"); se puede aumentar hasta 115-125 cm (44-48\")", respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes cutáneos, incluyendo las articulaciones de la rodilla y el tobillo" },
+      factores: { ri: "35 × 43 cm, vertical; en diagonal, o dos RI separados, para incluir las dos articulaciones", dfri: "DFRI mínima de 100 cm; se puede aumentar hasta 115-125 cm", respiracion: null, parrilla: "No", colimacion: "Cuatro lados hasta los bordes cutáneos, incluyendo las articulaciones de la rodilla y el tobillo" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI, centrado en la parte media de la pierna (parte media del RI)." },
       posicion: [
         "Decúbito con el lado afectado abajo; la pierna sana va por detrás para no rotar de más.",
         "Si hace falta, poner un apoyo debajo de la parte distal del pie afectado para que pie, tobillo y rodilla queden en lateral verdadera.",
-        "Las articulaciones del tobillo y la rodilla tienen que quedar a 3-5 cm (1-2\") de los extremos del RI.",
+        "Las articulaciones del tobillo y la rodilla tienen que quedar a 3-5 cm de los extremos del RI.",
         "Rodilla hacia el extremo del cátodo, para aprovechar el efecto anódico (talón).",
       ],
       criterios: [
@@ -332,7 +332,7 @@ export default {
     {
       id: "rodilla-ap", region: "rodilla", nombre: "AP de rodilla", categoria: ["AP"], tipo: "R",
       factores: { ri: RI_24x30_V, dfri: DFRI, respiracion: null, parrilla: PARRILLA_RODILLA, colimacion: "A los lados hasta los bordes cutáneos; a lo largo, hasta los bordes del RI" },
-      rc: { direccion: "variable", texto: "Centrado 1,25 cm (½\") distal al vértice de la rótula y paralelo a la meseta tibial. Para elegir el ángulo se mide la distancia de la EIAS al tablero de la mesa: menos de 19 cm (muslos y nalgas delgados), 3-5° caudal; 19-24 cm (medianos), 0°, perpendicular al RI; más de 24 cm (gruesos), 3-5° cefálico." },
+      rc: { direccion: "variable", texto: "Centrado 1,25 cm distal al vértice de la rótula y paralelo a la meseta tibial. Para elegir el ángulo se mide la distancia de la EIAS al tablero de la mesa: menos de 19 cm (muslos y nalgas delgados), 3-5° caudal; 19-24 cm (medianos), 0°, perpendicular al RI; más de 24 cm (gruesos), 3-5° cefálico." },
       posicion: [
         "Decúbito supino o sentado en la mesa, pierna extendida y centrada en el RC y en la línea media de la mesa o del RI.",
         "Si hace falta, rotar un poco la pierna hacia adentro para que rodilla y pierna queden en AP verdadera.",
@@ -348,7 +348,7 @@ export default {
     {
       id: "rodilla-ap-oblicuas", region: "rodilla", nombre: "AP oblicua de rodilla con rotación medial y lateral", categoria: ["Oblicuas"], tipo: "R",
       factores: { ri: RI_24x30_V, dfri: DFRI, respiracion: null, parrilla: PARRILLA_RODILLA, colimacion: "A los lados hasta los bordes cutáneos; a lo largo, hasta los bordes del RI" },
-      rc: { direccion: "perpendicular", texto: "Perpendicular al RI en un paciente de contextura media (ver AP de rodilla), centrado en la parte media del espacio articular, 1,25 cm (½\") por debajo de la rótula." },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI en un paciente de contextura media (ver AP de rodilla), centrado en la parte media del espacio articular, 1,25 cm por debajo de la rótula." },
       posicion: [
         "Semidecúbito supino, pierna extendida y centrada en el RC y en la línea media de la mesa.",
         "Oblicua medial: rotar 45° hacia adentro toda la extremidad (rodilla, tobillo y pie).",
@@ -368,7 +368,7 @@ export default {
     {
       id: "rodilla-lateral", region: "rodilla", nombre: "Lateral (mediolateral) de rodilla", categoria: ["Perfil"], tipo: "R",
       factores: { ri: RI_24x30_V, dfri: DFRI, respiracion: null, parrilla: PARRILLA_RODILLA, colimacion: "A los lados hasta los bordes cutáneos; a lo largo, hasta los bordes del RI" },
-      rc: { direccion: "cefálico", angulo: "5-7°", texto: "Angulado 5-7° cefálico, centrado a unos 2,5 cm (1\") distal al epicóndilo medial. Si se puede elevar la pierna hasta el plano del fémur, el RC puede ser perpendicular." },
+      rc: { direccion: "cefálico", angulo: "5-7°", texto: "Angulado 5-7° cefálico, centrado a unos 2,5 cm distal al epicóndilo medial. Si se puede elevar la pierna hasta el plano del fémur, el RC puede ser perpendicular." },
       posicion: [
         "Paciente sobre el lado afectado, con la rodilla flexionada unos 20-30°, centrada en el RC y en la línea media de la mesa o del RI.",
         "La pierna y la rodilla sanas van por detrás para no rotar de más.",
@@ -384,8 +384,8 @@ export default {
     },
     {
       id: "rodilla-ap-pa-bilateral-carga", region: "rodilla", nombre: "AP o PA bilateral de rodillas en carga", categoria: ["AP", "PA"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Región de las dos rodillas, incluyendo la parte distal de los fémures y la proximal de tibias y peronés" },
-      rc: { direccion: "variable", texto: "En el punto medio entre las dos rodillas, unos 1,25 cm (½\") distal al vértice de las rótulas. AP: horizontal, perpendicular al RI en un paciente de contextura media (ver AP de rodilla). PA: 10° caudal (con las rodillas flexionadas unos 20°)." },
+      factores: { ri: "35 × 43 cm, horizontal", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Región de las dos rodillas, incluyendo la parte distal de los fémures y la proximal de tibias y peronés" },
+      rc: { direccion: "variable", texto: "En el punto medio entre las dos rodillas, unos 1,25 cm distal al vértice de las rótulas. AP: horizontal, perpendicular al RI en un paciente de contextura media (ver AP de rodilla). PA: 10° caudal (con las rodillas flexionadas unos 20°)." },
       posicion: [
         "AP: de pie, subido a un escalón o al estribo de la mesa si hace falta, a una altura que permita bajar el tubo y usar un rayo horizontal.",
         "Pies rectos hacia adelante y rodillas extendidas, con el peso repartido por igual. El paciente se sostiene de los agarraderos de la mesa.",
@@ -396,8 +396,8 @@ export default {
     },
     {
       id: "rodilla-pa-axial-bilateral-rosenberg", region: "rodilla", nombre: "PA axial bilateral de rodillas en carga", metodo: "Rosenberg", categoria: ["PA", "Axiales", "Métodos especiales"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Región de las dos rodillas, incluyendo la parte distal de los fémures y la proximal de las tibias" },
-      rc: { direccion: "caudal", angulo: "10°", texto: "Angulado 10° caudal, hacia la parte media de las articulaciones de las rodillas, 1,25 cm (½\") por debajo del vértice de la rótula." },
+      factores: { ri: "35 × 43 cm, horizontal", dfri: DFRI, respiracion: null, parrilla: "Sí", colimacion: "Región de las dos rodillas, incluyendo la parte distal de los fémures y la proximal de las tibias" },
+      rc: { direccion: "caudal", angulo: "10°", texto: "Angulado 10° caudal, hacia la parte media de las articulaciones de las rodillas, 1,25 cm por debajo del vértice de la rótula." },
       posicion: [
         "De pie, en posición PA.",
         "Peso repartido por igual entre los dos pies.",
@@ -464,11 +464,11 @@ export default {
     },
     {
       id: "fosa-rotula-axial-merchant", region: "fosa-rotula", nombre: "Axial tangencial bilateral de rótula", metodo: "Merchant", categoria: ["Axiales", "Tangenciales", "Métodos especiales"], tipo: "E",
-      factores: { ri: "18 × 24 cm (8 × 10\"), horizontal, o 35 × 43 cm (14 × 17\") para rodillas grandes", dfri: "120-180 cm (48-72\"); una DFRI mayor reduce la magnificación", respiracion: null, parrilla: "No", colimacion: "Hasta las rótulas y las dos articulaciones femororrotulianas" },
+      factores: { ri: "18 × 24 cm, horizontal, o 35 × 43 cm para rodillas grandes", dfri: "120-180 cm; una DFRI mayor reduce la magnificación", respiracion: null, parrilla: "No", colimacion: "Hasta las rótulas y las dos articulaciones femororrotulianas" },
       rc: { direccion: "angulado", angulo: "30° respecto a la horizontal", texto: "Angulado 30° respecto a la horizontal (30° respecto al eje longitudinal de los fémures), en el punto medio entre las rótulas." },
       posicion: [
         "Decúbito supino, con las rodillas flexionadas 40° sobre soportes para las piernas. El paciente tiene que estar cómodo y con las piernas bien relajadas, para que la rótula no sea traccionada hacia el surco intercondíleo.",
-        "Apoyar el RI sobre los soportes contra las piernas, unos 30 cm (12\") distal a las rótulas y perpendicular al RC.",
+        "Apoyar el RI sobre los soportes contra las piernas, unos 30 cm distal a las rótulas y perpendicular al RC.",
         "Hace falta un dispositivo regulable para sostener las piernas y el RI.",
       ],
       criterios: SIN_CRITERIOS,
@@ -476,7 +476,7 @@ export default {
     },
     {
       id: "fosa-rotula-axial-settegast-hughston", region: "fosa-rotula", nombre: "Axial tangencial de rótula en decúbito prono", metodo: "Settegast y Hughston", categoria: ["Axiales", "Tangenciales", "Métodos especiales"], tipo: "E",
-      factores: { ri: "24 × 30 cm (10 × 12\"), horizontal", dfri: "100-120 cm (40-48\")", respiracion: null, parrilla: "No", colimacion: "Ajustada a la región de la rótula" },
+      factores: { ri: "24 × 30 cm, horizontal", dfri: "100-120 cm", respiracion: null, parrilla: "No", colimacion: "Ajustada a la región de la rótula" },
       rc: { direccion: "cefálico", angulo: "15-20° (Settegast) o 45° (Hughston)", texto: "Centrado en la parte media del espacio articular femororrotuliano. Settegast: 15-20° cefálico respecto del eje longitudinal de la pierna (rodilla flexionada 90°). Hughston: 45° cefálico respecto del eje longitudinal de la pierna (rodilla flexionada 50-60°)." },
       posicion: [
         "Settegast: decúbito prono, rodilla flexionada 90°.",
@@ -493,7 +493,7 @@ export default {
     },
     {
       id: "fosa-rotula-tangencial-hobbs", region: "fosa-rotula", nombre: "Tangencial superoinferior de rótula en sedestación (bilateral)", metodo: "Modificación de Hobbs", categoria: ["Tangenciales", "Métodos especiales"], tipo: "E",
-      factores: { ri: "35 × 43 cm (14 × 17\"), horizontal, o 18 × 24 cm (8 × 10\"), horizontal (unilateral)", dfri: "120-130 cm (48-50\")", respiracion: null, parrilla: "No", colimacion: "Región de las rodillas, fémur distal y rótula de los dos lados" },
+      factores: { ri: "35 × 43 cm, horizontal, o 18 × 24 cm, horizontal (unilateral)", dfri: "120-130 cm", respiracion: null, parrilla: "No", colimacion: "Región de las rodillas, fémur distal y rótula de los dos lados" },
       rc: { direccion: "perpendicular", texto: "Perpendicular al RI (tangencial a la articulación femororrotuliana), centrado a mitad de camino entre las dos articulaciones femororrotulianas." },
       posicion: [
         "Paciente sentado.",

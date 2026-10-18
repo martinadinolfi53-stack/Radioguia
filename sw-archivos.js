@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "2ca0bfedab";
+self.RG_VERSION = "b1358a9464";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -16,6 +16,7 @@ self.RG_ARCHIVOS = [
  "datos/cap10-portatiles.js",
  "datos/ediciones.json",
  "datos/glosario.js",
+ "datos/ilustraciones.js",
  "datos/indice.js",
  "fuentes/IBMPlexSans-400.ttf",
  "fuentes/IBMPlexSans-600.ttf",

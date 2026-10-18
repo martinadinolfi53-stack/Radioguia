@@ -1,6 +1,7 @@
 // Capa de datos: arma índices a partir de los capítulos y el glosario. Ninguna vista lee los archivos de datos directo.
 import { CAPITULOS, FUENTE } from "../datos/indice.js";
 import GLOSARIO from "../datos/glosario.js";
+import CON_ESQUEMA from "../datos/ilustraciones.js";
 import { validarDatos } from "./validacion.js";
 import { aplicarEdiciones, cargarCompartidas } from "./edicion.js";
 
@@ -13,6 +14,9 @@ export const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, 
 export const capitulos = CAPITULOS.map((c) => ({ ...c, regiones: c.regiones.map((r) => ({ ...r, capitulo: c.capitulo })) }));
 export const regiones = capitulos.flatMap((c) => c.regiones);
 export const proyecciones = capitulos.flatMap((c) => c.proyecciones.map((p) => ({ ...p, capitulo: c.capitulo })));
+// esquemas didácticos generados (ilustraciones/<id>.svg), sin verificar por un docente
+const esquemas = new Set(CON_ESQUEMA);
+for (const p of proyecciones) if (!p.ilustracion?.src && esquemas.has(p.id)) p.ilustracion = { src: `ilustraciones/${p.id}.svg`, alt: `Esquema: ${p.nombre}`, verificada: false };
 // correcciones del modo edición: las publicadas en GitHub y, encima, las de este dispositivo
 aplicarEdiciones(proyecciones, await cargarCompartidas());
 

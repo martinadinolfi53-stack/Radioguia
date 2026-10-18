@@ -22,6 +22,14 @@ const enMenu = GRUPOS.flatMap((g) => g.regiones);
 for (const r of regiones) if (!enMenu.includes(r.id)) problemas.push(`Región sin botón en el menú (js/menu.js): ${r.id}`);
 enMenu.forEach((id, i) => { if (enMenu.indexOf(id) !== i || !regiones.some((r) => r.id === id)) problemas.push(`Región repetida o inexistente en js/menu.js: ${id}`); });
 
+// angulación y rotación: una entrada por ficha, con «Sí…», «No…» o null
+const ANG = (await import(pathToFileURL(join(raiz, "datos/angulacion-rotacion.js")))).default;
+for (const p of proyecciones) if (!ANG[p.id]) problemas.push(`[${p.id}] falta en datos/angulacion-rotacion.js`);
+for (const [id, v] of Object.entries(ANG)) {
+  if (!proyecciones.some((p) => p.id === id)) problemas.push(`datos/angulacion-rotacion.js: "${id}" no es una proyección`);
+  for (const k of ["angulacion", "rotacion"]) if (v[k] !== null && !/^(Sí|No)(\s|;|$)/.test(v[k] ?? "")) problemas.push(`[${id}] ${k} tiene que empezar con Sí o No`);
+}
+
 // archivos de datos que existen pero no están en el índice
 const enIndice = readFileSync(join(raiz, "datos/indice.js"), "utf8");
 for (const f of readdirSync(join(raiz, "datos"))) if (/^cap\d+.*\.js$/.test(f) && !enIndice.includes(f)) problemas.push(`datos/${f} no está importado en datos/indice.js`);

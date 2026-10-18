@@ -18,7 +18,7 @@ const RC_FLECHA = {
   angulado: '<path d="M8 3l14 21M13 23l9 1 1-9"/>',
   variable: '<path d="M16 3v22M9 18l7 7 7-7"/>',
 };
-const FACTORES = [["ri", "Tamaño del RI"], ["dfri", "DFRI"], ["respiracion", "Respiración"]];
+const FACTORES = [["ri", "Tamaño del RI"], ["dfri", "DFRI"], ["respiracion", "Respiración"], ["angulacion", "Angulación del rayo"], ["rotacion", "Rotación de la región"]];
 const FACTORES_EXTRA = [["parrilla", "Parrilla (Bucky)"], ["colimacion", "Colimación"]];
 
 export function vistaFicha(p, volver) {
@@ -46,7 +46,7 @@ export function vistaFicha(p, volver) {
     </div>
 
     ${sec("Factores técnicos", () => `<dl class="tabla">${[...FACTORES, ...FACTORES_EXTRA].filter(([k]) => p.factores?.[k] || (p.factores && k in p.factores && p.factores[k] === null))
-      .map(([k, n]) => `<div class="it"><dt>${m(n)}</dt><dd>${p.factores[k] === null ? "" : m(p.factores[k])}</dd></div>`).join("")}</dl>`)}
+      .map(([k, n]) => `<div class="it"><dt>${m(n)}</dt><dd>${p.factores[k] === null ? "" : m(p.factores[k]).replace(/^(Sí|No)(?=\s|;|$)/, "<b>$1</b>")}</dd></div>`).join("")}</dl>`)}
 
     <section class="rc rc-${dir === "cefálico" ? "cefalico" : dir}" aria-labelledby="rc-t">
       <div class="rc-cab">

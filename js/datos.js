@@ -2,6 +2,7 @@
 import { CAPITULOS, FUENTE } from "../datos/indice.js";
 import GLOSARIO from "../datos/glosario.js";
 import CON_ESQUEMA from "../datos/ilustraciones.js";
+import ANG_ROT from "../datos/angulacion-rotacion.js";
 import { validarDatos } from "./validacion.js";
 import { aplicarEdiciones, cargarCompartidas } from "./edicion.js";
 
@@ -14,6 +15,8 @@ export const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, 
 export const capitulos = CAPITULOS.map((c) => ({ ...c, regiones: c.regiones.map((r) => ({ ...r, capitulo: c.capitulo })) }));
 export const regiones = capitulos.flatMap((c) => c.regiones);
 export const proyecciones = capitulos.flatMap((c) => c.proyecciones.map((p) => ({ ...p, capitulo: c.capitulo })));
+// angulación del rayo y rotación de la región (sacadas de los pasos y del RC de cada ficha)
+for (const p of proyecciones) if (ANG_ROT[p.id]) p.factores = { ...p.factores, ...Object.fromEntries(Object.entries(ANG_ROT[p.id]).filter(([k]) => !(k in (p.factores || {})))) };
 // esquemas didácticos generados (ilustraciones/<id>.svg), sin verificar por un docente
 const esquemas = new Set(CON_ESQUEMA);
 for (const p of proyecciones) if (!p.ilustracion?.src && esquemas.has(p.id)) p.ilustracion = { src: `ilustraciones/${p.id}.svg`, alt: `Esquema: ${p.nombre}`, verificada: false };

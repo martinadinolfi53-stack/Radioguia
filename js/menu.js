@@ -1,19 +1,69 @@
-// Menú principal por región, como el índice del PDF de Técnicas 1: de la cabeza a los pies
-// y, en las extremidades, de proximal a distal. Cada botón agrupa regiones del manual.
+// Menú principal por zona, como el índice del PDF de Técnicas 1: un botón por zona, con el color de su región.
+// Orden del manual; en las extremidades, de distal a proximal (mano, muñeca, antebrazo, codo, brazo, hombro).
+const C = { torax: "#2a9d8f", superior: "#1f9a6a", inferior: "#6f5fd0", pelvis: "#9a55c0", columna: "#3d7fd0", toraxOseo: "#6a9a2f", craneo: "#c0619a", abdomen: "#c98a1b", contraste: "#c76b3a", portatil: "#7d8796" };
+const F = {
+  torax: { nombre: "Tórax", color: C.torax },
+  superior: { nombre: "Miembro superior", color: C.superior },
+  inferior: { nombre: "Miembro inferior", color: C.inferior },
+  pelvis: { nombre: "Pelvis y cadera", color: C.pelvis },
+  columna: { nombre: "Columna vertebral", color: C.columna },
+  toraxOseo: { nombre: "Tórax óseo", color: C.toraxOseo },
+  craneo: { nombre: "Cráneo y cara", color: C.craneo },
+  abdomen: { nombre: "Abdomen", color: C.abdomen },
+  contraste: { nombre: "Estudios con contraste", color: C.contraste },
+  portatil: { nombre: "Portátiles e intraoperatorias", color: C.portatil },
+};
+
 export const GRUPOS = [
-  { id: "craneo", nombre: "Cráneo, cara y senos", color: "#c0619a", regiones: ["craneo", "craneo-trauma", "huesos-faciales", "faciales-trauma", "agujeros-opticos", "arcos-cigomaticos", "huesos-nasales", "mandibula", "atm", "senos"] },
-  { id: "columna", nombre: "Columna vertebral", color: "#3d7fd0", regiones: ["columna-cervical", "columna-toracica", "columna-lumbar", "columna-escoliosis", "columna-sacro-coccix", "columna-sacroiliacas"] },
-  { id: "torax", nombre: "Tórax", color: "#2a9d8f", regiones: ["torax", "via-aerea", "torax-pediatrico"] },
-  { id: "torax-oseo", nombre: "Tórax óseo", color: "#5e9e3f", regiones: ["esternon", "esternoclaviculares", "costillas-bilaterales", "costillas-axilares"] },
-  { id: "abdomen", nombre: "Abdomen", color: "#c98a1b", regiones: ["abdomen", "abdomen-pediatrico"] },
-  { id: "contraste", nombre: "Estudios con contraste", color: "#c76b3a", regiones: ["esofagograma", "estomago", "intestino-delgado", "enema-opaco", "urografia", "cistografia"] },
-  { id: "hombro", nombre: "Hombro y húmero", color: "#1f9a7a", regiones: ["clavicula", "acromioclaviculares", "escapula", "hombro", "humero"] },
-  { id: "superior", nombre: "Codo, antebrazo y mano", color: "#169c9c", regiones: ["codo", "antebrazo", "muneca", "mano", "pulgar", "dedos-mano", "ext-sup-pediatrica"] },
-  { id: "pelvis", nombre: "Pelvis y cadera", color: "#8a63c9", regiones: ["pelvis", "acetabulo", "caderas", "cadera-lateral", "caderas-pelvis-pediatricas"] },
-  { id: "inferior", nombre: "Miembro inferior", color: "#6f6fd6", regiones: ["femur", "rodilla", "fosa-rotula", "pierna", "tobillo", "calcaneo", "pie", "dedos-pie", "ext-inf-pediatrica"] },
-  { id: "portatiles", nombre: "Portátiles e intraoperatorias", color: "#7d8796", regiones: ["port-torax", "port-abdomen", "port-pelvis-cadera", "intraop-arco"] },
+  { id: "torax", nombre: "Tórax", familia: F.torax, regiones: ["torax", "torax-pediatrico"] },
+  { id: "via-aerea", nombre: "Vía aérea", familia: F.torax, regiones: ["via-aerea"] },
+
+  { id: "dedos-mano", nombre: "Dedos y pulgar", familia: F.superior, regiones: ["dedos-mano", "pulgar"] },
+  { id: "mano", nombre: "Mano", familia: F.superior, regiones: ["mano"] },
+  { id: "muneca", nombre: "Muñeca", familia: F.superior, regiones: ["muneca"] },
+  { id: "antebrazo", nombre: "Antebrazo", familia: F.superior, regiones: ["antebrazo"] },
+  { id: "codo", nombre: "Codo", familia: F.superior, regiones: ["codo"] },
+  { id: "brazo", nombre: "Brazo (húmero)", familia: F.superior, regiones: ["humero"] },
+  { id: "hombro", nombre: "Hombro", familia: F.superior, regiones: ["hombro", "acromioclaviculares"] },
+  { id: "clavicula", nombre: "Clavícula y escápula", familia: F.superior, regiones: ["clavicula", "escapula"] },
+  { id: "superior-ped", nombre: "Miembro superior pediátrico", familia: F.superior, regiones: ["ext-sup-pediatrica"] },
+
+  { id: "dedos-pie", nombre: "Dedos del pie", familia: F.inferior, regiones: ["dedos-pie"] },
+  { id: "pie", nombre: "Pie y calcáneo", familia: F.inferior, regiones: ["pie", "calcaneo"] },
+  { id: "tobillo", nombre: "Tobillo", familia: F.inferior, regiones: ["tobillo"] },
+  { id: "pierna", nombre: "Pierna", familia: F.inferior, regiones: ["pierna"] },
+  { id: "rodilla", nombre: "Rodilla y rótula", familia: F.inferior, regiones: ["rodilla", "fosa-rotula"] },
+  { id: "femur", nombre: "Fémur", familia: F.inferior, regiones: ["femur"] },
+  { id: "inferior-ped", nombre: "Miembro inferior pediátrico", familia: F.inferior, regiones: ["ext-inf-pediatrica"] },
+
+  { id: "cadera", nombre: "Cadera", familia: F.pelvis, regiones: ["caderas", "cadera-lateral"] },
+  { id: "pelvis", nombre: "Pelvis y acetábulo", familia: F.pelvis, regiones: ["pelvis", "acetabulo"] },
+  { id: "pelvis-ped", nombre: "Cadera y pelvis pediátricas", familia: F.pelvis, regiones: ["caderas-pelvis-pediatricas"] },
+
+  { id: "cervical", nombre: "Columna cervical", familia: F.columna, regiones: ["columna-cervical"] },
+  { id: "toracica", nombre: "Columna dorsal", familia: F.columna, regiones: ["columna-toracica"] },
+  { id: "lumbar", nombre: "Columna lumbar y escoliosis", familia: F.columna, regiones: ["columna-lumbar", "columna-escoliosis"] },
+  { id: "sacro", nombre: "Sacro, cóccix y sacroilíacas", familia: F.columna, regiones: ["columna-sacro-coccix", "columna-sacroiliacas"] },
+
+  { id: "esternon", nombre: "Esternón", familia: F.toraxOseo, regiones: ["esternon", "esternoclaviculares"] },
+  { id: "costillas", nombre: "Costillas", familia: F.toraxOseo, regiones: ["costillas-bilaterales", "costillas-axilares"] },
+
+  { id: "craneo", nombre: "Cráneo", familia: F.craneo, regiones: ["craneo", "craneo-trauma"] },
+  { id: "cara", nombre: "Huesos faciales", familia: F.craneo, regiones: ["huesos-faciales", "faciales-trauma", "agujeros-opticos", "arcos-cigomaticos", "huesos-nasales"] },
+  { id: "mandibula", nombre: "Mandíbula y ATM", familia: F.craneo, regiones: ["mandibula", "atm"] },
+  { id: "senos", nombre: "Senos paranasales", familia: F.craneo, regiones: ["senos"] },
+
+  { id: "abdomen", nombre: "Abdomen", familia: F.abdomen, regiones: ["abdomen", "abdomen-pediatrico"] },
+
+  { id: "digestivo", nombre: "Esófago, estómago e intestino", familia: F.contraste, regiones: ["esofagograma", "estomago", "intestino-delgado"] },
+  { id: "colon", nombre: "Colon (enema opaco)", familia: F.contraste, regiones: ["enema-opaco"] },
+  { id: "urinario", nombre: "Urografía y cistografía", familia: F.contraste, regiones: ["urografia", "cistografia"] },
+
+  { id: "portatiles", nombre: "Portátiles", familia: F.portatil, regiones: ["port-torax", "port-abdomen", "port-pelvis-cadera"] },
+  { id: "intraop", nombre: "Intraoperatoria (arco en C)", familia: F.portatil, regiones: ["intraop-arco"] },
 ];
+
+for (const g of GRUPOS) g.color = g.familia.color;
 
 export const grupoPorId = Object.fromEntries(GRUPOS.map((g) => [g.id, g]));
 export const grupoDeRegion = Object.fromEntries(GRUPOS.flatMap((g) => g.regiones.map((r) => [r, g])));
-

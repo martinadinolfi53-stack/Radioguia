@@ -30,14 +30,13 @@ function resultados(lista, q) {
   return `<p class="label">${res.length} ${res.length === 1 ? "resultado" : "resultados"}</p><div class="lista">${res.map((p) => filaProyeccion(p, true)).join("")}</div>`;
 }
 
-// menú principal: un botón por región, en orden (ver js/menu.js); "filtro" deja solo las proyecciones que cumplen (favoritos)
+// menú principal: botones por zona agrupados por región, con su color (ver js/menu.js); "filtro" deja solo las proyecciones que cumplen (favoritos)
 function menuRegiones(filtro) {
   const fav = filtro !== todos;
-  return `<div class="grupos">${GRUPOS.map((g) => {
-    const n = g.regiones.reduce((a, id) => a + proyeccionesDe(id).filter(filtro).length, 0);
-    return n ? `<a class="grupo" href="#g-${g.id}${fav ? "-fav" : ""}" style="--c:${g.color}"><span class="t">${esc(g.nombre)}</span>
-      <span class="s">${n} ${n === 1 ? "proyección" : "proyecciones"}</span>${icono.chev}</a>` : "";
-  }).join("")}</div>`;
+  const botones = GRUPOS.map((g) => ({ g, n: g.regiones.reduce((a, id) => a + proyeccionesDe(id).filter(filtro).length, 0) })).filter((x) => x.n);
+  const familias = [...new Set(botones.map((x) => x.g.familia))];
+  return familias.map((f) => `<section class="familia" style="--c:${f.color}"><h2>${esc(f.nombre)}</h2><div class="grupos">${botones.filter((x) => x.g.familia === f).map(({ g, n }) =>
+    `<a class="grupo" href="#g-${g.id}${fav ? "-fav" : ""}"><span class="t">${esc(g.nombre)}</span><span class="s">${n} ${n === 1 ? "proyección" : "proyecciones"}</span></a>`).join("")}</div></section>`).join("");
 }
 const todos = () => true;
 

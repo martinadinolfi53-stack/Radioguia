@@ -1,0 +1,149 @@
+// Arranque y navegación por #hash:
+// #  inicio · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #calc · #calc-<proyección> · #ajustes
+import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
+import { favoritos, preferencias, aplicarPreferencias } from "./almacen.js";
+import { estado, capAbiertos, vistaInicio, vistaRegion, vistaFavoritos, vistaAjustes } from "./vistas.js";
+import { vistaFicha } from "./ficha.js";
+import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
+import { mostrarTermino } from "./glosario.js";
+import { ampliar } from "./imagenes.js";
+import { pwa } from "./pwa.js";
+import { edicion, vistaEditar, leerFormulario } from "./edicion.js";
+
+const app = document.getElementById("app");
+aplicarPreferencias();
+favoritos.limpiar(new Set(proyecciones.map((p) => p.id)));
+
+// de dónde se llegó a cada pantalla, para que "Volver" lleve al lugar correcto
+let pantallaAnterior = "#";
+const historial = [];
+
+function ruta() {
+  const h = decodeURIComponent(location.hash || "#");
+  if (h.startsWith("#p-") && proyeccionPorId[h.slice(3)]) return { tipo: "ficha", p: proyeccionPorId[h.slice(3)] };
+  if (h.startsWith("#r-")) {
+    const fav = h.endsWith("-fav"), id = h.slice(3, fav ? -4 : undefined);
+    if (regionPorId[id]) return { tipo: "region", r: regionPorId[id], fav };
+  }
+  if (h.startsWith("#editar-") && proyeccionPorId[h.slice(8)] && edicion.activa()) return { tipo: "editar", p: proyeccionPorId[h.slice(8)] };
+  if (h === "#favoritos") return { tipo: "favoritos" };
+  if (h === "#ajustes") return { tipo: "ajustes" };
+  if (h === "#calc" || h.startsWith("#calc-")) return { tipo: "calc", id: h.slice(6) || null };
+  return { tipo: "inicio" };
+}
+
+function volverA(r) {
+  if (r.tipo === "ficha") return historial.findLast((x) => !x.startsWith("#p-") && !x.startsWith("#calc")) || `#r-${r.p.region}`;
+  if (r.tipo === "calc") return pantallaAnterior;
+  if (r.tipo === "editar") return `#p-${r.p.id}`;
+  return "#";
+}
+
+function render() {
+  const r = ruta();
+  const vuelta = volverA(r);
+  switch (r.tipo) {
+    case "ficha": app.innerHTML = vistaFicha(r.p, vuelta); break;
+    case "region": app.innerHTML = vistaRegion(r.r, r.fav); break;
+    case "favoritos": app.innerHTML = vistaFavoritos(); break;
+    case "ajustes": app.innerHTML = vistaAjustes(); break;
+    case "calc": app.innerHTML = vistaCalculadora(r.id, vuelta); break;
+    case "editar": app.innerHTML = vistaEditar(r.p, vuelta); break;
+    default: app.innerHTML = vistaInicio();
+  }
+  document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : "RadioGuía";
+}
+
+addEventListener("hashchange", (e) => {
+  const antes = new URL(e.oldURL).hash || "#";
+  pantallaAnterior = antes;
+  if (!antes.startsWith("#p-")) historial.push(antes); else if (!historial.length) historial.push(antes);
+  if (historial.length > 30) historial.shift();
+  render();
+  scrollTo(0, 0);
+});
+
+// solo se reemplaza el contenido, así el buscador no pierde el foco ni cierra el teclado
+function refrescarMain() {
+  const tmp = document.createElement("div");
+  tmp.innerHTML = ruta().tipo === "favoritos" ? vistaFavoritos() : vistaInicio();
+  const nuevo = tmp.querySelector("main"), actual = app.querySelector("main");
+  if (nuevo && actual) actual.replaceWith(nuevo);
+}
+
+app.addEventListener("click", async (e) => {
+  const t = e.target.closest("[data-desconectar],[data-exportar],[data-salir-edicion],[data-restaurar],[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso]");
+  if (!t) return;
+  if ("exportar" in t.dataset) return edicion.exportar();
+  if ("desconectar" in t.dataset) { edicion.configurarGithub(null); return render(); }
+  if ("salirEdicion" in t.dataset) { edicion.salir(); return render(); }
+  if (t.dataset.restaurar) {
+    if (!confirm("¿Volver a los datos originales de esta ficha? Se pierden tus cambios.")) return;
+    try { await edicion.restaurar(t.dataset.restaurar); } catch (err) { return alert(err.message); }
+    location.hash = `#p-${t.dataset.restaurar}`; return location.reload();
+  }
+  if (t.dataset.fav) {
+    e.preventDefault();
+    favoritos.alternar(t.dataset.fav);
+    const y = scrollY; render(); scrollTo(0, y);
+  } else if (t.dataset.term) mostrarTermino(t.dataset.term);
+  else if (t.dataset.ampliar) ampliar(t.dataset.ampliar, t.dataset.alt);
+  else if (t.dataset.filtro) { estado.filtro[t.dataset.filtro] = t.dataset.cat || undefined; const y = scrollY; render(); scrollTo(0, y); }
+  else if (t.dataset.borrar) {
+    const k = t.dataset.borrar === "q-fav" ? "qFav" : "q";
+    estado[k] = ""; render(); document.getElementById(t.dataset.borrar)?.focus();
+  } else if (t.dataset.pref) { preferencias.set(t.dataset.pref, t.dataset.val); render(); }
+  else if ("instalar" in t.dataset) { await pwa.instalar(); render(); }
+  else if ("cerrarAviso" in t.dataset) { preferencias.set("avisoInstalar", false); render(); }
+});
+
+app.addEventListener("input", (e) => {
+  const el = e.target;
+  if (el.id === "q-inicio" || el.id === "q-fav") {
+    estado[el.id === "q-fav" ? "qFav" : "q"] = el.value;
+    refrescarMain();
+    const b = app.querySelector(`[data-borrar="${el.id}"]`); if (b) b.hidden = !el.value;
+  } else if (el.id === "espesor") {
+    calcEstado.espesor = el.value;
+    const r = ruta();
+    document.getElementById("calc-res").innerHTML = resultadoHTML(calcular(el.value, r.id ? proyeccionPorId[r.id] : null));
+  }
+});
+
+app.addEventListener("submit", async (e) => {
+  const f = e.target;
+  if (f.id === "form-clave") {
+    e.preventDefault();
+    const ok = await edicion.entrar(f.elements.clave.value);
+    if (ok) render(); else document.getElementById("clave-error").hidden = false;
+  } else if (f.id === "form-edicion") {
+    e.preventDefault();
+    const id = f.dataset.id, estadoEl = document.getElementById("ed-estado"), btn = f.querySelector('[type="submit"]');
+    btn.disabled = true; estadoEl.textContent = "Guardando…";
+    try { estadoEl.textContent = await edicion.guardar(id, leerFormulario(f)); }
+    catch (err) { estadoEl.textContent = "Quedó guardado en este celular, pero no se pudo publicar: " + err.message; }
+    // se recarga para que el buscador y el glosario tomen los datos nuevos
+    setTimeout(() => { location.hash = `#p-${id}`; location.reload(); }, 1600);
+  } else if (f.id === "form-github") {
+    e.preventDefault();
+    const est = document.getElementById("gh-estado");
+    const repo = f.elements.repo.value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, ""), token = f.elements.token.value.trim();
+    if (!/^[\w.-]+\/[\w.-]+$/.test(repo) || !token) { est.textContent = "Completá el repositorio (usuario/nombre) y el token."; return; }
+    edicion.configurarGithub({ repo, token, rama: "main" });
+    est.textContent = "Probando…";
+    try { await edicion.probarGithub(); est.textContent = "Conectado."; setTimeout(render, 900); }
+    catch (err) { edicion.configurarGithub(null); est.textContent = "No se pudo conectar: " + err.message; }
+  }
+});
+
+// recordar qué capítulos quedaron desplegados en el inicio
+app.addEventListener("toggle", (e) => {
+  const d = e.target;
+  if (!d.dataset?.cap || ruta().tipo !== "inicio") return;
+  const n = Number(d.dataset.cap);
+  d.open ? capAbiertos.add(n) : capAbiertos.delete(n);
+}, true);
+
+pwa.iniciar(() => { if (["inicio", "ajustes"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
+matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
+render();

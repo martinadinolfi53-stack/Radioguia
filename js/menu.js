@@ -1,5 +1,5 @@
 // Menú principal por zona, como el índice del PDF de Técnicas 1: un botón por zona, con el color de su región.
-// Orden del manual; en las extremidades, de distal a proximal (mano, muñeca, antebrazo, codo, brazo, hombro).
+// Orden del manual; en las extremidades, de proximal a distal (hombro, brazo, codo, antebrazo, muñeca, mano), como pidió Martin.
 const C = { torax: "#2a9d8f", superior: "#1f9a6a", inferior: "#6f5fd0", pelvis: "#9a55c0", columna: "#3d7fd0", toraxOseo: "#6a9a2f", craneo: "#c0619a", abdomen: "#c98a1b", contraste: "#c76b3a", portatil: "#7d8796" };
 const F = {
   torax: { nombre: "Tórax", color: C.torax },
@@ -18,27 +18,27 @@ export const GRUPOS = [
   { id: "torax", nombre: "Tórax", familia: F.torax, regiones: ["torax", "torax-pediatrico"] },
   { id: "via-aerea", nombre: "Vía aérea", familia: F.torax, regiones: ["via-aerea"] },
 
-  { id: "dedos-mano", nombre: "Dedos y pulgar", familia: F.superior, regiones: ["dedos-mano", "pulgar"] },
-  { id: "mano", nombre: "Mano", familia: F.superior, regiones: ["mano"] },
-  { id: "muneca", nombre: "Muñeca", familia: F.superior, regiones: ["muneca"] },
-  { id: "antebrazo", nombre: "Antebrazo", familia: F.superior, regiones: ["antebrazo"] },
-  { id: "codo", nombre: "Codo", familia: F.superior, regiones: ["codo"] },
-  { id: "brazo", nombre: "Brazo (húmero)", familia: F.superior, regiones: ["humero"] },
-  { id: "hombro", nombre: "Hombro", familia: F.superior, regiones: ["hombro", "acromioclaviculares"] },
   { id: "clavicula", nombre: "Clavícula y escápula", familia: F.superior, regiones: ["clavicula", "escapula"] },
+  { id: "hombro", nombre: "Hombro", familia: F.superior, regiones: ["hombro", "acromioclaviculares"] },
+  { id: "brazo", nombre: "Brazo (húmero)", familia: F.superior, regiones: ["humero"] },
+  { id: "codo", nombre: "Codo", familia: F.superior, regiones: ["codo"] },
+  { id: "antebrazo", nombre: "Antebrazo", familia: F.superior, regiones: ["antebrazo"] },
+  { id: "muneca", nombre: "Muñeca", familia: F.superior, regiones: ["muneca"] },
+  { id: "mano", nombre: "Mano", familia: F.superior, regiones: ["mano"] },
+  { id: "dedos-mano", nombre: "Dedos y pulgar", familia: F.superior, regiones: ["dedos-mano", "pulgar"] },
   { id: "superior-ped", nombre: "Miembro superior pediátrico", familia: F.superior, regiones: ["ext-sup-pediatrica"] },
-
-  { id: "dedos-pie", nombre: "Dedos del pie", familia: F.inferior, regiones: ["dedos-pie"] },
-  { id: "pie", nombre: "Pie y calcáneo", familia: F.inferior, regiones: ["pie", "calcaneo"] },
-  { id: "tobillo", nombre: "Tobillo", familia: F.inferior, regiones: ["tobillo"] },
-  { id: "pierna", nombre: "Pierna", familia: F.inferior, regiones: ["pierna"] },
-  { id: "rodilla", nombre: "Rodilla y rótula", familia: F.inferior, regiones: ["rodilla", "fosa-rotula"] },
-  { id: "femur", nombre: "Fémur", familia: F.inferior, regiones: ["femur"] },
-  { id: "inferior-ped", nombre: "Miembro inferior pediátrico", familia: F.inferior, regiones: ["ext-inf-pediatrica"] },
 
   { id: "cadera", nombre: "Cadera", familia: F.pelvis, regiones: ["caderas", "cadera-lateral"] },
   { id: "pelvis", nombre: "Pelvis y acetábulo", familia: F.pelvis, regiones: ["pelvis", "acetabulo"] },
   { id: "pelvis-ped", nombre: "Cadera y pelvis pediátricas", familia: F.pelvis, regiones: ["caderas-pelvis-pediatricas"] },
+
+  { id: "femur", nombre: "Fémur", familia: F.inferior, regiones: ["femur"] },
+  { id: "rodilla", nombre: "Rodilla y rótula", familia: F.inferior, regiones: ["rodilla", "fosa-rotula"] },
+  { id: "pierna", nombre: "Pierna", familia: F.inferior, regiones: ["pierna"] },
+  { id: "tobillo", nombre: "Tobillo", familia: F.inferior, regiones: ["tobillo"] },
+  { id: "pie", nombre: "Pie y calcáneo", familia: F.inferior, regiones: ["pie", "calcaneo"] },
+  { id: "dedos-pie", nombre: "Dedos del pie", familia: F.inferior, regiones: ["dedos-pie"] },
+  { id: "inferior-ped", nombre: "Miembro inferior pediátrico", familia: F.inferior, regiones: ["ext-inf-pediatrica"] },
 
   { id: "cervical", nombre: "Columna cervical", familia: F.columna, regiones: ["columna-cervical"] },
   { id: "toracica", nombre: "Columna dorsal", familia: F.columna, regiones: ["columna-toracica"] },

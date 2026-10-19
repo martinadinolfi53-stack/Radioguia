@@ -304,34 +304,6 @@ const bucky = (x, y1, y2, lbl = "Bucky vertical") => `<rect x="${x}" y="${y1}" w
 // articulación de la rodilla (≈ 1,25 cm distal al vértice de la rótula), en el marco de la pierna
 const artic = (m) => m.L([LL - 10, 6]);
 
-I["rodilla-ap-pa-bilateral-carga"] = () => {
-  const s = 0.42;
-  // panel 1: AP, de espaldas al bucky, mira hacia el tubo (derecha)
-  const a = limb({ ankle: [126, 280], legDir: 270, footDir: 0, s });
-  const ka = artic(a);
-  // panel 2: PA, mira al bucky (derecha), rodillas flexionadas ~20°
-  const b = limb({ knee: [668, 140], legDir: 280, thighDir: 260, footDir: 0, s });
-  const kb = artic(b);
-  return svg(
-    view("1 · AP · vista lateral, de pie") +
-    bucky(80, 34, 244) + txt(12, 262, "RI 35 x 43", 11, INK) + txt(12, 276, "horizontal", 11, INK) +
-    escalon(60, 291, 170) + txt(240, 302, "escalón, si hace falta", 11, MUTE) +
-    clipR("cpC1", 0, 26, 378, 264, dibujar(a)) +
-    beam(ka[0], ka[1], 180, 170, { ref: 180 }) +
-    rayo(ka[0], ka[1], 92, ka[1]) +
-    note(ka[0] + 70, ka[1], 196, 50, ["RC horizontal, ⟂ al RI", "(contextura media), entre", "ambas rodillas, 1,25 cm distal", "al vértice de las rótulas"], RED) +
-    txt(196, 210, "Pies rectos hacia adelante,", 11.5, MUTE) + txt(196, 225, "rodillas extendidas, peso", 11.5, MUTE) + txt(196, 240, "parejo en ambos pies", 11.5, MUTE) +
-    panel2(404, "2 · PA alternativa · de frente al bucky") +
-    bucky(700, 34, 230) +
-    piso(404, 756, 298) +
-    clipR("cpC2", 392, 26, 368, 272, dibujar(b)) +
-    beam(kb[0], kb[1], 10, 190, { horizontal: true, angLabel: "10°" }) +
-    note(kb[0] - 100, kb[1] - 17, 420, 262, ["RC 10° caudal (hacia los pies)"], RED) +
-    txt(404, 318, "Rodillas apoyadas en el bucky, flexionadas ~20°", 11.5, INK) +
-    txt(196, 270, "DFRI 100 cm · parrilla", 11.5, MUTE) + txt(196, 286, "Se sostiene de los agarraderos", 11.5, MUTE)
-  );
-};
-
 I["rodilla-pa-axial-bilateral-rosenberg"] = () => {
   const s = 0.5;
   const m = limb({ ankle: [330, 300 - 47 * 0.5], legDir: 247.5, thighDir: 292.5, footDir: 180, s, sg: -1 });
@@ -376,69 +348,6 @@ I["fosa-rotula-pa-rotula"] = () => {
   );
 };
 
-I["fosa-rotula-tunel"] = () => {
-  // panel 1: Camp Coventry, prono, rodilla flexionada 40-50°
-  const s = 0.55;
-  const a = limb({ knee: [150, 252 - 40 * s], legDir: 135, thighDir: 180, footDir: -15, s, sg: -1 });
-  const ka = a.L([LL - 6, 0]);
-  const ank = a.ankle;
-  // panel 2: Holmblad, arrodillado, muslo inclinado 20-30° hacia adelante
-  const b = limb({ knee: [520, 252 - 40 * s], legDir: 180, thighDir: 245, footDir: 4, s, sg: -1, flexed: true });
-  const kb = b.L([LL - 30, -24]);
-  return svg(
-    view("1 · Camp Coventry · decúbito prono") +
-    table(0, 378, 252, "") +
-    ri(ka[0] - 44, 268, 88, 8, "RI 18 x 24", ka[0] + 50, 276) +
-    apoyo(ank[0] - 22, ank[1] + 14, 44, 252 - ank[1] - 14) +
-    note(ank[0] + 22, 230, 290, 300, ["apoyo grande", "bajo el tobillo"], INK) +
-    clipR("cpT1", 0, 26, 378, 226, dibujar(a)) +
-    tube(ka[0], ka[1], 45, 150, { angLabel: "40-50°" }) +
-    `<line x1="${f1(ka[0])}" y1="${f1(ka[1])}" x2="${f1(ka[0] + 30)}" y2="${f1(ka[1] + 30)}" stroke="${RED}" stroke-width="1.4" stroke-dasharray="3 3"/>` +
-    txt(16, 290, "RC 40-50° caudal (⟂ a la pierna),", 11.5, RED, "start", 700) +
-    txt(16, 305, "al centro de la rodilla; sale por el", 11.5, INK) + txt(16, 320, "borde distal de la rótula", 11.5, INK) +
-    txt(16, 44, "← cabeza", 11, MUTE) +
-    arco(a.knee[0], a.knee[1], 46, -45, 0) + `<line x1="${f1(a.knee[0])}" y1="${f1(a.knee[1])}" x2="${f1(a.knee[0] + 60)}" y2="${f1(a.knee[1])}" stroke="${BLUE}" stroke-width="1.2" stroke-dasharray="4 3"/>` +
-    txt(f1(a.knee[0] + 52), f1(a.knee[1] - 8), "flexión 40-50°", 11.5, BLUE, "start", 700) +
-    panel2(404, "2 · Holmblad · arrodillado") +
-    table(392, 760, 252, "") +
-    ri(kb[0] - 44, 268, 88, 8, "RI 18 x 24", kb[0] + 50, 276) +
-    clipR("cpT2", 392, 26, 368, 226, dibujar(b)) +
-    tube(kb[0], kb[1] - 4, 0, 165) +
-    note(kb[0] + 2, 150, 600, 110, ["RC ⟂ a la pierna, en el", "pliegue poplíteo medio"], RED) +
-    refline(b.knee[0], b.knee[1], b.knee[0], b.knee[1] - 120) +
-    arco(b.knee[0], b.knee[1], 90, 245, 270) + txt(f1(b.knee[0] - 84), f1(b.knee[1] - 96), "20-30°", 12, BLUE, "end", 700) +
-    txt(404, 290, "Se inclina hacia adelante 20-30°", 11.5, INK) + txt(404, 306, "(arrodillado o parcialmente de pie)", 11.5, MUTE) +
-    txt(600, 306, "DFRI 100 cm · parrilla", 11.5, MUTE)
-  );
-};
-
-I["fosa-rotula-axial-settegast-hughston"] = () => {
-  const s = 0.5;
-  // panel 1: Settegast, rodilla flexionada 90°
-  const a = limb({ knee: [180, 252 - 42 * s], legDir: 90, thighDir: 180, footDir: 276, s, sg: -1 });
-  const pa = a.T([14, 30]);
-  // panel 2: Hughston, rodilla flexionada 55° (pierna a 55° de la mesa)
-  const b = limb({ knee: [480, 252 - 42 * s], legDir: 125, thighDir: 180, footDir: 340, s, sg: -1 });
-  const pb = b.T([14, 30]);
-  return svg(
-    view("1 · Settegast · decúbito prono") +
-    table(0, 378, 252, "") +
-    clipR("cpS1", 0, 26, 378, 226, dibujar(a)) +
-    tube(pa[0], pa[1], -17.5, 200, { angLabel: "15-20°" }) +
-    arco(a.knee[0], a.knee[1], 30, -90, 0) + txt(f1(a.knee[0] - 30), f1(a.knee[1] - 34), "90°", 12, BLUE, "end", 700) +
-    txt(16, 284, "RC 15-20° cefálico respecto del", 11.5, RED, "start", 700) + txt(16, 299, "eje de la pierna, a la mitad del", 11.5, INK) + txt(16, 314, "espacio femororrotuliano", 11.5, INK) +
-    txt(16, 44, "← cabeza", 11, MUTE) +
-    panel2(404, "2 · Hughston · decúbito prono") +
-    table(392, 760, 252, "") +
-    clipR("cpS2", 392, 26, 368, 226, dibujar(b)) +
-    beam(pb[0], pb[1], 170, 210, { ref: 125, angLabel: "45°" }) +
-    `<line x1="${f1(b.knee[0])}" y1="${f1(b.knee[1])}" x2="${f1(b.knee[0] + 70)}" y2="${f1(b.knee[1])}" stroke="${BLUE}" stroke-width="1.2" stroke-dasharray="4 3"/>` +
-    arco(b.knee[0], b.knee[1], 56, -55, 0) + txt(f1(b.knee[0] + 50), f1(b.knee[1] - 50), "50-60°", 12, BLUE, "start", 700) +
-    txt(404, 284, "RC 45° cefálico respecto del", 11.5, RED, "start", 700) + txt(404, 299, "eje de la pierna, a la mitad del", 11.5, INK) + txt(404, 314, "espacio femororrotuliano", 11.5, INK) +
-    txt(610, 284, "Sostiene la pierna", 11, MUTE) + txt(610, 298, "con una venda o cinta", 11, MUTE) + txt(610, 314, "DFRI 100-120 cm", 11, MUTE)
-  );
-};
-
 // ---------- oblicuas: corte de la rodilla visto desde los pies ----------
 function corteRodilla(cx, cy, r, ghost = false) {
   const R = (pts) => pts.map(([x, y]) => { const v = rot([x, y], r); return [cx + v[0], cy + v[1]]; });
@@ -462,39 +371,6 @@ function oblicuaPanel(x0, r, titulo, giro) {
     txt(x0 + 30, 290, giro, 12, INK, "start", 700) +
     txt(x0 + 30, 306, "rodilla, tobillo y pie giran juntos", 11.5, MUTE);
 }
-I["rodilla-ap-oblicuas"] = () => svg(
-  oblicuaPanel(0, 45, "1 · Oblicua medial · desde los pies", "Rotación interna 45°") +
-  panel2(404, "") + oblicuaPanel(392, -45, "2 · Oblicua lateral · desde los pies", "Rotación externa 45°") +
-  txt(12, 44, "Rodilla derecha, semidecúbito supino", 11, MUTE) +
-  note(190, 150, 236, 64, ["RC ⟂ al RI, 1,25 cm por", "debajo de la rótula (mitad", "del espacio articular)"], RED) +
-  txt(404, 44, "RI 24 x 30 vertical · DFRI 100 cm · parrilla si > 10 cm", 11, MUTE) +
-  txt(12, 324, "punteado: rodilla sin rotar · línea azul: frente de la rodilla (rótula)", 10.5, MUTE)
-);
-
-I["fosa-rotula-axial-merchant"] = () => {
-  const s = 0.62;
-  const m = limb({ knee: [430, 252 - 46 * s], legDir: 220, thighDir: 180, footDir: 310, s });
-  const t = m.T([20, 42]); // a la altura de las rótulas
-  const u = unit(30), C = [t[0] + 120 * u[0], t[1] + 120 * u[1]], n = unit(120);
-  const ria = [C[0] - 34 * n[0], C[1] - 34 * n[1]], rib = [C[0] + 34 * n[0], C[1] + 34 * n[1]];
-  const sop = [[400, 252], [430, 240], [600, 380], [560, 380]];
-  return svg(
-    view("Vista lateral · decúbito supino, rodillas flexionadas 40°") +
-    table(0, 440, 252) +
-    `<path d="M${P([420, 236])} L${P([446, 236])} L${P([610, 330])} L${P([560, 330])} Z" fill="#d7dbe3" stroke="#8a8f9c"/>` + txt(604, 252, "soporte de piernas", 11, MUTE) +
-    clipR("cpMe", 0, 26, 760, 304, dibujar(m)) +
-    beam(t[0], t[1], 30, 220, { horizontal: true, angLabel: "30°" }) +
-    rayo(t[0], t[1], C[0], C[1], 1.6) +
-    `<line x1="${f1(ria[0])}" y1="${f1(ria[1])}" x2="${f1(rib[0])}" y2="${f1(rib[1])}" stroke="${INK}" stroke-width="7"/>` +
-    note(ria[0] + 4, ria[1] + 2, 610, 160, ["RI ⟂ al RC, apoyado contra", "las piernas, ~30 cm distal", "a las rótulas"], INK) +
-    note(t[0] - 40, t[1] - 24, 330, 50, ["RC 30° respecto de la horizontal", "(eje de los fémures), en el punto", "medio entre las rótulas"], RED) +
-    note(m.T([20, 40])[0], m.T([20, 40])[1] - 2, 480, 120, ["rótula"], BO) +
-    etiquetaHueso(m.T([140, 0])[0], m.T([140, 0])[1] + 4, "fémur", "middle") +
-    txt(16, 286, "Piernas relajadas: que el cuádriceps no tire de la rótula", 11.5, MUTE) +
-    txt(16, 302, "DFRI 120-180 cm · sin parrilla · RI 18 x 24 horizontal (35 x 43 si son grandes)", 11.5, MUTE)
-  );
-};
-
 I["fosa-rotula-tangencial-hobbs"] = () => {
   const s = 0.45, kn = [340, 184];
   const m = limb({ knee: kn, legDir: -40, thighDir: 180, footDir: 0, s, lt: 330 });
@@ -565,29 +441,172 @@ I["ped-ext-inf-lateral"] = () => svg(
   txt(12, 290, "RI según el tamaño · DFRI 100 cm", 11.5, MUTE) + txt(12, 306, "Sin parrilla", 11.5, MUTE)
 );
 
-I["ped-pie-ap-mediolateral-kite"] = () => {
+// ======================= VERSIONES (un esquema por posición; ver datos/versiones.js) =======================
+const col = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
+const g = (tr, inner) => `<g transform="${tr}">${inner}</g>`;
+
+// ---- AP oblicua de rodilla ----
+const oblTxt = (interna) =>
+  note(190, 150, 430, 60, ["RC perpendicular al RI, 1,25 cm", "por debajo de la rótula (mitad", "del espacio articular)"], RED) +
+  col(430, 130, [[`Rotar 45° hacia ${interna ? "adentro" : "afuera"} toda la`, INK, 700, 12.5], [interna ? "extremidad (rodilla, tobillo y pie)" : "extremidad", INK, 700, 12.5]]) +
+  col(430, 180, [["Semidecúbito supino, pierna extendida", INK], ["y centrada en el RC y en la línea", INK], ["media de la mesa", INK]]) +
+  col(430, 240, [[interna ? "Muestra la cabeza y el cuello del peroné" : "Muestra los cóndilos mediales del", MUTE, 400, 11], [interna ? "sin superposición" : "fémur y la tibia de perfil", MUTE, 400, 11]]) +
+  col(430, 290, [["RI 24 x 30 vertical · DFRI 100 cm", MUTE, 400, 11], ["Parrilla si el grosor supera 10 cm", MUTE, 400, 11]]) +
+  txt(12, 44, "Rodilla derecha, vista desde los pies", 11, MUTE) +
+  txt(12, 324, "punteado: rodilla sin rotar · línea azul: frente de la rodilla (rótula)", 10.5, MUTE);
+I["rodilla-ap-oblicuas--v1"] = () => svg(oblicuaPanel(0, 45, "Oblicua medial (interna) · desde los pies", "Rotación interna 45°").replace(/<text[^>]*>rodilla, tobillo y pie giran juntos<\/text>/, "") + oblTxt(true));
+I["rodilla-ap-oblicuas--v2"] = () => svg(oblicuaPanel(0, -45, "Oblicua lateral (externa) · desde los pies", "Rotación externa 45°").replace(/<text[^>]*>rodilla, tobillo y pie giran juntos<\/text>/, "") + oblTxt(false));
+
+// ---- AP o PA bilateral de rodillas en carga ----
+I["rodilla-ap-pa-bilateral-carga--v1"] = () => {
+  const s = 0.42;
+  const a = limb({ ankle: [126, 280], legDir: 270, footDir: 0, s });
+  const ka = artic(a);
+  return svg(
+    view("AP · vista lateral, de pie") +
+    bucky(80, 34, 244) + txt(12, 262, "RI 35 x 43", 11, INK) + txt(12, 276, "horizontal", 11, INK) +
+    escalon(60, 291, 170) + txt(240, 302, "escalón, si hace falta", 11, MUTE) +
+    clipR("cpC1", 0, 26, 378, 264, dibujar(a)) +
+    beam(ka[0], ka[1], 180, 170, { ref: 180 }) +
+    rayo(ka[0], ka[1], 92, ka[1]) +
+    note(ka[0] + 70, ka[1], 430, 60, ["RC horizontal, ⟂ al RI (contextura", "media), en el punto medio entre las", "rodillas, 1,25 cm distal al vértice", "de las rótulas"], RED) +
+    col(430, 150, [["De pie, de espaldas al bucky, subido a un", INK, 700], ["escalón si hace falta para usar un rayo", INK, 700], ["horizontal", INK, 700]]) +
+    col(430, 210, [["Pies rectos hacia adelante, rodillas", INK], ["extendidas, peso repartido por igual", INK], ["Se sostiene de los agarraderos de la mesa", INK]]) +
+    col(430, 300, [["DFRI 100 cm · parrilla", MUTE, 400, 11]])
+  );
+};
+I["rodilla-ap-pa-bilateral-carga--v2"] = () => {
+  const s = 0.42;
+  const b = limb({ knee: [668, 140], legDir: 280, thighDir: 260, footDir: 0, s });
+  const kb = artic(b), dx = -340;
+  return svg(
+    view("PA (alternativa) · de frente al bucky") +
+    g(`translate(${dx} 0)`,
+      bucky(700, 34, 230) + piso(404, 756, 298) +
+      clipR("cpC2", 392, 26, 368, 272, dibujar(b)) +
+      beam(kb[0], kb[1], 10, 190, { horizontal: true, angLabel: "10°" })) +
+    txt(370, 250, "RI 35 x 43 horizontal", 11, INK, "end") +
+    note(kb[0] + dx - 100, kb[1] - 17, 470, 60, ["RC 10° caudal, en el punto medio", "entre las rodillas, 1,25 cm distal", "al vértice de las rótulas"], RED) +
+    col(470, 140, [["Mira hacia la mesa o el soporte", INK, 700], ["del RI, con las rodillas apoyadas", INK, 700], ["en él y flexionadas unos 20°", INK, 700]]) +
+    col(470, 300, [["DFRI 100 cm · parrilla", MUTE, 400, 11]])
+  );
+};
+
+// ---- Fosa intercondílea: Camp Coventry / Holmblad ----
+I["fosa-rotula-tunel--v1"] = () => {
+  const s = 0.55;
+  const a = limb({ knee: [150, 252 - 40 * s], legDir: 135, thighDir: 180, footDir: -15, s, sg: -1 });
+  const ka = a.L([LL - 6, 0]);
+  const ank = a.ankle;
+  return svg(
+    view("Camp Coventry · decúbito prono") +
+    table(0, 400, 252, "") +
+    ri(ka[0] - 44, 268, 88, 8, "RI 18 x 24", ka[0] + 50, 276) +
+    apoyo(ank[0] - 22, ank[1] + 14, 44, 252 - ank[1] - 14) +
+    note(ank[0] + 22, 230, 290, 300, ["apoyo grande", "bajo el tobillo"], INK) +
+    clipR("cpT1", 0, 26, 400, 226, dibujar(a)) +
+    tube(ka[0], ka[1], 45, 150, { angLabel: "40-50°" }) +
+    `<line x1="${f1(ka[0])}" y1="${f1(ka[1])}" x2="${f1(ka[0] + 30)}" y2="${f1(ka[1] + 30)}" stroke="${RED}" stroke-width="1.4" stroke-dasharray="3 3"/>` +
+    txt(16, 44, "← cabeza", 11, MUTE) +
+    arco(a.knee[0], a.knee[1], 46, -45, 0) + `<line x1="${f1(a.knee[0])}" y1="${f1(a.knee[1])}" x2="${f1(a.knee[0] + 60)}" y2="${f1(a.knee[1])}" stroke="${BLUE}" stroke-width="1.2" stroke-dasharray="4 3"/>` +
+    txt(f1(a.knee[0] + 52), f1(a.knee[1] - 8), "flexión 40-50°", 11.5, BLUE, "start", 700) +
+    col(440, 70, [["RC 40-50° caudal (⟂ a la pierna),", RED, 700, 12], ["centrado en la rodilla; sale por el", INK], ["borde distal de la rótula", INK]]) +
+    col(440, 140, [["Decúbito prono, rodilla flexionada", INK, 700], ["40-50°, con un apoyo grande", INK, 700], ["debajo del tobillo", INK, 700]]) +
+    col(440, 200, [["Rodilla centrada en el RC; RI centrado", INK], ["en el RC proyectado", INK]]) +
+    col(440, 300, [["DFRI 100 cm · parrilla", MUTE, 400, 11]])
+  );
+};
+I["fosa-rotula-tunel--v2"] = () => {
+  const s = 0.55;
+  const b = limb({ knee: [520, 252 - 40 * s], legDir: 180, thighDir: 245, footDir: 4, s, sg: -1, flexed: true });
+  const kb = b.L([LL - 30, -24]), dx = -340;
+  return svg(
+    view("Holmblad · arrodillado") +
+    g(`translate(${dx} 0)`,
+      table(380, 760, 252, "") +
+      ri(kb[0] - 44, 268, 88, 8, "RI 18 x 24", kb[0] + 50, 276) +
+      clipR("cpT2", 380, 26, 380, 226, dibujar(b)) +
+      tube(kb[0], kb[1] - 4, 0, 165) +
+      refline(b.knee[0], b.knee[1], b.knee[0], b.knee[1] - 120) +
+      arco(b.knee[0], b.knee[1], 90, 245, 270) + txt(f1(b.knee[0] - 84), f1(b.knee[1] - 96), "20-30°", 12, BLUE, "end", 700)) +
+    note(kb[0] + dx + 2, 150, 440, 70, ["RC ⟂ a la pierna, en el", "pliegue poplíteo medio"], RED) +
+    col(440, 140, [["Arrodillado sobre la mesa o", INK, 700], ["parcialmente de pie", INK, 700], ["En la figura se inclina hacia", INK], ["adelante 20-30°", INK]]) +
+    col(440, 220, [["Rodilla centrada en el RC; RI centrado", INK], ["en el RC proyectado", INK]]) +
+    col(440, 300, [["DFRI 100 cm · parrilla", MUTE, 400, 11]])
+  );
+};
+
+// ---- Axial tangencial de rótula: Settegast / Hughston ----
+const settTxt = (y) => col(440, y, [["El paciente sostiene la pierna con una", MUTE, 400, 11], ["gasa larga o cinta · DFRI 100-120 cm", MUTE, 400, 11]]);
+I["fosa-rotula-axial-settegast-hughston--v1"] = () => {
+  const s = 0.5;
+  const a = limb({ knee: [180, 252 - 42 * s], legDir: 90, thighDir: 180, footDir: 276, s, sg: -1 });
+  const pa = a.T([14, 30]);
+  return svg(
+    view("Settegast · decúbito prono") +
+    table(0, 400, 252, "") +
+    clipR("cpS1", 0, 26, 400, 226, dibujar(a)) +
+    tube(pa[0], pa[1], -17.5, 200, { angLabel: "15-20°" }) +
+    arco(a.knee[0], a.knee[1], 30, -90, 0) + txt(f1(a.knee[0] - 30), f1(a.knee[1] - 34), "90°", 12, BLUE, "end", 700) +
+    txt(16, 44, "← cabeza", 11, MUTE) +
+    col(440, 70, [["RC 15-20° cefálico respecto del eje", RED, 700, 12], ["longitudinal de la pierna, en la", INK], ["mitad del espacio femororrotuliano", INK]]) +
+    col(440, 140, [["Decúbito prono, rodilla", INK, 700, 12.5], ["flexionada 90°", INK, 700, 12.5]]) +
+    settTxt(290)
+  );
+};
+I["fosa-rotula-axial-settegast-hughston--v2"] = () => {
+  const s = 0.5;
+  const b = limb({ knee: [480, 252 - 42 * s], legDir: 125, thighDir: 180, footDir: 340, s, sg: -1 });
+  const pb = b.T([14, 30]), dx = -280;
+  return svg(
+    view("Hughston · decúbito prono") +
+    g(`translate(${dx} 0)`,
+      table(280, 680, 252, "") +
+      clipR("cpS2", 280, 26, 400, 226, dibujar(b)) +
+      beam(pb[0], pb[1], 170, 210, { ref: 125, angLabel: "45°" }) +
+      `<line x1="${f1(b.knee[0])}" y1="${f1(b.knee[1])}" x2="${f1(b.knee[0] + 70)}" y2="${f1(b.knee[1])}" stroke="${BLUE}" stroke-width="1.2" stroke-dasharray="4 3"/>` +
+      arco(b.knee[0], b.knee[1], 56, -55, 0) + txt(f1(b.knee[0] + 50), f1(b.knee[1] - 50), "50-60°", 12, BLUE, "start", 700)) +
+    txt(16, 44, "← cabeza", 11, MUTE) +
+    col(440, 70, [["RC 45° cefálico respecto del eje", RED, 700, 12], ["longitudinal de la pierna, en la", INK], ["mitad del espacio femororrotuliano", INK]]) +
+    col(440, 140, [["Decúbito prono, rodilla flexionada", INK, 700, 12.5], ["50-60° desde la extensión completa", INK, 700, 12.5]]) +
+    col(440, 190, [["El pie puede apoyarse en un soporte", INK], ["que no sea el colimador", INK]]) +
+    settTxt(290)
+  );
+};
+
+// ---- Pie pediátrico (Kite): AP / lateral ----
+I["ped-pie-ap-mediolateral-kite--v1"] = () => {
   const a = limb({ ankle: [200, 214], legDir: 250, footDir: 0, s: 0.7 });
   const ta = a.F([40, -22]);
-  const b = limb({ ankle: [660, 190], legDir: 304, footDir: 180, s: 0.7, sg: -1 });
-  const mb = b.F([64, -28]);
   return svg(
-    view("1 · AP · rodilla flexionada, pie sobre el RI") +
-    table(0, 378, 259, "") + apoyo(20, 231, 120, 28) + txt(26, 249, "apoyo", 11, MUTE) +
+    view("AP · rodilla flexionada, pie sobre el RI") +
+    table(0, 400, 259, "") + apoyo(20, 231, 120, 28) + txt(26, 249, "apoyo", 11, MUTE) +
     ri(150, 247, 150, 12, "RI 18 x 24 vertical", 150, 296) +
-    clipR("cpK1", 0, 26, 378, 230, dibujar(a)) +
+    clipR("cpK1", 0, 26, 400, 230, dibujar(a)) +
     dot(ta[0], ta[1], RED) +
     tube(ta[0], ta[1] - 4, 0, 160) +
-    note(ta[0] + 4, 120, 290, 70, ["RC ⟂ al RI, en los", "tarsianos medios", "(sin angular)"], RED) +
-    panel2(404, "2 · Lateral · desde el tubo") +
-    riTop(470, 110, 230, 150, "") +
-    clipR("cpK2", 392, 26, 368, 300, dibujar(b) +
-      `<rect x="${f1(mb[0] - 8)}" y="100" width="16" height="170" fill="#fff" fill-opacity=".55" stroke="${MUTE}" stroke-dasharray="3 2"/>`) +
-    coll(482, 122, 206, 126) +
-    cross(mb[0], mb[1]) +
-    note(mb[0] - 8, mb[1] + 8, 470, 290, ["RC ⟂ en la zona metatarsiana proximal"], RED) +
-    txt(470, 98, "RI 18 x 24 · cinta adhesiva o banda", 11, INK) +
-    txt(404, 312, "Lado afectado abajo", 11.5, MUTE) +
-    txt(16, 312, "DFRI 100 cm · sin parrilla", 11.5, MUTE)
+    note(ta[0] + 4, 120, 440, 70, ["RC perpendicular al RI, en los", "tarsianos medios (Kite propone", "no angular el rayo)"], RED) +
+    col(440, 150, [["Paciente elevado sobre un apoyo,", INK, 700], ["rodilla flexionada y pie sobre el RI", INK, 700]]) +
+    col(440, 200, [["No intentar enderezar el pie al", INK], ["colocarlo sobre el RI", INK]]) +
+    col(440, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+I["ped-pie-ap-mediolateral-kite--v2"] = () => {
+  const b = limb({ ankle: [660, 190], legDir: 304, footDir: 180, s: 0.7, sg: -1 });
+  const mb = b.F([64, -28]), dx = -360;
+  return svg(
+    view("Lateral (mediolateral) · desde el tubo") +
+    g(`translate(${dx} 0)`,
+      riTop(470, 110, 230, 150, "") +
+      clipR("cpK2", 392, 26, 368, 300, dibujar(b) +
+        `<rect x="${f1(mb[0] - 8)}" y="100" width="16" height="170" fill="#fff" fill-opacity=".55" stroke="${MUTE}" stroke-dasharray="3 2"/>`) +
+      coll(482, 122, 206, 126) + cross(mb[0], mb[1])) +
+    txt(110, 98, "RI 18 x 24 · cinta adhesiva o banda", 11, INK) +
+    note(mb[0] + dx - 8, mb[1] + 8, 120, 290, ["RC perpendicular, en la zona", "metatarsiana proximal"], RED) +
+    col(440, 70, [["Paciente o pierna de costado,", INK, 700], ["lado afectado abajo", INK, 700]]) +
+    col(440, 120, [["Sujetar con cinta adhesiva o una", INK], ["banda de compresión", INK]]) +
+    col(440, 170, [["Frontal y lateral a 90° una de otra;", MUTE, 400, 11], ["no enderezar el pie", MUTE, 400, 11]]) +
+    col(440, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
   );
 };
 

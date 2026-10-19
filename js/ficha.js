@@ -31,6 +31,11 @@ export function vistaFicha(p, volver) {
   const fav = favoritos.tiene(p.id);
   const terminos = terminosDe(p);
   const dir = p.rc?.direccion || "perpendicular";
+  // una versión de la posición (datos/versiones.js): sus pasos, su RC si difiere del general y su esquema
+  const version = (x) => `<details class="sec ver"><summary><span>${esc(x.nombre)}</span>${icono.chev}</summary><div class="body">
+    ${x.posicion.length ? lista(x.posicion) : ""}
+    ${x.rc ? `<div class="ver-rc rc-${x.rc.direccion === "cefálico" ? "cefalico" : x.rc.direccion || "sin-dato"}"><h4>Rayo central</h4>${RC_ETIQUETA[x.rc.direccion] ? `<p class="rc-dir">${esc(RC_ETIQUETA[x.rc.direccion])}${x.rc.angulo ? ` <b>${esc(x.rc.angulo)}</b>` : ""}</p>` : ""}<p>${m(x.rc.texto)}</p></div>` : ""}
+    ${x.ilustracion?.src ? bloqueIlustracion(x.ilustracion, `${p.nombre} · ${x.nombre}`) : ""}</div></details>`;
 
   return cabecera({ titulo: r?.nombre || "", sub: r?.detalle, atras: volver, derecha: botonFav(p.id, fav, "ico fav") }) + `
   <main class="wrap ficha">
@@ -57,11 +62,11 @@ export function vistaFicha(p, volver) {
       <p class="rc-txt">${(v.clear(), m(p.rc?.texto || "Sin dato en la fuente."))}</p>
     </section>
 
-    ${sec("Posición del paciente", () => lista(p.posicion || []))}
+    ${sec("Posición del paciente", () => p.versiones ? (p.comun?.length ? lista(p.comun) : "") + `<div class="versiones">${p.versiones.map(version).join("")}</div>` : lista(p.posicion || []))}
 
     ${sec("Criterios de evaluación", () => (p.criterios || []).map(([t, it]) => `<h4>${esc(t)}</h4>${lista(it)}`).join(""))}
 
-    <section class="ilus-sec" aria-label="Ilustración">${bloqueIlustracion(p.ilustracion, p.nombre)}</section>
+    ${p.versiones?.length && p.versiones.every((x) => x.ilustracion?.src) ? "" : `<section class="ilus-sec" aria-label="Ilustración">${bloqueIlustracion(p.ilustracion, p.nombre)}</section>`}
 
     ${p.notas?.length ? `<aside class="nota"><h4>Nota sobre la fuente</h4>${p.notas.map((n) => `<p>${esc(n)}</p>`).join("")}</aside>` : ""}
     ${p.revision?.length ? `<aside class="revisar"><h4>Para revisar</h4>${p.revision.map((n) => `<p>${esc(n)}</p>`).join("")}</aside>` : ""}

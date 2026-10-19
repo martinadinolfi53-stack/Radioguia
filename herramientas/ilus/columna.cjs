@@ -896,10 +896,8 @@ module.exports = {
   "columna-cervical-odontoides-fuchs": fuchs,
   "columna-cervical-odontoides-judd": judd,
   "columna-cervical-ap-axial": cervicalAPaxial,
-  "columna-cervical-oblicuas": oblicuasCervical,
   "columna-cervical-lateral-erguida": lateralErguida,
   "columna-cervical-nadador": nadador,
-  "columna-cervical-lateral-flexion-extension": flexExtCervical,
   "columna-cervical-trauma-lateral-horizontal": traumaLateral,
   "columna-cervical-trauma-ap": traumaAP,
   "columna-cervical-trauma-ap-axial-oblicua": traumaOblicua,
@@ -910,10 +908,6 @@ module.exports = {
   "columna-lumbar-ap": lumbarAP,
   "columna-lumbar-lateral": lumbarPerfil,
   "columna-lumbar-lateral-l5-s1": pasajeL5S1,
-  "columna-lumbar-oblicua": lumbarOblicua,
-  "columna-lumbar-ap-flexion-lateral": flexionLateral,
-  "columna-lumbar-lateral-flexion-extension": flexExtLumbar,
-  "columna-escoliosis-pa-ferguson": ferguson,
   "columna-sacro-ap-axial": sacroAP,
   "columna-coccix-ap-axial": coccixAP,
   "columna-sacro-coccix-lateral": sacroCoccixLat,
@@ -921,3 +915,169 @@ module.exports = {
   "columna-sacroiliacas-ap-axial": siAP,
   "columna-sacroiliacas-oblicua-posterior": siOblicua,
 };
+
+// ======================= fichas con versiones: un esquema por versión =======================
+const col = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
+const g = (tr, inner) => `<g transform="${tr}">${inner}</g>`;
+
+// ---- oblicuas de columna cervical ----
+const oblCervTxt = (ant) =>
+  col(430, 150, [[ant ? "Oblicua anterior, de pie o sentado" : "Oblicua posterior, de pie o sentado", INK, 700], ["Torso y cabeza girados 45° respecto del RI", INK, 700]]) +
+  col(430, 196, [["Columna C alineada con el RC y el RI", INK], ["Mentón algo levantado, mirando adelante", INK], ["Se hacen derecha e izquierda", INK]]) +
+  col(430, 270, [["RI 24 x 30 vertical · bucky vertical", MUTE, 400, 11], ["DFRI 100-180 cm (mejor la mayor) · apnea", MUTE, 400, 11]]);
+function oblCervPost() {
+  const dx = -300, F = perfilDePie(560, 97, 0.62);
+  const [c4x, c4y] = F.pos.C4, X = c4x + dx;
+  return svg(
+    view("Oblicua posterior · vista lateral del haz") +
+    `<rect x="220" y="34" width="12" height="266" fill="#cfd3dc"/>` + txt(226, 314, "Bucky", 11, MUTE, "middle") +
+    g(`translate(${dx} 0)`, F.fig + F.vs) + resaltar(X, c4y, 0.62 * 13, 0.62 * 16) + etiquetaHueso(X - 8, c4y + 18, "C4", "end") +
+    beam(X, c4y, 180 + 17.5, 118, { ref: 180, angLabel: "15-20°" }) + dash(X, c4y, 232, c4y - (X - 232) * Math.tan((17.5 * Math.PI) / 180)) +
+    col(430, 60, [["RC 15-20° cefálico,", RED, 700, 12.5], ["entrando por C4", INK, 400, 12]]) + oblCervTxt(false)
+  );
+}
+function oblCervAnt() {
+  // espejo: la cara mira al bucky (izquierda); el tubo queda detrás, arriba, apuntando hacia los pies
+  const W = 752, F = perfilDePie(560, 97, 0.62);
+  const [c4x0, c4y] = F.pos.C4, X = W - c4x0, dir = 180 - 17.5;
+  return svg(
+    view("Oblicua anterior · vista lateral del haz") +
+    `<rect x="60" y="34" width="12" height="266" fill="#cfd3dc"/>` + txt(66, 314, "Bucky", 11, MUTE, "middle") +
+    g(`translate(${W} 0) scale(-1 1)`, F.fig + F.vs) + resaltar(X, c4y, 0.62 * 13, 0.62 * 16) + etiquetaHueso(X + 8, c4y + 18, "C4") +
+    beam(X, c4y, dir, 118, { ref: 180, angLabel: "15-20°" }) + dash(X, c4y, 72, c4y + (X - 72) * Math.tan((17.5 * Math.PI) / 180)) +
+    col(430, 60, [["RC 15-20° caudal", RED, 700, 12.5]]) + oblCervTxt(true)
+  );
+}
+
+// ---- lateral de columna cervical en hiperflexión / hiperextensión ----
+function flexExtCerv(rot, titulo, paso) {
+  const x0 = 60, F = perfilDePie(x0 + 150, 92, 0.55, rot, 262);
+  const [c4x, c4y] = F.pos.C4;
+  return svg(
+    view(titulo) +
+    riTop(x0 + 80, 36, 170, 220, "", 0, 0) + F.fig + F.vs + cross(c4x, c4y) + etiquetaHueso(c4x - 14, c4y + 4, "C4", "end") +
+    col(400, 60, [["⊕ RC perpendicular al RI en C4", RED, 700, 12.5], ["(borde superior del cartílago tiroides)", INK, 400, 12]]) +
+    col(400, 120, paso.map((t) => [t, INK, 700])) +
+    col(400, 170, [["De pie o sentado, lateral verdadera", INK], ["Hombros relajados y bajos", INK], ["Incluir toda la columna C", INK]]) +
+    col(400, 250, [["RI 24 x 30 vertical · DFRI 150-180 cm", MUTE, 400, 11], ["Espiración completa", MUTE, 400, 11], ["No hacer si hay sospecha de trauma", MUTE, 400, 11]]) +
+    txt(x0 + 165, 290, "RI 24 x 30 vertical", 11, INK, "middle")
+  );
+}
+
+// ---- oblicuas de columna lumbar ----
+function lumbarOblVer(ant) {
+  const cx = 200, tableY = 246;
+  const C = corte({ cx, tableY, rx: 86, ry: 52, ang: ant ? 135 : 45, cuna: !ant, tipo: "lumbar" });
+  const [vx, vy] = C.L(0, 52 * 0.45);
+  const [ex, ey] = C.L(-86 * 0.92, -52 * 0.25);
+  const ctr = C.L(0, 0), [l1x, l1y] = C.L(-120, 0), [l2x, l2y] = C.L(120, 0);
+  let o = view(ant ? "Oblicua anterior · corte visto desde los pies" : "Oblicua posterior · corte visto desde los pies") +
+    table(40, 370, tableY) + ri(90, 262, 220, 9) + txt(90, 288, "RI 30 x 35 o 24 x 30 vertical · parrilla", 11.5, INK) +
+    C.s + etiquetaHueso(vx + 16, vy + 6, "L3") +
+    refline(l1x, l1y, l2x, l2y) + `<line x1="${f1(ctr[0])}" y1="${f1(ctr[1])}" x2="${f1(ctr[0] + 120)}" y2="${f1(ctr[1])}" stroke="${MUTE}" stroke-width="1" stroke-dasharray="2 3"/>` +
+    (ant ? arco(ctr[0], ctr[1], 66, 0, -45, "45°") : arco(ctr[0], ctr[1], 66, 0, 45, "45°")) +
+    `<line x1="${f1(vx)}" y1="40" x2="${f1(vx)}" y2="${f1(vy - 10)}" stroke="${RED}" stroke-width="3" marker-end="url(#ar)"/>` + dash(vx, vy, vx, 262);
+  if (ant) {
+    o += txt(C.L(0, 52)[0] - 14, C.L(0, 52)[1] - 8, "espalda", 10.5, MUTE, "end") + txt(C.L(0, -52)[0] + 12, C.L(0, -52)[1] + 4, "abdomen", 10.5, MUTE);
+  } else {
+    o += dot(ex, ey) + txt(ex - 10, ey + 18, "EIAS de arriba", 11, BLUE, "end", 700) +
+      cota(ex, ey - 34, vx, ey - 34, "5 cm", ex - 6, ey - 30, BLUE, "end") + `<line x1="${f1(ex)}" y1="${f1(ey - 30)}" x2="${f1(ex)}" y2="${f1(ey - 4)}" stroke="${BLUE}" stroke-width="1" stroke-dasharray="2 3"/>` +
+      txt(C.L(-86, 40)[0] - 30, tableY - 6, "bloque", 10.5, MUTE, "end");
+  }
+  return svg(o +
+    note(vx + 2, 90, 410, 50, ["RC perpendicular al cuerpo de L3", "a la altura del borde costal inferior", "(2,5-5 cm sobre la cresta ilíaca)", "y 5 cm medial a la EIAS de arriba"], RED) +
+    col(410, 158, ant ? [["Oblicua anterior: cuerpo girado 45°", INK, 700]] : [["Oblicua posterior: cuerpo girado 45°", INK, 700], ["Bloques bajo la pelvis y los hombros", INK, 700]]) +
+    col(410, ant ? 190 : 205, [["Columna centrada en el RC y la mesa", INK], ["Se hacen derecha e izquierda", INK]]) +
+    col(410, 270, [["Apnea · DFRI 100 cm", MUTE, 400, 11], ["L1-L2: mejor 50° · L5-S1: mejor 30°", MUTE, 400, 11]])
+  );
+}
+
+// ---- AP con flexión lateral derecha / izquierda ----
+function flexLatVer(deg, titulo, paso) {
+  const s = 0.56, cx = 200;
+  const T = Tf(s, cx, 46);
+  const F = figuraInclinada(T, deg);
+  const [rx1, ry1] = T(-46, 116), [rx2, ry2] = T(46, 226), [ccx, ccy] = T(0, 171), [, crY] = T(0, CRESTA);
+  return svg(
+    view(titulo) +
+    F.fig + F.pelvis + F.vs + riBorde(rx1, ry1, rx2 - rx1, ry2 - ry1) +
+    `<line x1="${f1(rx1 - 30)}" y1="${f1(crY)}" x2="${f1(rx1)}" y2="${f1(crY)}" stroke="${BLUE}" stroke-width="1" stroke-dasharray="2 3"/>` +
+    cota(rx1 - 14, crY, rx1 - 14, ry2, "", 0, 0) +
+    cross(ccx, ccy) + side(cx - 92, 70, "D") + side(cx + 92, 70, "I") +
+    note(ccx + 12, ccy, 420, 64, ["⊕ RC perpendicular al", "centro del RI"], RED) +
+    col(420, 100, [["(más arriba si interesa la columna torácica)", MUTE, 400, 11]]) +
+    col(420, 130, [[paso, INK, 700]]) +
+    col(420, 160, [["Pelvis fija (fulcro), sin rotar pelvis ni torso", INK], ["De pie o en decúbito supino", INK]]) +
+    col(420, 206, [["▭ punteado = RI", INK], ["Borde inferior del RI", BLUE, 700], ["2,5-5 cm bajo la cresta", BLUE]]) +
+    col(420, 270, [["RI 35 x 43 o 35 x 90 · DFRI 100-150 cm", MUTE, 400, 11], ["Espiración", MUTE, 400, 11]])
+  );
+}
+
+// ---- lateral lumbar en hiperflexión / hiperextensión: el tronco se dobla sobre la columna lumbar ----
+function flexExtLumbVer(deg, titulo, paso, sub) {
+  const E = LAT, H = E.cabeza();
+  const px = E.X(350), py = E.Y(LY), ancho = 110;
+  const fr = (x) => Math.max(0, Math.min(1, (px - x) / ancho));
+  const B = (x, y) => rotAround(px, py, deg * fr(x))(x, y);
+  const cuerpo = tpF(H.d + " " + E.tp(CUELLO + " " + BRAZO_ADELANTE + " " + ABDOMEN + " " + PIERNAS_FLEX), B);
+  const cara = H.cara.replace(/<ellipse cx="([\d.-]+)" cy="([\d.-]+)"([^>]*?)transform="rotate\(([\d.-]+)[^"]*"/, (m, x, y, mid, r) => {
+    const [X, Y] = B(+x, +y); return `<ellipse cx="${f1(X)}" cy="${f1(Y)}"${mid}transform="rotate(${+r + deg} ${f1(X)} ${f1(Y)})"`;
+  }).replace(/d="([^"]+)"/g, (m, d) => `d="${tpF(d, B)}"`);
+  const apoyoR = `<rect x="${f1(E.X(292))}" y="${f1(E.Y(246))}" width="${f1(E.s * 76)}" height="${f1(E.s * 14)}" rx="6" fill="#d7dbe3" stroke="#8a8f9c"/>`;
+  const w = 17 * E.s, h = 14 * E.s;
+  let vs = "";
+  for (const [n, x] of LUMB) {
+    const [X, Y] = B(E.X(x), E.Y(LY));
+    vs += vert(X, Y, w, h, deg * fr(E.X(x)));
+  }
+  vs += hueso(E.tp("M386,225 C398,226 410,234 418,244 L415,249 C404,247 394,245 387,240 Z"));
+  const cr = E.X(354), rx2 = cr + 28, rx1 = rx2 - 236, ccx = (rx1 + rx2) / 2, sy = E.Y(LY);
+  const curv = (x1, y1, x2, y2, cx, cy) => `<path d="M${x1},${y1} Q${cx},${cy} ${x2},${y2}" fill="none" stroke="${BLUE}" stroke-width="2.4" marker-end="url(#arb)"/>`;
+  const flecha = deg > 0 ? curv(118, 230, 96, 168, 92, 206) : curv(118, 150, 96, 212, 92, 174);
+  return svg(
+    view(titulo) +
+    riTop(rx1, 124, 236, 136, "", 0, 0) +
+    apoyoR + piel(cuerpo) + cara + txt(E.X(250), E.Y(252) + 14, "espalda", 10.5, MUTE) + vs + coxal(E) +
+    refline(cr, 124, cr, E.Y(256)) + cota(cr, 266, rx2, 266, "2,5-5 cm", rx2 + 6, 270, BLUE, "start") + txt(cr + 4, 116, "cresta ilíaca", 11, BLUE) +
+    cross(ccx, sy) + flecha +
+    note(ccx + 8, sy + 8, 440, 300, ["RC perpendicular al centro del RI", "(o al sitio de la artrodesis, si se conoce)"], RED) +
+    col(440, 40, [[paso, BLUE, 700, 12.5], [sub, INK]]) +
+    col(20, deg > 0 ? 290 : 44, [["Decúbito o de pie, lateral verdadera · apoyo bajo la cintura", MUTE, 400, 11], ["RI 35 x 43 vertical · parrilla · espiración · DFRI 100 cm", MUTE, 400, 11]])
+  );
+}
+
+// ---- escoliosis PA (Ferguson) ----
+function fergusonVer(alza, titulo, pie) {
+  const s = 0.56, cx = 220;
+  const dx = (y) => (y < 60 ? 0 : 9 * Math.sin(((y - 60) / 175) * 2 * Math.PI) * -1);
+  const T = Tf(s, cx, 44);
+  const F = figuraInclinada(T, 0, { espalda: true, dx, alza, ladoAlza: 1 });
+  const [rx1, ry1] = T(-46, -4), [rx2, ry2] = T(46, 226), [ccx, ccy] = T(0, 111);
+  let o = F.fig + F.pelvis + F.vs + riBorde(rx1, ry1, rx2 - rx1, ry2 - ry1) + cross(ccx, ccy) +
+    side(cx - 92, 70, "I") + side(cx + 92, 70, "D") + txt(cx, 318, pie, 12, INK, "middle", 700);
+  if (alza) { const [bx, by] = T(40, 462 - alza); const [bx2, by2] = T(40, 462); o += apoyo(`M${f1(bx - 20)},${f1(by)} L${f1(bx + 20)},${f1(by)} L${f1(bx + 20)},${f1(by2)} L${f1(bx - 20)},${f1(by2)} Z`) + note(bx + 20, (by + by2) / 2, cx + 110, 280, ["alza 8-10 cm"], INK); }
+  return svg(
+    view(titulo) + o +
+    `<line x1="40" y1="${f1(44 + 462 * s)}" x2="420" y2="${f1(44 + 462 * s)}" stroke="#cfd3dc" stroke-width="2"/>` +
+    note(ccx + 12, ccy, 470, 60, ["⊕ RC perpendicular", "al centro del RI"], RED) +
+    col(470, 110, alza ? [["Misma posición que en el 1.º RI", INK, 700], ["Alza de 8-10 cm bajo el pie del lado", INK, 700], ["convexo (sentado: bajo la nalga)", INK, 700]]
+      : [["De pie o sentado, sin rotación", INK, 700], ["de la pelvis ni del tórax", INK, 700], ["Brazos a los costados", INK]]) +
+    col(470, 170, [["▭ punteado = RI", INK], ["Borde inferior 2,5-5 cm", INK], ["bajo la cresta ilíaca", INK]]) +
+    col(470, 240, [["RI 35 x 43 o 35 x 90 · DFRI 100-150 cm", MUTE, 400, 11], ["Espiración completa", MUTE, 400, 11], ["Protección gonadal y mamaria", MUTE, 400, 11]])
+  );
+}
+
+Object.assign(module.exports, {
+  "columna-cervical-oblicuas--v1": oblCervPost,
+  "columna-cervical-oblicuas--v2": oblCervAnt,
+  "columna-cervical-lateral-flexion-extension--v1": () => flexExtCerv(22, "1.º RI · hiperflexión · vista lateral", ["Bajar el mentón hasta tocar", "el tórax, si se puede"]),
+  "columna-cervical-lateral-flexion-extension--v2": () => flexExtCerv(-32, "2.º RI · hiperextensión · vista lateral", ["Levantar el mentón al máximo,", "siempre que esté cómodo"]),
+  "columna-lumbar-oblicua--v1": () => lumbarOblVer(false),
+  "columna-lumbar-oblicua--v2": () => lumbarOblVer(true),
+  "columna-lumbar-ap-flexion-lateral--v1": () => flexLatVer(-16, "Flexión lateral derecha · vista desde el tubo", "1.ª toma: máxima flexión hacia la derecha"),
+  "columna-lumbar-ap-flexion-lateral--v2": () => flexLatVer(16, "Flexión lateral izquierda · vista desde el tubo", "2.ª toma: máxima flexión hacia la izquierda"),
+  "columna-lumbar-lateral-flexion-extension--v1": () => flexExtLumbVer(18, "Hiperflexión · vista desde el tubo, decúbito lateral", "1.º RI: flexión máxima", "hacia adelante"),
+  "columna-lumbar-lateral-flexion-extension--v2": () => flexExtLumbVer(-18, "Hiperextensión · vista desde el tubo, decúbito lateral", "2.º RI: extensión máxima", "hacia atrás"),
+  "columna-escoliosis-pa-ferguson--v1": () => fergusonVer(0, "1.º RI · PA de pie · vista desde el tubo", "de pie, sin rotación"),
+  "columna-escoliosis-pa-ferguson--v2": () => fergusonVer(24, "2.º RI (con alza) · PA de pie · vista desde el tubo", "alza bajo el pie convexo"),
+});

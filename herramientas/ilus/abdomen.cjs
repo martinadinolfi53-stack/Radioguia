@@ -651,25 +651,6 @@ I["enema-opaco-pa-ap"] = () => {
   );
 };
 
-I["enema-opaco-oblicuas"] = () => {
-  const V = topView({ x: 140, y: 172, s: 3.2, pose: "prono", sq: 0.8, brazoD: "costado", brazoI: "arriba" });
-  const T = V.T;
-  const [cx, cy] = T(57.5, 2.5);
-  const p1 = clipR("cpEB", 0, 26, 386, 300,
-    riTop(T(38, 0)[0], T(0, -24)[1], T(90, 0)[0] - T(38, 0)[0], T(0, 24)[1] - T(0, -24)[1], "") +
-    V.piel + costillasF(T) + columnaF(T) + pelvisF(T) + colonF(T, 3.2) +
-    refline(T(61, -19)[0], T(61, -19)[1], T(61, 19)[0], T(61, 19)[1]) + cross(cx, cy));
-  const A = corte({ cx: 480, base: 222, s: 0.72, rot: 40, prono: true, abajo: "D", angTxt: "35-45°", tubeLen: 80 });
-  const B = corte({ cx: 670, base: 222, s: 0.72, rot: 40, prono: true, abajo: "I", angTxt: "35-45°", tubeLen: 80 });
-  return svg(
-    view("1 · Desde el tubo · semiprono (OAD)") + p1 +
-    note(cx + 4, cy + 10, 30, 290, ["RC ⟂: 2,5-5 cm sobre la cresta ilíaca", "y 2,5 cm a la izquierda del PMS"], RED) +
-    sep(388, "2 · Cortes desde los pies") + A.svg + B.svg +
-    txt(480, 262, "OAD", 12, INK, "middle", 700) + txt(670, 262, "OAI", 12, INK, "middle", 700) +
-    lineas(406, 284, ["OPD / OPI: la misma rotación en semisupino", "Incluir la zona rectal · RI 35 x 43 · DFRI 100 cm"], 11.5, INK)
-  );
-};
-
 I["enema-opaco-lateral-recto"] = () => {
   const E0 = escena(1.25, 30, 226);
   const ex = E0.X(382), eyA = E0.Y(205), eyP = E0.Y(250);
@@ -717,33 +698,6 @@ function axialPanel(E0, { prono, a, entry, label, angTxt, clipId, x0, w }) {
     : lumbaresL(E0) + coxalL(E0) + sinfisisL(E0);
   return clipR(clipId, x0, 26, w, 300, `<rect x="${x0}" y="${f1(E0.Y(252))}" width="${w}" height="10" fill="#cfd3dc"/>` + body + bones);
 }
-I["enema-opaco-ap-pa-axial"] = () => {
-  // panel 1: AP axial supino, 30-40° cefálico, entra 5 cm debajo de las EIAS
-  const A = escena(0.62, 70, 262);
-  const exA = A.X(382), eyA = A.Y(205), inA = A.X(401), skA = A.Y(199);
-  // panel 2: PA axial prono, 30-40° caudal, sale a la altura de las EIAS
-  const B = escena(0.62, 450, 262);
-  const exB = B.X(382), eyB = B.Y(245), tb = Math.tan(R(35));
-  const backY = B.Y(195), inB = exB - (B.Y(252) - backY) * tb;
-  return svg(
-    view("1 · AP axial · decúbito supino") +
-    axialPanel(A, { prono: false, clipId: "cpX1", x0: 0, w: 378 }) +
-    `<rect x="${f1(A.X(330))}" y="${f1(A.Y(252) + 14)}" width="110" height="7" fill="${INK}"/>` +
-    dot(exA, eyA) + lab(exA - 2, eyA - 4, exA - 40, eyA - 26, "EIAS", "end", BLUE) +
-    tube(inA, skA, -35, 130, { angLabel: "30-40°" }) + dash(inA, skA, inA + (A.Y(252) + 12 - skA) * Math.tan(R(-35)), A.Y(252) + 12) +
-    txt(inA - 60, 110, "← cefálico", 12, RED, "end", 700) +
-    txt(20, 50, "RC 30-40° cefálico,", 13, RED, "start", 700) + txt(20, 66, "5 cm por debajo de las EIAS", 12.5, INK) +
-    sep(380, "2 · PA axial · decúbito prono") +
-    axialPanel(B, { prono: true, clipId: "cpX2", x0: 382, w: 378 }) +
-    `<rect x="${f1(B.X(330))}" y="${f1(B.Y(252) + 14)}" width="110" height="7" fill="${INK}"/>` +
-    dot(exB, eyB) + lab(exB + 3, eyB + 3, exB + 60, eyB + 44, "EIAS", "start", BLUE) +
-    tube(inB, backY, 35, 130, { angLabel: "30-40°" }) + dash(inB, backY, exB + (14) * tb, B.Y(252) + 14) +
-    txt(inB + 70, 110, "caudal →", 12, RED, "start", 700) +
-    txt(400, 50, "RC 30-40° caudal, centrado", 13, RED, "start", 700) + txt(400, 66, "para salir a la altura de las EIAS", 12.5, INK) +
-    txt(20, 318, "OPI axial: 5 cm debajo y 5 cm medial a la EIAS derecha · RI 30 x 35 · DFRI 100 cm", 11, MUTE)
-  );
-};
-
 // ---------- UROGRAFÍA ----------
 I["urografia-ap"] = () => {
   const V = topView({ x: 120, y: 168, s: 3.3, pose: "supino" });
@@ -866,29 +820,6 @@ function semisentado(E0, th) {
   const body = piel(H.d + " " + trD(E0.tp(CUELLO + " " + PECHO + " " + ABDOMEN + " " + PIERNAS_EXT))) + linea(trD(E0.tp(BRAZO_COSTADO))) + H.cara;
   return { body, tr: (x, y) => tr(E0.X(x), E0.Y(y)), pv, rotP };
 }
-I["port-torax-ap"] = () => {
-  const E0 = escena(0.8, 70, 288), th = 32;
-  const S = semisentado(E0, th);
-  const [t7x, t7y] = S.tr(243, 184);
-  const [jx, jy] = S.tr(196, 202);
-  const ref = 90 + th;
-  // RI detrás de la espalda, sobre el respaldo
-  const back = S.rotP(E0.X(200), E0.Y(254)), back2 = S.rotP(E0.X(320), E0.Y(254));
-  const bk1 = S.rotP(E0.X(90), E0.Y(262)), bk2 = S.rotP(E0.X(420), E0.Y(262));
-  return svg(
-    view("Vista lateral · cama, posición semiincorporada") +
-    `<line x1="${f1(bk1[0])}" y1="${f1(bk1[1])}" x2="${f1(bk2[0])}" y2="${f1(bk2[1])}" stroke="#cfd3dc" stroke-width="12"/>` +
-    `<rect x="${f1(S.pv[0])}" y="${f1(E0.Y(256))}" width="${f1(E0.X(720) - S.pv[0])}" height="12" fill="#cfd3dc"/>` + txt(E0.X(560), E0.Y(256) + 26, "Cama (respaldo levantado)", 10.5, MUTE) +
-    `<line x1="${f1(back[0])}" y1="${f1(back[1])}" x2="${f1(back2[0])}" y2="${f1(back2[1])}" stroke="${INK}" stroke-width="7"/>` +
-    S.body +
-    dot(jx, jy) + lab(jx - 3, jy + 3, jx - 40, jy + 40, "escotadura yugular", "end", BLUE) +
-    beam(t7x, t7y, ref - 4, 108, { ref, angLabel: " " }) + txt(t7x + 66 * 0.53 + 22 * 0.85, t7y - 66 * 0.85 + 22 * 0.53, "3-5°", 13, RED, "start", 700) +
-    note(t7x + 0.52 * 108 + 46, t7y - 0.86 * 108 + 6, 470, 48, ["RC 3-5° caudal respecto de la ⟂ al RI", "(⟂ al esternón), 8-10 cm bajo la", "escotadura yugular (T7)"], RED) +
-    note((back[0] + back2[0]) / 2 - 6, (back[1] + back2[1]) / 2 + 4, 60, 300, ["RI 35 x 43 con funda, detrás de la espalda;", "borde sup. 5 cm sobre los hombros"]) +
-    lineas(470, 150, ["DFRI 120-180 cm (la mayor posible)", "Con o sin parrilla · sin rotación", "Hombros hacia adelante si se puede", "Exponer tras la 2.ª inspiración"], 11.5, INK, 16)
-  );
-};
-
 I["port-abdomen-ap-supino"] = () => {
   const E0 = escena(1, NX, 244), cr = E0.X(354);
   return svg(
@@ -954,25 +885,6 @@ function rot15() {
     `<line x1="${ANK[0]}" y1="${2 * PCY - ANK[1]}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="${BLUE}" stroke-width="1.4"/>` +
     txt(ANK[0] + 96, ANK[1] + 12, "15°", 12, BLUE, "start", 700) + txt(ANK[0] + 96, 2 * PCY - ANK[1] - 4, "15°", 12, BLUE, "start", 700);
 }
-I["port-pelvis-cadera-ap"] = () => svg(
-  view("Vista desde el tubo · decúbito supino en la cama") +
-  riTop(108, 79, 142, 172, "") +
-  supinoP(15) + pelvisHuesos() +
-  dot(144, 99) + dot(144, 231) + dot(220, 165) + dot(226, 233, BONEO) +
-  refline(144, 99, 220, 165) +
-  cross(182, 132) + cruzChica(222, 211) +
-  note(144, 99, 60, 52, ["EIAS"], BLUE) +
-  note(190, 128, 300, 46, ["Pelvis: RC ⟂ a mitad de camino", "entre las EIAS y la sínfisis del pubis"], RED) +
-  note(228, 214, 330, 262, ["Cadera: RC 5 cm medial a la EIAS,", "a la altura del trocánter mayor"], RED) +
-  note(220, 168, 300, 120, ["sínfisis del pubis"], BLUE) +
-  lab(232, 238, 270, 296, "trocánter mayor", "start", BONEO) +
-  txt(30, 270, "RI con funda bajo el paciente", 11.5, INK) +
-  txt(30, 285, "Pelvis: 35 x 43 horizontal, borde", 11.5, INK) + txt(30, 299, "sup. 2,5 cm sobre la cresta", 11.5, INK) +
-  txt(30, 314, "Cadera: 24 x 30 vertical", 11.5, INK) +
-  note(596, 222, 560, 286, ["Rotación interna de 15° solo si", "no se sospecha fractura de cadera"]) +
-  rot15() +
-  txt(560, 50, "EIAS a igual distancia del RI", 11.5, MUTE) + txt(560, 66, "Apnea · DFRI 100 cm · parrilla", 11.5, MUTE)
-);
 
 // axiolateral (Danelius-Miller) portátil: vista desde arriba
 I["port-cadera-axiolateral-danelius"] = () => {
@@ -1075,5 +987,126 @@ I["intraop-cadera-lateral"] = () => {
     lineas(560, 52, ["Tubo arriba (superior),", "intensificador abajo (inferior)", "Campo estéril · delantales", "y protecciones plomadas", "Máxima radiación del lado", "del tubo: alejarse de esa zona"], 11.5, INK, 16)
   );
 };
+
+// ---------------- fichas con versiones: un esquema por versión ----------------
+const colV = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
+
+// ---- enema opaco: oblicuas anteriores / posteriores ----
+const enemaObl = (prono) => {
+  const [n1, n2] = prono ? ["OAD", "OAI"] : ["OPD", "OPI"];
+  const A = corte({ cx: 120, base: 222, s: 0.95, rot: 40, prono, abajo: "D", angTxt: "35-45°", tubeLen: 90 });
+  const B = corte({ cx: 330, base: 222, s: 0.95, rot: 40, prono, abajo: "I", angTxt: "35-45°", tubeLen: 90 });
+  return svg(
+    view(prono ? "Oblicuas anteriores · cortes desde los pies" : "Oblicuas posteriores · cortes desde los pies") + A.svg + B.svg +
+    txt(120, 274, n1, 12.5, INK, "middle", 700) + txt(330, 274, n2, 12.5, INK, "middle", 700) +
+    colV(470, 60, [["RC perpendicular al centro del RI:", RED, 700, 12.5], ["2,5-5 cm sobre la cresta ilíaca y", INK, 400, 12], ["2,5 cm a la izquierda del PMS", INK, 400, 12]]) +
+    colV(470, 130, [[prono ? "Semiprono (PA), rotado 35-45°" : "Semisupino (AP), rotado 35-45°", INK, 700], ["Se hacen derecha e izquierda", INK]]) +
+    colV(470, 176, [["Abdomen centrado en la línea media", INK], ["RI centrado en la cresta ilíaca,", INK], ["incluyendo la zona rectal", INK]]) +
+    colV(470, 262, [["RI 35 x 43 vertical · parrilla · DFRI 100 cm", MUTE, 400, 11], ["Espiración", MUTE, 400, 11]])
+  );
+};
+I["enema-opaco-oblicuas--v1"] = () => enemaObl(true);
+I["enema-opaco-oblicuas--v2"] = () => enemaObl(false);
+
+// ---- enema opaco: AP axial / PA axial / oblicua axial ----
+const axialFin = colV(470, 262, [["RI 30 x 35 vertical · parrilla · DFRI 100 cm", MUTE, 400, 11], ["Espiración completa", MUTE, 400, 11]]);
+I["enema-opaco-ap-pa-axial--v1"] = () => {
+  const A = escena(0.62, 40, 262);
+  const exA = A.X(382), eyA = A.Y(205), inA = A.X(401), skA = A.Y(199);
+  return svg(
+    view("AP axial · decúbito supino") +
+    axialPanel(A, { prono: false, clipId: "cpX1", x0: 0, w: 440 }) +
+    `<rect x="${f1(A.X(330))}" y="${f1(A.Y(252) + 14)}" width="110" height="7" fill="${INK}"/>` +
+    dot(exA, eyA) + lab(exA - 2, eyA - 4, exA - 40, eyA - 26, "EIAS", "end", BLUE) +
+    tube(inA, skA, -35, 130, { angLabel: "30-40°" }) + dash(inA, skA, inA + (A.Y(252) + 12 - skA) * Math.tan(R(-35)), A.Y(252) + 12) +
+    txt(inA - 60, 110, "← cefálico", 12, RED, "end", 700) +
+    colV(470, 60, [["RC 30-40° cefálico,", RED, 700, 12.5], ["5 cm por debajo de las EIAS", INK, 400, 12]]) +
+    colV(470, 120, [["Decúbito supino", INK, 700], ["Alineado y centrado en la línea media", INK], ["de la mesa", INK]]) + axialFin
+  );
+};
+I["enema-opaco-ap-pa-axial--v2"] = () => {
+  const B = escena(0.62, 40, 262);
+  const exB = B.X(382), eyB = B.Y(245), tb = Math.tan(R(35));
+  const backY = B.Y(195), inB = exB - (B.Y(252) - backY) * tb;
+  return svg(
+    view("PA axial · decúbito prono") +
+    axialPanel(B, { prono: true, clipId: "cpX2", x0: 0, w: 440 }) +
+    `<rect x="${f1(B.X(330))}" y="${f1(B.Y(252) + 14)}" width="110" height="7" fill="${INK}"/>` +
+    dot(exB, eyB) + lab(exB + 3, eyB + 3, exB + 60, eyB + 44, "EIAS", "start", BLUE) +
+    tube(inB, backY, 35, 130, { angLabel: "30-40°" }) + dash(inB, backY, exB + (14) * tb, B.Y(252) + 14) +
+    txt(inB + 70, 110, "caudal →", 12, RED, "start", 700) +
+    colV(470, 60, [["RC 30-40° caudal, centrado", RED, 700, 12.5], ["para salir a la altura de las EIAS", INK, 400, 12]]) +
+    colV(470, 120, [["Decúbito prono", INK, 700], ["Alineado y centrado en la línea media", INK], ["de la mesa", INK]]) + axialFin
+  );
+};
+I["enema-opaco-ap-pa-axial--v3"] = () => {
+  const A = corte({ cx: 120, base: 222, s: 0.95, rot: 35, prono: false, abajo: "I", angTxt: "30-40°", haz: "no" });
+  const B = corte({ cx: 330, base: 222, s: 0.95, rot: 35, prono: true, abajo: "D", angTxt: "30-40°", haz: "no" });
+  const riBar = (cx) => `<rect x="${f1(cx - 57)}" y="248" width="114" height="7" fill="${INK}"/>`;
+  return svg(
+    view("Oblicua axial · cortes desde los pies") + A.svg + B.svg + riBar(120) + riBar(330) +
+    txt(120, 274, "OPI", 12.5, INK, "middle", 700) + txt(330, 274, "OAD", 12.5, INK, "middle", 700) +
+    colV(470, 60, [["OPI axial: RC 5 cm por debajo y", RED, 700, 12.5], ["5 cm medial a la EIAS derecha", INK, 400, 12]]) +
+    colV(470, 106, [["OAD axial: el manual no da el centrado", MUTE]]) +
+    colV(470, 150, [["Alternativa oblicua: OPI u OAD,", INK, 700], ["paciente oblicuo 30-40°", INK, 700]]) + axialFin
+  );
+};
+
+// ---- tórax AP portátil: decúbito supino / semiincorporado ----
+function portTorax(th) {
+  const E0 = escena(0.8, 70, th ? 288 : 262);
+  const S = semisentado(E0, th);
+  const [t7x, t7y] = S.tr(243, 184);
+  const [jx, jy] = S.tr(196, 202);
+  const ref = 90 + th;
+  const back = S.rotP(E0.X(200), E0.Y(254)), back2 = S.rotP(E0.X(320), E0.Y(254));
+  const bk1 = S.rotP(E0.X(90), E0.Y(262)), bk2 = S.rotP(E0.X(420), E0.Y(262));
+  const r = R(ref - 4), ux = Math.cos(r), uy = Math.sin(r);
+  return svg(
+    view(th ? "Semiincorporado · vista lateral en la cama" : "Decúbito supino · vista lateral en la cama") +
+    (th ? `<line x1="${f1(bk1[0])}" y1="${f1(bk1[1])}" x2="${f1(bk2[0])}" y2="${f1(bk2[1])}" stroke="#cfd3dc" stroke-width="12"/>` +
+      `<rect x="${f1(S.pv[0])}" y="${f1(E0.Y(256))}" width="${f1(E0.X(720) - S.pv[0])}" height="12" fill="#cfd3dc"/>`
+      : `<rect x="${f1(E0.X(80))}" y="${f1(E0.Y(256))}" width="${f1(E0.X(720) - E0.X(80))}" height="12" fill="#cfd3dc"/>`) +
+    txt(E0.X(560), E0.Y(256) + 26, th ? "Cama (respaldo levantado)" : "Cama", 10.5, MUTE) +
+    `<line x1="${f1(back[0])}" y1="${f1(back[1])}" x2="${f1(back2[0])}" y2="${f1(back2[1])}" stroke="${INK}" stroke-width="7"/>` +
+    S.body +
+    dot(jx, jy) + (th ? lab(jx - 3, jy + 3, jx - 40, jy + 40, "escotadura yugular", "end", BLUE) : lab(jx - 2, jy - 3, jx - 20, jy - 44, "escotadura yugular", "end", BLUE)) +
+    beam(t7x, t7y, ref - 4, 108, { ref, angLabel: " " }) +
+    txt(t7x - 66 * Math.cos(R(ref - 2)) + 14, t7y - 66 * Math.sin(R(ref - 2)) + 6, "3-5°", 13, RED, "start", 700) +
+    note(t7x - 80 * ux, t7y - 80 * uy, 470, 48, ["RC 3-5° caudal respecto de la ⟂ al RI", "(⟂ al esternón), 8-10 cm bajo la", "escotadura yugular (T7)"], RED) +
+    note((back[0] + back2[0]) / 2 - 6, (back[1] + back2[1]) / 2 + 4, th ? 60 : 30, 300, ["RI 35 x 43 con funda, detrás de la espalda;", "borde sup. 5 cm sobre los hombros"]) +
+    colV(470, 116, th ? [["Respaldo levantado, si se puede:", INK, 700], ["sentado o semierguido", INK, 700]] : [["Decúbito supino, cuando no se puede", INK, 700], ["levantar el respaldo de la cama", INK, 700]]) +
+    colV(470, 160, [["Sin rotación", INK], ["Hombros hacia adelante si se puede", INK]]) +
+    (th ? colV(470, 206, [["DFRI 120-180 cm (la mayor posible)", MUTE, 400, 11], ["Con o sin parrilla", MUTE, 400, 11], ["Exponer tras la 2.ª inspiración", MUTE, 400, 11]])
+      : colV(470, 302, [["DFRI 120-180 cm (la mayor posible) · con o sin parrilla", MUTE, 400, 11], ["Exponer tras la 2.ª inspiración", MUTE, 400, 11]]))
+  );
+}
+I["port-torax-ap--v1"] = () => portTorax(0);
+I["port-torax-ap--v2"] = () => portTorax(32);
+
+// ---- pelvis / cadera AP portátil ----
+const portPelvisBase = () => supinoP(15) + pelvisHuesos() + rot15() +
+  note(596, 222, 560, 286, ["Rotación interna de 15° solo si", "no se sospecha fractura de cadera"]) +
+  txt(560, 50, "EIAS a igual distancia del RI", 11.5, MUTE) + txt(560, 66, "Apnea · DFRI 100 cm · parrilla", 11.5, MUTE);
+I["port-pelvis-cadera-ap--v1"] = () => svg(
+  view("AP de pelvis · desde el tubo, supino en la cama") +
+  riTop(108, 79, 142, 172, "") + portPelvisBase() +
+  dot(144, 99) + dot(144, 231) + dot(220, 165) +
+  refline(144, 99, 220, 165) + cross(182, 132) +
+  note(144, 99, 60, 52, ["EIAS"], BLUE) +
+  note(190, 128, 300, 46, ["RC ⟂ a mitad de camino entre", "las EIAS y la sínfisis del pubis"], RED) +
+  note(220, 168, 300, 120, ["sínfisis del pubis"], BLUE) +
+  txt(30, 270, "RI con funda bajo el paciente", 11.5, INK) +
+  txt(30, 285, "35 x 43 horizontal, borde sup.", 11.5, INK) + txt(30, 299, "≈2,5 cm sobre la cresta ilíaca", 11.5, INK)
+);
+I["port-pelvis-cadera-ap--v2"] = () => svg(
+  view("AP de cadera · desde el tubo, supino en la cama") +
+  riTop(166, 163, 120, 96, "") + portPelvisBase() +
+  dot(144, 231) + dot(226, 233, BONEO) + cross(222, 211) +
+  note(144, 231, 60, 200, ["EIAS"], BLUE) +
+  note(230, 216, 330, 262, ["RC y RI centrados en la cadera:", "5 cm medial a la EIAS, a la", "altura del trocánter mayor"], RED) +
+  lab(232, 238, 270, 306, "trocánter mayor", "start", BONEO) +
+  txt(30, 285, "RI con funda bajo el paciente", 11.5, INK) + txt(30, 299, "24 x 30 vertical", 11.5, INK)
+);
 
 module.exports = I;

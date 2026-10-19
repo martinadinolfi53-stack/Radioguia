@@ -23,6 +23,12 @@ export function aplicarEdiciones(proyecciones, compartidas = {}) {
     if (e.factores) p.factores = { ...p.factores, ...e.factores };
     if (e.rc) p.rc = { ...p.rc, ...e.rc };
     for (const k of ["posicion", "criterios", "notas"]) if (e[k]) p[k] = e[k];
+    // fichas con versiones (datos/versiones.js): «posicion» guarda los pasos comunes y «versiones» los de cada versión
+    if (p.versiones && e.versiones) {
+      if (e.posicion) p.comun = e.posicion;
+      e.versiones.forEach((v, i) => { if (p.versiones[i] && v?.posicion) p.versiones[i] = { ...p.versiones[i], posicion: v.posicion }; });
+      p.posicion = [...p.comun, ...p.versiones.flatMap((v) => v.posicion)];
+    } else if (p.versiones && e.posicion) delete p.versiones; // edición sobre la lista completa, anterior a las versiones
     p._editada = ediciones[p.id] ? "local" : "compartida";
   }
 }
@@ -116,7 +122,9 @@ export function vistaEditar(p, volver) {
         ${campo("rc-angulo", "Ángulo (si está angulado)", p.rc?.angulo)}
         ${campo("rc-texto", "Descripción", p.rc?.texto, true)}
       </section>
-      <section class="panel"><h2>Posición del paciente</h2><p class="ayuda">Un paso por renglón.</p>${campo("posicion", "Pasos", lineas(p.posicion), true)}</section>
+      <section class="panel"><h2>Posición del paciente</h2><p class="ayuda">Un paso por renglón.</p>${p.versiones
+        ? campo("posicion", "Pasos comunes a todas las versiones", lineas(p.comun), true) + p.versiones.map((x, i) => campo(`version-${i}`, `Versión: ${esc(x.nombre)}`, lineas(x.posicion), true)).join("")
+        : campo("posicion", "Pasos", lineas(p.posicion), true)}</section>
       <section class="panel"><h2>Criterios de evaluación</h2><p class="ayuda">Un criterio por renglón. Para un subtítulo, empezá el renglón con ## (por ejemplo: ## Posicionamiento).</p>${campo("criterios", "Criterios", criteriosATexto(p.criterios), true)}</section>
       <section class="panel"><h2>Notas</h2>${campo("notas", "Una nota por renglón", lineas(p.notas), true)}</section>
       <div class="ed-acciones">
@@ -133,10 +141,13 @@ export function leerFormulario(form) {
   const v = (n) => form.elements[n]?.value.trim() ?? "";
   const lista = (n) => v(n).split("\n").map((x) => x.trim()).filter(Boolean);
   const factores = Object.fromEntries(FACT.map(([k]) => [k, v("f-" + k) || null]));
+  const versiones = [];
+  for (let i = 0; form.elements[`version-${i}`]; i++) versiones.push({ posicion: lista(`version-${i}`) });
   return {
     factores,
     rc: { direccion: v("rc-direccion"), angulo: v("rc-angulo") || undefined, texto: v("rc-texto") },
     posicion: lista("posicion"),
+    ...(versiones.length ? { versiones } : {}),
     criterios: textoACriterios(v("criterios")),
     notas: lista("notas"),
   };

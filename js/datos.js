@@ -3,6 +3,7 @@ import { CAPITULOS, FUENTE } from "../datos/indice.js";
 import GLOSARIO from "../datos/glosario.js";
 import CON_ESQUEMA from "../datos/ilustraciones.js";
 import ANG_ROT from "../datos/angulacion-rotacion.js";
+import VERSIONES from "../datos/versiones.js";
 import { validarDatos } from "./validacion.js";
 import { aplicarEdiciones, cargarCompartidas } from "./edicion.js";
 
@@ -20,6 +21,16 @@ for (const p of proyecciones) if (ANG_ROT[p.id]) p.factores = { ...p.factores, .
 // esquemas didácticos generados (ilustraciones/<id>.svg), sin verificar por un docente
 const esquemas = new Set(CON_ESQUEMA);
 for (const p of proyecciones) if (!p.ilustracion?.src && esquemas.has(p.id)) p.ilustracion = { src: `ilustraciones/${p.id}.svg`, alt: `Esquema: ${p.nombre}`, verificada: false };
+// fichas con varias posiciones del paciente (datos/versiones.js): pasos comunes + una versión por posición, cada una con su esquema
+for (const p of proyecciones) {
+  const v = VERSIONES[p.id];
+  if (!v) continue;
+  p.comun = [...(v.comun || [])];
+  p.versiones = v.versiones.map((x, i) => {
+    const id = `${p.id}--v${i + 1}`;
+    return { ...x, posicion: [...x.posicion], ilustracion: esquemas.has(id) ? { src: `ilustraciones/${id}.svg`, alt: `Esquema: ${p.nombre} · ${x.nombre}`, verificada: false } : null };
+  });
+}
 // correcciones del modo edición: las publicadas en GitHub y, encima, las de este dispositivo
 aplicarEdiciones(proyecciones, await cargarCompartidas());
 
@@ -33,7 +44,7 @@ export const proyeccionesDe = (regionId) => proyecciones.filter((p) => p.region 
 for (const p of proyecciones) {
   const r = regionPorId[p.region];
   p._titulo = norm([r?.nombre, r?.detalle, p.nombre, p.metodo, ...(p.categoria || [])].join(" "));
-  p._todo = norm([p._titulo, p.rc?.texto, ...(p.posicion || []), ...Object.values(p.factores || {})].join(" "));
+  p._todo = norm([p._titulo, p.rc?.texto, ...(p.posicion || []), ...(p.versiones || []).flatMap((v) => [v.nombre, v.rc?.texto, ...v.posicion]), ...Object.values(p.factores || {})].join(" "));
 }
 
 export const problemas = validarDatos({ capitulos, regiones, proyecciones, glosario: GLOSARIO });

@@ -291,48 +291,6 @@ I["mano-pa-oblicua"] = () => {
   );
 };
 
-I["mano-lateral"] = () => {
-  const a = manoCanto({ s: 1.2, at: [70, 180], rot: 0, modo: "abanico", F: 120 });
-  const b = manoCanto({ s: 0.9, at: [470, 200], rot: 0, modo: "ext", F: 90 });
-  const step = `<path d="M${P([[236, 220], [236, 196], [268, 196], [268, 176], [300, 176], [300, 156], [330, 156], [330, 220]])} Z" fill="#e3e6ec" stroke="#9aa0ac" stroke-width="1.2" stroke-dasharray="4 3"/>`;
-  return svg(
-    view("1 · En abanico · desde el tubo") +
-    riTop(40, 50, 320, 226) + txt(40, 292, "RI 18 x 24 vertical", 11.5, INK) +
-    drawHand(a) + coll(56, 64, 290, 196) + crossP(a.pts.mcp2) +
-    note(a.pts.mcp2[0] + 6, a.pts.mcp2[1] + 8, 250, 316, ["RC ⟂ en la 2.ª MCF"], RED) +
-    txt(12, 40, "Dedos abiertos sobre un soporte escalonado radiotransparente;", 11, MUTE) +
-    txt(12, 316, "Metacarpianos en lateral verdadera", 11, MUTE) +
-    panelSep("2 · Alternativa en extensión") +
-    riTop(424, 70, 280, 200) +
-    drawHand(b) + crossP(b.pts.mcp2) +
-    txt(402, 294, "Dedos juntos y extendidos: ante sospecha de", 11.5, INK) +
-    txt(402, 308, "cuerpo extraño o lesión de un metacarpiano.", 11.5, INK) +
-    txt(402, 324, "Mano en lateral, lado del pulgar hacia arriba · DFRI 100 cm", 11, MUTE)
-  );
-};
-
-I["manos-ap-oblicua-norgaard"] = () => {
-  const L = manoEsq({ s: 0.8, at: [150, 266], rot: -90, sx: 0.66, cara: "palma", spread: 1.1, F: 34 });
-  const R = manoEsq({ s: 0.8, at: [230, 266], rot: -90, sx: 0.66, cara: "palma", spread: 1.1, F: 34, flip: true });
-  const mid = lerp(L.pts.mcp[5], R.pts.mcp[5], 0.5);
-  const v = [586, 254];
-  const cl = corte({ rot: 225, flip: true, contact: [55, -16], at: [v[0] - 2, v[1]], s: 0.85 });
-  const cr2 = corte({ rot: 135, contact: [55, -16], at: [v[0] + 2, v[1]], s: 0.85 });
-  const tgt = lerp(cl.heads[3], cr2.heads[3], 0.5);
-  return svg(
-    view("1 · Desde el tubo") +
-    riTop(40, 54, 300, 246) + txt(40, 316, "RI 24 x 30 o 35 x 43 horizontal", 11, INK) +
-    drawHand(L) + drawHand(R) + coll(66, 72, 248, 206) + crossP(mid) +
-    note(mid[0] + 8, mid[1] - 8, 212, 42, ["RC ⟂ entre las 5.as MCF"], RED) +
-    panelSep("2 · Desde la punta de los dedos") +
-    riBar(430, 716, 254) + cuna(v, 45, 96, -1) + cuna(v, 45, 96, 1) + cl.svg + cr2.svg +
-    beam(f1(tgt[0]), f1(tgt[1]), 90, 160) +
-    arco(v, 62, 180, 225, "45°", BLUE, 14) + arco(v, 62, 315, 360, "45°", BLUE, 14) +
-    labL(cl.thumb, -30, -50, "pulgar") + lab(...cr2.thumb, f1(cr2.thumb[0] + 30), f1(cr2.thumb[1] - 50), "pulgar", "start") +
-    bold(402, 300, "Palmas arriba, manos a 45°, bordes mediales") + bold(402, 315, "juntos; dedos extendidos sobre los bloques")
-  );
-};
-
 // ======================= DEDOS =======================
 I["dedos-pa"] = () => {
   const h = manoEsq({ s: 1.25, at: [150, 190], rot: 0, spread: 1.7, F: 150 });
@@ -370,26 +328,6 @@ I["dedos-pa-oblicua"] = () => {
     arco([650, 256], 62, 180, 225, "45°", BLUE, 14) + labL([556, 248], -10, -30, "bloque de 45°") +
     labL(c.thumb, -30, -50, "pulgar") +
     bold(402, 296, "Mano rotada 45° hacia medial o lateral,") + bold(402, 311, "según el dedo") + txt(402, 326, "DFRI 100 cm · sin parrilla", 11, MUTE)
-  );
-};
-
-I["dedos-lateral"] = () => {
-  const h = manoCanto({ s: 1.15, at: [64, 190], rot: 0, modo: "solo", solo: 3, F: 100 });
-  const f = h.pts.ifp3, m = h.pts.mcp3, t = h.pts.tip3;
-  const up = corte({ rot: 90, contact: [56, 0], at: [500, 262], s: 0.62 });
-  const dn = corte({ rot: -90, contact: [-73, 10], at: [660, 262], s: 0.62 });
-  return svg(
-    view("1 · Desde el tubo · 3.er dedo") +
-    riTop(150, 92, 220, 170) + txt(150, 280, "RI 18 x 24 vertical", 11.5, INK) +
-    drawHand(h) + coll(m[0] - 26, m[1] - 18, t[0] - m[0] + 40, 36) + crossP(f) +
-    note(f[0] + 4, f[1] - 8, 170, 60, ["RC ⟂ en la IFP"], RED) +
-    txt(12, 300, "Dedo alineado con el eje de la zona", 11.5, INK) + txt(12, 314, "del RI que se expone, paralelo al RI", 11.5, INK) +
-    panelSep("2 · Desde la punta de los dedos") +
-    riBar(440, 560, 262, "") + riBar(600, 720, 262, "") + up.svg + dn.svg +
-    beam(500 - 10, 160, 90, 80) + beam(660 - 10, 160, 90, 80) +
-    lab(...up.thumb, 540, 104, "pulgar", "start") + lab(...dn.thumb, 700, 236, "pulgar", "start") +
-    bold(440, 292, "3.º a 5.º dedo") + txt(440, 306, "pulgar arriba", 11.5, INK) + txt(440, 320, "(lateromedial)", 11, MUTE) +
-    bold(600, 292, "2.º dedo") + txt(600, 306, "pulgar abajo", 11.5, INK) + txt(600, 320, "(mediolateral)", 11, MUTE)
   );
 };
 
@@ -550,27 +488,6 @@ I["muneca-lateral"] = () => {
   );
 };
 
-I["muneca-desviacion-cubital"] = () => {
-  const h = manoEsq({ s: 1.0, at: [140, 140], rot: 0, dev: 22, spread: 0.8, F: 140 });
-  const e = h.pts.escafoides;
-  const sv = cantoSobreRI({ s: 0.85, modo: "ext", fx: -10, F: 200 }, 540, 262);
-  const ec = sv.pts.carpo;
-  return svg(
-    view("1 · Desde el tubo") +
-    riTop(60, 40, 260, 240) + txt(60, 298, "RI 18 x 24 vertical", 11.5, INK) +
-    drawHand(h) + coll(e[0] - 40, e[1] - 34, 90, 84) + redDot(e) +
-    labL(e, -30, -40, "escafoides") +
-    note(...h.pts.tip[3], 200, 318, ["Desviación cubital"]) +
-    txt(12, 318, "Colimar al carpo", 11, AMB) +
-    panelSep("2 · De costado") +
-    riBar(420, 716, 262) + drawHand(sv) + redDot(ec) +
-    beam(f1(ec[0]), f1(ec[1]), 102.5, 190, { angLabel: " " }) + txt(f1(ec[0] + 36), f1(ec[1] - 120), "10-15°", 13, RED, "start", 700) +
-    txt(420, 130, "← codo", 11, MUTE) +
-    bold(402, 296, "RC ⟂ al RI, u otra opción: 10-15° hacia") + bold(402, 310, "el codo, centrado en el escafoides") +
-    txt(402, 325, "Bloque de 20° (Stecher modificado): RC ⟂ · DFRI 100 cm", 11, INK)
-  );
-};
-
 I["muneca-desviacion-radial"] = () => {
   const h = manoEsq({ s: 1.25, at: [170, 186], rot: 0, dev: -18, spread: 0.8, F: 170 });
   const c = h.pts.carpo;
@@ -620,24 +537,6 @@ function brazoMesa() {
   return { piel: piel(d), huesos, det: m.det };
 }
 
-I["codo-ap"] = () => {
-  const b = brazoMesa();
-  return svg(
-    view("Vista desde el tubo · brazo extendido sobre la mesa") +
-    riTop(226, 92, 220, 170, "RI 24 x 30 vertical", 232, 256) +
-    b.piel + b.huesos + b.det +
-    refline(311, 144, 311, 208) + dot(311, 154) + dot(311, 197) + txt(226, 82, "epicóndilos paralelos al RI", 11, BLUE) +
-    coll(262, 118, 150, 116) + cross(336, 176) +
-    lab(200, 172, 200, 130, "húmero", "end") + lab(306, 156, 250, 112, "epicóndilo medial", "end") +
-    lab(306, 198, 250, 238, "epicóndilo lateral", "end") + lab(440, 165, 456, 130, "cúbito") + lab(440, 188, 456, 232, "radio") +
-    note(346, 176, 470, 60, ["RC perpendicular en la parte", "media de la articulación del codo"], RED) +
-    note(530, 186, 540, 262, ["Codo extendido, mano supinada"]) +
-    txt(20, 286, "Si hace falta, inclinar al paciente hacia lateral (palpar los epicóndilos).", 11.5, INK) +
-    txt(20, 302, "Flexión parcial: dos AP, una con el húmero y otra con el antebrazo paralelos al RI (RC ⟂ a cada uno).", 11.5, INK) +
-    txt(20, 320, "DFRI 100 cm · sin parrilla · colimar al área de interés", 11, MUTE)
-  );
-};
-
 // corte del codo visto desde la mano: piel + húmero distal con los epicóndilos, girado 'g' grados
 function codoCorte(cx, yRI, g, lado) {
   const c = [cx, yRI - 46];
@@ -648,22 +547,6 @@ function codoCorte(cx, yRI, g, lado) {
   return { svg: sk + hum + refline(...add(em, sub(em, el), 0.25), ...add(el, sub(el, em), 0.25)) + bluePt(em) + bluePt(el), em, el, c };
 }
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
-I["codo-ap-oblicua"] = () => {
-  const a = codoCorte(200, 250, -45), b = codoCorte(590, 250, 45);
-  const panel = (k, x0, x1, ang, lbl) => riBar(x0, x1, 250, "") + k.svg + beam(f1(k.c[0]), f1(k.c[1]), 90, 140) +
-    `<line x1="${f1(k.c[0] - 80)}" y1="${f1(k.c[1])}" x2="${f1(k.c[0] + 80)}" y2="${f1(k.c[1])}" stroke="${MUTE}" stroke-width="1" stroke-dasharray="3 4"/>` +
-    arco(k.c, 70, ang < 0 ? 0 : 180, ang < 0 ? -45 : 225, lbl, BLUE, 16);
-  return svg(
-    view("1 · Oblicua medial (interna) · desde la mano") + panel(a, 60, 330, -45, "45°") +
-    labL(a.em, -24, -34, "medial") + lab(...a.el, 300, 100, "lateral") + azul(228, 176, 110, 64, "línea de los epicóndilos") +
-    bold(30, 288, "Codo extendido, mano en pronación;") + txt(30, 303, "palpar los epicóndilos: rotación interna de 45°", 11.5, INK) +
-    panelSep("2 · Oblicua lateral (externa) · desde la mano") + panel(b, 450, 720, 45, "40-45°") +
-    lab(...b.el, 690, 238, "lateral") + labL(b.em, -20, -40, "medial") +
-    bold(402, 288, "Mano en supinación, codo rotado hacia") + bold(402, 303, "afuera 40-45° (inclinar el tronco si hace falta)") +
-    txt(30, 322, "RC perpendicular al RI en la parte media de la articulación del codo · RI 24 x 30 vertical · DFRI 100 cm · sin parrilla", 11, MUTE)
-  );
-};
-
 // codo a 90° visto desde el tubo: húmero horizontal y antebrazo hacia arriba (adaptado de "Codo|Perfil")
 function codoPerfil(largo = 82, sMano = 1.45) {
   const wy = 200 - largo - 0;
@@ -704,19 +587,6 @@ function coyle(cx, dir, rotulo) {
   const tg = [cx - 4, y - 28];
   return { svg: riBar(cx - 240, cx + 60, y, "") + hum + humB + fore + fb + redDot(tg) + beam(tg[0], tg[1], dir, 150, { angLabel: "45°" }), tg };
 }
-I["codo-axial-coyle"] = () => {
-  const a = coyle(220, 135), b = coyle(600, 45);
-  return svg(
-    view("1 · Cabeza del radio · de costado") + a.svg +
-    txt(30, 120, "← hombro", 11, MUTE) + lab(206, 234, 192, 196, "antebrazo (hacia el observador)", "end") +
-    bold(30, 292, "RC 45° hacia el hombro, en la cabeza del radio") + txt(30, 307, "Codo a 90° si se puede, mano en pronación", 11.5, INK) +
-    panelSep("2 · Apófisis coronoides · de costado") + b.svg +
-    txt(410, 120, "← hombro", 11, MUTE) +
-    bold(402, 292, "RC 45° alejándose del hombro, en la coronoides") + txt(402, 307, "Codo flexionado solo 80°, mano en pronación", 11.5, INK) +
-    txt(30, 324, "En ambos casos el RC entra por la parte media de la articulación del codo · RI 24 x 30 vertical · DFRI 100 cm · sin parrilla", 10.5, MUTE)
-  );
-};
-
 I["antebrazo-ap"] = () => {
   const b = brazoMesa();
   return svg(
@@ -819,6 +689,243 @@ I["ped-ext-sup-lateral"] = () => {
     note(168, 296, 470, 254, ["Protección plomada", "sobre la pelvis"]) +
     txt(196, 250, "Brazo en abducción,", 12, INK, "start", 700) + txt(196, 266, "separado del cuerpo", 12, INK) +
     txt(470, 300, "Padres solo si hace falta, con guantes", 11, MUTE) + txt(470, 314, "y delantal plomados · DFRI 100 cm", 11, MUTE)
+  );
+};
+
+// ======================= VERSIONES (un esquema por posición; ver datos/versiones.js) =======================
+// columna de texto a la derecha del dibujo
+const col = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
+
+// ---- Mano lateral ----
+I["mano-lateral--v1"] = () => {
+  const a = manoCanto({ s: 1.2, at: [60, 180], rot: 0, modo: "abanico", F: 110 });
+  return svg(
+    view("Lateral en abanico · vista desde el tubo") +
+    riTop(34, 50, 320, 226) + txt(40, 292, "RI 18 x 24 vertical", 11.5, INK) +
+    drawHand(a) + coll(50, 64, 290, 196) + crossP(a.pts.mcp2) +
+    note(a.pts.mcp2[0] + 6, a.pts.mcp2[1] + 8, 420, 230, ["RC perpendicular al RI", "en la 2.ª articulación MCF"], RED) +
+    note(...a.pts.tip3, 420, 70, ["Dedos separados y abiertos", "sobre un soporte escalonado", "radiotransparente"]) +
+    col(420, 140, [["Mano en lateral, lado del pulgar", INK, 700], ["hacia arriba", INK, 700], ["Metacarpianos en lateral verdadera", MUTE]]) +
+    col(420, 300, [["Colimar a mano y muñeca, con todo el carpo", AMB, 400, 11], ["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+I["mano-lateral--v2"] = () => {
+  const b = manoCanto({ s: 1.2, at: [60, 190], rot: 0, modo: "ext", F: 110 });
+  return svg(
+    view("Lateral en extensión · vista desde el tubo") +
+    riTop(34, 60, 330, 210) + txt(40, 288, "RI 18 x 24 vertical", 11.5, INK) +
+    drawHand(b) + coll(50, 84, 300, 160) + crossP(b.pts.mcp2) +
+    note(b.pts.mcp2[0] + 6, b.pts.mcp2[1] + 8, 420, 230, ["RC perpendicular al RI", "en la 2.ª articulación MCF"], RED) +
+    note(...b.pts.tip2, 420, 80, ["Dedos juntos y extendidos"]) +
+    col(420, 130, [["Mano en lateral, lado del pulgar", INK, 700], ["hacia arriba", INK, 700], ["Se usa ante sospecha de cuerpo", INK], ["extraño o lesión de un metacarpiano", INK]]) +
+    col(420, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+
+// ---- AP bilateral oblicua de manos (Norgaard) ----
+function norgaard(flex) {
+  const L = manoEsq({ s: 0.92, at: [180, 270], rot: -90, sx: 0.66, cara: "palma", spread: 1.1, F: 26, flex });
+  const R = manoEsq({ s: 0.92, at: [258, 270], rot: -90, sx: 0.66, cara: "palma", spread: 1.1, F: 26, flex, flip: true });
+  const mid = lerp(L.pts.mcp[5], R.pts.mcp[5], 0.5);
+  return { svg: riTop(50, 40, 340, 262) + drawHand(L) + drawHand(R) + coll(74, 56, 292, 230) + crossP(mid), mid, L, R };
+}
+const norgaardTxt = (x) => col(x, 128, [["Sentado, antebrazos y manos", INK, 700], ["extendidos, palmas arriba", INK, 700], ["Manos a 45°, bordes mediales", INK], ["juntos, sobre bloques de 45°", INK]]);
+I["manos-ap-oblicua-norgaard--v1"] = () => {
+  const n = norgaard(0);
+  return svg(
+    view("Dedos en extensión · vista desde el tubo") + n.svg + txt(50, 320, "RI 24 x 30 o 35 x 43 horizontal", 11, INK) +
+    note(n.mid[0] + 8, n.mid[1] - 8, 430, 64, ["RC perpendicular, entre", "las 5.as articulaciones MCF"], RED) +
+    norgaardTxt(430) + note(...n.R.pts.tip[2], 430, 214, ["Dedos en extensión completa", "sobre los bloques"]) +
+    col(430, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+I["manos-ap-oblicua-norgaard--v2"] = () => {
+  const n = norgaard(0.7);
+  return svg(
+    view("Variante «receptor de pelota» · desde el tubo") + n.svg + txt(50, 320, "RI 24 x 30 o 35 x 43 horizontal", 11, INK) +
+    note(n.mid[0] + 8, n.mid[1] - 8, 430, 64, ["RC perpendicular, entre", "las 5.as articulaciones MCF"], RED) +
+    norgaardTxt(430) + note(...n.R.pts.tip[2], 430, 214, ["Dedos en flexión parcial"]) +
+    col(430, 236, [["Muestra bien metacarpianos y MCF,", MUTE], ["pero deforma las interfalángicas", MUTE]]) +
+    col(430, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+
+// ---- Lateral de dedos ----
+I["dedos-lateral--v1"] = () => {
+  const h = manoCanto({ s: 1.25, at: [40, 196], rot: 0, modo: "solo", solo: 3, F: 90 });
+  const f = h.pts.ifp3, m = h.pts.mcp3, t = h.pts.tip3;
+  const up = corte({ rot: 90, contact: [56, 0], at: [650, 286], s: 0.5 });
+  return svg(
+    view("Dedos 3.º a 5.º · lateromedial · desde el tubo") +
+    riTop(150, 86, 240, 190) + txt(150, 294, "RI 18 x 24 vertical", 11.5, INK) +
+    drawHand(h) + coll(m[0] - 26, m[1] - 18, t[0] - m[0] + 40, 36) + crossP(f) +
+    note(f[0] + 4, f[1] - 8, 430, 60, ["RC perpendicular al RI", "en la IFP (aquí, 3.er dedo)"], RED) +
+    note(...h.pts.tip1, 430, 124, ["Mano en lateral, lado del", "pulgar hacia arriba"]) +
+    col(430, 184, [["Dedo paralelo al RI, alineado con", INK], ["el eje de la zona que se expone", INK]]) +
+    riBar(600, 700, 286, "") + up.svg + lab(...up.thumb, 690, 236, "pulgar", "start") + txt(650, 322, "corte visto desde la punta de los dedos", 10.5, MUTE, "middle")
+  );
+};
+I["dedos-lateral--v2"] = () => {
+  const h = manoCanto({ s: 1.25, at: [40, 176], rot: 0, modo: "solo", solo: 2, F: 90, sinPulgar: true, flip: true });
+  const f = h.pts.ifp2, m = h.pts.mcp2, t = h.pts.tip2;
+  const dn = corte({ rot: -90, contact: [-73, 10], at: [650, 286], s: 0.5 });
+  return svg(
+    view("2.º dedo · mediolateral · desde el tubo") +
+    riTop(150, 66, 240, 190) + txt(150, 274, "RI 18 x 24 vertical", 11.5, INK) +
+    drawHand(h) + coll(m[0] - 26, m[1] - 18, t[0] - m[0] + 40, 36) + crossP(f) +
+    note(f[0] + 4, f[1] + 8, 430, 60, ["RC perpendicular al RI", "en la IFP del 2.º dedo"], RED) +
+    col(430, 116, [["Mano en lateral, lado del", INK, 700], ["pulgar hacia abajo", INK, 700], ["(el pulgar queda debajo,", MUTE], ["contra el RI)", MUTE]]) +
+    col(430, 194, [["Dedo paralelo al RI, alineado con", INK], ["el eje de la zona que se expone", INK]]) +
+    riBar(600, 700, 286, "") + dn.svg + lab(...dn.thumb, 720, 250, "pulgar", "start") + txt(650, 322, "corte visto desde la punta de los dedos", 10.5, MUTE, "middle")
+  );
+};
+
+// ---- PA con desviación cubital (escafoides) ----
+I["muneca-desviacion-cubital--v1"] = () => {
+  const h = manoEsq({ s: 1.1, at: [150, 150], rot: 0, dev: 22, spread: 0.8, F: 150 });
+  const e = h.pts.escafoides;
+  return svg(
+    view("Con desviación cubital · vista desde el tubo") +
+    riTop(70, 40, 280, 250) + txt(70, 308, "RI 18 x 24 vertical", 11.5, INK) +
+    drawHand(h) + coll(e[0] - 44, e[1] - 38, 98, 92) + redDot(e) +
+    labL(e, -30, -46, "escafoides") +
+    note(...h.pts.tip[3], 430, 214, ["Mano llevada hacia el lado", "cubital todo lo que tolere"]) +
+    note(e[0] + 6, e[1] - 4, 430, 60, ["RC perpendicular al RI", "Otra opción: 10-15° hacia el codo,", "centrado en el escafoides"], RED) +
+    col(430, 140, [["Desde la PA de muñeca", INK, 700], ["(lado del pulgar del carpo = escafoides)", MUTE]]) +
+    col(430, 296, [["Colimar a la región del carpo", AMB, 400, 11], ["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+I["muneca-desviacion-cubital--v2"] = () => {
+  // de costado: antebrazo sobre el RI y la mano apoyada en un bloque de 20°
+  const yRI = 262, w = [300, yRI - 15];
+  const h = manoCanto({ s: 0.9, at: w, rot: -20, flip: true, modo: "ext", F: 8, pulgarPlano: true });
+  const arm = skin([{ pts: [[40, yRI - 1.7], [40, yRI - 42], [w[0] + 6, yRI - 40], [w[0] + 10, yRI - 1.7]] }]);
+  const armB = boneAlong([44, yRI - 26], [w[0] + 2, yRI - 26], [[0, 6, 6], [0.9, 7, 7], [1, 9, 9]]) + boneAlong([44, yRI - 14], [w[0] + 2, yRI - 14], [[0, 5, 5], [0.9, 5, 5], [1, 6, 6]]);
+  const c = h.pts.carpo;
+  return svg(
+    view("Stecher modificado · de costado") +
+    riBar(40, 560, yRI) + cuna([w[0] + 6, yRI], 20, 220, 1) + arm + armB + drawHand(h) + redDot(c) +
+    beam(f1(c[0]), f1(c[1]), 90, 170) +
+    arco([w[0] + 6, yRI], 120, 0, -20, "20°", BLUE, 16) +
+    txt(48, 200, "← codo", 11, MUTE) + labL([360, yRI - 4], -20, 34, "bloque de goma espuma a 20°") +
+    note(c[0] + 6, c[1] - 6, 600, 70, ["RC perpendicular", "al RI"], RED) +
+    col(600, 130, [["Si no puede hacer la", INK, 700], ["desviación cubital:", INK, 700], ["mano apoyada en un", INK], ["bloque de 20°", INK]]) +
+    col(600, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+
+// ---- AP de codo: extensión y flexión parcial ----
+I["codo-ap--v1"] = () => {
+  const b = brazoMesa();
+  return svg(
+    view("Extensión completa · vista desde el tubo") +
+    riTop(226, 92, 220, 170, "RI 24 x 30 vertical", 232, 256) +
+    b.piel + b.huesos + b.det +
+    refline(311, 144, 311, 208) + dot(311, 154) + dot(311, 197) + txt(226, 82, "epicóndilos paralelos al RI", 11, BLUE) +
+    coll(262, 118, 150, 116) + cross(336, 176) +
+    lab(200, 172, 200, 130, "húmero", "end") + lab(306, 156, 250, 112, "epicóndilo medial", "end") +
+    lab(306, 198, 250, 238, "epicóndilo lateral", "end") + lab(440, 165, 456, 130, "cúbito") + lab(440, 188, 456, 232, "radio") +
+    note(346, 176, 470, 60, ["RC perpendicular en la parte", "media de la articulación del codo"], RED) +
+    note(530, 186, 540, 262, ["Codo extendido, mano supinada"]) +
+    txt(20, 290, "Si hace falta, inclinar al paciente hacia lateral (palpar los epicóndilos).", 11.5, INK) +
+    txt(20, 310, "DFRI 100 cm · sin parrilla · colimar al área de interés", 11, MUTE)
+  );
+};
+// codo en flexión parcial visto de costado: un segmento apoyado sobre el RI y el otro levantado
+function codoFlexion(apoyado) {
+  const yRI = 262, r = 20, E0 = [310, yRI - r - 2], L = 200, a = rad(32);
+  const up = apoyado === "humero" ? [E0[0] + L * Math.cos(a), E0[1] - L * Math.sin(a)] : [E0[0] - L * Math.cos(a), E0[1] - L * Math.sin(a)];
+  const flat = apoyado === "humero" ? [50, E0[1]] : [560, E0[1]];
+  const hum = apoyado === "humero" ? flat : up, wrist = apoyado === "humero" ? up : flat;
+  const dirF = Math.atan2(wrist[1] - E0[1], wrist[0] - E0[0]) * 180 / Math.PI;
+  const h = manoCanto({ s: 0.75, at: wrist, rot: dirF, modo: "ext", F: 6, pulgarPlano: true, flip: apoyado === "humero" });
+  const sk = skin([{ pts: [hum, E0], w: 2 * r + 4 }, { pts: [E0, wrist], w: 2 * r - 6 }]);
+  const n = (p, q, k) => { const d = Math.hypot(q[0] - p[0], q[1] - p[1]); return [-(q[1] - p[1]) / d * k, (q[0] - p[0]) / d * k]; };
+  const off = n(E0, wrist, 6);
+  const huesos = boneAlong(lerp(hum, E0, 0.02), lerp(hum, E0, 0.97), [[0, 7, 7], [0.85, 7, 7], [0.95, 12, 12], [1, 9, 9]]) +
+    boneAlong(add(lerp(E0, wrist, 0.05), off), add(lerp(E0, wrist, 0.95), off), [[0, 6, 6], [0.15, 4, 4], [1, 5, 5]]) +
+    boneAlong(add(lerp(E0, wrist, 0.03), off, -1), add(lerp(E0, wrist, 0.95), off, -1), [[0, 7, 7], [0.15, 4, 4], [1, 4, 4]]);
+  return { svg: riBar(40, 580, yRI, "") + sk + huesos + drawHand(h), E0, hum, wrist, yRI };
+}
+I["codo-ap--v2"] = () => {
+  const c = codoFlexion("humero"), tg = [c.E0[0] - 26, c.E0[1]];
+  return svg(
+    view("Flexión parcial · húmero apoyado · de costado") + c.svg + redDot(tg) + beam(tg[0], tg[1], 90, 170) +
+    txt(48, 214, "← hombro", 11, MUTE) + lab(160, c.E0[1], 150, 300, "húmero apoyado paralelo al RI", "start") + lab(...lerp(c.E0, c.wrist, 0.55), 470, 230, "antebrazo") +
+    note(tg[0] - 6, tg[1] - 6, 60, 70, ["RC perpendicular", "al húmero distal"], RED) +
+    col(600, 120, [["Si el codo no se", INK, 700], ["extiende del todo:", INK, 700], ["dos AP. Esta, con el", INK], ["húmero paralelo al RI", INK]]) +
+    col(600, 300, [["RI 24 x 30 vertical", INK, 400, 11], ["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+I["codo-ap--v3"] = () => {
+  const c = codoFlexion("antebrazo"), tg = [c.E0[0] + 26, c.E0[1]];
+  return svg(
+    view("Flexión parcial · antebrazo apoyado · de costado") + c.svg + redDot(tg) + beam(tg[0], tg[1], 90, 170) +
+    lab(...lerp(c.E0, c.hum, 0.6), 100, 290, "húmero", "end") + txt(60, 100, "hombro ↖", 11, MUTE) +
+    lab(440, c.E0[1], 450, 300, "antebrazo apoyado paralelo al RI", "start") +
+    note(tg[0] + 6, tg[1] - 6, 600, 60, ["RC perpendicular al", "antebrazo proximal"], RED) +
+    col(600, 120, [["Si el codo no se", INK, 700], ["extiende del todo:", INK, 700], ["dos AP. Esta, con el", INK], ["antebrazo paralelo al RI", INK]]) +
+    col(600, 300, [["RI 24 x 30 vertical", INK, 400, 11], ["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+
+// ---- AP oblicua de codo ----
+function codoOblicua(medial) {
+  const k = codoCorte(250, 262, medial ? -45 : 45);
+  return k;
+}
+I["codo-ap-oblicua--v1"] = () => {
+  const k = codoOblicua(true);
+  return svg(
+    view("Oblicua medial (interna) · vista desde la mano") +
+    riBar(100, 400, 262, "RI") + k.svg + beam(f1(k.c[0]), f1(k.c[1]), 90, 150) +
+    `<line x1="${f1(k.c[0] - 90)}" y1="${f1(k.c[1])}" x2="${f1(k.c[0] + 90)}" y2="${f1(k.c[1])}" stroke="${MUTE}" stroke-width="1" stroke-dasharray="3 4"/>` +
+    arco(k.c, 80, 0, -45, "45°", BLUE, 16) +
+    labL(k.em, -24, -34, "medial") + lab(...k.el, 360, 110, "lateral") + azul(278, 186, 120, 70, "línea de los epicóndilos") +
+    note(k.c[0] + 6, k.c[1] + 6, 470, 300, ["RC perpendicular al RI en la parte", "media de la articulación del codo"], RED) +
+    col(470, 70, [["Codo extendido y mano", INK, 700, 12.5], ["en pronación", INK, 700, 12.5]]) +
+    col(470, 120, [["Palpar los epicóndilos para", INK], ["confirmar una rotación", INK], ["interna de 45°", INK]]) +
+    col(470, 200, [["Muestra mejor la apófisis", MUTE], ["coronoides", MUTE]]) +
+    col(470, 246, [["RI 24 x 30 vertical · DFRI 100 cm", MUTE, 400, 11], ["sin parrilla", MUTE, 400, 11]])
+  );
+};
+I["codo-ap-oblicua--v2"] = () => {
+  const k = codoOblicua(false);
+  return svg(
+    view("Oblicua lateral (externa) · vista desde la mano") +
+    riBar(100, 400, 262, "RI") + k.svg + beam(f1(k.c[0]), f1(k.c[1]), 90, 150) +
+    `<line x1="${f1(k.c[0] - 90)}" y1="${f1(k.c[1])}" x2="${f1(k.c[0] + 90)}" y2="${f1(k.c[1])}" stroke="${MUTE}" stroke-width="1" stroke-dasharray="3 4"/>` +
+    arco(k.c, 80, 180, 225, "40-45°", BLUE, 22) +
+    lab(...k.el, 340, 250, "lateral") + labL(k.em, -20, -44, "medial") +
+    note(k.c[0] + 6, k.c[1] + 6, 470, 300, ["RC perpendicular al RI en la parte", "media de la articulación del codo"], RED) +
+    col(470, 70, [["Codo extendido y mano", INK, 700, 12.5], ["en supinación", INK, 700, 12.5]]) +
+    col(470, 120, [["Codo rotado hacia afuera 40-45°", INK], ["(palpar los epicóndilos)", INK], ["Cuesta más: inclinar el tronco", INK], ["hacia lateral si hace falta", INK]]) +
+    col(470, 200, [["Muestra mejor la cabeza y el", MUTE], ["cuello del radio", MUTE]]) +
+    col(470, 246, [["RI 24 x 30 vertical · DFRI 100 cm", MUTE, 400, 11], ["sin parrilla", MUTE, 400, 11]])
+  );
+};
+
+// ---- Axial de codo (Coyle) ----
+I["codo-axial-coyle--v1"] = () => {
+  const a = coyle(330, 135);
+  return svg(
+    view("Cabeza del radio · de costado") + a.svg +
+    txt(90, 200, "← hombro", 11, MUTE) + lab(316, 234, 300, 120, "antebrazo (hacia el observador)", "end") +
+    note(a.tg[0] + 6, a.tg[1] + 8, 470, 300, ["RC 45° hacia el hombro,", "en la cabeza del radio"], RED) +
+    col(470, 70, [["Codo flexionado 90° si se", INK, 700, 12.5], ["puede, mano en pronación", INK, 700, 12.5]]) +
+    col(470, 120, [["El RC entra por la parte media", INK], ["de la articulación del codo", INK]]) +
+    col(470, 180, [["RI 24 x 30 vertical · DFRI 100 cm", MUTE, 400, 11], ["sin parrilla", MUTE, 400, 11]])
+  );
+};
+I["codo-axial-coyle--v2"] = () => {
+  const b = coyle(330, 45);
+  return svg(
+    view("Apófisis coronoides · de costado") + b.svg +
+    txt(90, 200, "← hombro", 11, MUTE) + lab(316, 234, 300, 112, "antebrazo (hacia el observador)", "end") +
+    note(b.tg[0] + 6, b.tg[1] + 8, 470, 300, ["RC 45° alejándose del", "hombro, en la coronoides"], RED) +
+    col(470, 70, [["Codo flexionado solo 80°,", INK, 700, 12.5], ["mano en pronación", INK, 700, 12.5]]) +
+    col(470, 120, [["El RC entra por la parte media", INK], ["de la articulación del codo", INK]]) +
+    col(470, 180, [["RI 24 x 30 vertical · DFRI 100 cm", MUTE, 400, 11], ["sin parrilla", MUTE, 400, 11]])
   );
 };
 

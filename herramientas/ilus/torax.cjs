@@ -448,61 +448,9 @@ I["torax-ap-lordotica"] = () => {
   );
 };
 
-I["torax-oblicua-anterior"] = () => {
-  const A = panelSup({ x0: 0, w: 380, th: -45, angLabel: "45°" });
-  const B = panelSup({ x0: 380, w: 380, th: 45, angLabel: "45°" });
-  return svg(
-    view("1 · OAD · vista superior (desde la cabeza)") + A.svg +
-    note(A.bx + 4, 70, A.bx + 18, 62, ["RC ⟂ al RI en T7"], RED) +
-    panelSep(380, "2 · OAI · vista superior") + B.svg +
-    note(B.bx + 4, 70, B.bx + 18, 62, ["RC ⟂ al RI en T7"], RED) +
-    txt(18, 288, "Hombro derecho (anterior) contra el RI", 11.5, INK, "start", 700) +
-    txt(398, 288, "Hombro izquierdo (anterior) contra el RI", 11.5, INK, "start", 700) +
-    txt(398, 302, "Estudios cardíacos: OAI a 60°", 11, MUTE) +
-    txt(18, 304, "Brazo lejano arriba; el cercano abajo, en la cadera", 11, MUTE) +
-    txt(18, 319, "De pie · DFRI 180 cm · parrilla · RI 35 × 43 cm vertical · 2.ª inspiración", 11, MUTE)
-  );
-};
-
 // ---------------------------------------------------------------------
 // VÍA AÉREA
 // ---------------------------------------------------------------------
-I["via-aerea-ap-lateral"] = () => {
-  // panel 1: AP (de frente, desde el tubo)
-  const M = afin(250, 152, 1.2);
-  const ec = M([0, -14]);
-  const [rx, ry, rw, rh] = rectL(M, -60, -84, 60, 64);
-  const p1 = view("1 · AP · desde el tubo") +
-    riTop(rx, ry, rw, rh) +
-    `<clipPath id="cvA"><rect x="0" y="28" width="378" height="290"/></clipPath><g clip-path="url(#cvA)">` +
-    frente(M, { brazos: "abajo" }) + huesosFrente(M, { pulmones: false, nCost: 3 }) +
-    `<path d="${mapD(M, "M-4,-34 L4,-34 L4,40 L-4,40 Z")}" fill="#cfe0f2" stroke="#7f97bd" stroke-width="1.1" opacity=".9"/>` + `</g>` +
-    dot(...M([0, -26])) + dot(...M(J)) +
-    cross(...ec) +
-    note(ec[0] - 12, ec[1], 24, 56, ["RC ⟂ en C6-C7", "punto medio entre", "prominencia laríngea", "y escotadura yugular"], RED) +
-    note(...M([3, -27]), 300, 52, ["prominencia", "laríngea"], BLUE) +
-    note(...M([-2, 27]), 24, 148, ["escotadura yugular"], BLUE) +
-    note(...M([3, 8]), 300, 112, ["tráquea"], "#5f7fae");
-  // panel 2: lateral (de costado, desde el tubo)
-  const N = afinP(560, 168, 1.35);
-  const c = N([447, 130]);
-  const [r2x, r2y, r2w, r2h] = rectL(N, 395, 60, 505, 196);
-  const p2 = panelSep(380, "2 · Lateral · desde el tubo") +
-    riTop(r2x, r2y, r2w, r2h) +
-    `<clipPath id="cvB"><rect x="381" y="28" width="379" height="290"/></clipPath><g clip-path="url(#cvB)">` +
-    perfil(N, { brazos: "atras" }) + huesosPerfil(N, { pulmones: false, traquea: true, esternon: false }) + `</g>` +
-    dot(...N([453, 118])) + dot(...N(PJ)) +
-    cross(...c) +
-    note(c[0] - 12, c[1] + 4, 398, 150, ["RC ⟂ en C6-C7"], RED) +
-    note(...N([454, 116]), 640, 64, ["prominencia", "laríngea"], BLUE) +
-    note(...N([461, 142]), 660, 160, ["escotadura", "yugular"], BLUE) +
-    txt(398, 212, "Hombros abajo", 11.5, INK, "start", 700) + txt(398, 226, "y hacia atrás", 11.5, INK, "start", 700) +
-    lineas(398, 274, ["Brazos abajo, mentón", "levemente elevado", "Sentado o de pie"], 11, MUTE, 14) +
-    txt(640, 254, "RI 24 × 30 cm vertical", 11, INK) + txt(640, 268, "DFRI 180 cm · parrilla", 11, RED) +
-    txt(640, 288, "Inspiración lenta", 11, MUTE) + txt(640, 302, "y profunda", 11, MUTE);
-  return svg(p1 + p2);
-};
-
 // ---------------------------------------------------------------------
 // TÓRAX PEDIÁTRICO
 // ---------------------------------------------------------------------
@@ -813,6 +761,61 @@ I["costillas-axilares-opi-inferiores"] = () => {
     txt(418, 272, "DFRI 180 cm de pie · 100 cm en decúbito", 11, RED) +
     txt(418, 294, "Se prefiere en decúbito (aquí, de pie)", 11, MUTE)
   );
+};
+
+// ---------------- fichas con versiones: un esquema por versión ----------------
+const colV = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
+const gV = (tr, inner) => `<g transform="${tr}">${inner}</g>`;
+
+const oblAnt = (th, nombre, hombro, extra) => {
+  const A = panelSup({ x0: 20, w: 380, th, angLabel: "45°" });
+  return svg(
+    view(`${nombre} · vista superior (desde la cabeza)`) + A.svg +
+    note(A.bx + 4, 70, A.bx + 18, 62, ["RC ⟂ al RI en T7"], RED) +
+    colV(440, 70, [["De pie, rotado 45°", INK, 700], [`Hombro ${hombro} (anterior) contra el RI`, INK, 700]]) +
+    colV(440, 120, [["Brazo lejano arriba, sobre la cabeza", INK], ["o el soporte; el cercano abajo, en la cadera", INK], ["Mentón arriba", INK]]) +
+    (extra ? colV(440, 180, [[extra, MUTE]]) : "") +
+    colV(440, 260, [["DFRI 180 cm · parrilla · RI 35 × 43 cm vertical", MUTE, 400, 11], ["2.ª inspiración", MUTE, 400, 11]])
+  );
+};
+I["torax-oblicua-anterior--v1"] = () => oblAnt(-45, "OAD", "derecho");
+I["torax-oblicua-anterior--v2"] = () => oblAnt(45, "OAI", "izquierdo", "Estudios cardíacos: OAI a 60°");
+
+const viaTxt = (lat) =>
+  colV(470, 80, lat ? [["Sentado o de pie", INK, 700], ["Brazos abajo, mentón levemente elevado", INK], ["Hombros abajo y hacia atrás", INK, 700]]
+    : [["Sentado o de pie", INK, 700], ["Brazos abajo, mentón levemente elevado", INK]]) +
+  colV(470, 150, [["Vía aérea centrada en el RC", INK], ["Centro del RI a la altura del RC", INK]]) +
+  colV(470, 250, [["RI 24 × 30 cm vertical · DFRI 180 cm · parrilla", MUTE, 400, 11], ["Inspiración lenta y profunda", MUTE, 400, 11]]);
+I["via-aerea-ap-lateral--v1"] = () => {
+  const M = afin(250, 152, 1.2);
+  const ec = M([0, -14]);
+  const [rx, ry, rw, rh] = rectL(M, -60, -84, 60, 64);
+  return svg(view("AP · desde el tubo") +
+    riTop(rx, ry, rw, rh) +
+    `<clipPath id="cvA"><rect x="0" y="28" width="378" height="290"/></clipPath><g clip-path="url(#cvA)">` +
+    frente(M, { brazos: "abajo" }) + huesosFrente(M, { pulmones: false, nCost: 3 }) +
+    `<path d="${mapD(M, "M-4,-34 L4,-34 L4,40 L-4,40 Z")}" fill="#cfe0f2" stroke="#7f97bd" stroke-width="1.1" opacity=".9"/>` + `</g>` +
+    dot(...M([0, -26])) + dot(...M(J)) +
+    cross(...ec) +
+    note(ec[0] - 12, ec[1], 24, 56, ["RC ⟂ en C6-C7", "punto medio entre", "prominencia laríngea", "y escotadura yugular"], RED) +
+    note(...M([3, -27]), 300, 52, ["prominencia", "laríngea"], BLUE) +
+    note(...M([-2, 27]), 24, 148, ["escotadura yugular"], BLUE) +
+    note(...M([3, 8]), 300, 112, ["tráquea"], "#5f7fae") + viaTxt(false));
+};
+I["via-aerea-ap-lateral--v2"] = () => {
+  const dx = -330, N = afinP(560, 168, 1.35);
+  const c = N([447, 130]), C = [c[0] + dx, c[1]];
+  const [r2x, r2y, r2w, r2h] = rectL(N, 395, 60, 505, 196);
+  const pl = N([454, 116]), ey = N([461, 142]);
+  return svg(view("Lateral · desde el tubo") +
+    gV(`translate(${dx} 0)`, riTop(r2x, r2y, r2w, r2h) +
+      `<clipPath id="cvB"><rect x="381" y="28" width="379" height="290"/></clipPath><g clip-path="url(#cvB)">` +
+      perfil(N, { brazos: "atras" }) + huesosPerfil(N, { pulmones: false, traquea: true, esternon: false }) + `</g>` +
+      dot(...N([453, 118])) + dot(...N(PJ))) +
+    cross(...C) +
+    note(C[0] - 12, C[1] + 4, 30, 150, ["RC ⟂ en C6-C7", "punto medio entre", "prominencia laríngea", "y escotadura yugular"], RED) +
+    note(pl[0] + dx, pl[1], 310, 64, ["prominencia", "laríngea"], BLUE) +
+    note(ey[0] + dx, ey[1], 330, 160, ["escotadura", "yugular"], BLUE) + viaTxt(true));
 };
 
 module.exports = I;

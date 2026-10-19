@@ -36,11 +36,41 @@ for (const f of readdirSync(join(raiz, "datos"))) if (/^cap\d+.*\.js$/.test(f) &
 // ilustraciones referenciadas que no existen
 for (const p of proyecciones) if (p.ilustracion?.src) { try { statSync(join(raiz, p.ilustracion.src)); } catch { problemas.push(`[${p.id}] ilustración inexistente: ${p.ilustracion.src}`); } }
 
-// esquemas presentes en ilustraciones/ → datos/ilustraciones.js (la app los asigna a cada ficha)
+// fichas con varias posiciones del paciente: datos/versiones.js
+const VERSIONES = (await import(pathToFileURL(join(raiz, "datos/versiones.js")))).default;
+for (const [id, v] of Object.entries(VERSIONES)) {
+  if (!proyecciones.some((p) => p.id === id)) problemas.push(`datos/versiones.js: "${id}" no es una proyección`);
+  if (!Array.isArray(v.comun) || !Array.isArray(v.versiones) || v.versiones.length < 2) problemas.push(`datos/versiones.js: "${id}" necesita comun (lista) y al menos dos versiones`);
+  for (const [i, x] of (v.versiones || []).entries()) {
+    if (!x.nombre || !Array.isArray(x.posicion)) problemas.push(`datos/versiones.js: "${id}" versión ${i + 1} sin nombre o sin lista de posición`);
+    if (!x.posicion?.length && !x.rc) problemas.push(`datos/versiones.js: "${id}" versión ${i + 1} vacía`);
+    if (x.rc && !x.rc.texto) problemas.push(`datos/versiones.js: "${id}" versión ${i + 1}: rc sin texto`);
+  }
+}
+
+// esquemas presentes en ilustraciones/ → datos/ilustraciones.js (la app los asigna a cada ficha o a cada versión: <id>--v<N>.svg)
 const conEsquema = readdirSync(join(raiz, "ilustraciones")).filter((f) => f.endsWith(".svg")).map((f) => f.slice(0, -4)).sort();
-for (const id of conEsquema) if (!proyecciones.some((p) => p.id === id)) problemas.push(`ilustraciones/${id}.svg no corresponde a ninguna proyección`);
+for (const id of conEsquema) {
+  const m = id.match(/^(.+)--v(\d+)$/);
+  if (!m) { if (!proyecciones.some((p) => p.id === id)) problemas.push(`ilustraciones/${id}.svg no corresponde a ninguna proyección`); continue; }
+  const cant = VERSIONES[m[1]]?.versiones.length || 0;
+  if (!proyecciones.some((p) => p.id === m[1])) problemas.push(`ilustraciones/${id}.svg: "${m[1]}" no es una proyección`);
+  else if (+m[2] < 1 || +m[2] > cant) problemas.push(`ilustraciones/${id}.svg: versión fuera de rango (la ficha tiene ${cant} en datos/versiones.js)`);
+}
+// una ficha con esquemas por versión no debería conservar el combinado
+for (const [id, v] of Object.entries(VERSIONES)) {
+  const conVer = v.versiones.map((_, i) => conEsquema.includes(`${id}--v${i + 1}`));
+  if (conVer.every(Boolean) && conEsquema.includes(id)) problemas.push(`ilustraciones/${id}.svg sobra: la ficha ya tiene un esquema por versión`);
+  if (conVer.some(Boolean) && !conVer.every(Boolean)) problemas.push(`[${id}] faltan esquemas de versión: ${conVer.map((x, i) => (x ? "" : `--v${i + 1}`)).filter(Boolean).join(", ")}`);
+}
 writeFileSync(join(raiz, "datos/ilustraciones.js"), `// Generado por herramientas/preparar.mjs: fichas con esquema en ilustraciones/<id>.svg. No editar a mano.\nexport default ${JSON.stringify(conEsquema)};\n`);
-for (const p of proyecciones) if (!p.ilustracion?.src && conEsquema.includes(p.id)) p.ilustracion = { src: `ilustraciones/${p.id}.svg` };
+for (const p of proyecciones) {
+  if (!p.ilustracion?.src && conEsquema.includes(p.id)) p.ilustracion = { src: `ilustraciones/${p.id}.svg` };
+  const v = VERSIONES[p.id];
+  if (v) p.versiones = v.versiones.map((x, i) => ({ ...x, ilustracion: conEsquema.includes(`${p.id}--v${i + 1}`) ? { src: `ilustraciones/${p.id}--v${i + 1}.svg` } : null }));
+  // con un esquema por versión, la ficha cuenta como ilustrada
+  if (!p.ilustracion?.src && p.versiones?.every((x) => x.ilustracion)) p.ilustracion = { src: p.versiones[0].ilustracion.src };
+}
 
 const INCLUIR = ["index.html", "manifest.webmanifest", "css", "js", "datos", "config", "iconos", "fuentes", "ilustraciones"];
 const archivos = [];

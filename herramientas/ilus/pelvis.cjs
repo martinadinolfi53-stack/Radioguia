@@ -312,23 +312,6 @@ function ranaArriba(dx, { bilateral }) {
   else { const p = piernaExt(1, 0); ps.push(p.d); dd = p.dedos; }
   return `<g transform="translate(${dx} 0)">${union(ps)}${dd}${pelvisHuesos({ femur: false, l5: false })}${femurRana(-1)}${bilateral ? femurRana(1) : femurProx(1)}</g>`;
 }
-I["cadera-lateral-rana-unilateral"] = () => {
-  const P = piesRana(190, { izq: "rana", der: "ext", blanco: "cadera" });
-  const dx = 400, rc = [dx + 206, 207];
-  return svg(
-    view("1 · Vista desde los pies del paciente") + P.s +
-    side(30, 250, "D") + side(350, 250, "I") +
-    note(P.tgt[0] - 60, P.tgt[1] - 60, 220, 60, ["Rodilla y cadera", "flexionadas, fémur", "a 45° de la vertical"], INK) +
-    note(150, 282, 120, 312, ["RI 24 x 30 horizontal · parrilla"], INK) +
-    panelSep("2 · Vista desde el tubo") +
-    clip("cpRU", 392, 26, 368, 300, riTop(rc[0] - 60, rc[1] - 48, 120, 96, "") + ranaArriba(dx, { bilateral: false }) + riBorde(rc[0] - 60, rc[1] - 48, 120, 96)) +
-    cross(...rc) +
-    note(rc[0] + 8, rc[1] + 6, 560, 300, ["RC ⟂ a la mitad del cuello", "o de la cabeza femoral"], RED) +
-    txt(404, 48, "Decúbito supino · apnea", 11.5, MUTE) +
-    txt(404, 314, "Sin traumatismo de cadera", 11.5, MUTE)
-  );
-};
-
 // ---------- AP bilateral de caderas en rana ----------
 I["cadera-lateral-rana-bilateral"] = () => {
   const P = piesRana(190, { blanco: "centro" });
@@ -595,6 +578,54 @@ I["femur-lateral-haz-horizontal"] = () => {
     side(24, 56, "I") + txt(40, 60, "lado lesionado (ejemplo)", 11, MUTE) +
     txt(12, 290, "No mover al paciente del supino:", 11.5, MUTE) + txt(12, 304, "levantar con cuidado la pierna lesionada", 11.5, MUTE) +
     txt(12, 318, "DFRI 100 cm · colimar estrecho a los cuatro lados", 11.5, MUTE)
+  );
+};
+
+// ---------------- fichas con versiones: un esquema por versión ----------------
+const colV = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
+const ranaTxtFin = colV(430, 262, [["RI 24 x 30 horizontal · parrilla · DFRI 100 cm", MUTE, 400, 11], ["Apnea · no hacerla si puede haber fractura", MUTE, 400, 11]]);
+I["cadera-lateral-rana-unilateral--v1"] = () => {
+  const P = piesRana(190, { izq: "rana", der: "ext", blanco: "cadera" });
+  return svg(
+    view("Cuello femoral · vista desde los pies") + P.s +
+    side(30, 250, "D") + side(350, 250, "I") +
+    note(P.tgt[0] - 60, P.tgt[1] - 60, 220, 60, ["Rodilla y cadera", "flexionadas, fémur", "a 45° de la vertical"], INK) +
+    note(150, 282, 120, 312, ["RI 24 x 30 horizontal"], INK) +
+    colV(430, 60, [["RC perpendicular a la mitad", RED, 700, 12.5], ["del cuello o de la cabeza femoral", INK, 400, 12]]) +
+    colV(430, 120, [["Decúbito supino", INK, 700], ["Lado afectado: rodilla y cadera flexionadas,", INK], ["fémur a 45° de abducción de la vertical", INK]]) +
+    colV(430, 190, [["Con 20-30° el cuello sale menos acortado", MUTE]]) + ranaTxtFin
+  );
+};
+I["cadera-lateral-rana-unilateral--v2"] = () => {
+  // paciente oblicuado 35-45° hacia el lado afectado (derecho, a la izquierda del dibujo); pierna abducida sobre la mesa
+  const cx = 210, th = -40, r = (th * Math.PI) / 180, c = Math.cos(r), sn = Math.sin(r);
+  const R0 = ([x, y]) => [cx + (x - cx) * c - (y - 234) * sn, 234 + (x - cx) * sn + (y - 234) * c];
+  const cuerpo0 = [[cx - 92, 234], [cx - 80, 206], [cx, 194], [cx + 80, 206], [cx + 92, 234], [cx + 74, 258], [cx, 261], [cx - 74, 258]].map(R0);
+  const off = 261 - Math.max(...cuerpo0.map((p) => p[1]));
+  const R = (p) => { const q = R0(p); return [q[0], q[1] + off]; };
+  const cuerpo = cuerpo0.map(([x, y]) => [x, y + off]);
+  const J = R([cx - 60, 234]), Jr = R([cx + 60, 234]);
+  const K = [J[0] - 120, 247], A = [J[0] + 6, 252];
+  const parts = [suave(cuerpo, true, 0.9), poly(miembro([[J[0] + 4, J[1] + 4], J, K], [22, 22, 15], [22, 22, 15]))];
+  const top = piel(poly(miembro([K, lerp(K, A, 0.5), A], [13, 12, 9], [13, 12, 9])), 'opacity=".55"');
+  const ox = cx + 60;
+  const pOtra = piel(suave([[ox - 12, 234], [ox - 14, 200], [ox - 6, 178], [ox + 6, 178], [ox + 14, 200], [ox + 12, 234], [ox, 246]].map(R), true, 0.9));
+  const bones = hueso(poly(miembro([J, lerp(J, K, 0.5), K], [5, 4.5, 8], [5, 4.5, 8]))) + `<circle cx="${f1(J[0])}" cy="${f1(J[1])}" r="10" fill="${BONE}" stroke="${BO}" stroke-width="1.4"/>`;
+  const a = cuerpo[7], b = cuerpo[5];
+  const ux = (Jr[0] - J[0]) / Math.hypot(Jr[0] - J[0], Jr[1] - J[1]), uy = (Jr[1] - J[1]) / Math.hypot(Jr[0] - J[0], Jr[1] - J[1]);
+  const P0 = J;
+  return svg(
+    view("Cabeza femoral, acetábulo y diáfisis · desde los pies") +
+    table(20, 400, 262, "") + ri(J[0] - 100, 278, 200, 8) + union(parts) + pOtra + bones + top +
+    refline(P0[0], P0[1], P0[0] + ux * 170, P0[1] + uy * 170) +
+    `<line x1="${f1(P0[0])}" y1="${f1(P0[1])}" x2="${f1(P0[0] + 170)}" y2="${f1(P0[1])}" stroke="${MUTE}" stroke-width="1" stroke-dasharray="2 3"/>` +
+    arco(P0[0], P0[1], 120, -40, 0) + txt(P0[0] + 128, P0[1] - 26, "35-45°", 13, BLUE, "start", 700) +
+    tube(J[0], J[1], 0, 150) +
+    side(30, 300, "D") + side(380, 300, "I") +
+    note(K[0] + 30, K[1] - 18, 40, 130, ["pierna abducida", "hasta la mesa"], INK) +
+    colV(430, 60, [["RC perpendicular a la mitad", RED, 700, 12.5], ["del cuello o de la cabeza femoral", INK, 400, 12]]) +
+    colV(430, 120, [["Decúbito supino, oblicuado 35-45°", INK, 700], ["hacia el lado afectado", INK, 700], ["Abducir la pierna hasta la mesa, si se puede", INK], ["Cadera y cuello centrados en el RC", INK]]) +
+    ranaTxtFin
   );
 };
 

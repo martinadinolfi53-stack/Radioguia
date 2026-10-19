@@ -207,23 +207,6 @@ I["tobillo-lateral"] = () => {
   );
 };
 
-I["tobillo-ap-estres"] = () => {
-  const inv = pieTubo(572, 214, 22, 0.42), ev = pieTubo(670, 214, -22, 0.42);
-  const lab = (f, t) => { const a = f.P([74, 62]); return txt(f1(a[0]), f1(a[1]), t, 11.5, INK, "middle", 700); };
-  const curv = (f, sg) => { const a = f.P([74 + 70 * sg, 12]), b = f.P([74 - 50 * sg, 16]); return `<path d="M${f1(a[0])},${f1(a[1])} Q${f1((a[0] + b[0]) / 2)},${f1(a[1] + 26)} ${f1(b[0])},${f1(b[1])}" fill="none" stroke="${BLUE}" stroke-width="1.6" marker-end="url(#arb)"/>`; };
-  return svg(
-    view("Vista lateral · decúbito supino, pierna extendida") +
-    tobilloLateral("cpTE", { conApoyo: false, riTxt: "RI 24 × 30 vert. o 35 × 43" }) +
-    sep(PX) + panel(PX + 14, "Desde el tubo · dedos arriba") +
-    inv.svg + ev.svg + curv(inv, 1) + curv(ev, -1) +
-    lab(inv, "inversión") + lab(ev, "eversión") +
-    txt(PX + 10, 60, "← medial", 10.5, MUTE) + txt(752, 60, "lateral →", 10.5, MUTE, "end") + txt(PX + 10, 76, "(planta hacia el borde inferior)", 10, MUTE) +
-    txt(PX + 14, 284, "Sin rotar la pierna (AP verdadera):", 11, INK, "start", 700) +
-    txt(PX + 14, 299, "forzar planta hacia adentro", 11, INK) +
-    txt(PX + 14, 314, "y después hacia afuera", 11, INK)
-  );
-};
-
 // ======================= PIE =======================
 I["pie-ap-dorsoplantar"] = () => {
   const m = limb({ ankle: [530, 213], legDir: 250, footDir: 0, s: 1.0 });
@@ -293,32 +276,6 @@ I["pie-lateral"] = () => {
   );
 };
 
-I["pie-ap-lateral-carga"] = () => {
-  const m = limb({ ankle: [116, 238], legDir: 270, footDir: 0, s: 0.68 });
-  const b3 = m.F([58, -24]);
-  // panel derecho: desde arriba
-  const pd = planta(630, 176, 0, 0.78), pi = planta(500, 176, 0, 0.78, false, true);
-  const mt5 = pd.P([32, 6]);
-  const blk = (c) => `<rect x="${c - 46}" y="90" width="92" height="170" rx="4" fill="#e3e6ec" stroke="#8a8f9c" stroke-width="1.2"/>`;
-  return svg(clip("cpPC", 0, 0, 360, 330) +
-    `<rect x="20" y="260" width="330" height="10" fill="#cfd3dc"/>` +
-    ri(40, 250, 220, 10, "") + txt(20, 286, "RI 24 × 30 horiz. (35 × 43 los dos pies)", 11, INK) +
-    `<g clip-path="url(#cpPC)">${piel(m.d)}${m.huesos}${m.toes}</g>` +
-    `<rect x="8" y="6" width="190" height="20" fill="#fff" opacity=".85"/>` + view("AP · vista lateral, de pie") +
-    tube(b3[0], b3[1] - 4, -15, 160, { angLabel: " " }) + txt(f1(b3[0] - 8), f1(b3[1] - 70), "15°", 13, RED, "end", 700) +
-    note(f1(b3[0] + (b3[1] - 204) * Math.tan(deg(15))), 200, 246, 160, ["RC 15° posterior", "(cefálico) a la base", "del 3.er MT, entre", "los dos pies"], RED) +
-    txt(16, 306, "Peso repartido en los dos pies, parado sobre el RI", 11, MUTE) +
-    sep(372) + panel(386, "Lateral · desde arriba") +
-    blk(500) + blk(630) + txt(565, 278, "bloques", 10.5, MUTE, "middle") +
-    pi.svg + pd.svg +
-    `<rect x="562" y="70" width="7" height="200" fill="${INK}"/>` + txt(565, 62, "RI vertical entre los pies", 11, INK, "middle") +
-    beam(mt5[0] + 2, mt5[1], 180, 76, { ref: 180 }) +
-    txt(744, 124, "RC horizontal", 12.5, RED, "end", 700) + txt(744, 240, "base del 5.º MT", 11.5, INK, "end") +
-    txt(386, 306, "Derecho e izquierdo, para comparar", 11, MUTE) +
-    txt(386, 320, "DFRI 100 cm", 11, MUTE)
-  );
-};
-
 // ======================= CALCÁNEO =======================
 I["calcaneo-plantodorsal-axial"] = () => {
   const m = limb({ ankle: [470, 205], legDir: 180, footDir: 270, s: 0.95 });
@@ -384,66 +341,138 @@ I["dedos-pie-ap"] = () => {
   );
 };
 
-I["dedos-pie-ap-oblicua"] = () => {
-  const S = 0.72;
-  // izquierda: oblicua medial (borde medial sobre el RI)
-  const xA = 120, yA = 250;
-  const fA = pieFrontal(xA, yA, -38, S);
-  // derecha: oblicua lateral (borde lateral sobre el RI): giro opuesto, pivote en el borde lateral
-  const tmp = pieFrontal(0, 0, 38, S), lp = tmp.P([152, 0]);
-  const xB = 640 - lp[0], yB = 250 - lp[1];
-  const fB = pieFrontal(xB, yB, 38, S);
-  const tA = fA.P([22, -16]), tB = fB.P([121, -9]);
-  const wedge = (f, a, b) => { const p = f.P(a), q = f.P(b); return `<path d="M${f1(p[0])},${f1(p[1])} L${f1(q[0])},${f1(q[1])} L${f1(q[0])},250 L${f1(p[0])},250 Z" fill="#dfe3ea" stroke="#8a8f9c" stroke-width="1.2"/>`; };
-  const ang = (x, y, sg) => { const r = 92, a = sg > 0 ? -1 : 1; const ex = x + sg * r * Math.cos(deg(37.5)), ey = y - r * Math.sin(deg(37.5)); return `<line x1="${x}" y1="${y}" x2="${f1(x + sg * 130 * Math.cos(deg(37.5)))}" y2="${f1(y - 130 * Math.sin(deg(37.5)))}" stroke="${BLUE}" stroke-width="1.4" stroke-dasharray="4 4"/><path d="M${x + sg * r},${y} A${r},${r} 0 0 ${sg > 0 ? 0 : 1} ${f1(ex)},${f1(ey)}" fill="none" stroke="${BLUE}" stroke-width="1.5"/>`; };
+const TF = 70;
+
+// ======================= VERSIONES (un esquema por posición; ver datos/versiones.js) =======================
+const col = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
+
+// ---- AP de tobillo con sobrecarga: inversión / eversión (vista desde el tubo, dedos arriba) ----
+function estres(fr, nombre, sentido) {
+  const f = pieTubo(150, 282, fr, 0.92);
+  const a = f.P([74 + 74 * (fr > 0 ? 1 : -1), 6]), b = f.P([74 - 56 * (fr > 0 ? 1 : -1), 12]);
+  const curv = `<path d="M${f1(a[0])},${f1(a[1])} Q${f1((a[0] + b[0]) / 2)},${f1(a[1] + 40)} ${f1(b[0])},${f1(b[1])}" fill="none" stroke="${BLUE}" stroke-width="2" marker-end="url(#arb)"/>`;
+  const mid = f.P([74, -70]);
   return svg(
-    view("Vista desde los dedos · pie oblicuado") +
-    ri(40, 250, 300, 10, "") + ri(420, 250, 300, 10, "") +
-    wedge(fA, [70, 3], [150, 3]) + wedge(fB, [0, 3], [80, 3]) +
-    fA.svg + fB.svg +
-    ang(xA, yA, 1) + ang(640, 250, -1) +
-    txt(xA + 96, yA - 26, "30-45°", 13, BLUE, "start", 700) + txt(640 - 96, 224, "30-45°", 13, BLUE, "end", 700) +
-    tube(tA[0], tA[1] - 14, 0, 120) + tube(tB[0], tB[1] - 12, 0, 120) +
-    `<circle cx="${f1(tA[0])}" cy="${f1(tA[1])}" r="${f1(17 * S + 3)}" fill="none" stroke="${RED}" stroke-width="2"/>` +
-    `<circle cx="${f1(tB[0])}" cy="${f1(tB[1])}" r="${f1(9 * S + 3)}" fill="none" stroke="${RED}" stroke-width="2"/>` +
-    txt(40, 46, "Dedos 1.º a 3.º: hacia medial", 12.5, INK, "start", 700) +
-    txt(720, 46, "Dedos 4.º y 5.º: hacia lateral", 12.5, INK, "end", 700) +
-    txt(xA - 14, yA - 4, "medial", 10.5, MUTE, "end") + txt(648, 246, "lateral", 10.5, MUTE) +
-    txt(380, 284, "Apoyo bajo el pie · RC perpendicular al RI, centrado en las MTF de interés · RI 18 × 24 horiz. · DFRI 100 cm", 11, RED, "middle") +
-    txt(380, 302, "Eje de los dedos alineado con la zona del RI que se expone", 11, MUTE, "middle")
+    view(`${nombre} · vista desde el tubo, dedos arriba`) +
+    riTop(110, 50, 240, 270) + txt(116, 68, "RI", 11.5, INK) +
+    f.svg + curv + cross(f1(mid[0]), f1(mid[1])) +
+    txt(20, 300, "← medial", 10.5, MUTE) + txt(420, 300, "lateral →", 10.5, MUTE, "end") + txt(20, 316, "Planta hacia el borde inferior del dibujo", 10.5, MUTE) +
+    note(mid[0] + 12, mid[1], 430, 60, ["RC perpendicular al RI, a mitad", "de camino entre los maléolos"], RED) +
+    col(430, 120, [["Decúbito supino o sentado,", INK, 700], ["pierna extendida, sin rotar la", INK, 700], ["pierna ni el tobillo (AP verdadera)", INK, 700]]) +
+    col(430, 180, [[`Forzar el tobillo girando la planta`, INK], [sentido, INK]]) +
+    col(430, 226, [["Sobrecarga con mucho cuidado: gasa larga", MUTE, 400, 11], ["que sostiene el paciente, o a mano por", MUTE, 400, 11], ["personal capacitado con guantes y delantal", MUTE, 400, 11], ["plomados", MUTE, 400, 11]]) +
+    col(430, 300, [["RI 24 × 30 vert. o 35 × 43 · DFRI 100 cm", MUTE, 400, 11]])
+  );
+}
+I["tobillo-ap-estres--v1"] = () => estres(22, "Inversión", "hacia adentro (inversión)");
+I["tobillo-ap-estres--v2"] = () => estres(-22, "Eversión", "hacia afuera (eversión)");
+
+// ---- AP y lateral de pies en carga ----
+I["pie-ap-lateral-carga--v1"] = () => {
+  const m = limb({ ankle: [180, 238], legDir: 270, footDir: 0, s: 0.68 });
+  const b3 = m.F([58, -24]);
+  return svg(clip("cpPC1", 0, 0, 470, 330) +
+    `<rect x="60" y="260" width="380" height="10" fill="#cfd3dc"/>` +
+    ri(100, 250, 240, 10, "") + txt(100, 290, "RI 24 × 30 horiz. (35 × 43 los dos pies)", 11, INK) +
+    `<g clip-path="url(#cpPC1)">${piel(m.d)}${m.huesos}${m.toes}</g>` +
+    `<rect x="8" y="6" width="250" height="20" fill="#fff" opacity=".85"/>` + view("AP · vista lateral, de pie") +
+    tube(b3[0], b3[1] - 4, -15, 160, { angLabel: " " }) + txt(f1(b3[0] - 8), f1(b3[1] - 70), "15°", 13, RED, "end", 700) +
+    note(f1(b3[0] + (b3[1] - 204) * Math.tan(deg(15))), 200, 470, 70, ["RC 15° posterior (cefálico)", "a la base del 3.er MT, a mitad", "de camino entre los dos pies"], RED) +
+    col(470, 150, [["De pie, parado sobre el RI,", INK, 700], ["con el peso repartido por igual", INK, 700], ["entre los dos pies", INK, 700]]) +
+    col(470, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+  );
+};
+I["pie-ap-lateral-carga--v2"] = () => {
+  const pd = planta(300, 176, 0, 0.78), pi = planta(170, 176, 0, 0.78, false, true);
+  const mt5 = pd.P([32, 6]);
+  const blk = (c) => `<rect x="${c - 46}" y="90" width="92" height="170" rx="4" fill="#e3e6ec" stroke="#8a8f9c" stroke-width="1.2"/>`;
+  return svg(
+    view("Lateral · vista desde arriba") +
+    blk(170) + blk(300) + txt(235, 278, "bloques", 10.5, MUTE, "middle") +
+    pi.svg + pd.svg +
+    `<rect x="232" y="70" width="7" height="200" fill="${INK}"/>` + txt(235, 62, "RI vertical entre los pies", 11, INK, "middle") +
+    beam(mt5[0] + 2, mt5[1], 180, 76, { ref: 180 }) +
+    note(mt5[0] + 4, mt5[1] + 4, 470, 250, ["RC horizontal, hacia", "la base del 5.º MT"], RED) +
+    col(470, 70, [["De pie, con todo el peso sobre", INK, 700], ["los dos pies y el RI vertical", INK, 700], ["entre ellos", INK, 700]]) +
+    col(470, 130, [["Pies sobre bloques lo bastante altos", INK], ["como para usar un RC horizontal", INK]]) +
+    col(470, 180, [["Se radiografían el pie derecho y el", INK], ["izquierdo para comparar", INK]]) +
+    col(470, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
   );
 };
 
-I["dedos-pie-lateral"] = () => {
+// ---- AP oblicua de dedos del pie ----
+function pieOblicuoPanel(medial) {
+  const S = 0.9;
+  const wedge = (f, a, b) => { const p = f.P(a), q = f.P(b); return `<path d="M${f1(p[0])},${f1(p[1])} L${f1(q[0])},${f1(q[1])} L${f1(q[0])},260 L${f1(p[0])},260 Z" fill="#dfe3ea" stroke="#8a8f9c" stroke-width="1.2"/>`; };
+  const ang = (x, y, sg) => { const r = 100; const ex = x + sg * r * Math.cos(deg(37.5)), ey = y - r * Math.sin(deg(37.5)); return `<line x1="${x}" y1="${y}" x2="${f1(x + sg * 150 * Math.cos(deg(37.5)))}" y2="${f1(y - 150 * Math.sin(deg(37.5)))}" stroke="${BLUE}" stroke-width="1.4" stroke-dasharray="4 4"/><path d="M${x + sg * r},${y} A${r},${r} 0 0 ${sg > 0 ? 0 : 1} ${f1(ex)},${f1(ey)}" fill="none" stroke="${BLUE}" stroke-width="1.5"/>`; };
+  if (medial) {
+    const xA = 120, yA = 260, f = pieFrontal(xA, yA, -38, S), t = f.P([22, -16]);
+    return ri(50, 260, 340, 10, "") + wedge(f, [70, 3], [150, 3]) + f.svg + ang(xA, yA, 1) +
+      txt(xA + 104, yA - 28, "30-45°", 13, BLUE, "start", 700) + tube(t[0], t[1] - 16, 0, 130) +
+      `<circle cx="${f1(t[0])}" cy="${f1(t[1])}" r="${f1(17 * S + 3)}" fill="none" stroke="${RED}" stroke-width="2"/>` +
+      txt(xA - 14, yA - 4, "medial", 10.5, MUTE, "end") + txt(380, 254, "lateral", 10.5, MUTE, "end");
+  }
+  const tmp = pieFrontal(0, 0, 38, S), lp = tmp.P([152, 0]);
+  const xB = 330 - lp[0], yB = 260 - lp[1], f = pieFrontal(xB, yB, 38, S), t = f.P([121, -9]);
+  return ri(50, 260, 340, 10, "") + wedge(f, [0, 3], [80, 3]) + f.svg + ang(330, 260, -1) +
+    txt(330 - 104, 232, "30-45°", 13, BLUE, "end", 700) + tube(t[0], t[1] - 14, 0, 130) +
+    `<circle cx="${f1(t[0])}" cy="${f1(t[1])}" r="${f1(9 * S + 3)}" fill="none" stroke="${RED}" stroke-width="2"/>` +
+    txt(338, 256, "lateral", 10.5, MUTE) + txt(60, 254, "medial", 10.5, MUTE);
+}
+const pieOblTxt = (medial) =>
+  col(440, 70, [[`Oblicuar el pie 30-45° hacia ${medial ? "medial" : "lateral"}`, INK, 700, 12.5]]) +
+  col(440, 100, [["Decúbito supino o sentado, pie", INK], ["apoyado sobre el RI, con un apoyo", INK], ["debajo del pie", INK]]) +
+  col(440, 160, [["Eje de los dedos alineado con la", INK], ["zona del RI que se expone", INK]]) +
+  col(440, 206, [["RC perpendicular al RI, centrado", RED, 700], ["en las MTF de interés", RED, 700]]) +
+  col(440, 290, [["RI 18 × 24 horiz. · DFRI 100 cm", MUTE, 400, 11], ["Varias tomas en un RI: cubrir con plomo el resto", MUTE, 400, 11]]);
+I["dedos-pie-ap-oblicua--v1"] = () => svg(view("Dedos 1.º a 3.º · vista desde los dedos") + pieOblicuoPanel(true) + pieOblTxt(true));
+I["dedos-pie-ap-oblicua--v2"] = () => svg(view("Dedos 4.º y 5.º · vista desde los dedos") + pieOblicuoPanel(false) + pieOblTxt(false));
+
+// ---- Lateral de dedos del pie ----
+// espejo = true: el pie se ve desde el otro lado (mediolateral)
+function dedosLateral(id, espejo) {
   const m = limb({ ankle: [590, 130], legDir: 304, footDir: 180, s: 1.6, sg: -1 });
-  const ifj = m.F([129, -39]);
-  return svg(clip("cpDL") +
-    view("Vista desde el tubo · lateral de dedos (detalle)") +
-    riTop(250, 100, 290, 170, "") + txt(534, 264, "RI 18 × 24 horiz.", 12, INK, "end") +
-    `<g clip-path="url(#cpDL)">${piel(m.d)}${m.huesos}${m.toes}</g>` +
-    coll(f1(ifj[0] - 70), f1(ifj[1] - 40), 150, 80) +
-    cross(ifj[0], ifj[1]) +
-    note(ifj[0] - 6, ifj[1] - 12, 300, 56, ["RC perpendicular a la IF del 1.er dedo", "(IFP en los dedos 2.º a 5.º) · DFRI 100 cm"], RED, "end") +
-    note(f1(ifj[0] - 70), f1(ifj[1] + 30), 230, 300, ["Colimar al dedo de interés"], AMB, "end") +
-    txt(560, 230, "Dedos 1.º a 3.º: lateromedial", 12, INK, "start", 700) + txt(560, 246, "(1.er dedo abajo, contra el RI)", 11.5, INK) +
-    txt(560, 270, "Dedos 4.º y 5.º: mediolateral", 12, INK, "start", 700) + txt(560, 286, "(1.er dedo arriba)", 11.5, INK) +
-    txt(560, 312, "Separar los otros dedos con cinta o gasa", 11, MUTE)
+  const ifj0 = m.F([129, -39]);
+  const X = (x) => (espejo ? 760 - x : x);
+  const ifj = [X(ifj0[0]), ifj0[1]];
+  const dib = `<g clip-path="url(#${id})">${piel(m.d)}${m.huesos}${m.toes}</g>`;
+  return { svg: clip(id) + riTop(X(espejo ? 540 : 250), 100, 290, 170, "") + (espejo ? `<g transform="translate(760 0) scale(-1 1)">${dib}</g>` : dib) +
+    coll(f1(ifj[0] - 70), f1(ifj[1] - 40), 150, 80) + cross(f1(ifj[0]), f1(ifj[1])), ifj };
+}
+I["dedos-pie-lateral--v1"] = () => {
+  const d = dedosLateral("cpDL1", false), j = d.ifj;
+  return svg(
+    view("Dedos 1.º a 3.º · lateromedial · desde el tubo") + d.svg + txt(534, 264, "RI 18 × 24 horiz.", 12, INK, "end") +
+    note(j[0] - 6, j[1] - 12, 300, 56, ["RC perpendicular a la IF del 1.er dedo", "(IFP del 2.º o el 3.er dedo)"], RED, "end") +
+    note(f1(j[0] - 70), f1(j[1] + 30), 230, 300, ["Colimar al dedo de interés"], AMB, "end") +
+    col(560, 230, [["Lateromedial:", INK, 700, 12], ["1.er dedo abajo, contra el RI", INK]]) +
+    col(560, 280, [["Separar los otros dedos con", MUTE, 400, 11], ["cinta o gasa · DFRI 100 cm", MUTE, 400, 11]])
+  );
+};
+I["dedos-pie-lateral--v2"] = () => {
+  const d = dedosLateral("cpDL2", true), j = d.ifj;
+  return svg(
+    d.svg + `<rect x="8" y="6" width="310" height="20" fill="#fff" opacity=".85"/>` + view("Dedos 4.º y 5.º · mediolateral · desde el tubo") + txt(236, 264, "RI 18 × 24 horiz.", 12, INK, "start") +
+    note(j[0] + 6, j[1] - 12, 460, 56, ["RC perpendicular a la IFP", "del dedo a estudiar"], RED, "start") +
+    note(f1(j[0] + 70), f1(j[1] + 30), 530, 300, ["Colimar al dedo de interés"], AMB, "start") +
+    col(20, 230, [["Mediolateral:", INK, 700, 12], ["1.er dedo arriba", INK]]) +
+    col(20, 280, [["Separar los otros dedos con", MUTE, 400, 11], ["cinta o gasa · DFRI 100 cm", MUTE, 400, 11]])
   );
 };
 
-I["dedos-pie-tangencial-sesamoideos"] = () => {
-  // decúbito prono: cara anterior de la pierna hacia la mesa, rodilla apoyada; pie casi vertical sobre los dedos en flexión dorsal
+// ---- Tangencial de sesamoideos ----
+I["dedos-pie-tangencial-sesamoideos--v1"] = () => {
   const m = limb({ knee: [250, 222], legDir: 167.5, thighDir: 180, footDir: 72.5, s: 0.85, sg: -1, flexed: true, toeFlex: TF });
   const h = m.F([104, -47]);
   const p1 = m.F([-30, -43]), p2 = m.F([104, -47]);
   const u = [p2[0] - p1[0], p2[1] - p1[1]], n = Math.hypot(...u);
   const e1 = [p1[0] - u[0] / n * 30, p1[1] - u[1] / n * 30], e2 = [p2[0] + u[0] / n * 20, p2[1] + u[1] / n * 20];
-  const ang = Math.atan2(u[0], u[1]) * 180 / Math.PI; // respecto de la vertical
-  return svg(clip("cpDS") +
-    view("Vista lateral · decúbito prono") +
+  const ang = Math.atan2(u[0], u[1]) * 180 / Math.PI;
+  return svg(clip("cpDS1") +
+    view("Decúbito prono · vista lateral") +
     table(0, 760, 262) +
     ri(400, 250, 170, 12, "") + txt(410, 290, "RI 18 × 24 horiz.", 11.5, INK) +
-    `<g clip-path="url(#cpDS)">${piel(m.d)}${m.huesos}${m.toes}</g>` +
+    `<g clip-path="url(#cpDS1)">${piel(m.d)}${m.huesos}${m.toes}</g>` +
     `<line x1="${f1(e1[0])}" y1="${f1(e1[1])}" x2="${f1(e2[0])}" y2="${f1(e2[1])}" stroke="${BLUE}" stroke-width="2"/>` +
     refline(f1(e1[0]), f1(e1[1]), f1(e1[0]), f1(e1[1] + 120)) +
     arco(e1[0], e1[1], 70, 90, 90 - ang) + txt(f1(e1[0] - 10), f1(e1[1] + 2), "Planta a 15-20°", 12.5, BLUE, "end", 700) + txt(f1(e1[0] - 10), f1(e1[1] + 17), "de la vertical", 11.5, BLUE, "end") +
@@ -451,9 +480,27 @@ I["dedos-pie-tangencial-sesamoideos"] = () => {
     note(h[0] + 4, h[1] + 4, 640, 236, ["Cabeza del", "1.er MT"], RED) +
     note(h[0], 170, 642, 120, ["RC perpendicular,", "tangente a la", "cabeza del 1.er MT", "(angulado si falta", "flexión dorsal)"], RED) +
     txt(16, 290, "Pie y 1.er dedo en flexión dorsal, apoyados sobre el RI.", 11.5, INK, "start", 700) +
-    txt(16, 306, "Alternativa en supino si hay mucho dolor: el paciente sostiene los dedos con una gasa · DFRI 100 cm", 11, MUTE)
+    txt(16, 306, "Si no se logra la planta a 15-20° de la vertical, ajustar el ángulo del RC · DFRI 100 cm", 11, MUTE)
   );
 };
-const TF = 70;
+I["dedos-pie-tangencial-sesamoideos--v2"] = () => {
+  // decúbito supino: pierna extendida, pie hacia arriba y dedos en flexión dorsal sostenidos con una gasa
+  const m = limb({ ankle: [400, 228], legDir: 180, footDir: 270, s: 0.64, toeFlex: TF });
+  const h = m.F([104, -47]), tip = m.F([150, -40]), talon = m.F([-34, -34]);
+  const hx = f1(h[0] + 3);
+  const mano = [140, 96];
+  return svg(clip("cpDS2", 0, 0, 760, 330) +
+    view("Decúbito supino (alternativa) · vista lateral") +
+    table(0, 760, 252) + ri(f1(talon[0] - 4), 242, 110, 10, "") + txt(f1(talon[0] + 4), 276, "RI 18 × 24 horiz.", 11.5, INK) +
+    `<g clip-path="url(#cpDS2)">${piel(m.d)}${m.huesos}${m.toes}</g>` +
+    `<path d="M${f1(tip[0])},${f1(tip[1])} Q${f1((tip[0] + mano[0]) / 2)},${f1(Math.min(tip[1], mano[1]) - 20)} ${mano[0]},${mano[1]}" fill="none" stroke="#9fc3e8" stroke-width="3"/>` +
+    txt(mano[0], mano[1] - 26, "← gasa: la sostiene el paciente", 11, MUTE, "start") +
+    tube(hx, f1(h[1]), 0, 130) + `<circle cx="${hx}" cy="${f1(h[1])}" r="4" fill="${RED}"/>` +
+    note(hx + 4, h[1] + 4, 600, 210, ["Cabeza del", "1.er MT"], RED) +
+    note(hx + 6, 100, 600, 70, ["RC perpendicular, o", "angulado según la", "flexión dorsal, centrado", "en la cabeza del 1.er MT"], RED) +
+    txt(16, 296, "Suele tolerarse mejor si el paciente tiene mucho dolor.", 11.5, INK, "start", 700) +
+    txt(16, 312, "El paciente sostiene los dedos con una tira larga de gasa · DFRI 100 cm", 11, MUTE)
+  );
+};
 
 module.exports = I;

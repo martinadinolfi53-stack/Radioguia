@@ -738,7 +738,6 @@ module.exports = {
   "craneo-trauma-lateral": crTraumaLat,
   "craneo-trauma-ap-axial": crTraumaAP,
   "faciales-lateral": facLateral,
-  "faciales-parietoacantial-waters": facWaters,
   "faciales-pa-axial-caldwell": facCaldwell,
   "faciales-trauma-lateral": facTraumaLat,
   "faciales-trauma-waters-inversa": facTraumaWatersInv,
@@ -752,10 +751,89 @@ module.exports = {
   "mandibula-axiolateral": mandAxio,
   "mandibula-axiolateral-trauma": mandAxioTrauma,
   "mandibula-ap-axial": mandAPaxial,
-  "atm-law-modificado": atmLaw,
-  "atm-schuller": atmSchuller,
   "senos-lateral": senLateral,
-  "senos-pa-caldwell": senCaldwell,
   "senos-parietoacantial-waters": senWaters,
   "senos-smv": senSMV,
 };
+
+// ======================= fichas con versiones: un esquema por versión =======================
+const col = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
+
+// ---- Waters / Waters modificada ----
+const facWatersV = (mod) => svg(
+  (mod ? watersPanel(40, 400, -35, "comisura", "LLM", "55°", "Waters modificada · vista lateral", ["RC ⟂ al RI, sale por el acantión"], 470, 60)
+    : watersPanel(40, 400, -53, "menton", "LMM", "37°", "Waters · vista lateral", ["RC ⟂ al RI, sale por el acantión"], 470, 60)) +
+  col(470, 100, mod ? [["LLM ⟂ al RI → LOM a 55° del RI", BLUE, 700], ["(LLM: comisura de los labios-MAE)", INK]]
+    : [["LMM ⟂ al RI → LOM a 37° del RI", BLUE, 700], ["Cabeza extendida, apoyada en el mentón", INK]]) +
+  col(470, 150, [["Sentado erguido (se prefiere)", INK], ["o en decúbito prono sobre la mesa", INK], ["RI centrado en el RC", INK]]) +
+  col(470, 280, [["RI 18 × 24 o 24 × 30 vertical", MUTE, 400, 11], ["parrilla · DFRI 100 cm", MUTE, 400, 11]])
+);
+
+// ---- ATM (Law modificado y Schüller): boca cerrada / abierta, vista de frente ----
+function atmV({ ang, label, sobre, rc, abierta, titulo, textos, ri: riTxt }) {
+  const cx = 220, cy = 128, r = 52;
+  let o = atmFrente(ang, label, sobre, rc).replace(vista("De frente · lado afectado contra el RI"), vista(titulo));
+  if (abierta) {
+    const cara = `<ellipse cx="${cx}" cy="${cy}" rx="${r * 0.92}" ry="${r * 1.12}"`;
+    const boca = `<path d="M${cx - r * 0.25},${cy + r * 0.55} Q${cx},${cy + r * 0.68} ${cx + r * 0.25},${cy + r * 0.55}" fill="none" stroke="${SKO}" stroke-width="1.4"/>`;
+    if (!o.includes(cara) || !o.includes(boca)) throw new Error("atmV: no encuentro la cara");
+    o = o.replace(cara, `<ellipse cx="${cx}" cy="${f1(cy + r * 0.1)}" rx="${r * 0.92}" ry="${f1(r * 1.22)}"`)
+      .replace(boca, `<ellipse cx="${cx}" cy="${f1(cy + r * 0.72)}" rx="${f1(r * 0.2)}" ry="${f1(r * 0.2)}" fill="#8a5d4b" stroke="${SKO}" stroke-width="1.4"/>`)
+      .replace(mandFrente(cx, cy, r), `<g transform="translate(0 ${f1(r * 0.2)})">${mandFrente(cx, cy, r)}</g>`);
+  }
+  return svg(o +
+    col(470, 60, [[abierta ? "Boca bien abierta" : "Boca cerrada", INK, 700, 12.5], [abierta ? "2.ª exposición, en la misma posición" : "1.ª exposición", INK]]) +
+    col(470, 110, textos) + col(470, 290, [[riTxt, MUTE, 400, 11]]));
+}
+const lawTxt = [["Sentado erguido (se prefiere) o semidecúbito", INK], ["prono, lado afectado abajo", INK],
+  ["PMS girado 15° hacia el RI, sin inclinación;", BLUE, 700], ["LIP ⟂ al RI", BLUE, 700], ["LIOM ⟂ al borde anterior del RI", INK]];
+const schTxt = [["Sentado erguido o semidecúbito prono,", INK], ["lado afectado abajo", INK],
+  ["Lateral verdadera, sin rotación ni inclinación", BLUE, 700], ["LIOM ⟂ al borde anterior del RI", INK]];
+const atmLawV = (abierta) => atmV({ ang: 15, label: "15°", sobre: 30, rc: ["RC 15° caudal", "entra 4 cm por encima del MAE de arriba"], abierta,
+  titulo: `De frente · boca ${abierta ? "abierta" : "cerrada"}`, textos: lawTxt, ri: "Boca cerrada y abierta en el mismo RI (18 × 24)" });
+const atmSchV = (abierta) => atmV({ ang: 27.5, label: "25-30°", sobre: 36, rc: ["RC 25-30° caudal", "entra ≈5 cm por encima y 1-2 cm", "por delante del MAE de arriba"], abierta,
+  titulo: `De frente · boca ${abierta ? "abierta" : "cerrada"}`, textos: schTxt, ri: "Boca cerrada y abierta en el mismo RI (18 × 24 horiz.)" });
+
+// ---- PA de Caldwell (soporte inclinado) / Caldwell modificada ----
+function senCaldwellV(mod) {
+  const s = 0.56, rot = -15;
+  let o;
+  if (!mod) {
+    const S1 = escenaErguido(s, rot, 380, 150), h1 = S1.h;
+    const n1 = h1.P("nasion"), Q = add(n1, rot, 8);
+    const riDir = rot - 90;
+    const hitRI = (p) => { const ux = Math.cos(riDir * D), uy = Math.sin(riDir * D); const t = (p[1] - Q[1]) / uy; return [Q[0] + ux * t, p[1]]; };
+    const R1 = rayo(h1, n1, 0, { len: 96, ref: rot, angLabel: "<tspan></tspan>", hasta: (e) => hitRI(e) });
+    const l1 = add(R1.e, 157, 70);
+    o = S1.piel + h1.huesos.craneo(0.25) + h1.huesos.senos() + riBar(add(Q, riDir, 10), 210, riDir) +
+      linRef(h1.mae, h1.P("canto"), 24, Math.hypot(Q[0] - h1.P("canto")[0], Q[1] - h1.P("canto")[1]), "LOM", "inicio", -14, 4) + recto(Q, rot + 180, riDir, 8) +
+      R1.svg + pto(n1, RED, 3.2) + txt(f1(l1[0]), f1(l1[1] + 8), "15°", 13, RED, "middle", 700) +
+      col(470, 60, [["RC horizontal, sale por el nasión", RED, 700, 12.5]]) +
+      col(470, 96, [["Soporte del RI inclinado 15°", INK, 700], ["(la parte superior hacia el paciente)", INK], ["LOM ⟂ al RI, sin rotación", BLUE, 700], ["RI centrado en el nasión", INK]]) +
+      vista("PA de Caldwell · soporte inclinado");
+  } else {
+    const X = 410, S2 = escenaErguido(s, rot, X - 2, 150), h2 = S2.h, n2 = h2.P("nasion");
+    const R2 = rayo(h2, n2, 0, { len: 96, hasta: hastaX(X) });
+    const m = h2.mae, k = hastaX(X)(m, rot);
+    o = S2.piel + h2.huesos.craneo(0.25) + h2.huesos.senos() + E.ri(X, 40, 8, 210) +
+      E.refline(f1(m[0]), f1(m[1]), f1(k[0]), f1(k[1])) + txt(f1(m[0] - 8), f1(m[1] + 4), "LOM", 11.5, BLUE, "end", 700) +
+      `<line x1="${f1(m[0])}" y1="${f1(m[1])}" x2="${X}" y2="${f1(m[1])}" stroke="${MUTE}" stroke-width="1" stroke-dasharray="2 3"/>` +
+      arco(m, 0, rot, 48, "") + txt(f1(m[0] + 40), f1(m[1] + 16), "15°", 12.5, BLUE, "middle", 700) + R2.svg + pto(n2, RED, 3.2) +
+      col(470, 60, [["RC horizontal, sale por el nasión", RED, 700, 12.5]]) +
+      col(470, 96, [["Si no se puede inclinar el soporte:", INK, 700], ["inclinar la cabeza hacia atrás", INK], ["LOM a 15° de la horizontal", BLUE, 700]]) +
+      vista("Caldwell modificada · soporte fijo");
+  }
+  return svg(o + col(470, 186, [["Sentado erguido, mirando al RI", INK]]) +
+    col(470, 280, [["RI 18 × 24 vertical · parrilla", MUTE, 400, 11], ["DFRI 100 cm · siempre erguido", MUTE, 400, 11]]));
+}
+
+Object.assign(module.exports, {
+  "faciales-parietoacantial-waters--v1": () => facWatersV(false),
+  "faciales-parietoacantial-waters--v2": () => facWatersV(true),
+  "atm-law-modificado--v1": () => atmLawV(false),
+  "atm-law-modificado--v2": () => atmLawV(true),
+  "atm-schuller--v1": () => atmSchV(false),
+  "atm-schuller--v2": () => atmSchV(true),
+  "senos-pa-caldwell--v1": () => senCaldwellV(false),
+  "senos-pa-caldwell--v2": () => senCaldwellV(true),
+});

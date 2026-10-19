@@ -646,25 +646,34 @@ function lumbarPerfil() {
   const F1 = A.f1;
   // panel 1: cuerpo entero (1,75 px = 1 cm); cabeza a la izquierda, espalda hacia abajo
   const s1 = 1.75, T1 = A.X({ s: s1, at: [212, 176], rot: -90 });
-  const fig = A.figuraPerfil({ T: T1, cabeza: 4, cadera: 55, rodilla: 85, tobillo: 0, hombro: 75, codo: 105, escorzo: [1, 1], mano: "abierta",
-    lejos: { d: [1.2, 1.5], cadera: 48, rodilla: 88, hombro: 88, codo: 110 } });
+  // decúbito lateral verdadero: muslos hacia adelante (~45°), rodillas a ~80° y apiladas (la de abajo apenas corrida),
+  // brazos hacia adelante y arriba, delante de la cabeza
+  const fig = A.figuraPerfil({ T: T1, cabeza: 0, cadera: 50, rodilla: 95, tobillo: -25, hombro: 78, codo: 105, escorzo: [1, 0.95], mano: "abierta",
+    lejos: { d: [2.2, 3.0], cadera: 40, rodilla: 88, tobillo: -25, hombro: 70, codo: 110 } });
   const col1 = A.columnaLateral({ T: T1, desde: "T11", hasta: "L5", detalle: false });
   const L = (x, h) => T1([x, A.yH(h)]);
   const cr1 = L(0, A.ALT.cresta), l3a = L(-3.2, A.VERT.L3);
   // caja del detalle (región lumbar) en el panel 1
   const rcP = L(-3.0, A.ALT.cresta + 4), ri1 = [rcP[0] - 43 * s1 / 2, rcP[1] - 35 * s1 / 2, 43 * s1, 35 * s1]; // RI 35 x 43, largo a lo largo de la columna
-  const almohada = `<rect x="${F1(L(4, 176)[0] - 32)}" y="${F1(L(4, 176)[1] - 22)}" width="44" height="40" rx="10" fill="#e3e6ec" stroke="#9aa0ac" stroke-width="1.2"/>`;
+  const ca = L(1.5, 160), almohada = `<rect x="${F1(ca[0] - 30)}" y="${F1(ca[1] - 30)}" width="54" height="56" rx="12" fill="#e3e6ec" stroke="#9aa0ac" stroke-width="1.2"/>`;
   const rod = fig.P.rodilla, rodL = fig.P.rodillaLejos;
-  const cojinRod = `<rect x="${F1((rod[0] + rodL[0]) / 2 - 10)}" y="${F1((rod[1] + rodL[1]) / 2 - 7)}" width="22" height="13" rx="5" fill="#d9c8a0" stroke="#9a875e" stroke-width="1.2" transform="rotate(-35 ${F1((rod[0] + rodL[0]) / 2)} ${F1((rod[1] + rodL[1]) / 2)})"/>`;
+  const cm = [(rod[0] + rodL[0]) / 2 + 3, (rod[1] + rodL[1]) / 2 - 2];
+  const cojinRod = `<rect x="${F1(cm[0] - 13)}" y="${F1(cm[1] - 8)}" width="26" height="16" rx="6" fill="#d9c8a0" stroke="#9a875e" stroke-width="1.2" transform="rotate(-20 ${F1(cm[0])} ${F1(cm[1])})"/>`;
+  // corte visto desde los pies: paciente de costado sobre la mesa, RC vertical
+  const kt = A.corteTronco({ T: A.X({ s: 2.0, at: [334, 290] }), g: 90 });
+  const inset = `<rect x="262" y="244" width="114" height="84" rx="4" fill="#fff" stroke="#d5d8e0"/>` + txt(268, 258, "desde los pies", 10, MUTE) +
+    `<rect x="272" y="${290 + 21 + 1}" width="96" height="6" fill="#cfd3dc"/>` + kt.svg +
+    `<line x1="334" y1="250" x2="334" y2="${290 - 31}" stroke="${RED}" stroke-width="2.2" marker-end="url(#ar)"/>`;
   const p1 = view("1 · Vista desde el tubo · decúbito lateral") +
-    `<rect x="12" y="44" width="360" height="190" rx="4" fill="#f1f2f5" stroke="#d5d8e0"/>` + txt(18, 228, "Mesa", 10, MUTE) +
-    `<line x1="12" y1="${F1(l3a[1])}" x2="372" y2="${F1(l3a[1])}" stroke="#b9bfcb" stroke-width="1" stroke-dasharray="2 3"/>` + txt(366, F1(l3a[1] + 13), "línea media de la mesa", 9.5, MUTE, "end") +
-    `<rect x="${F1(ri1[0])}" y="${F1(ri1[1])}" width="${F1(ri1[2])}" height="${F1(ri1[3])}" fill="#e2e5eb"/>` + almohada + fig.atras + fig.cuerpo + col1.svg + fig.frente + fig.cara + cojinRod +
+    `<rect x="12" y="44" width="360" height="190" rx="4" fill="#f1f2f5" stroke="#d5d8e0"/>` + txt(18, 228, "Mesa · - - - línea media", 10, MUTE) + txt(18, 58, "↑ abdomen", 10, MUTE) + txt(366, 228, "↓ espalda", 10, MUTE, "end") +
+    `<line x1="12" y1="${F1(l3a[1])}" x2="372" y2="${F1(l3a[1])}" stroke="#b9bfcb" stroke-width="1" stroke-dasharray="2 3"/>` +
+    `<rect x="${F1(ri1[0])}" y="${F1(ri1[1])}" width="${F1(ri1[2])}" height="${F1(ri1[3])}" fill="#e2e5eb"/>` + almohada + fig.atras + cojinRod + fig.cuerpo + col1.svg + fig.frente + fig.cara +
     `<rect x="${F1(ri1[0])}" y="${F1(ri1[1])}" width="${F1(ri1[2])}" height="${F1(ri1[3])}" fill="none" stroke="${INK}" stroke-width="1.5" stroke-dasharray="8 3"/>` +
     txt(F1(ri1[0] + 2), F1(ri1[1] - 5), "RI · detalle en 2 →", 10.5, INK) +
-    note(...fig.P.rodilla, 236, 262, ["Apoyo entre", "las rodillas;", "caderas y rodillas", "flexionadas"]) +
-    lines(20, 262, ["Apoyo bajo la cintura:", "columna paralela a la mesa"], 11, INK) +
-    lines(20, 294, ["Plano medioaxilar en la línea media", "Plomo detrás · parte baja al cátodo", "Escoliosis: convexidad hacia abajo"], 10.5, MUTE, "start", 13.5);
+    note(F1(cm[0] + 8), F1(cm[1] - 6), 300, 62, ["apoyo"], INK) +
+    inset +
+    lines(20, 256, ["Caderas y rodillas flexionadas; apoyo", "entre las rodillas y bajo la cintura"], 11, INK, "start", 14) +
+    lines(20, 288, ["Columna paralela a la mesa", "Plano medioaxilar en la línea media", "Plomo detrás · parte baja al cátodo", "Escoliosis: convexidad hacia abajo"], 10.5, MUTE, "start", 12.5);
   // panel 2: detalle de la columna lumbar de perfil (5,4 px = 1 cm), misma orientación
   const s2 = 5.4, T2 = A.X({ s: s2, at: [560, 164], rot: -90, o: [0, A.yH(100)] });
   const P2 = (x, h) => T2([x, A.yH(h)]);

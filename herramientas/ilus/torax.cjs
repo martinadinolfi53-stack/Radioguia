@@ -322,14 +322,14 @@ I["torax-pa"] = () => {
   // panel 1: de costado, de pie, pecho contra el Bucky (figura anatómica de anatomia.cjs, 2,2 px = 1 cm)
   const yv = 44, s1 = 2.2, xp = 227; // y del vértice, escala, x de la línea de plomada
   const T1 = A.X({ s: s1, at: [xp, yv + (172 - 87) * s1] });
-  const F = A.figuraPerfil({ T: T1, cabeza: 16, hombro: -14, codo: 42, escorzo: [0.88, 0.62] });
+  const F = A.figuraPerfil({ T: T1, cabeza: 16, hombro: -35, codo: 65, escorzo: [0.72, 0.92] }); // codo hacia afuera: brazo y antebrazo escorzados
   const H = (h) => yv + (172 - h) * s1;
   const t7 = T1([A.ejeX(A.VERT.T7), A.yH(A.VERT.T7)]), back = [T1([-12.7, 0])[0], H(A.VERT.T7)];
   const cl = A.columnaLateral({ T: T1, desde: "C2", hasta: "L2", sacro: false }), tl = A.toraxLateral({ T: T1 });
   const p1 = view("1 · Vista lateral · de pie") +
     wall(254, 40, 306, "Bucky vertical") +
     `<clipPath id="cpTP1"><rect x="0" y="26" width="372" height="278"/></clipPath><g clip-path="url(#cpTP1)">` +
-    F.atras + F.cuerpo + tl.svg + cl.svg + F.frente + F.cara + `</g>` +
+    F.atras + F.cuerpo + tl.svg + cl.svg + `<g opacity=".82">${F.frente}</g>` + F.cara + `</g>` +
     `<rect x="${f1(t7[0] - 7)}" y="${f1(t7[1] - 6)}" width="14" height="12" rx="3" fill="none" stroke="${RED}" stroke-width="1.3" stroke-dasharray="3 2"/>` +
     beam(f1(back[0]), f1(back[1]), 0, 130, { horizontal: true }) + dashRC(back[0], back[1], 254, back[1]) +
     txt(110, back[1] + 26, "DFRI 180 cm", 12.5, RED, "middle", 700) +

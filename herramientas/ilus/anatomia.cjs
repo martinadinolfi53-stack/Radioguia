@@ -229,12 +229,22 @@ const CAB = {
   piel: [[0, -12.4], [3.5, -11.9], [6.6, -10.4], [8.8, -7.6], [9.7, -5.2], [10.15, -3.5], [9.85, -2.5], [10.5, -1.3], [11.5, 0.3], [12.6, 1.7], [12.2, 2.55], [11.05, 2.95],
     [11.45, 4.15], [10.9, 4.85], [11.15, 5.5], [10.2, 6.85], [10.45, 8.4], [9.75, 9.75], [8.3, 10.85], [6.0, 10.9], [4.6, 11.2]],
   nuca: [[-5.6, 6.2], [-7.0, 3.6], [-8.6, 0.6], [-9.6, -3.2], [-9.4, -6.6], [-7.6, -9.6], [-4.3, -11.8]],
-  craneo: [[0, -11.6], [3.4, -11.1], [6.3, -9.7], [8.3, -7.2], [9.15, -4.9], [9.35, -3.5], [8.95, -2.4], [8.0, -2.0], [6.3, -0.7], [4.0, 0.2], [1.6, 0.6], [-0.9, 1.2], [-3.4, 2.0], [-6.2, 1.9],
+  craneo: [[0, -11.6], [3.4, -11.1], [6.3, -9.7], [8.3, -7.2], [9.15, -4.9], [9.4, -3.5], [9.25, -2.45], [8.6, -2.1], [8.0, -2.0], [6.3, -0.7], [4.0, 0.2], [1.6, 0.6], [-0.9, 1.2], [-3.4, 2.0], [-6.2, 1.9],
     [-7.9, 0.8], [-8.85, -2.6], [-8.75, -6.1], [-7.1, -9.0], [-4.0, -11.1]],
-  facial: [[8.0, -2.0], [8.95, -2.4], [9.35, -1.6], [10.4, -0.3], [10.15, 0.6], [9.75, 1.8], [10.0, 2.6], [9.7, 3.1], [10.25, 4.3], [9.6, 4.55], [8.1, 4.3], [6.3, 3.4], [4.7, 2.0], [3.6, 0.8], [5.0, 0.0], [6.3, -0.7]],
-  mandibula: [[10.05, 4.85], [9.65, 6.2], [9.65, 7.8], [9.4, 9.2], [8.5, 10.0], [6.5, 9.8], [3.5, 8.6], [1.4, 7.6], [0.55, 6.4], [0.35, 4.0], [0.55, 1.6], [1.05, 0.15], [1.65, 0.0], [1.75, 1.2],
-    [2.3, 1.6], [3.1, 0.05], [3.6, 0.15], [3.3, 2.4], [3.5, 4.6], [5.0, 5.3], [7.0, 5.1], [8.6, 4.85]],
-  orbita: [7.65, -1.95, 1.75, 1.85],
+  // maxilar: apófisis frontal (reborde orbitario medial), reborde infraorbitario, abertura piriforme, espina nasal
+  // anterior (acantión), apófisis alveolar y tuberosidad
+  facial: [[9.25, -2.3], [9.6, -1.4], [10.0, -0.45], [9.55, 0.4], [9.4, 1.4], [9.6, 2.25], [9.95, 2.6], [9.55, 2.85], [9.6, 3.35], [9.8, 3.9], [9.2, 4.0], [7.2, 3.95],
+    [5.6, 3.95], [5.0, 3.45], [5.1, 2.4], [5.9, 1.75], [7.4, 1.45], [8.2, 0.6], [8.55, -0.05], [8.75, -1.1], [8.85, -2.05]],
+  // huesos propios de la nariz (del nasion al rinion)
+  nasal: [[9.2, -2.45], [9.55, -2.45], [10.0, -1.35], [10.45, -0.55], [10.05, -0.4], [9.6, -1.25], [9.15, -2.0]],
+  // malar: apófisis frontal (reborde orbitario lateral), cuerpo y apófisis temporal hacia el arco
+  cigoma: [[6.95, -2.75], [7.55, -2.85], [7.45, -1.9], [7.25, -0.8], [7.55, -0.1], [8.35, 0.05], [8.25, 0.7], [7.75, 1.45], [6.85, 1.7], [5.6, 1.15], [5.6, 0.45],
+    [6.4, 0.25], [6.7, -0.9], [6.8, -2.1]],
+  // mandíbula: cóndilo delante del MAE, escotadura sigmoidea, coronoides (bajo el arco), rama, ángulo (gonion), cuerpo y sínfisis
+  mandibula: [[1.05, 1.1], [1.0, 2.6], [0.85, 4.6], [0.75, 6.1], [1.2, 6.9], [2.4, 7.6], [4.6, 8.6], [6.6, 9.4], [8.0, 9.95], [8.75, 9.85], [9.3, 9.2], [9.5, 8.4], [9.2, 7.3],
+    [9.25, 6.3], [9.55, 5.3], [9.0, 5.2], [7.0, 5.2], [5.2, 5.25], [4.55, 5.0], [4.0, 4.0], [3.75, 2.6], [3.9, 1.3], [4.05, 0.75], [3.6, 0.95], [3.0, 1.55], [2.3, 1.45],
+    [1.85, 0.75], [1.75, 0.15], [1.35, -0.1], [0.9, 0.1], [0.85, 0.6]],
+  orbita: [8.15, -1.35, 1.05, 1.6],
   puntos: { mae: [0, 0], canto: [6.8, -0.95], infraorbitario: [7.85, -0.1], glabela: [10.15, -3.5], nasion: [9.85, -2.5], acantion: [9.95, 2.6], acantionPiel: [11.05, 2.95],
     menton: [9.75, 9.75], comisura: [9.6, 4.9], vertice: [0, -12.4], gonion: [0.6, 6.4], inion: [-8.2, 0.8], ojo: [7.9, -1.4], nariz: [12.6, 1.7] },
 };
@@ -256,10 +266,22 @@ function cabezaLateral(o = {}) {
     `<path d="${cr([[-0.6, -3.1], [0.6, -3.6], [1.3, -2.4], [1.0, -0.5], [1.15, 1.6], [0.4, 3.1], [-0.6, 2.7], [-1.4, 0.4], [-1.5, -2.0]].map(T), true)}" fill="${SK}" stroke="${sk}" stroke-width="1.5"/>` + // oreja
     `<path d="${cr([[0.3, -2.3], [-0.6, -1.4], [-0.5, 0.6], [0.2, 1.8]].map(T))}" fill="none" stroke="${sk}" stroke-width="1.1"/>`;
   const oc = CAB.orbita;
-  const huesos = huesoP(mapa(T, CAB.craneo)) + huesoP(mapa(T, CAB.facial)) + huesoP(mapa(T, CAB.mandibula)) +
-    `<path d="${cr(mapa(T, elipse([oc[0], oc[1]], oc[2], oc[3], 0, 18)), true)}" fill="#f6f1e6" stroke="${BONEO}" stroke-width="1.2"/>` +
-    huesoSuperpuesto(mapa(T, [[5.8, 0.2], [7.6, -0.1], [8.6, 0.9], [8.4, 2.6], [6.9, 3.1], [5.6, 2.2]])) + // seno maxilar
-    lineaHueso(mapa(T, [[6.4, 0.25], [4.4, 0.45], [1.9, 0.1]]), 1.6) + // arco cigomático
+  const dientes = (y0, y1, xs) => xs.map(([x, w]) => `<path d="${cr(mapa(T, [[x - w / 2, y0], [x + w / 2, y0], [x + w / 2 * 0.9, y1], [x - w / 2 * 0.9, y1]]), true, 0.5)}" fill="#fbf8f1" stroke="${BONEO}" stroke-width="0.9"/>`).join("");
+  const huesos = huesoP(mapa(T, CAB.craneo)) +
+    lineaHueso(mapa(T, [[8.3, -2.2], [5.8, -2.0], [3.6, -2.3]]), 0.9) + // base anterior del cráneo
+    lineaHueso(mapa(T, [[3.6, -2.3], [3.3, -1.7], [2.6, -1.6], [2.2, -2.1], [2.4, -2.6]]), 1.0) + // silla turca
+    lineaHueso(mapa(T, [[2.4, -4.6], [3.3, -3.6], [4.4, -2.9]]), 0.8) + // ala mayor del esfenoides (fosa temporal)
+    huesoP(mapa(T, CAB.mandibula)) +
+    huesoSuperpuesto(mapa(T, [[1.3, 6.8], [3.6, 7.6], [6.4, 8.5], [8.6, 9.0]])) + // conducto mandibular
+    huesoP(mapa(T, CAB.facial)) +
+    huesoSuperpuesto(mapa(T, [[5.8, 0.9], [7.4, 0.7], [8.4, 1.4], [8.5, 2.7], [7.0, 3.3], [5.6, 2.8]])) + // seno maxilar
+    lineaHueso(mapa(T, [[9.6, 2.75], [7.5, 3.05], [5.1, 3.1]]), 1.0) + // paladar duro
+    `<path d="${cr(mapa(T, elipse([oc[0], oc[1]], oc[2], oc[3], -8, 18)), true)}" fill="#ddd2bd" stroke="${BONEO}" stroke-width="1.2"/>` + // órbita
+    huesoP(mapa(T, CAB.nasal)) +
+    huesoP(perfilHueso([[5.9, 0.75], [3.8, 0.55], [1.9, 0.35]], [[0, 0.4], [0.5, 0.3], [1, 0.36]], 0.6).map(T)) + // arco cigomático
+    huesoP(mapa(T, CAB.cigoma)) +
+    dientes(3.95, 4.8, [[5.85, 1.0], [6.85, 0.95], [7.75, 0.8], [8.45, 0.65], [9.05, 0.6], [9.55, 0.5]]) +
+    dientes(5.2, 6.0, [[5.4, 1.05], [6.4, 1.0], [7.35, 0.8], [8.05, 0.65], [8.65, 0.55], [9.15, 0.5]]) +
     huesoP(mapa(T, [[-0.9, 0.9], [-1.0, 2.6], [-1.55, 3.4], [-2.1, 2.6], [-2.2, 1.2]])) + // apófisis mastoides
     `<path d="${circulo(T([0, 0]), 0.55 * T.s)}" fill="#fff" stroke="${BONEO}" stroke-width="1.2"/>`;
   return { piel: forma, cara, huesos, P, T };
@@ -484,7 +506,7 @@ module.exports.toraxPA = toraxPA;
 // ================================================================ COLUMNA DE PERFIL
 // Línea de los centros de los cuerpos vertebrales en una figura de pie mirando a +x (x adelante, h altura):
 // lordosis cervical, cifosis torácica (vértice en T7), lordosis lumbar (vértice en L3).
-const EJE_COL = [[-1.5, 160.5], [-1.0, 156.3], [-1.4, 152.1], [-3.0, 147.9], [-5.2, 141.75], [-6.4, 136.25], [-6.8, 128], [-6.0, 119.75], [-4.8, 114.25], [-4.1, 110.5], [-3.2, 103.1], [-4.0, 95.7]];
+const EJE_COL = [[0.2, 160.5], [0.6, 156.3], [0.2, 152.1], [-1.2, 147.9], [-3.4, 141.75], [-4.6, 136.25], [-5.1, 128], [-4.6, 119.75], [-4.0, 114.25], [-3.8, 110.5], [-3.2, 103.1], [-4.0, 95.7]];
 function ejeX(h) { // interpolación lineal del eje
   const e = EJE_COL;
   if (h >= e[0][1]) return e[0][0];
@@ -524,7 +546,7 @@ function columnaLateral(o = {}) {
       const arco = [L(-p - 1.2 * k, a * 0.82), L(-p - 1.3 * k, a + 0.5 * k), L(-p - 1.95 * k, a + 0.72 * k), L(-p - 2.5 * k, a * 0.55), L(-p - 2.75 * k, -a * 0.3), L(-p - 2.45 * k, -a - 0.62 * k),
         L(-p - 1.75 * k, -a - 0.45 * k), L(-p - 1.55 * k, -a * 0.25), L(-p - 1.35 * k, 0)];
       const ex = -Math.cos(m.incl * R), ey = -Math.sin(m.incl * R); // dirección de la espinosa (atrás y abajo)
-      const hs = tipo === "L" ? a * 0.82 : tipo === "T" ? a * 0.32 : a * 0.3, Ls = (tipo === "L" ? 2.9 : tipo === "T" ? 3.4 : v === "C7" ? 2.6 : 1.6) * (tipo === "C" ? 1 : k);
+      const hs = tipo === "L" ? a * 0.82 : tipo === "T" ? a * 0.32 : a * 0.3, Ls = (tipo === "L" ? 2.9 : tipo === "T" ? 2.9 : v === "C7" ? 2.3 : 1.4) * (tipo === "C" ? 1 : k);
       const b0 = [-p - 2.45 * k, a * 0.15], b1 = add(b0, [ex, ey], Ls);
       const nx = -ey, ny = ex; // normal (hacia arriba de la espinosa)
       const esp = [add(b0, [nx, ny], -hs), add(b1, [nx, ny], -hs * 0.75), add(b1, [ex, ey], 0.35), add(b1, [nx, ny], hs * 0.8), add(add(b0, [nx, ny], hs), [ex, ey], -0.2)].map(([u, w]) => L(u, w));
@@ -643,6 +665,25 @@ function codoOblicuoMedial(o = {}) {
   return { svg: s, P };
 }
 module.exports.codoOblicuoMedial = codoOblicuoMedial;
+// Oblicua lateral (rotación externa 45°; mano en supinación). Mismo sistema local que codoOblicuoMedial.
+// Epicóndilo lateral y cóndilo (capitulum) de perfil, cabeza, cuello y tuberosidad del radio libres del cúbito,
+// radio y cúbito paralelos (supinación), epicóndilo medial acortado.
+function codoOblicuoLateral(o = {}) {
+  const { T = X(), largoH = 18, largoA = 24 } = o;
+  const humero = [[-largoH, -1.2], [-8, -1.25], [-4.4, -1.5], [-2.4, -1.95], [-1.5, -2.1], [-0.8, -1.75], [-0.1, -1.3], [0.15, -0.45], [0.0, 0.3], [0.35, 0.9], [0.45, 1.6],
+    [0.1, 2.35], [-0.7, 2.95], [-1.6, 3.3], [-2.6, 2.75], [-4.4, 1.6], [-8, 1.3], [-largoH, 1.25]];
+  const cubito = [[-1.6, -1.15], [-0.6, -1.6], [0.6, -1.7], [2.0, -1.45], [4, -1.2], [9, -1.25], [16, -1.75], [largoA, -2.65], [largoA, -1.2], [16, -0.6], [9, -0.15], [4, -0.15],
+    [2.4, -0.25], [1.0, -0.2], [0.2, -0.5], [-0.8, -0.4], [-1.5, -0.5]];
+  const radio = [[0.62, 0.5], [0.55, 2.7], [1.45, 2.75], [1.62, 2.1], [2.6, 2.05], [4, 2.15], [9, 2.25], [16, 2.15], [largoA - 0.6, 2.2], [largoA, 2.3], [largoA, -0.9], [16, 0.3],
+    [9, 0.85], [4.0, 0.8], [3.3, 0.5], [2.7, 0.85], [2.5, 1.2], [1.62, 1.2], [1.45, 0.45]];
+  let s = huesoP(mapa(T, humero)) + huesoSuperpuesto(mapa(T, elipse([-2.0, 0.1], 0.9, 0.6))) + // fosa olecraneana
+    huesoP(mapa(T, cubito), 'opacity=".92"') + huesoP(mapa(T, radio));
+  s += lineaHueso(mapa(T, [[-0.3, 0.75], [0.0, 1.5], [-0.25, 2.25]]), 0.9); // contorno del cóndilo (capitulum)
+  const P = { centro: T([0.2, 0.5]), epicondiloLateral: T([-1.6, 3.3]), epicondiloMedial: T([-1.5, -2.1]), capitulo: T([0.25, 1.5]), cabezaRadio: T([1.0, 2.7]),
+    cuelloRadio: T([2.1, 2.05]), tuberosidad: T([3.2, 0.55]), humero: T([-8, 0]), cubito: T([12, -0.9]), radio: T([12, 1.5]) };
+  return { svg: s, P };
+}
+module.exports.codoOblicuoLateral = codoOblicuoLateral;
 // corte transversal del codo a la altura de los epicóndilos, visto desde la mano (desde distal).
 // Local: x hacia lateral (+) / medial (-), y hacia posterior (+). g = giro en grados (+ horario). Devuelve piel, hueso y epicóndilos.
 function corteCodo(o = {}) {

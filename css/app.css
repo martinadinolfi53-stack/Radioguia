@@ -234,3 +234,14 @@ a.row.reg .chev { grid-row: 1 / 3; grid-column: 2; align-self: center; color: va
 .ed-error { color: var(--warn); margin: 0; }
 .edicion { display: grid; gap: 12px; }
 .ed-estado { margin: 0; font-size: .9em; color: var(--accent); min-height: 1.2em; }
+
+/* Pantalla de entrada: hay que tocar el ícono (el pulgar radiografiado) para entrar */
+#entrada { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: env(safe-area-inset-top, 0px) 16px env(safe-area-inset-bottom, 0px); background: #000; color: #e7edf5; text-align: center; transition: opacity .25s ease; }
+#entrada.saliendo { opacity: 0; pointer-events: none; }
+#entrar { width: min(56vw, 240px); aspect-ratio: 1; padding: 0; border: 0; border-radius: 22%; overflow: hidden; background: #000; cursor: pointer; box-shadow: 0 0 0 1px #1d3a55, 0 0 40px #1f6fae55; animation: latido 2.4s ease-in-out infinite; }
+#entrar img { display: block; width: 100%; height: 100%; }
+#entrar:active { transform: scale(.96); }
+.entrada-nombre { margin: 16px 0 0; font-size: 1.6em; font-weight: 700; }
+.entrada-ayuda { margin: 0; color: #93a0b2; }
+@keyframes latido { 50% { box-shadow: 0 0 0 1px #2a5a85, 0 0 56px #3d9be0aa; } }
+@media (prefers-reduced-motion: reduce) { #entrar { animation: none; } #entrada { transition: none; } }

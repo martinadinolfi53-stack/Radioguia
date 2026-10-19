@@ -74,6 +74,13 @@ addEventListener("hashchange", (e) => {
   if (!antes.startsWith("#p-")) historial.push(antes); else if (!historial.length) historial.push(antes);
   if (historial.length > 30) historial.shift();
   render();
+
+// pantalla de entrada: se sale tocando el ícono
+const entrada = document.getElementById("entrada");
+document.getElementById("entrar")?.addEventListener("click", () => {
+  entrada.classList.add("saliendo");
+  setTimeout(() => entrada.remove(), 260);
+}, { once: true });
   scrollTo(0, 0);
 });
 
@@ -153,3 +160,10 @@ app.addEventListener("submit", async (e) => {
 pwa.iniciar(() => { if (["inicio", "ajustes"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
 render();
+
+// pantalla de entrada: se sale tocando el ícono
+const entrada = document.getElementById("entrada");
+document.getElementById("entrar")?.addEventListener("click", () => {
+  entrada.classList.add("saliendo");
+  setTimeout(() => entrada.remove(), 260);
+}, { once: true });

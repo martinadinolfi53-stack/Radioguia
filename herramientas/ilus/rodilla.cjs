@@ -1,6 +1,7 @@
 // Esquemas de rodilla, rótula / fosa intercondílea, pierna y extremidad inferior pediátrica.
 // Estilo aprobado: contorno continuo color piel + huesos de referencia (adaptado de referencia-tecnicas1-pelvis/pie).
 const E = require("./estilo.cjs");
+const A = require("./anatomia.cjs");
 const { SK, SKO, RED, BLUE, AMB, INK, MUTE, BONEO, table, wall, ri, riTop, beam, tube, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, cabezaPerfil, cabezaFrente } = E;
 
 // ---------- helpers (copiados de las referencias) ----------
@@ -241,38 +242,54 @@ I["rodilla-ap"] = () => {
 };
 
 I["rodilla-lateral"] = () => {
-  const r = rodillaLateralTubo(25);
-  const { K, cm, pat } = r;
-  const RCp = [cm[0] + 9, cm[1] + 1];
-  const p1 = clipR("cpRL1", 0, 26, 388, 304, r.piezas + riBorde(RCp[0] - 60, RCp[1] - 48, 120, 96));
-  // panel 2: desde el costado de la mesa (cara medial arriba), de la referencia
-  const piel2 = [[395, 190], [450, 193], [520, 199], [566, 204], [584, 202], [600, 206], [614, 212], [640, 214], [690, 213], [745, 216]];
-  const fem2 = [[395, 222], [550, 222], [568, 214], [586, 210], [596, 216], [598, 230], [598, 238], [596, 250], [586, 255], [568, 252], [550, 244], [395, 244]];
-  const tib2 = [[604, 213], [620, 214], [632, 220], [650, 222], [745, 223], [745, 241], [650, 241], [634, 244], [620, 252], [604, 252], [602, 232]];
-  const per2 = [[624, 248], [636, 246], [644, 250], [660, 250], [745, 249], [745, 255], [660, 256], [644, 258], [626, 257]];
-  const p2 = clipR("cpRL2", 404, 26, 336, 236,
-    piel(suave(piel2, false) + " L745,261 L395,261 Z") +
-    hueso(suave(fem2, false, 0.7) + " Z") + hueso(suave(per2, false, 0.7) + " Z") + hueso(suave(tib2, false, 0.7) + " Z"));
+  // panel 1: desde el tubo, figura anatómica (anatomia.cjs) en decúbito lateral sobre el lado afectado, 4 px = 1 cm.
+  // Muslo casi horizontal, rodilla flexionada 25°; la pierna sana (arriba) va por detrás.
+  const s1 = 5, flex = 25, cad = 35;
+  const Kf = [40 * Math.cos((90 - cad) * Math.PI / 180), 40 * Math.sin((90 - cad) * Math.PI / 180)]; // rodilla en coordenadas de figura
+  const rot = -90 + cad, rr = rot * Math.PI / 180;
+  const Ks = [168, 142]; // dónde cae la rodilla en el dibujo
+  const at = [Ks[0] - s1 * (Kf[0] * Math.cos(rr) - Kf[1] * Math.sin(rr)), Ks[1] - s1 * (Kf[0] * Math.sin(rr) + Kf[1] * Math.cos(rr))];
+  const T1 = A.X({ s: s1, at, rot });
+  const fig = A.figuraPerfil({ T: T1, cadera: cad, rodilla: flex, tobillo: 5, hombro: 60, codo: 60, lejos: { encima: true, d: [-3, 0], cadera: -12, rodilla: 12, tobillo: 0 } });
+  const kn = A.rodillaLateral({ T: T1, K: fig.J.rodilla, dirF: fig.J.dirMuslo + 180, dirT: fig.J.dirPierna });
+  const ep = kn.P.epicondilo, RCp = kn.Fm([-0.6, 0.2]); // 2,5 cm distal al epicondilo medial
+  const riW = 30 * s1, riH = 24 * s1;
+  const p1 = clipR("cpRL1", 0, 26, 388, 304,
+    `<rect x="${f1(RCp[0] - riW / 2)}" y="${f1(RCp[1] - riH / 2)}" width="${riW}" height="${riH}" fill="#eceef2"/>` +
+    fig.atras + fig.cuerpo + kn.svg + fig.frente + fig.cara +
+    riBorde(RCp[0] - riW / 2, RCp[1] - riH / 2, riW, riH) + coll(f1(RCp[0] - riW / 2 + 3), f1(RCp[1] - 30), riW - 6, 60));
+  // marca de la flexión: eje del muslo prolongado y eje de la pierna
+  const K = kn.P.K;
+  const a0 = rot + fig.J.dirMuslo, a1 = rot + fig.J.dirPierna; // direcciones en el dibujo
+  const pM = [K[0] + 96 * Math.cos(a0 * Math.PI / 180), K[1] + 96 * Math.sin(a0 * Math.PI / 180)], pT = [K[0] + 96 * Math.cos(a1 * Math.PI / 180), K[1] + 96 * Math.sin(a1 * Math.PI / 180)];
+  const flexMarca = `<line x1="${f1(K[0])}" y1="${f1(K[1])}" x2="${f1(pM[0])}" y2="${f1(pM[1])}" stroke="${BLUE}" stroke-width="1.4" stroke-dasharray="5 4"/>` +
+    `<line x1="${f1(K[0])}" y1="${f1(K[1])}" x2="${f1(pT[0])}" y2="${f1(pT[1])}" stroke="${BLUE}" stroke-width="1.4" stroke-dasharray="5 4"/>` + arco(K[0], K[1], 84, a0, a1);
+  // panel 2: desde el costado de la mesa (cara medial arriba), rodilla de frente girada 90°, 3,6 px = 1 cm
+  const s2 = 4.6, K2 = [590, 236];
+  const T2 = A.X({ s: s2, at: K2 });
+  const piel2 = A.pielUnida([{ pts: [[-60, -8.2], [-30, -7.6], [-14, -6.6], [-5, -5.6], [0, -5.4], [5, -5.2], [12, -5.4], [20, -5.0], [32, -4.0], [45, -3.6], [45, 5.4], [-60, 5.4]].map(T2) }]);
+  const ap = A.rodillaAP({ T: T2, K: [0.4, 0], dirF: 180, dirT: 0, medial: 1, largoF: 40, largoT: 40 });
+  const epM = ap.P.epicondiloMedial, epS = [epM[0], K2[1] - 5.6 * s2]; // epicóndilo medial en la superficie de arriba
+  const rcS = [epS[0] + 2.5 * s2, epS[1] + 1];
+  const p2 = clipR("cpRL2", 404, 26, 336, 240, piel2 + ap.svg);
   return svg(
     view("1 · Vista desde el tubo · decúbito lateral") +
-    `<g transform="translate(${f1(RCp[0] - 60)} ${f1(RCp[1] - 48)})">${riTop(0, 0, 120, 96, "")}</g>` +
-    p1 + r.flexMarca + txt(K[0] + 64, K[1] - 34, "flexión 20-30°", 11.5, BLUE, "start", 700) +
-    dot(cm[0], cm[1], BO) +
-    cross(RCp[0], RCp[1]) +
-    note(cm[0] - 2, cm[1] - 4, 110, 70, ["epicóndilo medial"], BO, "end") +
-    note(pat[0] - 2, pat[1] - 6, 150, 46, ["rótula"], BO, "end") +
-    etiquetaHueso(K[0] + 70, K[1] + 3, "tibia") +
-    txt(RCp[0] - 60, RCp[1] + 64, "RI 24 x 30 vertical", 12, INK) +
-    note(K[0] + 146, K[1] + 12, 236, 250, ["apoyo bajo tobillo y pie,", "si hace falta"], INK) +
-    txt(16, 324, "pierna sana por detrás", 11, MUTE) +
+    p1 + flexMarca + txt(f1(pM[0] + 4), f1(pM[1] - 8), "flexión 20-30°", 11.5, BLUE, "start", 700) +
+    dot(f1(ep[0]), f1(ep[1]), BO) + cross(f1(RCp[0]), f1(RCp[1])) +
+    note(f1(ep[0] - 2), f1(ep[1] - 2), 118, 84, ["epicóndilo medial"], BO, "end") +
+    (kn.P.rotula ? note(f1(kn.P.rotula[0]), f1(kn.P.rotula[1] - 6), 220, 52, ["rótula"], BO, "end") : "") +
+    etiquetaHueso(f1(kn.Tb([0, 9])[0] + 6), f1(kn.Tb([0, 9])[1] - 8), "tibia") + etiquetaHueso(f1(kn.Fm([0, 12])[0]), f1(kn.Fm([0, 12])[1] + 4), "fémur", "middle") +
+    txt(f1(RCp[0] - riW / 2), f1(RCp[1] + riH / 2 + 15), "RI 24 x 30 vertical", 12, INK) +
+    note(...fig.P.tobillo.map(f1), 236, 276, ["apoyo bajo tobillo y pie,", "si hace falta"], INK) +
+    txt(16, 324, "pierna sana (arriba) por detrás", 11, MUTE) +
     panel2(404, "2 · Vista desde el costado de la mesa") +
     table(404, 740, 262, "") + p2 +
-    dot(588, 207, BO) + txt(578, 186, "epicóndilo medial", 10.5, BO, "end") +
-    etiquetaHueso(470, 238, "fémur") + etiquetaHueso(690, 237, "tibia") +
+    dot(f1(epS[0]), f1(epS[1]), BO) + txt(f1(epS[0] - 10), f1(epS[1] - 12), "epicóndilo medial", 10.5, BO, "end") +
+    etiquetaHueso(470, 233, "fémur") + etiquetaHueso(690, 232, "tibia") + etiquetaHueso(f1(ap.P.cabezaPerone[0] + 40), 256, "peroné") +
     ri(540, 278, 120, 8, "") +
     txt(424, 300, "← cabeza", 11, MUTE) + txt(736, 300, "pie →", 11, MUTE, "end") +
-    tube(600, 232, -6, 160, { angLabel: "\u200b" }) + txt(624, 176, "5-7°", 13, RED, "start", 700) + txt(666, 106, "cefálico", 12, RED, "start", 700) +
-    note(596, 200, 560, 100, ["RC 5-7° cefálico,", "2,5 cm distal al", "epicóndilo medial"], RED, "end") +
+    tube(f1(rcS[0]), f1(rcS[1]), -6, 160, { angLabel: "\u200b" }) + txt(f1(rcS[0] + 24), 176, "5-7°", 13, RED, "start", 700) + txt(f1(rcS[0] + 66), 106, "cefálico", 12, RED, "start", 700) +
+    note(f1(rcS[0] - 4), f1(rcS[1] - 12), 560, 100, ["RC 5-7° cefálico,", "2,5 cm distal al", "epicóndilo medial"], RED, "end") +
     txt(404, 318, "DFRI 100 cm · parrilla si el grosor supera 10 cm", 11.5, MUTE)
   );
 };

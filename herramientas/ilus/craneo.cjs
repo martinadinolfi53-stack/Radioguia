@@ -769,6 +769,52 @@ const facWatersV = (mod) => svg(
   col(470, 280, [["RI 18 × 24 o 24 × 30 vertical", MUTE, 400, 11], ["parrilla · DFRI 100 cm", MUTE, 400, 11]])
 );
 
+// ---- Waters con cabeza y cráneo anatómicos (anatomia.cjs): perfil sentado, mentón en el RI vertical ----
+// La geometría de la cabeza cumple LMM-LOM = 53° y LLM-LOM = 35°: con la LMM (o la LLM) ⟂ al RI, la LOM queda a 37° (o 55°).
+function watersAnat(mod) {
+  const A = require("./anatomia.cjs");
+  const linea = mod ? "comisura" : "menton", nom = mod ? "LLM" : "LMM", angTxt = mod ? "55°" : "37°";
+  const sc = 6.6, XRI = 396; // escala (px por cm) y cara del RI
+  // extensión del cuello para que la línea elegida quede horizontal (⟂ al RI vertical)
+  const P0 = A.CAB.puntos, ext = Math.atan2(P0[linea][1], P0[linea][0]) * 180 / Math.PI;
+  const prueba = A.figuraPerfil({ T: A.X({ s: sc }), cabeza: ext, sinPiernas: true, sinBrazo: true });
+  // el mentón (o la nariz) toca el RI: punto de la cabeza más adelantado
+  const xmax = Math.max(...prueba.cab.piel.map((p) => p[0]));
+  const dx = XRI - 1 - xmax, dy = 196 - prueba.P.mae[1];
+  const T = A.X({ s: sc, at: [dx, dy] });
+  const F = A.figuraPerfil({ T, cabeza: ext, sinPiernas: true, sinBrazo: true });
+  const P = F.P, mae = P.mae, L = P[linea], can = P.canto, ac = P.acantion;
+  // LOM prolongada hasta el RI y ángulo con el RI
+  const k = (XRI - mae[0]) / (can[0] - mae[0]), v = [XRI, mae[1] + (can[1] - mae[1]) * k];
+  const angLOM = Math.atan2(can[1] - mae[1], can[0] - mae[0]) * 180 / Math.PI; // grados SVG (negativo = hacia arriba)
+  const entrada = Math.min(...F.cab.piel.filter((p) => Math.abs(p[1] - ac[1]) < 12).map((p) => p[0]));
+  const clip = `<clipPath id="cpWA${mod ? 2 : 1}"><rect x="0" y="28" width="${XRI}" height="300"/></clipPath>`;
+  const arcoR = 52, a0 = 90, a1 = angLOM + 180; // entre el RI (hacia abajo) y la LOM (hacia el MAE)
+  const pA = (a) => [v[0] + arcoR * Math.cos(a * D), v[1] + arcoR * Math.sin(a * D)];
+  const [q0, q1] = [pA(a0), pA(a1)], am = (a0 + a1) / 2, qm = pA(am);
+  const arcoSvg = `<path d="M${f1(q0[0])},${f1(q0[1])} A${arcoR},${arcoR} 0 0 1 ${f1(q1[0])},${f1(q1[1])}" fill="none" stroke="${BLUE}" stroke-width="1.8"/>` +
+    txt(f1(v[0] + (arcoR + 18) * Math.cos(am * D)), f1(v[1] + (arcoR + 18) * Math.sin(am * D) + 5), angTxt, 13, BLUE, "middle", 700);
+  return svg(
+    `<text x="80" y="20" font-size="12" font-weight="700" fill="${MUTE}" letter-spacing=".06em">${(mod ? "Waters modificada" : "Waters").toUpperCase()} · VISTA LATERAL · SENTADO</text>` +
+    clip + `<g clip-path="url(#cpWA${mod ? 2 : 1})">` + F.atras + F.cuerpo + F.cabHuesos + F.frente + F.cara + `</g>` +
+    `<rect x="${XRI}" y="30" width="9" height="${f1(Math.max(250, L[1] + 70) - 30)}" fill="${INK}"/>` + txt(XRI + 14, f1(Math.max(250, L[1] + 70) - 4), "RI", 12, INK) +
+    E.refline(f1(mae[0] - 20), f1(mae[1] - (can[1] - mae[1]) / (can[0] - mae[0]) * 20), f1(v[0]), f1(v[1])) + txt(f1(mae[0] + (v[0] - mae[0]) * 0.72 - 10), f1(mae[1] + (v[1] - mae[1]) * 0.72), "LOM", 11.5, BLUE, "end", 700) +
+    E.refline(f1(mae[0] - 20), f1(L[1]), XRI, f1(L[1])) + txt(f1(mae[0] - 24), f1(L[1] + 4), nom, 11.5, BLUE, "end", 700) +
+    `<path d="M${XRI - 9},${f1(L[1])} L${XRI - 9},${f1(L[1] - 9)} L${XRI},${f1(L[1] - 9)}" fill="none" stroke="${BLUE}" stroke-width="1.3"/>` +
+    arcoSvg + dot(f1(mae[0]), f1(mae[1])) + dot(f1(L[0]), f1(L[1])) +
+    beam(f1(entrada - 6), f1(ac[1]), 0, 150, { horizontal: true }) +
+    `<line x1="${f1(entrada)}" y1="${f1(ac[1])}" x2="${XRI}" y2="${f1(ac[1])}" stroke="${RED}" stroke-width="1.6" stroke-dasharray="4 4"/>` +
+    `<circle cx="${f1(ac[0])}" cy="${f1(ac[1])}" r="3.5" fill="${RED}"/>` +
+    note(f1(ac[0] - 3), f1(ac[1] - 3), f1(ac[0] - 74), f1(ac[1] - 70), ["acantión"], RED, "end") +
+    etiquetaHueso(f1(mae[0] + 6), f1(mae[1] + 22), "MAE") +
+    col(470, 60, [["RC ⟂ al RI, sale por el acantión", RED, 700, 12.5]]) +
+    col(470, 100, mod ? [[nom + " ⟂ al RI → LOM a 55° del RI", BLUE, 700], ["(LLM: comisura de los labios-MAE)", INK]]
+      : [[nom + " ⟂ al RI → LOM a 37° del RI", BLUE, 700], ["Cabeza extendida, apoyada en el mentón", INK]]) +
+    col(470, 150, [["Sentado erguido (se prefiere)", INK], ["o en decúbito prono sobre la mesa", INK], ["RI centrado en el RC", INK]]) +
+    col(470, 280, [["RI 18 × 24 o 24 × 30 vertical", MUTE, 400, 11], ["parrilla · DFRI 100 cm", MUTE, 400, 11]])
+  );
+}
+
 // ---- ATM (Law modificado y Schüller): boca cerrada / abierta, vista de frente ----
 function atmV({ ang, label, sobre, rc, abierta, titulo, textos, ri: riTxt }) {
   const cx = 220, cy = 128, r = 52;
@@ -828,7 +874,7 @@ function senCaldwellV(mod) {
 }
 
 Object.assign(module.exports, {
-  "faciales-parietoacantial-waters--v1": () => facWatersV(false),
+  "faciales-parietoacantial-waters--v1": () => watersAnat(false),
   "faciales-parietoacantial-waters--v2": () => facWatersV(true),
   "atm-law-modificado--v1": () => atmLawV(false),
   "atm-law-modificado--v2": () => atmLawV(true),

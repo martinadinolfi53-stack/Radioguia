@@ -2,6 +2,7 @@
 // Estilo aprobado (contorno continuo color piel + huesos "por transparencia"). Helpers de codo/antebrazo copiados de
 // referencia-tecnicas1-superior.cjs; mano esquelética, cortes desde los dedos y vistas laterales nuevos.
 const E = require("./estilo.cjs");
+const A = require("./anatomia.cjs");
 const { SK, SKO, RED, BLUE, AMB, INK, MUTE, BONEO, riTop, beam, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, mk, cabezaFrente } = E;
 
 // ---------- helpers copiados de referencia-tecnicas1-superior.cjs ----------
@@ -252,20 +253,23 @@ const I = {};
 
 // ======================= MANO =======================
 I["mano-pa"] = () => {
-  const h = manoEsq({ s: 1.25, at: [178, 186], rot: 0, spread: 1.4, F: 150 });
-  const m3 = h.pts.mcp[3];
+  // mano derecha en pronación, dedos hacia la derecha; 11 px = 1 cm (RI 30 x 24 cm a escala)
+  const T = A.X({ s: 13, at: [170, 182], rot: 90 });
+  const h = A.manoPA({ T, antebrazo: 16, dedos: 1.15 });
+  const m3 = h.P.mcf3, c = h.P.caja, px = h.P.borde.proximal[0];
+  const cx0 = Math.min(c.x0, px) - 8, cy0 = c.y0 - 8, cx1 = c.x1 + 8, cy1 = c.y1 + 8;
   return svg(
     view("Vista desde el tubo · mano apoyada en el RI") +
-    riTop(120, 50, 360, 252) + txt(120, 318, "RI 24 x 30", 12, INK) +
-    refline(20, 186, 470, 186) +
-    drawHand(h) + coll(150, 66, 312, 228) + crossP(m3) +
-    lab(...h.pts.carpo, 210, 288, "carpo", "end") +
-    lab(...lerp(h.pts.mcb[4], h.pts.mcp[4], 0.5), 300, 288, "metacarpianos") +
-    lab(...h.pts.ifp[5], 420, 288, "falanges") +
+    riTop(138, 46, 330, 264) + txt(138, 324, "RI 24 x 30", 12, INK) +
+    refline(20, 182, 484, 182) +
+    A.pielUnida(h.piel) + h.detalle + h.huesos + coll(f1(cx0), f1(cy0), f1(cx1 - cx0), f1(cy1 - cy0)) + crossP(m3) +
+    lab(...h.P.carpo, 214, 290, "carpo", "end") +
+    lab(...h.P.mcMedio4, 300, 290, "metacarpianos") +
+    lab(...h.P.ifp5, 410, 290, "falanges") +
     note(m3[0] + 10, m3[1] - 4, 520, 62, ["RC perpendicular al RI", "en la 3.ª articulación MCF"], RED) +
-    note(470, 186, 520, 122, ["Eje de mano y muñeca", "paralelo al borde del RI"], BLUE) +
-    note(...h.pts.tip[3], 520, 176, ["Pronación completa,", "dedos un poco separados"]) +
-    note(462, 250, 520, 232, ["Colimar a los bordes de", "mano y muñeca, con las", "dos hileras del carpo"], AMB) +
+    note(484, 182, 520, 122, ["Eje de mano y muñeca", "paralelo al borde del RI"], BLUE) +
+    note(h.P.punta3[0] + 4, h.P.punta3[1] - 3, 520, 176, ["Pronación completa,", "dedos un poco separados"]) +
+    note(f1(cx1), f1(cy1 - 16), 520, 232, ["Colimar a los bordes de", "mano y muñeca, con las", "dos hileras del carpo"], AMB) +
     tecnica(520, 300, "24 x 30 vertical") + txt(12, 40, "Sentado, codo flexionado, protección en el regazo", 11.5, MUTE)
   );
 };
@@ -875,18 +879,39 @@ function codoOblicua(medial) {
   return k;
 }
 I["codo-ap-oblicua--v1"] = () => {
-  const k = codoOblicua(true);
+  // panel 1: desde el tubo, brazo extendido sobre la mesa en oblicua medial (anatomia.cjs), 4,4 px = 1 cm
+  const s = 5.8, C = [108, 212], g = -20;
+  const T = A.X({ s, at: C, rot: g });
+  const brazo = A.perfilHueso([[-40, 0], [-12, 0], [0, 0], [10, 0], [25.6, 0]], [[0, 4.6], [0.4, 4.3], [0.52, 4.05], [0.62, 4.1], [0.8, 3.5], [1, 2.75]], 0.4).map(T);
+  const h = A.manoPA({ T: A.X({ s, at: T([25.8, 0]), rot: 90 + g }), antebrazo: 1.5, unas: false });
+  const k = A.codoOblicuoMedial({ T, largoH: 40, largoA: 25.4 });
+  const riW = 30 * s, riH = 24 * s;
+  const c = k.P.centro, rotG = (inner) => `<g transform="rotate(${g} ${f1(c[0])} ${f1(c[1])})">${inner}</g>`;
+  const p1 = `<clipPath id="cpCO1"><rect x="0" y="30" width="384" height="300"/></clipPath><g clip-path="url(#cpCO1)">` +
+    rotG(riTop(f1(c[0] - riW / 2), f1(c[1] - riH / 2), f1(riW), f1(riH))) + A.pielUnida([brazo, ...h.piel]) + h.huesos + k.svg + `</g>` +
+    rotG(coll(f1(c[0] - 64), f1(c[1] - 44), 128, 88)) + cross(f1(c[0]), f1(c[1]));
+  // panel 2: corte del codo visto desde la mano, epicóndilos a 45° del RI
+  const yRI = 276, k0 = A.corteCodo({ T: A.X({ s: 8.6, at: [478, 0] }), g: -45 });
+  const kc = A.corteCodo({ T: A.X({ s: 8.6, at: [478, yRI - 1 - k0.fondo] }), g: -45 });
+  const ctr = kc.c, em = kc.em, el = kc.el;
+  const ext = (a, b, t) => [a[0] + (a[0] - b[0]) * t, a[1] + (a[1] - b[1]) * t];
+  const p2 = `<line x1="392" y1="14" x2="392" y2="322" stroke="#e2e4ea"/>` + txt(404, 20, "2 · CORTE, VISTO DESDE LA MANO", 12, MUTE, "start", 700).replace("<text ", '<text letter-spacing=".06em" ') +
+    riBar(410, 548, yRI, "RI") + kc.svg +
+    `<line x1="${f1(ctr[0])}" y1="58" x2="${f1(ctr[0])}" y2="${f1(ctr[1] - 10)}" stroke="${RED}" stroke-width="3" marker-end="url(#ar)"/>` +
+    refline(...ext(em, el, 0.3).map(f1), ...ext(el, em, 0.3).map(f1)) + bluePt(em) + bluePt(el) +
+    `<line x1="${f1(ctr[0] - 64)}" y1="${f1(ctr[1])}" x2="${f1(ctr[0] + 64)}" y2="${f1(ctr[1])}" stroke="${MUTE}" stroke-width="1" stroke-dasharray="3 4"/>` +
+    arco(ctr, 56, 0, -45, "45°", BLUE, 16) +
+    labL(em, -16, -30, "medial") + lab(...el, 520, 132, "lateral") + txt(404, 318, "línea de los epicóndilos a 45°", 11, BLUE);
   return svg(
-    view("Oblicua medial (interna) · vista desde la mano") +
-    riBar(100, 400, 262, "RI") + k.svg + beam(f1(k.c[0]), f1(k.c[1]), 90, 150) +
-    `<line x1="${f1(k.c[0] - 90)}" y1="${f1(k.c[1])}" x2="${f1(k.c[0] + 90)}" y2="${f1(k.c[1])}" stroke="${MUTE}" stroke-width="1" stroke-dasharray="3 4"/>` +
-    arco(k.c, 80, 0, -45, "45°", BLUE, 16) +
-    labL(k.em, -24, -34, "medial") + lab(...k.el, 360, 110, "lateral") + azul(278, 186, 120, 70, "línea de los epicóndilos") +
-    note(k.c[0] + 6, k.c[1] + 6, 470, 300, ["RC perpendicular al RI en la parte", "media de la articulación del codo"], RED) +
-    col(470, 70, [["Codo extendido y mano", INK, 700, 12.5], ["en pronación", INK, 700, 12.5]]) +
-    col(470, 120, [["Palpar los epicóndilos para", INK], ["confirmar una rotación", INK], ["interna de 45°", INK]]) +
-    col(470, 200, [["Muestra mejor la apófisis", MUTE], ["coronoides", MUTE]]) +
-    col(470, 246, [["RI 24 x 30 vertical · DFRI 100 cm", MUTE, 400, 11], ["sin parrilla", MUTE, 400, 11]])
+    view("1 · Oblicua medial (interna) · desde el tubo") + p1 + p2 +
+    lab(...k.P.epicondiloMedial, 96, 124, "epicóndilo medial", "end") + lab(...k.P.coronoides, 196, 110, "coronoides") +
+    lab(...k.P.cabezaRadio, 196, 262, "cabeza del radio") + txt(196, 276, "sobre el cúbito", 10.5, BONEO, "start").replace("<text ", '<text font-style="italic" ') + labL(k.P.humero, -4, 40, "húmero") +
+    txt(196, 304, "Mano en pronación: el radio", 11.5, MUTE) + txt(196, 319, "cruza sobre el cúbito", 11.5, MUTE) +
+    note(f1(c[0] - 4), f1(c[1] - 8), 12, 56, ["RC ⟂ al RI, en la parte media", "de la articulación del codo"], RED) +
+    col(572, 62, [["Codo extendido y", INK, 700, 12.5], ["mano en pronación", INK, 700, 12.5]]) +
+    col(572, 106, [["Palpar los epicóndilos", INK], ["para confirmar una", INK], ["rotación interna de 45°", INK]]) +
+    col(572, 170, [["Muestra mejor la", MUTE], ["apófisis coronoides", MUTE]]) +
+    col(572, 214, [["RI 24 x 30 vertical", MUTE, 400, 11], ["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
   );
 };
 I["codo-ap-oblicua--v2"] = () => {

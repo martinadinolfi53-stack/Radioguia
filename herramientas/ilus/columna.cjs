@@ -5,6 +5,7 @@ const {
   table, ri, riTop, beam, tube, cross, coll, refline, note, view, txt, svg, dot, side,
   piel, linea, hueso, etiquetaHueso, mk, cabezaPerfil, cabezaFrente,
 } = require("./estilo.cjs");
+const A = require("./anatomia.cjs");
 
 const f1 = (n) => n.toFixed(1);
 
@@ -640,20 +641,55 @@ function lumbarAP() {
   );
 }
 
+// decúbito lateral verdadero visto desde el tubo, con figura anatómica (anatomia.cjs) y detalle de la columna lumbar
 function lumbarPerfil() {
-  const E = LAT, rc = E.X(330), sy = E.Y(LY), cr = E.X(354);
-  return svg(
-    view("Vista desde el tubo · decúbito lateral") +
-    riTop(rc - 112, 128, 224, 128, "RI · parrilla", rc - 106, 251) +
-    latDec({ cojin: true }) + lumbares(E, { marca: "L3", izq: ["L4"] }) + coxal(E) +
-    refline(cr, 126, cr, E.Y(256)) + txt(cr + 4, 122, "nivel de la cresta ilíaca", 11, BLUE) +
-    coll(E.X(282), sy - 26, E.X(396) - E.X(282), 52) + cross(rc, sy) +
-    note(rc - 8, sy + 8, 190, 280, ["RC perpendicular 4 cm sobre la cresta (L3);", "con RI 35 x 43, en la cresta (L4)"], RED) +
-    txt(190, 316, "Pelvis ancha y tórax estrecho: puede hacer falta 3-5° caudal", 11.5, RED) +
-    note(E.X(512), E.Y(152), 600, 44, ["Apoyo entre las rodillas,", "caderas y rodillas flexionadas"]) +
-    lines(20, 60, ["RI 30 x 35 o 35 x 43 vertical", "DFRI 100 cm · espiración"], 11.5, INK) +
-    lines(560, 252, ["Apoyo bajo la cintura", "Plomo detrás del paciente", "Parte baja hacia el cátodo", "Escoliosis: convexidad abajo"])
-  );
+  const F1 = A.f1;
+  // panel 1: cuerpo entero (1,75 px = 1 cm); cabeza a la izquierda, espalda hacia abajo
+  const s1 = 1.75, T1 = A.X({ s: s1, at: [212, 176], rot: -90 });
+  const fig = A.figuraPerfil({ T: T1, cabeza: 4, cadera: 55, rodilla: 85, tobillo: 0, hombro: 75, codo: 105, escorzo: [1, 1], mano: "abierta",
+    lejos: { d: [1.2, 1.5], cadera: 48, rodilla: 88, hombro: 88, codo: 110 } });
+  const col1 = A.columnaLateral({ T: T1, desde: "T11", hasta: "L5", detalle: false });
+  const L = (x, h) => T1([x, A.yH(h)]);
+  const cr1 = L(0, A.ALT.cresta), l3a = L(-3.2, A.VERT.L3);
+  // caja del detalle (región lumbar) en el panel 1
+  const rcP = L(-3.0, A.ALT.cresta + 4), ri1 = [rcP[0] - 43 * s1 / 2, rcP[1] - 35 * s1 / 2, 43 * s1, 35 * s1]; // RI 35 x 43, largo a lo largo de la columna
+  const almohada = `<rect x="${F1(L(4, 176)[0] - 32)}" y="${F1(L(4, 176)[1] - 22)}" width="44" height="40" rx="10" fill="#e3e6ec" stroke="#9aa0ac" stroke-width="1.2"/>`;
+  const rod = fig.P.rodilla, rodL = fig.P.rodillaLejos;
+  const cojinRod = `<rect x="${F1((rod[0] + rodL[0]) / 2 - 10)}" y="${F1((rod[1] + rodL[1]) / 2 - 7)}" width="22" height="13" rx="5" fill="#d9c8a0" stroke="#9a875e" stroke-width="1.2" transform="rotate(-35 ${F1((rod[0] + rodL[0]) / 2)} ${F1((rod[1] + rodL[1]) / 2)})"/>`;
+  const p1 = view("1 · Vista desde el tubo · decúbito lateral") +
+    `<rect x="12" y="44" width="360" height="190" rx="4" fill="#f1f2f5" stroke="#d5d8e0"/>` + txt(18, 228, "Mesa", 10, MUTE) +
+    `<line x1="12" y1="${F1(l3a[1])}" x2="372" y2="${F1(l3a[1])}" stroke="#b9bfcb" stroke-width="1" stroke-dasharray="2 3"/>` + txt(366, F1(l3a[1] + 13), "línea media de la mesa", 9.5, MUTE, "end") +
+    `<rect x="${F1(ri1[0])}" y="${F1(ri1[1])}" width="${F1(ri1[2])}" height="${F1(ri1[3])}" fill="#e2e5eb"/>` + almohada + fig.atras + fig.cuerpo + col1.svg + fig.frente + fig.cara + cojinRod +
+    `<rect x="${F1(ri1[0])}" y="${F1(ri1[1])}" width="${F1(ri1[2])}" height="${F1(ri1[3])}" fill="none" stroke="${INK}" stroke-width="1.5" stroke-dasharray="8 3"/>` +
+    txt(F1(ri1[0] + 2), F1(ri1[1] - 5), "RI · detalle en 2 →", 10.5, INK) +
+    note(...fig.P.rodilla, 236, 262, ["Apoyo entre", "las rodillas;", "caderas y rodillas", "flexionadas"]) +
+    lines(20, 262, ["Apoyo bajo la cintura:", "columna paralela a la mesa"], 11, INK) +
+    lines(20, 294, ["Plano medioaxilar en la línea media", "Plomo detrás · parte baja al cátodo", "Escoliosis: convexidad hacia abajo"], 10.5, MUTE, "start", 13.5);
+  // panel 2: detalle de la columna lumbar de perfil (5,4 px = 1 cm), misma orientación
+  const s2 = 5.4, T2 = A.X({ s: s2, at: [560, 164], rot: -90, o: [0, A.yH(100)] });
+  const P2 = (x, h) => T2([x, A.yH(h)]);
+  // piel de la región (espalda abajo, abdomen arriba)
+  const tronco = A.pielUnida([{ pts: [[-9.8, 136], [-11.8, 126], [-11.2, 118], [-10.4, 111], [-10.0, 105], [-11.0, 98], [-13.0, 91], [-13.9, 85], [-13.4, 76], [-11, 58], [11, 58], [11.6, 76], [11.6, 84], [11.0, 91], [11.9, 99], [11.6, 107], [11.8, 113], [13.0, 120], [13.9, 126], [12.9, 136]].map(([x, h]) => P2(x, h)) }]);
+  const col = A.columnaLateral({ T: T2, desde: "T11", hasta: "L5", detalle: true, sacro: true }), pel = A.pelvisLateral({ T: T2 });
+  const crY = P2(0, A.ALT.cresta), l3 = col.P.L3, l4 = col.P.L4;
+  const clip = (inner) => `<clipPath id="cpLL2"><rect x="392" y="78" width="350" height="164"/></clipPath><g clip-path="url(#cpLL2)">${inner}</g>` +
+    `<rect x="392" y="78" width="350" height="164" fill="none" stroke="${MUTE}" stroke-width="1.2" stroke-dasharray="4 3"/>`;
+  // RI (35 x 43, vertical = largo a lo largo de la columna) y colimación larga y estrecha
+  const rc4 = P2(-3.0, A.ALT.cresta + 4); // 4 cm sobre la cresta
+  const colW = 30 * s2, colH = 9.5 * s2;
+  const p2 = panelSep(380) + `<text x="394" y="20" font-size="12" font-weight="700" fill="${MUTE}" letter-spacing=".06em">2 · DETALLE: COLUMNA LUMBAR DE PERFIL</text>` +
+    clip(tronco + pel.svg + col.svg) +
+    refline(F1(crY[0]), 62, F1(crY[0]), 248) + txt(F1(crY[0] + 5), 72, "cresta ilíaca", 11, BLUE) +
+    coll(F1(rc4[0] - colW / 2), F1(rc4[1] - colH / 2), F1(colW), F1(colH)) +
+    `<circle cx="${F1(l4[0])}" cy="${F1(l4[1])}" r="7" fill="none" stroke="${RED}" stroke-width="1.6" stroke-dasharray="3 2"/>` +
+    cross(F1(rc4[0]), F1(rc4[1])) +
+    ["L1", "L2", "L3", "L4", "L5"].map((v) => etiquetaHueso(F1(col.P[v + "ant"][0]), F1(col.P[v + "ant"][1] - 10), v, "middle")).join("") +
+    etiquetaHueso(F1(pel.P.eias[0] + 4), F1(pel.P.eias[1] - 6), "EIAS") + etiquetaHueso(F1(col.P.sacro[0] + 30), F1(col.P.sacro[1] + 8), "sacro") +
+    txt(398, 72, "↑ abdomen", 10.5, MUTE) + txt(398, 256, "↓ espalda", 10.5, MUTE) +
+    note(F1(rc4[0] - 4), F1(rc4[1] + 10), 480, 266, ["RC ⟂ 4 cm sobre la cresta (L3);", "con RI 35 x 43, en la cresta", "(L4, círculo punteado)"], RED) +
+    txt(398, 322, "Pelvis ancha y tórax estrecho: puede hacer falta 3-5° caudal", 10.5, RED) +
+    lines(398, 42, ["RI 30 x 35 o 35 x 43 vertical · parrilla", "DFRI 100 cm · espiración"], 10.5, INK, "start", 13);
+  return svg(p1 + p2);
 }
 
 function pasajeL5S1() {

@@ -26,7 +26,7 @@ function claveInvalida(clave) {
   return null;
 }
 const zonas = process.argv.slice(2);
-const archivos = readdirSync(join(raiz, "herramientas/ilus")).filter((f) => f.endsWith(".cjs") && f !== "estilo.cjs" && !f.startsWith("referencia-"))
+const archivos = readdirSync(join(raiz, "herramientas/ilus")).filter((f) => f.endsWith(".cjs") && f !== "estilo.cjs" && f !== "anatomia.cjs" && !f.startsWith("referencia-"))
   .filter((f) => !zonas.length || zonas.includes(f.replace(/\.cjs$/, "")));
 mkdirSync(join(raiz, "ilustraciones"), { recursive: true });
 const problemas = [];

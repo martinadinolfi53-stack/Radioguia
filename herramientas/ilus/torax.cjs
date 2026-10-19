@@ -2,6 +2,7 @@
 // Estilo: contorno continuo color piel + huesos de referencia "por transparencia" (ver estilo.cjs y referencia-*.cjs).
 // Solo unidades métricas en los rótulos.
 const E = require("./estilo.cjs");
+const A = require("./anatomia.cjs");
 const { SK, SKO, RED, BLUE, AMB, INK, MUTE, BONE, BONEO, wall, ri, riTop, beam, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, cabezaPerfil, cabezaFrente } = E;
 
 // ---------- helpers geométricos ----------
@@ -318,28 +319,37 @@ const I = {};
 // TÓRAX
 // ---------------------------------------------------------------------
 I["torax-pa"] = () => {
-  // panel 1: de costado
-  const M = afinP(199, 113, 0.8);
-  const t7 = M(PT7), back = M([421, 188]);
+  // panel 1: de costado, de pie, pecho contra el Bucky (figura anatómica de anatomia.cjs, 2,2 px = 1 cm)
+  const yv = 44, s1 = 2.2, xp = 227; // y del vértice, escala, x de la línea de plomada
+  const T1 = A.X({ s: s1, at: [xp, yv + (172 - 87) * s1] });
+  const F = A.figuraPerfil({ T: T1, cabeza: 16, hombro: -14, codo: 42, escorzo: [0.88, 0.62] });
+  const H = (h) => yv + (172 - h) * s1;
+  const t7 = T1([A.ejeX(A.VERT.T7), A.yH(A.VERT.T7)]), back = [T1([-12.7, 0])[0], H(A.VERT.T7)];
+  const cl = A.columnaLateral({ T: T1, desde: "C2", hasta: "L2", sacro: false }), tl = A.toraxLateral({ T: T1 });
   const p1 = view("1 · Vista lateral · de pie") +
     wall(254, 40, 306, "Bucky vertical") +
-    perfil(M, { brazos: "caderas" }) + huesosPerfil(M, { pulmones: true }) +
+    `<clipPath id="cpTP1"><rect x="0" y="26" width="372" height="278"/></clipPath><g clip-path="url(#cpTP1)">` +
+    F.atras + F.cuerpo + tl.svg + cl.svg + F.frente + F.cara + `</g>` +
     `<rect x="${f1(t7[0] - 7)}" y="${f1(t7[1] - 6)}" width="14" height="12" rx="3" fill="none" stroke="${RED}" stroke-width="1.3" stroke-dasharray="3 2"/>` +
-    beam(back[0], back[1], 0, 130, { horizontal: true }) + dashRC(back[0], back[1], 254, back[1]) +
-    txt(130, back[1] + 26, "DFRI 180 cm", 12.5, RED, "middle", 700) +
-    note(back[0] - 30, back[1] - 2, 172, 112, ["RC ⟂ al RI", "(horizontal), en T7"], RED, "end") +
-    note(...M([484, 98]), 292, 52, ["Mentón", "elevado"]) +
-    note(...M([470, 262]), 292, 230, ["Manos en", "las caderas,", "hombros", "adelante"]) +
+    beam(f1(back[0]), f1(back[1]), 0, 130, { horizontal: true }) + dashRC(back[0], back[1], 254, back[1]) +
+    txt(110, back[1] + 26, "DFRI 180 cm", 12.5, RED, "middle", 700) +
+    note(back[0] - 30, back[1] - 2, 150, 92, ["RC ⟂ al RI", "(horizontal), en T7"], RED, "end") +
+    note(F.P.menton[0] + 2, F.P.menton[1] + 2, 292, 52, ["Mentón", "elevado"]) +
+    note(...F.P.muneca, 292, 214, ["Manos en", "las caderas,", "hombros", "adelante"]) +
     lineas(24, 266, ["Pecho contra el RI,", "sin rotación"], 11.5, MUTE);
-  // panel 2: desde el tubo (espalda)
-  const N = afin(560, 122, 0.8);
-  const [rx, ry, rw, rh] = rectL(N, -96, -26, 96, 196);
-  const [cxl, cyl, cwl, chl] = rectL(N, -82, -4, 82, 150);
-  const c7 = N([0, -4]), t7b = N(T7), mx = N([-30, 0])[0];
+  // panel 2: desde el tubo (de espaldas), 2,6 px = 1 cm; RI 35 x 43 cm a escala
+  const s2 = 2.6, xc = 560, yv2 = 40, H2 = (h) => yv2 + (172 - h) * s2;
+  const T2 = A.X({ s: s2, at: [xc, yv2 + (172 - 87) * s2] });
+  const G = A.figuraFrente({ T: T2, espalda: true, brazos: "caderas" });
+  const tx = A.toraxPA({ T: T2, espalda: true, hombrosAdelante: true });
+  const riY0 = H2(148), riW = 35 * s2, riH = 43 * s2;
+  const c7 = [xc, H2(A.ALT.c7)], t7b = [xc, H2(A.VERT.T7)], mx = xc - 30;
+  const piel = 16.6 * s2;
   const p2 = panelSep(380, "2 · Desde el tubo (de espaldas)") +
-    riTop(rx, ry, rw, rh) +
-    frente(N, { brazos: "caderas", espalda: true }) + huesosFrente(N, { espalda: true }) +
-    coll(cxl, cyl, cwl, chl) +
+    `<clipPath id="cpTP2"><rect x="386" y="26" width="374" height="292"/></clipPath><g clip-path="url(#cpTP2)">` +
+    riTop(f1(xc - riW / 2), f1(riY0), f1(riW), f1(riH)) + G.cuerpo + tx.svg + G.frente + G.cara + `</g>` +
+    `<rect x="${f1(xc - riW / 2)}" y="${f1(riY0)}" width="${f1(riW)}" height="${f1(riH)}" fill="none" stroke="${INK}" stroke-width="1.6" stroke-dasharray="10 3" opacity=".8"/>` +
+    coll(f1(xc - piel), f1(c7[1]), f1(2 * piel), f1(riY0 + riH - c7[1] - 3)) +
     dot(...c7) + medida(mx, c7[1] + 2, mx, t7b[1] - 2) + `<line x1="${f1(mx - 4)}" y1="${f1(c7[1])}" x2="${f1(c7[0])}" y2="${f1(c7[1])}" stroke="${BLUE}" stroke-width="1"/>` +
     cross(...t7b) +
     note(c7[0] - 4, c7[1] - 2, 398, 50, ["Vértebra", "prominente"], BLUE) +

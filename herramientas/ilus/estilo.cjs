@@ -61,8 +61,16 @@ const refline = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="
 // llamada: línea desde el punto (px,py) hasta el texto en (tx,ty)
 function note(px, py, tx, ty, lines, color = INK, anchor = "start") {
   const [first, ...rest] = lines;
-  const lx = anchor === "start" ? tx - 4 : tx + 4;
-  return `<line x1="${px}" y1="${py}" x2="${lx}" y2="${ty - 4}" stroke="${color}" stroke-width="1.1"/>` +
+  // caja aproximada del texto, para que la línea llegue al borde más cercano y nunca lo tache
+  const ancho = (t, k) => String(t).replace(/<[^>]*>/g, "").length * k;
+  const w = Math.max(ancho(first, 7.9), ...rest.map((l) => ancho(l, 7)));
+  const x0 = anchor === "start" ? tx : anchor === "end" ? tx - w : tx - w / 2, x1 = x0 + w;
+  const y0 = ty - 12, y1 = ty + 16 * rest.length + 4;
+  let lx, ly;
+  if (px <= x0) { lx = x0 - 4; ly = ty - 4; }
+  else if (px >= x1) { lx = x1 + 4; ly = ty - 4; }
+  else { lx = px; ly = py < y0 ? y0 - 2 : y1 + 2; }
+  return `<line x1="${px}" y1="${py}" x2="${lx.toFixed(1)}" y2="${ly.toFixed(1)}" stroke="${color}" stroke-width="1.1"/>` +
     `<text x="${tx}" y="${ty}" font-size="13.5" fill="${color}" text-anchor="${anchor}"><tspan font-weight="700">${first}</tspan>` +
     rest.map((l) => `<tspan x="${tx}" dy="16" fill="${INK}">${l}</tspan>`).join("") + `</text>`;
 }

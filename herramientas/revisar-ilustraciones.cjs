@@ -17,10 +17,24 @@ const { chromium } = require("playwright"); const fs = require("fs"); const path
         if (ox > 2 && oy > 2) over.push(`"${ts[i].t}" ↔ "${ts[j].t}"`);
       }
       const fuera = ts.filter((x) => x.b.left < sb.left - 1 || x.b.right > sb.right + 1 || x.b.top < sb.top - 1 || x.b.bottom > sb.bottom + 1).map((x) => x.t);
-      return { over, fuera };
+      // líneas (guías de rótulos, flechas) que atraviesan un texto
+      const cruza = [];
+      const seg = (ax, ay, bx, by, r) => { // ¿el segmento corta el rectángulo r?
+        const dentro = (x, y) => x > r.left && x < r.right && y > r.top && y < r.bottom;
+        for (let k = 1; k < 20; k++) { const t = k / 20; if (dentro(ax + (bx - ax) * t, ay + (by - ay) * t)) return true; }
+        return false;
+      };
+      const pt = svg.createSVGPoint(), M = svg.getScreenCTM();
+      const aPantalla = (x, y) => { pt.x = x; pt.y = y; const q = pt.matrixTransform(M); return [q.x, q.y]; };
+      for (const l of svg.querySelectorAll("line")) {
+        if (l.closest("g[transform]")) continue;
+        const [ax, ay] = aPantalla(+l.getAttribute("x1"), +l.getAttribute("y1")), [bx, by] = aPantalla(+l.getAttribute("x2"), +l.getAttribute("y2"));
+        for (const x of ts) { const r = { left: x.b.left + 1, right: x.b.right - 1, top: x.b.top + 2, bottom: x.b.bottom - 2 }; if (seg(ax, ay, bx, by, r)) { cruza.push(x.t); break; } }
+      }
+      return { over, fuera, cruza };
     });
     await p.locator("svg").screenshot({ path: path.join(out, path.basename(f, ".svg") + ".png") });
-    if (r.over.length || r.fuera.length) { malos++; console.log(path.basename(f), r.over.length ? "SE PISAN: " + r.over.join(" | ") : "", r.fuera.length ? "SE SALEN: " + r.fuera.join(" | ") : ""); }
+    if (r.over.length || r.fuera.length || r.cruza.length) { malos++; console.log(path.basename(f), r.over.length ? "SE PISAN: " + r.over.join(" | ") : "", r.fuera.length ? "SE SALEN: " + r.fuera.join(" | ") : "", r.cruza.length ? "LÍNEA SOBRE TEXTO: " + r.cruza.join(" | ") : ""); }
   }
   console.log(`${files.length} revisados, ${malos} con problemas de texto. PNG en ${out}`);
   await b.close();

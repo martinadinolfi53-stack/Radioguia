@@ -7,7 +7,7 @@ export default [
   { id: "rc", termino: "RC (rayo central)", formas: ["RC", "rayo central"], definicion: "Centro del haz de rayos X. Su dirección y el punto donde entra marcan cómo se proyecta la anatomía en la imagen.", estado: "pendiente" },
   { id: "ri", termino: "RI (receptor de imagen)", formas: ["RI", "receptor de imagen"], definicion: "Dispositivo que recibe los rayos X y forma la imagen: chasis, placa o detector digital.", estado: "pendiente" },
   { id: "dfri", termino: "DFRI", formas: ["DFRI", "distancia foco-receptor"], definicion: "Distancia foco-receptor de imagen: distancia entre el foco del tubo de rayos X y el receptor.", estado: "pendiente" },
-  { id: "perpendicular", termino: "Perpendicular", formas: ["perpendicular"], definicion: "El rayo forma un ángulo de 90° con el receptor de imagen; no tiene angulación.", estado: "pendiente" },
+  { id: "perpendicular", termino: "Perpendicular", formas: ["perpendicular"], definicion: "El rayo forma un ángulo de 90° con el receptor de imagen.", estado: "aprobado" },
   { id: "cefalico", termino: "Cefálico (craneal)", formas: ["cefálico", "cefálica", "craneal"], definicion: "Hacia la cabeza. Un RC con angulación cefálica se inclina apuntando hacia la cabeza del paciente.", sinonimo: "Craneal", estado: "pendiente" },
   { id: "caudal", termino: "Caudal", formas: ["caudal"], definicion: "Hacia los pies. Un RC con angulación caudal se inclina apuntando hacia los pies del paciente.", estado: "pendiente" },
   { id: "decubito", termino: "Decúbito", formas: ["decúbito"], definicion: "Paciente acostado. Supino: boca arriba. Prono: boca abajo. Lateral: de costado.", estado: "pendiente" },

@@ -2,7 +2,7 @@
 // Rutas: #juegos-cuenta · #juegos-foto · #juegos-grupos · #juegos-nuevo · #juegos-grupo-<gid>[-historico] · #juegos-editar-<gid>
 //        #juegos-unirse-<gid> (link de invitación) · #juegos-desafio[-<gid>]
 // Los datos viven en Firebase (js/nube.js). Las pantallas se dibujan con lo que haya y se vuelven a dibujar cuando llega la respuesta.
-import { proyecciones, proyeccionPorId } from "./datos.js";
+import { proyecciones, proyeccionPorId, regionPorId } from "./datos.js";
 import * as almacen from "./almacen.js";
 import { esc, icono, cabecera } from "./util.js";
 import { GRUPOS, grupoDeRegion } from "./menu.js";
@@ -371,7 +371,7 @@ async function empezarDesafio(gid) {
   const fichas = g.fichas.map((id) => proyeccionPorId[id]).filter(Boolean);
   const fecha = nube.hoy();
   // misma semilla para todo el grupo ese día: todos reciben las mismas preguntas
-  const preguntas = generarPreguntas({ fichas, todas: proyecciones, zonaDe, aspectos: g.aspectos?.length ? g.aspectos : ASPECTOS.map((a) => a.id), excluir: g.excluir || [], cantidad: conf.preguntas, semilla: `${gid}|${fecha}` });
+  const preguntas = generarPreguntas({ fichas, todas: proyecciones, zonaDe, regionNombre: (id) => regionPorId[id]?.nombre || id, aspectos: g.aspectos?.length ? g.aspectos : ASPECTOS.map((a) => a.id), excluir: g.excluir || [], cantidad: conf.preguntas, semilla: `${gid}|${fecha}` });
   if (!preguntas.length) throw new Error("Con los enfoques de este grupo no se pueden armar preguntas. Pedile a quien lo creó que cambie los enfoques.");
   await nube.empezarPartida(gid, conf.vidas);
   juego = { gid, fecha, nombre: g.nombre, preguntas, respuestas: [], actual: 0, vidas: conf.vidas, vidasIni: conf.vidas, inicio: Date.now(), fin: null, resultado: null };

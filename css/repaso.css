@@ -92,3 +92,19 @@
 .rp-aspecto { display: grid; gap: 8px; }
 .rp-aspecto > .rp-op { width: 100%; }
 .rp-aspecto .rp-chips { padding-left: 12px; }
+
+/* reportar una pregunta */
+.rp-reportar { justify-self: start; min-height: 40px; color: var(--mute); text-decoration: underline; text-underline-offset: 3px; font-size: .9em; }
+.rp-reportada { color: var(--mute); font-size: .9em; }
+.rp-reporte { display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+.rp-reporte label { font-weight: 600; font-size: .9em; }
+.rp-reporte label small { color: var(--mute); font-weight: 400; }
+.rp-reporte input { width: 100%; height: 44px; border-radius: 12px; border: 1px solid var(--line); padding: 0 12px; font: inherit; font-size: 16px; background: var(--bg); color: var(--fg); }
+.rp-reporte input:focus { border-color: var(--accent); outline: none; }
+.rp-reporte .rp-limpiar { margin-top: 0; justify-self: start; }
+.rp-rep-acc { margin-top: 10px; }
+
+/* contrarreloj */
+.rp-min { margin-top: 10px; }
+.rp-reloj { flex: none; min-width: 64px; text-align: right; font-size: 1.35em; font-variant-numeric: tabular-nums; color: var(--accent); }
+.rp-barra.reloj span { background: var(--warn); transition: width .25s linear; }

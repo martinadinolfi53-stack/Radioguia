@@ -41,14 +41,20 @@ service cloud.firestore {
         && texto(request.resource.data.nombre, 40) && request.resource.data.fichas.size() <= 400;
       allow delete: if false;
 
+      function cierraPartida(uid, fecha) {
+        let ruta = /databases/$(base)/documents/grupos/$(gid)/partidas/$(fecha + '_' + uid);
+        return exists(ruta) && get(ruta).data.terminada == false && getAfter(ruta).data.terminada == true;
+      }
+
       match /miembros/{uid} {
         allow read: if miembro() || yo(uid);
         allow create: if yo(uid) && request.resource.data.uid == uid && request.resource.data.puntos == 0 && request.resource.data.partidas == 0;
         // los puntos solo suben de a una partida por vez (10 por acierto, hasta 100 preguntas, más el bonus de racha)
-        allow update: if yo(uid) && request.resource.data.uid == uid
-          && request.resource.data.puntos >= resource.data.puntos && request.resource.data.puntos - resource.data.puntos <= 1010
-          && request.resource.data.partidas >= resource.data.partidas && request.resource.data.partidas - resource.data.partidas <= 1
-          && texto(request.resource.data.apodo, 24);
+        // cambiar el apodo, o sumar exactamente los puntos de la partida de hoy en el mismo momento en que se cierra
+        allow update: if yo(uid) && request.resource.data.uid == uid && texto(request.resource.data.apodo, 24)
+          && ((request.resource.data.puntos == resource.data.puntos && request.resource.data.partidas == resource.data.partidas)
+            || (request.resource.data.partidas == resource.data.partidas + 1 && cierraPartida(uid, request.resource.data.ultimaFecha)
+              && request.resource.data.puntos == resource.data.puntos + getAfter(/databases/$(base)/documents/grupos/$(gid)/partidas/$(request.resource.data.ultimaFecha + '_' + uid)).data.puntos));
         allow delete: if yo(uid) || (logueado() && grupo().creador == request.auth.uid);
       }
 
@@ -60,7 +66,7 @@ service cloud.firestore {
           && request.resource.data.terminada == false && request.resource.data.puntos == 0;
         allow update: if miembro() && resource.data.uid == request.auth.uid && resource.data.terminada == false
           && request.resource.data.uid == resource.data.uid && request.resource.data.fecha == resource.data.fecha
-          && request.resource.data.correctas is int && request.resource.data.correctas <= 100
+          && request.resource.data.correctas is int && request.resource.data.correctas <= 50
           && request.resource.data.puntos <= request.resource.data.correctas * 10 + 10;
         allow delete: if false;
       }

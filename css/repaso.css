@@ -92,3 +92,4 @@
 .rp-aspecto { display: grid; gap: 8px; }
 .rp-aspecto > .rp-op { width: 100%; }
 .rp-aspecto .rp-chips { padding-left: 12px; }
+.rp-compl { margin-top: 10px; }

@@ -48,7 +48,14 @@ const pasaFiltros = (p, f = conf.filtros) =>
   (!f.familias.length || f.familias.includes(grupoDeRegion[p.region]?.familia.nombre)) &&
   (!f.tipos.length || f.tipos.includes(p.tipo)) &&
   (!f.cats.length || (p.categoria || []).some((c) => f.cats.includes(c)));
-const fichasElegidas = () => fichasDelOrigen().filter((p) => pasaFiltros(p));
+// complementarios: con cada enfoque elegido entran las otras proyecciones de rutina de su región (la serie básica del manual)
+function conComplementarios(lista) {
+  if (!conf.complementarios) return lista;
+  const ids = new Set(lista.map((p) => p.id));
+  for (const p of lista) for (const x of proyecciones) if (x.region === p.region && x.tipo === "R") ids.add(x.id);
+  return proyecciones.filter((p) => ids.has(p.id));
+}
+const fichasElegidas = () => conComplementarios(fichasDelOrigen()).filter((p) => pasaFiltros(p));
 function origenActual() {
   if (conf.origen === "sueltos") return { tipo: "sueltos", nombre: "Enfoques elegidos" };
   if (conf.origen === "todas") return { tipo: "todas", nombre: "Todas las fichas" };
@@ -125,7 +132,8 @@ function maximo(fichas, aspectos, excluir) {
 
 function vistaElegir(aviso) {
   validarOrigen();
-  const delOrigen = fichasDelOrigen(), fichas = delOrigen.filter((p) => pasaFiltros(p));
+  const propias = fichasDelOrigen(), delOrigen = conComplementarios(propias), fichas = delOrigen.filter((p) => pasaFiltros(p));
+  const sumados = delOrigen.length - propias.length;
   const max = maximo(fichas, conf.aspectos, conf.excluir);
   const nFiltros = conf.filtros.familias.length + conf.filtros.tipos.length + conf.filtros.cats.length;
   const n = conf.cantidad ? Math.min(conf.cantidad, max) : max;
@@ -144,7 +152,8 @@ function vistaElegir(aviso) {
     ${aviso ? `<div class="vacio">${esc(aviso)}</div>` : ""}
     ${enCurso ? `<a class="rp-seguir" href="#repaso-jugar"><span><b>Seguir el repaso</b><small>Vas por la pregunta ${sesion.actual + 1} de ${sesion.preguntas.length}</small></span>${icono.chev}</a>` : ""}
     <section class="panel"><h2>¿Qué enfoques?</h2><div class="opciones rp-col">${origenes}</div>
-      ${conf.origen === "sueltos" ? selectorSueltos() : ""}</section>
+      ${conf.origen === "sueltos" ? selectorSueltos() : ""}
+      ${conf.origen === "todas" ? "" : `<div class="opciones rp-col rp-compl">${op(!!conf.complementarios, 'data-rp="complementarios"', "Sumar los complementarios", conf.complementarios ? `${sumados ? `Se suman ${sumados} ${sumados === 1 ? "enfoque" : "enfoques"}: ` : ""}las otras proyecciones de rutina de la misma región` : "Con cada enfoque entran las otras proyecciones de rutina de su región (ej. AP + lateral + oblicua)")}</div>`}</section>
     <details class="panel rp-filtros"${nFiltros ? " open" : ""}><summary><h2>Filtrar enfoques</h2><span>${nFiltros ? `${fichas.length} de ${delOrigen.length} enfoques` : "Sin filtros"}</span>${icono.chev}</summary>
       ${filaFiltro("familias", "Región", FAMILIAS.map((x) => [x.nombre, x.nombre]))}
       ${filaFiltro("tipos", "Rutina o especial", TIPOS)}
@@ -215,6 +224,7 @@ function vistaResultado() {
     </section>
     <div class="rp-acciones">
       ${errores.length ? `<button class="rp-empezar" data-rp="errores">Repasar los ${errores.length === 1 ? "error" : `${errores.length} errores`}</button>` : ""}
+      <button class="btn" data-rp="repetir">Repetir esta misma partida</button>
       <button class="btn" data-rp="otra">Otra vez con preguntas nuevas</button>
       ${s.soloErrores ? "" : `<button class="btn" data-rp="compartir">Compartir esta partida</button>`}
       <p class="pie" id="rp-compartido" hidden></p>
@@ -274,6 +284,12 @@ export function iniciarRepaso(app, render) {
         empezar({ ...sesion, soloErrores: true, preguntas: malas.map((q) => ({ ...q })), origen: { ...sesion.origen, nombre: `${sesion.origen?.nombre || "Repaso"} · errores` } });
         render(); return scrollTo(0, 0);
       }
+      // mismas preguntas, mismas opciones y mismo orden (misma semilla), para ver si mejoraste
+      case "repetir":
+        empezar({ fichas: sesion.fichas, aspectos: sesion.aspectos, excluir: sesion.excluir, cantidad: sesion.cantidad, semilla: sesion.semilla, origen: sesion.origen,
+          ...(sesion.soloErrores ? { soloErrores: true, preguntas: sesion.preguntas.map((q) => ({ ...q })) } : {}) });
+        render(); return scrollTo(0, 0);
+      case "complementarios": conf.complementarios = !conf.complementarios; break;
       case "otra":
         empezar({ fichas: sesion.fichas, aspectos: sesion.aspectos, excluir: sesion.excluir, cantidad: sesion.cantidad, origen: sesion.origen }); render(); return scrollTo(0, 0);
       case "compartir": {

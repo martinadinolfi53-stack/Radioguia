@@ -379,3 +379,4 @@ button.sel-fila { width: 100%; text-align: left; padding: 10px 14px; gap: 12px; 
 .casilla { flex: none; width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--mute); display: grid; place-items: center; }
 .sel-fila.on .casilla { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .sel-fila.on { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.portada-hola .portada-foto { display: block; width: 72px; height: 72px; margin: 0 auto 12px; border: 2px solid rgba(255,255,255,.25); }

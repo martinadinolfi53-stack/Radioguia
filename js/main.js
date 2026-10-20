@@ -16,6 +16,8 @@ import { vistaRepaso, iniciarRepaso } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
 import { iniciarGrupos } from "./grupos.js";
 import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificacion } from "./identificacion.js";
+import * as nube from "./nube.js";
+import { vistaFoto } from "./foto.js";
 
 const app = document.getElementById("app");
 aplicarPreferencias();
@@ -60,6 +62,13 @@ function render() {
   if (!identificado()) {
     recordarDestino(location.hash);
     app.innerHTML = vistaIdentificacion();
+    document.title = "RX";
+    return;
+  }
+  // después, la foto de perfil (obligatoria); sin internet no se pide, para no trabar la app
+  const cuenta = nube.estado();
+  if (navigator.onLine && cuenta.listo && cuenta.usuario && cuenta.perfil && !cuenta.perfil.foto) {
+    app.innerHTML = vistaFoto({ titulo: "Tu foto", sub: cuenta.perfil.apodo, listo: render });
     document.title = "RX";
     return;
   }
@@ -194,4 +203,6 @@ iniciarJuegos(app);
 iniciarGrupos(app, render);
 pwa.iniciar(() => { if (["portada", "inicio", "ajustes", "ayuda-app"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
+// cuando llega la cuenta: pedir la foto si falta, o mostrarla en la portada
+nube.alCambiar(() => { const p = nube.estado().perfil; if (identificado() && (ruta().tipo === "portada" || (p && !p.foto))) render(); });
 render();

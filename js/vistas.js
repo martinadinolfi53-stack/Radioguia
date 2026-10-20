@@ -6,6 +6,8 @@ import { panelEdicionAjustes } from "./edicion.js";
 import { pwa } from "./pwa.js";
 import { GRUPOS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
+import * as nube from "./nube.js";
+import { avatar } from "./foto.js";
 
 export const estado = { q: "", qFav: "", filtro: {}, sel: null }; // búsqueda, filtro de categoría por región y selección en Favoritos (Set o null)
 
@@ -44,6 +46,8 @@ const todos = () => true;
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
 const AYUDA_ICONO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>';
 
+const fotoPortada = () => { const p = nube.estado().perfil; return p?.foto ? avatar(p.foto, p.apodo, "portada-foto") : ""; };
+
 export function vistaPortada() {
   return `<main class="portada">
     <div class="portada-barra">
@@ -51,7 +55,7 @@ export function vistaPortada() {
       <h1 class="portada-rx">RX</h1>
       <a class="portada-boton" href="#ajustes" aria-label="Ajustes">${icono.ajustes}<span>Ajustes</span></a>
     </div>
-    <p class="portada-hola">Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
+    <p class="portada-hola">${fotoPortada()}Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
     <div class="portada-ops">
       <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
       <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>

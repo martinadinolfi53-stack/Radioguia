@@ -103,7 +103,7 @@ export function vistaJuegos(h) {
 }
 
 function vistaMenu() {
-  const nv = nivel(), r = racha();
+  const nv = nivel(), r = racha(), deb = debiles();
   const tarjeta = (href, titulo, detalle, extra = "") => href
     ? `<a class="jg-tarjeta" href="${href}"><span><b>${titulo}</b><small>${detalle}</small></span>${extra}${icono.chev}</a>`
     : `<div class="jg-tarjeta pronto" aria-disabled="true"><span><b>${titulo}</b><small>${detalle}</small></span><em>Próximamente</em></div>`;
@@ -111,15 +111,19 @@ function vistaMenu() {
   <main class="wrap juegos">
     <a class="jg-yo" href="#juegos-perfil">
       <span class="jg-nivel">${nv.numero}</span>
-      <span><b>${esc(nv.nombre)}</b><small>${st.xp} de experiencia${r ? ` · ${r} ${r === 1 ? "día" : "días"} seguidos` : ""}</small></span>${icono.chev}
+      <span><b>${esc(nv.nombre)}</b><small>${st.xp} de experiencia${r ? ` · ${r} ${r === 1 ? "día seguido" : "días seguidos"}` : ""}</small></span>${icono.chev}
     </a>
     <div class="jg-lista">
       ${tarjeta("", "Desafío del día", "Las mismas preguntas para todo tu grupo, con 5 vidas. Suma al ranking.")}
       ${tarjeta("#repaso", "Práctica libre", "Todas las veces que quieras, para parciales y exámenes. Suma experiencia y estadísticas.")}
+      ${deb.pilares.length || deb.zonas.length
+        ? `<button class="jg-tarjeta debiles" data-jg="debiles"><span><b>Repasar mis débiles</b><small>${[...deb.pilares, ...deb.zonas].map((x) => esc(x.nombre)).join(" · ")}</small></span>${icono.chev}</button>`
+        : `<div class="jg-tarjeta pronto"><span><b>Repasar mis débiles</b><small>Aparece cuando tengas algunos repasos hechos y algo para reforzar.</small></span></div>`}
       ${tarjeta("", "Grupos", "Creá un grupo e invitá a tus compañeros con un link.")}
       ${tarjeta("", "Ranking", "Semanal e histórico de tu grupo.")}
       ${tarjeta("#juegos-perfil", "Mi perfil", "Tu nivel, medallas, pilares fuertes y para mejorar.")}
     </div>
+    <p class="pie" id="jg-aviso" hidden></p>
     <p class="pie">Desafío, grupos y ranking necesitan una cuenta; se activan cuando estén listos.</p>
   </main>`;
 }

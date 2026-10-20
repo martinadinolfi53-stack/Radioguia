@@ -6,6 +6,9 @@
 .jg-yo small, .jg-tarjeta small { color: var(--mute); font-size: .85em; line-height: 1.35; }
 .jg-yo .chev, .jg-tarjeta .chev { flex: none; color: var(--mute); }
 .jg-lista { display: grid; gap: 10px; }
+button.jg-tarjeta { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.jg-tarjeta.debiles { border-color: var(--warn); }
+.jg-tarjeta.debiles b { color: var(--warn); }
 .jg-tarjeta.pronto { opacity: .6; }
 .jg-tarjeta em { flex: none; font-style: normal; font-size: .75em; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: var(--surface-2); color: var(--mute); border: 1px solid var(--line); }
 

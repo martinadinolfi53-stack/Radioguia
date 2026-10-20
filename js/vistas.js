@@ -40,14 +40,16 @@ function menuRegiones(filtro) {
 }
 const todos = () => true;
 
-// lo primero al entrar: elegir entre las fichas de enfoques (con la calculadora) y los juegos; cada parte vuelve acá con su flecha
+// lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
 export function vistaPortada() {
-  return cabecera({ titulo: "RadioGuía", sub: "Técnicas y proyecciones radiológicas", derecha: `<a class="ico" href="#ajustes" aria-label="Ajustes">${icono.ajustes}</a>` }) + `
-  <main class="wrap portada">
-    <a class="portada-op" href="#enfoques">${icono.libro}<span><b>Enfoques</b><small>Fichas de cada proyección, favoritos y calculadora de técnica</small></span>${icono.chev}</a>
-    <a class="portada-op" href="#juegos">${icono.repaso}<span><b>Juegos</b><small>Práctica libre, desafío del día, grupos, ranking y tu perfil</small></span>${icono.chev}</a>
-    ${pwa.aviso()}
-    <p class="pie">${proyecciones.length} proyecciones · ${regiones.length} regiones · Fuente: ${esc(FUENTE.corto)}</p>
+  return `<main class="portada">
+    <p class="portada-nombre">RadioGuía</p>
+    <p class="portada-ayuda">¿Por dónde empezamos?</p>
+    <div class="portada-ops">
+      <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
+      <a class="portada-op" href="#juegos"><span class="portada-img juegos">${icono.repaso}</span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
+    </div>
+    <div class="portada-pie">${pwa.aviso()}<a href="#ajustes">${icono.ajustes}<span>Ajustes</span></a></div>
   </main>`;
 }
 

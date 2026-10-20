@@ -121,7 +121,7 @@ function vistaElegir(aviso) {
   const ultimos = resultados().slice(0, 5);
   const enCurso = sesion && !sesion.resultado && sesion.respuestas.length < sesion.preguntas.length;
 
-  return cabecera({ titulo: "Repaso", sub: "Multiple choice con tus enfoques", atras: "#" }) + `
+  return cabecera({ titulo: "Repaso", sub: "Multiple choice con tus enfoques", atras: "#juegos" }) + `
   <main class="wrap repaso">
     ${aviso ? `<div class="vacio">${esc(aviso)}</div>` : ""}
     ${enCurso ? `<a class="rp-seguir" href="#repaso-jugar"><span><b>Seguir el repaso</b><small>Vas por la pregunta ${sesion.actual + 1} de ${sesion.preguntas.length}</small></span>${icono.chev}</a>` : ""}

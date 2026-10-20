@@ -2,8 +2,8 @@
 // #  inicio · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #imprimir (lista activa) · #calc · #calc-<proyección> · #ajustes
 import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { listas, preferencias, aplicarPreferencias } from "./almacen.js";
-import { tocarEstrella, hojaLista } from "./listas-ui.js";
-import { vistaImprimir, opcionesImpresion, imprimir } from "./imprimir.js";
+import { tocarEstrella, hojaLista, quitarDeLista } from "./listas-ui.js";
+import { vistaImprimir, opcionesImpresion, preguntarEImprimir } from "./imprimir.js";
 import { estado, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
@@ -76,6 +76,7 @@ addEventListener("resize", altoCabecera);
 addEventListener("hashchange", (e) => {
   const antes = new URL(e.oldURL).hash || "#";
   pantallaAnterior = antes;
+  estado.sel = null;
   if (!antes.startsWith("#p-")) historial.push(antes); else if (!historial.length) historial.push(antes);
   if (historial.length > 30) historial.shift();
   render();
@@ -91,7 +92,7 @@ function refrescarMain() {
 }
 
 app.addEventListener("click", async (e) => {
-  const t = e.target.closest("[data-desconectar],[data-exportar],[data-salir-edicion],[data-restaurar],[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir]");
+  const t = e.target.closest("[data-desconectar],[data-exportar],[data-salir-edicion],[data-restaurar],[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir]");
   if (!t) return;
   if ("exportar" in t.dataset) return edicion.exportar();
   if ("desconectar" in t.dataset) { edicion.configurarGithub(null); return render(); }
@@ -104,10 +105,21 @@ app.addEventListener("click", async (e) => {
   const rehacer = () => { const y = scrollY; render(); scrollTo(0, y); };
   if (t.dataset.fav) { e.preventDefault(); tocarEstrella(t.dataset.fav, rehacer); }
   else if (t.dataset.lista) { listas.elegir(t.dataset.lista); estado.qFav = ""; rehacer(); }
+  else if ("selEntrar" in t.dataset) { estado.sel = new Set(); render(); scrollTo(0, 0); }
+  else if ("selSalir" in t.dataset) { estado.sel = null; render(); scrollTo(0, 0); }
+  else if (t.dataset.sel) { estado.sel.has(t.dataset.sel) ? estado.sel.delete(t.dataset.sel) : estado.sel.add(t.dataset.sel); rehacer(); }
+  else if ("selTodas" in t.dataset) {
+    const ids = listas.activa().ids;
+    estado.sel = estado.sel.size === ids.length ? new Set() : new Set(ids); rehacer();
+  } else if ("selQuitar" in t.dataset) {
+    const n = estado.sel.size, act = listas.activa();
+    if (!n || !confirm(`¿Quitar ${n === 1 ? "1 proyección" : `${n} proyecciones`} de “${act.nombre}”?`)) return;
+    quitarDeLista(act.id, estado.sel); estado.sel = null; render(); scrollTo(0, 0);
+  }
   else if ("listaNueva" in t.dataset) hojaLista(null, rehacer);
   else if (t.dataset.listaEditar) hojaLista(t.dataset.listaEditar, rehacer);
   else if (t.dataset.impOp) { opcionesImpresion[t.dataset.impOp] = !opcionesImpresion[t.dataset.impOp]; rehacer(); }
-  else if ("imprimir" in t.dataset) imprimir(app); else if (t.dataset.term) mostrarTermino(t.dataset.term);
+  else if ("imprimir" in t.dataset) preguntarEImprimir(app, rehacer); else if (t.dataset.term) mostrarTermino(t.dataset.term);
   else if (t.dataset.ampliar) ampliar(t.dataset.ampliar, t.dataset.alt);
   else if (t.dataset.filtro) { estado.filtro[t.dataset.filtro] = t.dataset.cat || undefined; const y = scrollY; render(); scrollTo(0, y); }
   else if (t.dataset.borrar) {

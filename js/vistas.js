@@ -6,7 +6,7 @@ import { panelEdicionAjustes } from "./edicion.js";
 import { pwa } from "./pwa.js";
 import { GRUPOS } from "./menu.js";
 
-export const estado = { q: "", qFav: "", filtro: {} }; // texto de búsqueda y filtro de categoría por región
+export const estado = { q: "", qFav: "", filtro: {}, sel: null }; // búsqueda, filtro de categoría por región y selección en Favoritos (Set o null)
 
 const filaProyeccion = (p, conRegion) => `<div class="row">
   <a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span>
@@ -99,24 +99,43 @@ export function vistaGrupo(g, soloFav) {
   </main>`;
 }
 
-// lista activa de favoritos: selector de listas arriba, acciones (editar, nueva, imprimir) y el menú filtrado
+// modo seleccionar de Favoritos: las proyecciones de la lista con casillas, para quitar varias juntas
+function seleccionLista(favs) {
+  const sel = estado.sel, n = sel.size, todas = n === favs.length;
+  const porRegion = regiones.map((r) => [r, favs.filter((p) => p.region === r.id)]).filter(([, l]) => l.length);
+  return `<div class="sel-barra">
+      <button class="btn-sec" data-sel-todas>${todas ? "Quitar la selección" : "Seleccionar todas"}</button>
+      <button class="btn-sec peligro" data-sel-quitar ${n ? "" : "disabled"}>Quitar de la lista${n ? ` (${n})` : ""}</button>
+      <button class="btn-sec" data-sel-salir>Listo</button>
+    </div>
+    ${porRegion.map(([r, l]) => `<section class="parte"><h2 class="sub"><span>${esc(r.nombre)}</span>${r.detalle ? `<small>${esc(r.detalle)}</small>` : ""}</h2>
+      <div class="lista">${l.map((p) => `<button class="row sel-fila${sel.has(p.id) ? " on" : ""}" data-sel="${esc(p.id)}" aria-pressed="${sel.has(p.id)}">
+        <span class="casilla" aria-hidden="true">${sel.has(p.id) ? icono.tilde : ""}</span>
+        <span class="sel-txt"><span class="t">${esc(p.nombre)}</span><span class="s">${esc([...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "))}</span></span></button>`).join("")}</div></section>`).join("")}`;
+}
+
+// lista activa de favoritos: selector de listas arriba, acciones (editar, nueva, seleccionar, imprimir) y el menú filtrado
 export function vistaFavoritos() {
   const act = listas.activa(), todas = listas.todas();
   const favs = proyecciones.filter((p) => act.ids.includes(p.id));
+  if (estado.sel) for (const id of estado.sel) if (!act.ids.includes(id)) estado.sel.delete(id);
+  if (estado.sel && !favs.length) estado.sel = null;
   const q = estado.qFav.trim();
   let cuerpo;
   if (!favs.length) cuerpo = `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
+  else if (estado.sel) cuerpo = seleccionLista(favs);
   else if (q) cuerpo = resultados(favs, q);
   else cuerpo = menuRegiones((p) => act.ids.includes(p.id));
-  const selector = `<div class="lst-selector" role="group" aria-label="Listas de favoritos">${todas.map((l) =>
+  const selector = estado.sel ? "" : `<div class="lst-selector" role="group" aria-label="Listas de favoritos">${todas.map((l) =>
       `<button class="lst-chip${l.id === act.id ? " on" : ""}" data-lista="${esc(l.id)}" aria-pressed="${l.id === act.id}" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}<span>${esc(l.nombre)}</span><b>${l.ids.length}</b></button>`).join("")}
     <button class="lst-chip nueva" data-lista-nueva>${icono.mas}<span>Nueva lista</span></button></div>
     <div class="lst-acciones">
       <button class="btn-sec" data-lista-editar="${esc(act.id)}">${icono.lapiz}<span>Nombre y color</span></button>
-      ${favs.length ? `<a class="btn-sec" href="#imprimir">${icono.imprimir}<span>Imprimir o PDF</span></a>` : ""}
+      ${favs.length ? `<button class="btn-sec" data-sel-entrar>${icono.tilde}<span>Seleccionar</span></button>
+      <a class="btn-sec" href="#imprimir">${icono.imprimir}<span>Imprimir o PDF</span></a>` : ""}
     </div>`;
-  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: `${todas.length > 1 ? "Favoritos · " : ""}${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#" }) +
-    (favs.length ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
+  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#" }) +
+    (favs.length && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
     `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>`;
 }
 

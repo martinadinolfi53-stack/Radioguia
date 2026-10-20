@@ -2,7 +2,7 @@
 // impresión del navegador (desde ahí se guarda como PDF). Funciona sin conexión: no usa ninguna biblioteca externa.
 import { regionPorId, proyecciones, FUENTE } from "./datos.js";
 import { listas } from "./almacen.js";
-import { esc, icono, cabecera } from "./util.js";
+import { esc, icono, cabecera, abrirHoja } from "./util.js";
 import { FACTORES_FICHA, RC_ETIQUETA } from "./ficha.js";
 
 export const opcionesImpresion = { ilustraciones: true, criterios: true };
@@ -43,7 +43,7 @@ export function vistaImprimir() {
   <main class="wrap imprimir">
     <section class="panel imp-opciones">
       <h2>Incluir</h2>
-      <div class="opciones">${op("ilustraciones", "Ilustraciones")}${op("criterios", "Criterios de evaluación")}</div>
+      <div class="opciones">${op("criterios", "Criterios de evaluación")}</div>
       <button class="btn pri" data-imprimir ${fichas.length ? "" : "disabled"}>${icono.imprimir}<span>Imprimir o guardar PDF</span></button>
       <p class="ayuda">Se abre el menú de impresión. Para tener el PDF, en el iPad tocá el botón Compartir de la vista previa y elegí Guardar en Archivos; en la computadora elegí «Guardar como PDF» como impresora.</p>
     </section>
@@ -51,8 +51,21 @@ export function vistaImprimir() {
   </main>`;
 }
 
+// antes de imprimir pregunta si van las ilustraciones
+export function preguntarEImprimir(raiz, rehacer) {
+  const { panel, cerrar } = abrirHoja("¿Incluir las ilustraciones?", `<div class="lst-elegir">
+    <button class="lst-fila" data-imp-ilus="si">${icono.imagenChica}<span class="t">Con ilustraciones<small>Más hojas, con los esquemas de cada ficha</small></span></button>
+    <button class="lst-fila" data-imp-ilus="no">${icono.imprimir}<span class="t">Sin ilustraciones<small>Solo el texto, ocupa menos hojas</small></span></button></div>`);
+  panel.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-imp-ilus]");
+    if (!t) return;
+    opcionesImpresion.ilustraciones = t.dataset.impIlus === "si";
+    cerrar(); rehacer(); imprimir(raiz);
+  });
+}
+
 // espera a que carguen las ilustraciones para que no salgan hojas en blanco
-export async function imprimir(raiz) {
+async function imprimir(raiz) {
   await Promise.all([...raiz.querySelectorAll(".imp-hojas img")].map((img) => (img.complete ? null : img.decode().catch(() => {}))));
   print();
 }

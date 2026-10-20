@@ -17,6 +17,7 @@ export const ASPECTOS = [
 export const CAMPOS = [
   { id: "esquema", aspecto: "general", nombre: "Esquema → proyección" },
   { id: "rc-a-proyeccion", aspecto: "general", nombre: "Rayo central → proyección" },
+  { id: "serie", aspecto: "general", nombre: "Series de rutina poco comunes" },
   { id: "ri", aspecto: "factores", nombre: "Tamaño del RI" },
   { id: "dfri", aspecto: "factores", nombre: "DFRI" },
   { id: "parrilla", aspecto: "factores", nombre: "Parrilla (Bucky)" },
@@ -126,7 +127,7 @@ const FACTORES = [
 // fichas: proyecciones a repasar · todas: todas las proyecciones (de ahí salen los distractores)
 // zonaDe(regionId) → [botón del menú, familia], para buscar distractores primero en la misma zona (más difíciles de descartar)
 // excluir: ids de CAMPOS que no se preguntan
-export function generarPreguntas({ fichas, todas, zonaDe = () => ["", ""], aspectos, excluir = [], cantidad, semilla }) {
+export function generarPreguntas({ fichas, todas, zonaDe = () => ["", ""], regionNombre = (id) => id.replace(/-/g, " "), aspectos, excluir = [], cantidad, semilla }) {
   const r = azar(`${semilla}|${fichas.map((p) => p.id).join(",")}|${[...aspectos].sort().join(",")}|${cantidad}${excluir.length ? `|-${[...excluir].sort().join(",")}` : ""}`);
   const fuera = new Set(excluir);
   const elegidas = new Set(fichas.map((p) => p.id));
@@ -213,6 +214,21 @@ export function generarPreguntas({ fichas, todas, zonaDe = () => ["", ""], aspec
       if (t) {
         const pool = vecinas.filter((x) => nombreOk(x) && x.rc?.texto && DISTINTO.texto(t, x.rc.texto)).map((x) => x.nombre);
         lista.push(armar(p, "general", "rc-a-proyeccion", "¿En qué proyección el rayo central es así?", n, juntar(n, pool, () => true), { dato: "Proyección", cita: t }));
+      }
+    }
+    // serie de rutina: solo las que no son el clásico frente + perfil (tienen oblicua, axial o un método especial)
+    if (aspectos.includes("general") && p.tipo === "R") {
+      const serie = todas.filter((x) => x.region === p.region && x.tipo === "R");
+      const rara = serie.length > 1;
+      // la respuesta es siempre una de las poco comunes: «AP → lateral» sería obvia
+      const comun = (x) => (x.categoria || []).every((c) => ["AP", "PA", "Perfil"].includes(c));
+      const otras = mezclar(serie.filter((x) => x.id !== p.id && !comun(x)), r);
+      if (rara && otras.length) {
+        const [g] = zonaDe(p.region);
+        const ok = (x) => x.tipo !== "R" && !serie.includes(x) && norm(x.nombre) !== norm(otras[0].nombre);
+        // distractores: proyecciones especiales de la misma región y, si faltan, de la misma zona del menú
+        const pool = [...mezclar(todas.filter((x) => x.region === p.region && ok(x)), r), ...mezclar(todas.filter((x) => x.region !== p.region && zonaDe(x.region)[0] === g && ok(x)), r)].map((x) => x.nombre);
+        lista.push(armar(p, "general", "serie", `Rutina de ${regionNombre(p.region).toLowerCase()}: ya tenés «${n}». ¿Qué otra proyección es parte de esa rutina?`, otras[0].nombre, juntar(otras[0].nombre, pool, () => true), { dato: "Serie de rutina", conNombre: false }));
       }
     }
     candidatas.push(mezclar(lista.filter(Boolean), r));

@@ -264,7 +264,8 @@ a.row.reg .chev { grid-row: 1 / 3; grid-column: 2; align-self: center; color: va
 .portada-boton { display: inline-flex; align-items: center; justify-self: start; gap: 6px; min-height: 44px; padding: 0 12px; border: 1px solid #263142; border-radius: 999px; color: #c9d3df; font-size: .85em; }
 .portada-boton svg { flex: none; }
 @media (max-width: 420px) { .portada-boton span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } .portada-boton { padding: 0 11px; } }
-.portada-hola { margin: 10px 0 18px; font-size: 1.15em; color: #e7edf5; overflow-wrap: anywhere; }
+.portada-hola { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 10px 0 18px; font-size: 1.15em; color: #e7edf5; overflow-wrap: anywhere; text-align: left; }
+.portada-hola p { margin: 0; min-width: 0; }
 /* identificación al entrar */
 .ident-form { display: grid; gap: 6px; width: min(100%, 380px); text-align: left; }
 .ident-form label { font-weight: 600; }
@@ -379,3 +380,4 @@ button.sel-fila { width: 100%; text-align: left; padding: 10px 14px; gap: 12px; 
 .casilla { flex: none; width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--mute); display: grid; place-items: center; }
 .sel-fila.on .casilla { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .sel-fila.on { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.portada .portada-hola .ft-av { width: 52px; height: 52px; font-size: 1.3em; box-shadow: 0 0 0 2px #1d3a55; }

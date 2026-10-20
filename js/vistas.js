@@ -5,7 +5,7 @@ import { esc, icono, cabecera, botonFav } from "./util.js";
 import { panelEdicionAjustes } from "./edicion.js";
 import { pwa } from "./pwa.js";
 import { GRUPOS } from "./menu.js";
-import { nombre as nombreUsuario } from "./identificacion.js";
+import { nombre as nombreUsuario, avatarUsuario } from "./identificacion.js";
 
 export const estado = { q: "", qFav: "", filtro: {}, sel: null }; // búsqueda, filtro de categoría por región y selección en Favoritos (Set o null)
 
@@ -51,7 +51,7 @@ export function vistaPortada() {
       <h1 class="portada-rx">RX</h1>
       <a class="portada-boton" href="#ajustes" aria-label="Ajustes">${icono.ajustes}<span>Ajustes</span></a>
     </div>
-    <p class="portada-hola">Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
+    <div class="portada-hola">${avatarUsuario()}<p>Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p></div>
     <div class="portada-ops">
       <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
       <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>

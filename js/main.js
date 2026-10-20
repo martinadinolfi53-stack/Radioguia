@@ -15,7 +15,7 @@ import { grupoPorId, grupoDeRegion } from "./menu.js";
 import { vistaRepaso, iniciarRepaso } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
 import { iniciarGrupos } from "./grupos.js";
-import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificacion } from "./identificacion.js";
+import { identificado, necesitaFoto, vistaPasoFoto, recordarDestino, vistaIdentificacion, iniciarIdentificacion } from "./identificacion.js";
 
 const app = document.getElementById("app");
 aplicarPreferencias();
@@ -60,6 +60,11 @@ function render() {
   if (!identificado()) {
     recordarDestino(location.hash);
     app.innerHTML = vistaIdentificacion();
+    document.title = "RX";
+    return;
+  }
+  if (necesitaFoto() && !location.hash.startsWith("#juegos-foto")) {
+    app.innerHTML = vistaPasoFoto(render);
     document.title = "RX";
     return;
   }

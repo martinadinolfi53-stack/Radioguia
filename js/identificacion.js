@@ -2,16 +2,26 @@
 // El nombre también se guarda en este dispositivo, así la app abre directo y funciona sin internet.
 import * as nube from "./nube.js";
 import { esc } from "./util.js";
+import { vistaFoto, avatar } from "./foto.js";
 
 const CLAVE = "radioguia.nombre";
 const DESTINO = "radioguia.destino";
 const leer = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 const escribir = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
 
-let error = "", ocupado = false;
+let error = "", ocupado = false, visto = "";
 
 export const nombre = () => leer(CLAVE) || "";
 export const identificado = () => !!nombre();
+
+// la foto de perfil es obligatoria (hilo de cuentas): se pide después de identificarse, solo si hay conexión
+// y la cuenta ya cargó, así sin internet la app abre igual
+export function necesitaFoto() {
+  const { listo, usuario, perfil } = nube.estado();
+  return navigator.onLine !== false && listo && !!usuario && !!perfil && !perfil.foto;
+}
+export const vistaPasoFoto = (render) => vistaFoto({ titulo: "Tu foto", sub: `Hola ${nombre()}, falta un paso`, listo: render });
+export const avatarUsuario = () => avatar(nube.estado().perfil?.foto, nombre(), "grande");
 
 // adónde iba la persona antes de identificarse (por ejemplo, el link de un grupo)
 export function recordarDestino(h) { if (h && h !== "#") escribir(DESTINO, h); }
@@ -21,10 +31,10 @@ export function iniciarIdentificacion(app, render) {
   nube.alCambiar(() => {
     const { listo, usuario, perfil } = nube.estado();
     if (!listo) return;
-    const antes = nombre();
     if (usuario && perfil?.apodo) escribir(CLAVE, perfil.apodo);
     else if (!usuario) escribir(CLAVE, null);
-    if (antes !== nombre()) render();
+    const ahora = `${nombre()}|${!!usuario}|${!!perfil}|${perfil?.foto || ""}`;
+    if (ahora !== visto) { visto = ahora; render(); }
   });
   if (identificado()) nube.iniciar().catch(() => {});
 

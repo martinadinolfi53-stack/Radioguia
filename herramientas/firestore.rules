@@ -6,6 +6,8 @@ service cloud.firestore {
     function logueado() { return request.auth != null; }
     function yo(uid) { return logueado() && request.auth.uid == uid; }
     function texto(s, max) { return s is string && s.size() > 0 && s.size() <= max; }
+    // foto de perfil: JPEG chico como data URL (la app la guarda de 160 px, unos 10 KB)
+    function fotoOk(d) { return !('foto' in d) || d.foto == '' || (d.foto is string && d.foto.size() <= 60000 && d.foto.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+')); }
 
     // dificultad del desafío del día: solo se cambia desde la consola
     match /config/{doc} {
@@ -16,7 +18,7 @@ service cloud.firestore {
     match /usuarios/{uid} {
       allow read: if logueado();
       allow create, update: if yo(uid)
-        && (!('apodo' in request.resource.data) || texto(request.resource.data.apodo, 24))
+        && (!('apodo' in request.resource.data) || texto(request.resource.data.apodo, 24)) && fotoOk(request.resource.data)
         && (!('grupos' in request.resource.data) || (request.resource.data.grupos is list && request.resource.data.grupos.size() <= 30));
       allow delete: if false;
     }
@@ -48,10 +50,10 @@ service cloud.firestore {
 
       match /miembros/{uid} {
         allow read: if miembro() || yo(uid);
-        allow create: if yo(uid) && request.resource.data.uid == uid && request.resource.data.puntos == 0 && request.resource.data.partidas == 0;
+        allow create: if yo(uid) && request.resource.data.uid == uid && request.resource.data.puntos == 0 && request.resource.data.partidas == 0 && fotoOk(request.resource.data);
         // los puntos solo suben de a una partida por vez (10 por acierto, hasta 100 preguntas, más el bonus de racha)
-        // cambiar el apodo, o sumar exactamente los puntos de la partida de hoy en el mismo momento en que se cierra
-        allow update: if yo(uid) && request.resource.data.uid == uid && texto(request.resource.data.apodo, 24)
+        // cambiar el apodo o la foto, o sumar exactamente los puntos de la partida de hoy en el mismo momento en que se cierra
+        allow update: if yo(uid) && request.resource.data.uid == uid && texto(request.resource.data.apodo, 24) && fotoOk(request.resource.data)
           && ((request.resource.data.puntos == resource.data.puntos && request.resource.data.partidas == resource.data.partidas)
             || (request.resource.data.partidas == resource.data.partidas + 1 && cierraPartida(uid, request.resource.data.ultimaFecha)
               && request.resource.data.puntos == resource.data.puntos + getAfter(/databases/$(base)/documents/grupos/$(gid)/partidas/$(request.resource.data.ultimaFecha + '_' + uid)).data.puntos));

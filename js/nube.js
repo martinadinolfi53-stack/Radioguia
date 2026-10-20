@@ -4,10 +4,10 @@
 //
 // Firestore (reglas en herramientas/firestore.rules):
 //   config/desafio                         { preguntas, vidas }  lo cambia Martin desde la consola para ajustar la dificultad
-//   usuarios/{uid}                         { apodo, grupos: [gid] }
+//   usuarios/{uid}                         { apodo, foto, grupos: [gid] }   foto: JPEG cuadrado chico como data URL
 //   codigos/{CODIGO}                       { gid, creador }  para unirse escribiendo el código del grupo
 //   grupos/{gid}                           { nombre, codigo, creador, creado, fichas, aspectos, excluir, origen }
-//   grupos/{gid}/miembros/{uid}            { uid, apodo, puntos, partidas, racha, ultimaFecha }  acumulado para el ranking histórico
+//   grupos/{gid}/miembros/{uid}            { uid, apodo, foto, puntos, partidas, racha, ultimaFecha }  acumulado para el ranking histórico
 //   grupos/{gid}/partidas/{fecha}_{uid}    { uid, apodo, fecha, semana, correctas, respondidas, vidas, sinVidas, puntos, bonus, duracionMs, terminada, detalle }
 import { firebaseConfig } from "../config/firebase.js";
 
@@ -75,6 +75,16 @@ export async function guardarApodo(apodo) {
   avisar();
 }
 
+// la foto de perfil es obligatoria; va en el perfil y en cada grupo, como el apodo, para mostrarla en el ranking
+export async function guardarFoto(foto) {
+  if (!/^data:image\/jpeg;base64,/.test(foto || "")) throw new Error("Elegí una foto.");
+  const uid = auth.currentUser.uid;
+  await fb.setDoc(fb.doc(db, "usuarios", uid), { foto }, { merge: true });
+  perfil = { ...(perfil || {}), foto };
+  await Promise.all((perfil.grupos || []).map((g) => fb.updateDoc(fb.doc(db, "grupos", g, "miembros", uid), { foto }).catch(() => {})));
+  avisar();
+}
+
 // ---------- grupos ----------
 const LETRAS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sin O/0 ni I/1, que se confunden
 const nuevoCodigo = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => LETRAS[b % LETRAS.length]).join("");
@@ -129,7 +139,7 @@ export async function unirse(gid) {
   await iniciar();
   const uid = auth.currentUser.uid;
   const m = fb.doc(db, "grupos", gid, "miembros", uid);
-  if (!(await fb.getDoc(m)).exists()) await fb.setDoc(m, { uid, apodo: perfil?.apodo || "Jugador", puntos: 0, partidas: 0, racha: 0, ultimaFecha: "" });
+  if (!(await fb.getDoc(m)).exists()) await fb.setDoc(m, { uid, apodo: perfil?.apodo || "Jugador", foto: perfil?.foto || "", puntos: 0, partidas: 0, racha: 0, ultimaFecha: "" });
   await fb.setDoc(fb.doc(db, "usuarios", uid), { grupos: fb.arrayUnion(gid) }, { merge: true });
   perfil = { ...(perfil || {}), grupos: [...new Set([...(perfil?.grupos || []), gid])] };
   avisar();
@@ -201,7 +211,7 @@ export async function terminarPartida(gid, { correctas, respondidas, vidas, sinV
     const bonus = correctas ? Math.min((racha - 1) * DESAFIO.bonusPorDia, DESAFIO.bonusMax) : 0;
     const puntos = correctas * DESAFIO.puntosPorAcierto + bonus;
     t.update(refPartida(gid), { correctas, respondidas, vidas, sinVidas, duracionMs, puntos, bonus, detalle, terminada: true });
-    t.set(mRef, { uid, apodo: perfil?.apodo || "Jugador", puntos: (m.puntos || 0) + puntos, partidas: (m.partidas || 0) + 1, racha, ultimaFecha: hoy() }, { merge: true });
+    t.set(mRef, { uid, apodo: perfil?.apodo || "Jugador", foto: perfil?.foto || "", puntos: (m.puntos || 0) + puntos, partidas: (m.partidas || 0) + 1, racha, ultimaFecha: hoy() }, { merge: true });
     return { puntos, bonus, racha };
   });
 }

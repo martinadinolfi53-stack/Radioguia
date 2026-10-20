@@ -1,4 +1,5 @@
 // Modo repaso: multiple choice sobre los enfoques de una lista de favoritos o elegidos sueltos.
+// Se entra desde Juegos (#juegos; sin esa sección, la ruta cae en el inicio).
 // Rutas: #repaso (elegir) · #repaso-l-<lista> (elegir, con esa lista) · #repaso-jugar · #repaso-partida-<código> (partida compartida)
 // Las preguntas salen de js/repaso-preguntas.js. Los resultados se guardan en este dispositivo con un formato pensado
 // para mandarlos después a un ranking de grupo (ver guardarResultado).
@@ -121,7 +122,7 @@ function vistaElegir(aviso) {
   const ultimos = resultados().slice(0, 5);
   const enCurso = sesion && !sesion.resultado && sesion.respuestas.length < sesion.preguntas.length;
 
-  return cabecera({ titulo: "Repaso", sub: "Multiple choice con tus enfoques", atras: "#" }) + `
+  return cabecera({ titulo: "Repaso", sub: "Multiple choice con tus enfoques", atras: "#juegos" }) + `
   <main class="wrap repaso">
     ${aviso ? `<div class="vacio">${esc(aviso)}</div>` : ""}
     ${enCurso ? `<a class="rp-seguir" href="#repaso-jugar"><span><b>Seguir el repaso</b><small>Vas por la pregunta ${sesion.actual + 1} de ${sesion.preguntas.length}</small></span>${icono.chev}</a>` : ""}

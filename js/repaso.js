@@ -1,12 +1,13 @@
 // Modo repaso: multiple choice sobre los enfoques de una lista de favoritos o elegidos sueltos.
+// Se entra desde Juegos (#juegos; sin esa sección, la ruta cae en el inicio).
 // Rutas: #repaso (elegir) · #repaso-l-<lista> (elegir, con esa lista) · #repaso-jugar · #repaso-partida-<código> (partida compartida)
 // Las preguntas salen de js/repaso-preguntas.js. Los resultados se guardan en este dispositivo con un formato pensado
 // para mandarlos después a un ranking de grupo (ver guardarResultado).
-import { proyecciones, proyeccionPorId, regionPorId } from "./datos.js";
+import { proyecciones, proyeccionPorId, regionPorId, CATEGORIAS } from "./datos.js";
 import * as almacen from "./almacen.js";
 import { esc, icono, cabecera } from "./util.js";
 import { GRUPOS, grupoDeRegion } from "./menu.js";
-import { ASPECTOS, generarPreguntas } from "./repaso-preguntas.js";
+import { ASPECTOS, CAMPOS, generarPreguntas } from "./repaso-preguntas.js";
 
 const K_RES = "radioguia.repaso.resultados", K_SUELTOS = "radioguia.repaso.sueltos", K_CONF = "radioguia.repaso.config", K_SESION = "radioguia.repaso.sesion";
 const leer = (st, k, def) => { try { const v = st.getItem(k); return v == null ? def : JSON.parse(v); } catch { return def; } };
@@ -25,26 +26,38 @@ function listas() {
   return [{ id: "favoritos", nombre: "Favoritos", ids }];
 }
 
-// cantidad 0 = todas las que se puedan armar
-const conf = { origen: "lista:favoritos", aspectos: ASPECTOS.map((a) => a.id), cantidad: 10, ...leer(local, K_CONF, {}) };
+const FAMILIAS = [...new Map(GRUPOS.map((g) => [g.familia.nombre, g.familia])).values()];
+const TIPOS = [["R", "Rutina"], ["E", "Especial"]];
+
+// cantidad 0 = todas las que se puedan armar · excluir: tipos de pregunta apagados (CAMPOS)
+// filtros: se aplican sobre los enfoques elegidos; una lista vacía = sin filtro
+const conf = { origen: "lista:favoritos", aspectos: ASPECTOS.map((a) => a.id), excluir: [], cantidad: 10, ...leer(local, K_CONF, {}) };
+conf.filtros = { familias: [], tipos: [], cats: [], ...conf.filtros };
 let sueltos = new Set(leer(local, K_SUELTOS, []));
 let sesion = leer(sesionSt, K_SESION, null);
 const guardarConf = () => escribir(local, K_CONF, conf);
 const guardarSesion = () => escribir(sesionSt, K_SESION, sesion);
 
-function fichasElegidas() {
+function fichasDelOrigen() {
+  if (conf.origen === "todas") return proyecciones;
   const ids = conf.origen === "sueltos" ? [...sueltos] : listas().find((l) => `lista:${l.id}` === conf.origen)?.ids || [];
   // en el orden del manual
   return proyecciones.filter((p) => ids.includes(p.id));
 }
+const pasaFiltros = (p, f = conf.filtros) =>
+  (!f.familias.length || f.familias.includes(grupoDeRegion[p.region]?.familia.nombre)) &&
+  (!f.tipos.length || f.tipos.includes(p.tipo)) &&
+  (!f.cats.length || (p.categoria || []).some((c) => f.cats.includes(c)));
+const fichasElegidas = () => fichasDelOrigen().filter((p) => pasaFiltros(p));
 function origenActual() {
   if (conf.origen === "sueltos") return { tipo: "sueltos", nombre: "Enfoques elegidos" };
+  if (conf.origen === "todas") return { tipo: "todas", nombre: "Todas las fichas" };
   const l = listas().find((x) => `lista:${x.id}` === conf.origen) || listas()[0];
   return l.id === "favoritos" ? { tipo: "favoritos", nombre: l.nombre } : { tipo: "lista", id: l.id, nombre: l.nombre };
 }
 // si la lista guardada ya no existe, vuelve a la primera
 function validarOrigen() {
-  if (conf.origen === "sueltos") return;
+  if (conf.origen === "sueltos" || conf.origen === "todas") return;
   const ls = listas();
   if (!ls.some((l) => `lista:${l.id}` === conf.origen)) conf.origen = `lista:${ls[0].id}`;
 }
@@ -52,13 +65,13 @@ function validarOrigen() {
 export function resultados() { return leer(local, K_RES, []); }
 
 // formato de resultado (v1), pensado para un ranking de grupo:
-// { v, id, fecha, semilla, fichas, aspectos, preguntas, correctas, puntaje, duracionMs, origen: {tipo, id?, nombre}, soloErrores, detalle: [{ficha, aspecto, campo, ok}] }
-// con semilla + fichas + aspectos + preguntas cualquiera vuelve a generar exactamente las mismas preguntas.
+// { v, id, fecha, semilla, fichas, aspectos, excluir, preguntas, correctas, puntaje, duracionMs, origen: {tipo, id?, nombre}, soloErrores, detalle: [{ficha, aspecto, campo, ok}] }
+// con semilla + fichas + aspectos + excluir + preguntas cualquiera vuelve a generar exactamente las mismas preguntas.
 function guardarResultado(s) {
   const correctas = s.respuestas.filter((r, i) => r === s.preguntas[i].correcta).length;
   const res = {
     v: 1, id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`, fecha: new Date().toISOString(),
-    semilla: s.semilla, fichas: s.fichas, aspectos: s.aspectos, preguntas: s.preguntas.length, correctas, puntaje: correctas * 100,
+    semilla: s.semilla, fichas: s.fichas, aspectos: s.aspectos, excluir: s.excluir || [], preguntas: s.preguntas.length, correctas, puntaje: correctas * 100,
     duracionMs: Math.max(0, (s.fin || Date.now()) - s.inicio), origen: s.origen, soloErrores: !!s.soloErrores,
     detalle: s.preguntas.map((q, i) => ({ ficha: q.ficha, aspecto: q.aspecto, campo: q.campo, ok: s.respuestas[i] === q.correcta })),
   };
@@ -68,18 +81,18 @@ function guardarResultado(s) {
   return res;
 }
 
-function empezar({ fichas, aspectos, cantidad, semilla = Math.random().toString(36).slice(2, 10), origen, preguntas, soloErrores = false }) {
+function empezar({ fichas, aspectos, excluir = [], cantidad, semilla = Math.random().toString(36).slice(2, 10), origen, preguntas, soloErrores = false }) {
   const lista = fichas.map((id) => proyeccionPorId[id]).filter(Boolean);
-  preguntas ||= generarPreguntas({ fichas: lista, todas: proyecciones, zonaDe, aspectos, cantidad: cantidad || Infinity, semilla });
+  preguntas ||= generarPreguntas({ fichas: lista, todas: proyecciones, zonaDe, aspectos, excluir, cantidad: cantidad || Infinity, semilla });
   if (!preguntas.length) return false;
-  sesion = { semilla, fichas: lista.map((p) => p.id), aspectos, cantidad, origen, soloErrores, preguntas, respuestas: [], actual: 0, inicio: Date.now(), fin: null, resultado: null };
+  sesion = { semilla, fichas: lista.map((p) => p.id), aspectos, excluir, cantidad, origen, soloErrores, preguntas, respuestas: [], actual: 0, inicio: Date.now(), fin: null, resultado: null };
   guardarSesion();
   return true;
 }
 
 // para otras pantallas (ej. estadísticas): arranca un repaso con esas fichas y va a la pregunta 1. Devuelve false si no hay preguntas.
-export function empezarRepaso({ fichas, aspectos = ASPECTOS.map((a) => a.id), cantidad = 10, origen = { tipo: "otro", nombre: "Repaso" } }) {
-  const ok = empezar({ fichas, aspectos, cantidad, origen });
+export function empezarRepaso({ fichas, aspectos = ASPECTOS.map((a) => a.id), excluir = [], cantidad = 10, origen = { tipo: "otro", nombre: "Repaso" } }) {
+  const ok = empezar({ fichas, aspectos, excluir, cantidad, origen });
   if (ok) location.hash = "#repaso-jugar";
   return ok;
 }
@@ -87,13 +100,13 @@ export function empezarRepaso({ fichas, aspectos = ASPECTOS.map((a) => a.id), ca
 // partida compartida: la configuración en el link, para que todos respondan las mismas preguntas
 const codificar = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const decodificar = (c) => { try { return JSON.parse(decodeURIComponent(escape(atob(c.replace(/-/g, "+").replace(/_/g, "/"))))); } catch { return null; } };
-const linkPartida = (s) => `${location.origin}${location.pathname}#repaso-partida-${codificar({ s: s.semilla, f: s.fichas, a: s.aspectos, n: s.cantidad })}`;
+const linkPartida = (s) => `${location.origin}${location.pathname}#repaso-partida-${codificar({ s: s.semilla, f: s.fichas, a: s.aspectos, n: s.cantidad, ...(s.excluir?.length ? { x: s.excluir } : {}) })}`;
 
 // ---------- pantallas ----------
 export function vistaRepaso(h) {
   if (h.startsWith("#repaso-partida-")) {
     const c = decodificar(h.slice(16));
-    const ok = c && Array.isArray(c.f) && empezar({ fichas: c.f, aspectos: c.a || [], cantidad: +c.n || 0, semilla: String(c.s), origen: { tipo: "partida", nombre: "Partida compartida" } });
+    const ok = c && Array.isArray(c.f) && empezar({ fichas: c.f, aspectos: c.a || [], excluir: Array.isArray(c.x) ? c.x : [], cantidad: +c.n || 0, semilla: String(c.s), origen: { tipo: "partida", nombre: "Partida compartida" } });
     history.replaceState(null, "", ok ? "#repaso-jugar" : "#repaso");
     if (!ok) return vistaElegir("El link de la partida no es válido o no tiene preguntas.");
   }
@@ -104,19 +117,24 @@ export function vistaRepaso(h) {
 
 // cuántas preguntas se pueden armar (se recuerda, porque con muchas fichas tarda)
 let memo = {};
-function maximo(fichas, aspectos) {
+function maximo(fichas, aspectos, excluir) {
   if (!fichas.length) return 0;
-  const k = fichas.map((p) => p.id).join(",") + "|" + aspectos.join(",");
-  return (memo = memo.k === k ? memo : { k, n: generarPreguntas({ fichas, todas: proyecciones, zonaDe, aspectos, cantidad: Infinity, semilla: "x" }).length }).n;
+  const k = fichas.map((p) => p.id).join(",") + "|" + aspectos.join(",") + "|" + excluir.join(",");
+  return (memo = memo.k === k ? memo : { k, n: generarPreguntas({ fichas, todas: proyecciones, zonaDe, aspectos, excluir, cantidad: Infinity, semilla: "x" }).length }).n;
 }
 
 function vistaElegir(aviso) {
   validarOrigen();
-  const fichas = fichasElegidas();
-  const max = maximo(fichas, conf.aspectos);
+  const delOrigen = fichasDelOrigen(), fichas = delOrigen.filter((p) => pasaFiltros(p));
+  const max = maximo(fichas, conf.aspectos, conf.excluir);
+  const nFiltros = conf.filtros.familias.length + conf.filtros.tipos.length + conf.filtros.cats.length;
   const n = conf.cantidad ? Math.min(conf.cantidad, max) : max;
   const op = (on, attrs, txt, det = "") => `<button class="opcion rp-op${on ? " on" : ""}" ${attrs} aria-pressed="${on}"><span>${txt}</span>${det ? `<small>${det}</small>` : ""}</button>`;
-  const origenes = [...listas().map((l) => op(conf.origen === `lista:${l.id}`, `data-rp="origen" data-val="lista:${esc(l.id)}"`, esc(l.nombre), `${l.ids.length} ${l.ids.length === 1 ? "enfoque" : "enfoques"}`)),
+  const chip = (on, attrs, txt) => `<button class="rp-chip${on ? " on" : ""}" ${attrs} aria-pressed="${on}">${txt}</button>`;
+  // filtros: cada botón muestra cuántos enfoques del origen tiene
+  const cuantos = (k, v) => delOrigen.filter((p) => pasaFiltros(p, { ...conf.filtros, [k]: [v] })).length;
+  const filaFiltro = (k, titulo, valores) => `<h3>${titulo}</h3><div class="rp-chips">${valores.map(([v, txt]) => chip(conf.filtros[k].includes(v), `data-rp="filtro" data-k="${k}" data-val="${esc(v)}"`, `${esc(txt)} <small>${cuantos(k, v)}</small>`)).join("")}</div>`;
+  const origenes = [op(conf.origen === "todas", 'data-rp="origen" data-val="todas"', "Todas las fichas", `${proyecciones.length} enfoques`), ...listas().map((l) => op(conf.origen === `lista:${l.id}`, `data-rp="origen" data-val="lista:${esc(l.id)}"`, esc(l.nombre), `${l.ids.length} ${l.ids.length === 1 ? "enfoque" : "enfoques"}`)),
     op(conf.origen === "sueltos", 'data-rp="origen" data-val="sueltos"', "Elegir enfoques", `${sueltos.size} ${sueltos.size === 1 ? "elegido" : "elegidos"}`)].join("");
   const ultimos = resultados().slice(0, 5);
   const enCurso = sesion && !sesion.resultado && sesion.respuestas.length < sesion.preguntas.length;
@@ -127,9 +145,20 @@ function vistaElegir(aviso) {
     ${enCurso ? `<a class="rp-seguir" href="#repaso-jugar"><span><b>Seguir el repaso</b><small>Vas por la pregunta ${sesion.actual + 1} de ${sesion.preguntas.length}</small></span>${icono.chev}</a>` : ""}
     <section class="panel"><h2>¿Qué enfoques?</h2><div class="opciones rp-col">${origenes}</div>
       ${conf.origen === "sueltos" ? selectorSueltos() : ""}</section>
-    <section class="panel"><h2>¿Qué preguntar?</h2><div class="opciones rp-col">${ASPECTOS.map((a) => op(conf.aspectos.includes(a.id), `data-rp="aspecto" data-val="${a.id}"`, esc(a.nombre), esc(a.detalle))).join("")}</div></section>
+    <details class="panel rp-filtros"${nFiltros ? " open" : ""}><summary><h2>Filtrar enfoques</h2><span>${nFiltros ? `${fichas.length} de ${delOrigen.length} enfoques` : "Sin filtros"}</span>${icono.chev}</summary>
+      ${filaFiltro("familias", "Región", FAMILIAS.map((x) => [x.nombre, x.nombre]))}
+      ${filaFiltro("tipos", "Rutina o especial", TIPOS)}
+      ${filaFiltro("cats", "Tipo de proyección", CATEGORIAS.map((c) => [c, c]))}
+      ${nFiltros ? `<button class="rp-limpiar" data-rp="limpiar">Quitar filtros</button>` : ""}
+    </details>
+    <section class="panel"><h2>¿Qué preguntar?</h2><div class="rp-aspectos">${ASPECTOS.map((a) => {
+      const on = conf.aspectos.includes(a.id);
+      return `<div class="rp-aspecto">${op(on, `data-rp="aspecto" data-val="${a.id}"`, esc(a.nombre), esc(a.detalle))}
+        ${on ? `<div class="rp-chips">${CAMPOS.filter((c) => c.aspecto === a.id).map((c) => chip(!conf.excluir.includes(c.id), `data-rp="campo" data-val="${c.id}"`, esc(c.nombre))).join("")}</div>` : ""}</div>`;
+    }).join("")}</div></section>
     <section class="panel"><h2>¿Cuántas preguntas?</h2><div class="opciones">${CANTIDADES.map((c) => op(conf.cantidad === c, `data-rp="cantidad" data-val="${c}"`, String(c))).join("")}${op(!conf.cantidad, 'data-rp="cantidad" data-val="0"', `Todas${max ? ` (${max})` : ""}`)}</div></section>
-    ${fichas.length ? "" : `<div class="vacio">${conf.origen === "sueltos" ? "Elegí al menos un enfoque de la lista de arriba." : "<b>Esta lista está vacía.</b><br>Agregá enfoques con la estrella o elegí enfoques sueltos."}</div>`}
+    ${fichas.length ? "" : `<div class="vacio">${delOrigen.length ? "<b>Ningún enfoque pasa los filtros.</b><br>Sacá alguno de los filtros de arriba." : conf.origen === "sueltos" ? "Elegí al menos un enfoque de la lista de arriba." : "<b>Esta lista está vacía.</b><br>Agregá enfoques con la estrella o elegí enfoques sueltos."}</div>`}
+    ${fichas.length && !max ? `<div class="vacio">Con estos enfoques y estos tipos de pregunta no se puede armar ninguna pregunta. Prendé más tipos de pregunta.</div>` : ""}
     <button class="rp-empezar" data-rp="empezar" ${n ? "" : "disabled"}>Empezar · ${n} ${n === 1 ? "pregunta" : "preguntas"}</button>
     ${ultimos.length ? `<section class="panel"><h2>Últimos resultados</h2><div class="rp-hist">${ultimos.map((r) => `<div><span>${esc(r.origen?.nombre || "")}<small>${new Date(r.fecha).toLocaleDateString("es-AR", { day: "numeric", month: "short" })} · ${r.preguntas} preguntas</small></span><b>${r.correctas}/${r.preguntas}</b></div>`).join("")}</div></section>` : ""}
     <p class="pie">Preguntas armadas con los datos de las fichas (Bontrager 9ª ed.). Los resultados se guardan en este dispositivo.</p>
@@ -211,10 +240,26 @@ export function iniciarRepaso(app, render) {
         if (!a.size) return; // siempre queda al menos uno
         conf.aspectos = ASPECTOS.map((x) => x.id).filter((x) => a.has(x)); break;
       }
+      case "campo": {
+        const x = new Set(conf.excluir); x.has(v) ? x.delete(v) : x.add(v);
+        const aspecto = CAMPOS.find((c) => c.id === v)?.aspecto;
+        // si se apagan todos los tipos de un aspecto, se apaga el aspecto y sus tipos vuelven a quedar prendidos para la próxima
+        if (CAMPOS.filter((c) => c.aspecto === aspecto).every((c) => x.has(c.id))) {
+          if (conf.aspectos.length === 1) return;
+          conf.aspectos = conf.aspectos.filter((a) => a !== aspecto);
+          CAMPOS.filter((c) => c.aspecto === aspecto).forEach((c) => x.delete(c.id));
+        }
+        conf.excluir = CAMPOS.map((c) => c.id).filter((c) => x.has(c)); break;
+      }
+      case "filtro": {
+        const k = t.dataset.k, l = new Set(conf.filtros[k]); l.has(v) ? l.delete(v) : l.add(v);
+        conf.filtros = { ...conf.filtros, [k]: [...l] }; break;
+      }
+      case "limpiar": conf.filtros = { familias: [], tipos: [], cats: [] }; break;
       case "cantidad": conf.cantidad = +v; break;
       case "empezar": {
         const fichas = fichasElegidas().map((p) => p.id);
-        if (empezar({ fichas, aspectos: conf.aspectos, cantidad: conf.cantidad, origen: origenActual() })) location.hash = "#repaso-jugar";
+        if (empezar({ fichas, aspectos: conf.aspectos, excluir: conf.excluir, cantidad: conf.cantidad, origen: origenActual() })) location.hash = "#repaso-jugar";
         return;
       }
       case "responder":
@@ -230,7 +275,7 @@ export function iniciarRepaso(app, render) {
         render(); return scrollTo(0, 0);
       }
       case "otra":
-        empezar({ fichas: sesion.fichas, aspectos: sesion.aspectos, cantidad: sesion.cantidad, origen: sesion.origen }); render(); return scrollTo(0, 0);
+        empezar({ fichas: sesion.fichas, aspectos: sesion.aspectos, excluir: sesion.excluir, cantidad: sesion.cantidad, origen: sesion.origen }); render(); return scrollTo(0, 0);
       case "compartir": {
         const url = linkPartida(sesion), aviso = document.getElementById("rp-compartido");
         const texto = "Partida de repaso de RadioGuía: respondé las mismas preguntas que yo.";

@@ -1,8 +1,9 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "ac45d00bbe";
+self.RG_VERSION = "a9aee67a55";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
+ "config/firebase.js",
  "css/app.css",
  "css/juegos.css",
  "css/repaso.css",
@@ -284,6 +285,7 @@ self.RG_ARCHIVOS = [
  "js/repaso.js",
  "js/util.js",
  "js/validacion.js",
+ "js/vendor/firebase.js",
  "js/vistas.js",
  "manifest.webmanifest"
 ];

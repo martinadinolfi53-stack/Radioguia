@@ -73,3 +73,22 @@
 #rp-compartido { overflow-wrap: anywhere; }
 .rp-err { font-size: .85em; margin-top: 4px; color: var(--ok); }
 .rp-err.mal { color: #e5484d; margin-top: 0; }
+
+/* filtros de enfoques y tipos de pregunta */
+.rp-filtros > summary { list-style: none; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.rp-filtros > summary::-webkit-details-marker { display: none; }
+.rp-filtros > summary h2 { margin: 0; flex: 1; }
+.rp-filtros > summary span { font-size: .85em; color: var(--mute); }
+.rp-filtros > summary .chev { color: var(--mute); transition: transform .15s; }
+.rp-filtros[open] > summary .chev { transform: rotate(90deg); }
+.rp-filtros h3 { margin: 14px 0 6px; font-size: .85em; font-weight: 600; }
+.rp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rp-chip { padding: 7px 12px; min-height: 38px; border-radius: 99px; border: 1px solid var(--line); background: var(--surface-2); font-size: .88em; line-height: 1.25; text-align: left; }
+.rp-chip small { color: var(--mute); font-variant-numeric: tabular-nums; }
+.rp-chip.on { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.rp-chip.on small { color: inherit; opacity: .8; }
+.rp-limpiar { margin-top: 12px; color: var(--accent); font-weight: 600; min-height: 40px; }
+.rp-aspectos { display: grid; gap: 10px; }
+.rp-aspecto { display: grid; gap: 8px; }
+.rp-aspecto > .rp-op { width: 100%; }
+.rp-aspecto .rp-chips { padding-left: 12px; }

@@ -1,9 +1,10 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "ee5e1d4ff9";
+self.RG_VERSION = "d0dadaae5a";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
  "css/app.css",
+ "css/juegos.css",
  "css/repaso.css",
  "datos/angulacion-rotacion.js",
  "datos/cap01-torax.js",
@@ -275,6 +276,7 @@ self.RG_ARCHIVOS = [
  "js/ficha.js",
  "js/glosario.js",
  "js/imagenes.js",
+ "js/juegos.js",
  "js/main.js",
  "js/menu.js",
  "js/pwa.js",

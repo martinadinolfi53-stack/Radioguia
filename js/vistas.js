@@ -1,4 +1,4 @@
-// Pantallas de navegación: Inicio, Región, Favoritos, resultados del buscador y Ajustes.
+// Pantallas de navegación: Portada (elegir Enfoques o Juegos), Inicio de enfoques, Región, Favoritos, resultados del buscador y Ajustes.
 import { capitulos, regiones, regionPorId, proyecciones, proyeccionesDe, CATEGORIAS, norm, FUENTE } from "./datos.js";
 import { listas, preferencias } from "./almacen.js";
 import { esc, icono, cabecera, botonFav } from "./util.js";
@@ -40,19 +40,30 @@ function menuRegiones(filtro) {
 }
 const todos = () => true;
 
+// lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
+export function vistaPortada() {
+  return `<main class="portada">
+    <p class="portada-nombre">RadioGuía</p>
+    <p class="portada-ayuda">¿Por dónde empezamos?</p>
+    <div class="portada-ops">
+      <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
+      <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
+    </div>
+    <div class="portada-pie">${pwa.aviso()}<a href="#ajustes">${icono.ajustes}<span>Ajustes</span></a></div>
+  </main>`;
+}
+
 export function vistaInicio() {
   const q = estado.q.trim();
   const act = listas.activa();
-  return cabecera({ titulo: "RadioGuía", sub: "Técnicas y proyecciones radiológicas", derecha: `<a class="ico" href="#ajustes" aria-label="Ajustes">${icono.ajustes}</a>` }) + `
+  return cabecera({ titulo: "Enfoques", sub: "Técnicas y proyecciones radiológicas", atras: "#" }) + `
   <div class="buscar-barra"><div class="wrap">${buscador("q-inicio", estado.q, "Región, proyección o método")}</div></div>
   <main class="wrap">
     ${q ? resultados(proyecciones, q) : `
       <div class="accesos">
         <a class="acceso fav" href="#favoritos" style="--lc: var(--lc-${act.color})">${icono.estrella(true)}<span>${listas.todas().length > 1 ? esc(act.nombre) : "Favoritos"}</span><b>${act.ids.length}</b></a>
         <a class="acceso" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
-        <a class="acceso" href="#repaso">${icono.repaso}<span>Repaso</span></a>
       </div>
-      ${pwa.aviso()}
       ${menuRegiones(todos)}`}
     <p class="pie">${proyecciones.length} proyecciones · ${regiones.length} regiones · Fuente: ${esc(FUENTE.corto)}</p>
   </main>`;
@@ -65,7 +76,7 @@ export function vistaRegion(r, soloFav) {
   const f = estado.filtro[r.id];
   const lista = f ? todas.filter((p) => p.categoria.includes(f)) : todas;
   const chip = (c, txt) => `<button class="chip${(f || "") === c ? " on" : ""}" data-filtro="${esc(r.id)}" data-cat="${esc(c)}">${esc(txt)}</button>`;
-  return cabecera({ titulo: r.nombre, sub: soloFav ? act.nombre : r.detalle, atras: soloFav ? "#favoritos" : "#" }) + `
+  return cabecera({ titulo: r.nombre, sub: soloFav ? act.nombre : r.detalle, atras: soloFav ? "#favoritos" : "#enfoques" }) + `
   <div class="filtros"><div class="wrap filtros-row">
     <div class="chips" role="group" aria-label="Filtrar por proyección">${cats.length > 1 ? chip("", "Todas") + cats.map((c) => chip(c, c)).join("") : cats.map((c) => `<span class="chip on">${esc(c)}</span>`).join("")}</div>
     <a class="btn-calc" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
@@ -90,7 +101,7 @@ export function vistaGrupo(g, soloFav) {
     return `<section class="parte"><h2 class="sub"><span>${esc(r.nombre)}</span>${r.detalle ? `<small>${esc(r.detalle)}</small>` : ""}</h2>
       <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></section>`;
   }).join("");
-  return cabecera({ titulo: g.nombre, sub: `${soloFav ? act.nombre + " · " : ""}${todas.length} ${todas.length === 1 ? "proyección" : "proyecciones"}`, atras: soloFav ? "#favoritos" : "#" }) + `
+  return cabecera({ titulo: g.nombre, sub: `${soloFav ? act.nombre + " · " : ""}${todas.length} ${todas.length === 1 ? "proyección" : "proyecciones"}`, atras: soloFav ? "#favoritos" : "#enfoques" }) + `
   <div class="filtros"><div class="wrap filtros-row">
     ${cats.length > 1 ? `<div class="chips" role="group" aria-label="Filtrar por proyección">${chip("", "Todas") + cats.map((c) => chip(c, c)).join("")}</div>` : ""}
     <a class="btn-calc" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
@@ -136,7 +147,7 @@ export function vistaFavoritos() {
       <a class="btn-sec" href="#imprimir">${icono.imprimir}<span>Imprimir o PDF</span></a>
       <a class="btn-sec" href="#repaso-l-${esc(act.id)}">${icono.repaso}<span>Repasar</span></a>` : ""}
     </div>`;
-  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#" }) +
+  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#enfoques" }) +
     (favs.length && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
     `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>`;
 }

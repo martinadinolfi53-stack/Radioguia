@@ -1,0 +1,75 @@
+rules_version = '2';
+// Reglas de Firestore para cuentas, grupos y ranking de RadioGuía (ver js/nube.js).
+// Se publican pegándolas en la consola de Firebase: Firestore Database > Reglas > Publicar.
+service cloud.firestore {
+  match /databases/{base}/documents {
+    function logueado() { return request.auth != null; }
+    function yo(uid) { return logueado() && request.auth.uid == uid; }
+    function texto(s, max) { return s is string && s.size() > 0 && s.size() <= max; }
+
+    // dificultad del desafío del día: solo se cambia desde la consola
+    match /config/{doc} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /usuarios/{uid} {
+      allow read: if logueado();
+      allow create, update: if yo(uid)
+        && (!('apodo' in request.resource.data) || texto(request.resource.data.apodo, 24))
+        && (!('grupos' in request.resource.data) || (request.resource.data.grupos is list && request.resource.data.grupos.size() <= 30));
+      allow delete: if false;
+    }
+
+    match /codigos/{codigo} {
+      allow read: if logueado();
+      allow create: if logueado() && request.resource.data.creador == request.auth.uid && request.resource.data.gid is string;
+      allow update, delete: if false;
+    }
+
+    match /grupos/{gid} {
+      function grupo() { return get(/databases/$(base)/documents/grupos/$(gid)).data; }
+      function miembro() { return logueado() && exists(/databases/$(base)/documents/grupos/$(gid)/miembros/$(request.auth.uid)); }
+
+      // quien tiene el link o el código puede ver el grupo para unirse
+      allow get: if logueado();
+      allow list: if false;
+      allow create: if logueado() && request.resource.data.creador == request.auth.uid
+        && texto(request.resource.data.nombre, 40) && request.resource.data.fichas is list && request.resource.data.fichas.size() <= 400;
+      allow update: if logueado() && resource.data.creador == request.auth.uid
+        && request.resource.data.creador == resource.data.creador && request.resource.data.codigo == resource.data.codigo
+        && texto(request.resource.data.nombre, 40) && request.resource.data.fichas.size() <= 400;
+      allow delete: if false;
+
+      function cierraPartida(uid, fecha) {
+        let ruta = /databases/$(base)/documents/grupos/$(gid)/partidas/$(fecha + '_' + uid);
+        return exists(ruta) && get(ruta).data.terminada == false && getAfter(ruta).data.terminada == true;
+      }
+
+      match /miembros/{uid} {
+        allow read: if miembro() || yo(uid);
+        allow create: if yo(uid) && request.resource.data.uid == uid && request.resource.data.puntos == 0 && request.resource.data.partidas == 0;
+        // los puntos solo suben de a una partida por vez (10 por acierto, hasta 100 preguntas, más el bonus de racha)
+        // cambiar el apodo, o sumar exactamente los puntos de la partida de hoy en el mismo momento en que se cierra
+        allow update: if yo(uid) && request.resource.data.uid == uid && texto(request.resource.data.apodo, 24)
+          && ((request.resource.data.puntos == resource.data.puntos && request.resource.data.partidas == resource.data.partidas)
+            || (request.resource.data.partidas == resource.data.partidas + 1 && cierraPartida(uid, request.resource.data.ultimaFecha)
+              && request.resource.data.puntos == resource.data.puntos + getAfter(/databases/$(base)/documents/grupos/$(gid)/partidas/$(request.resource.data.ultimaFecha + '_' + uid)).data.puntos));
+        allow delete: if yo(uid) || (logueado() && grupo().creador == request.auth.uid);
+      }
+
+      // una partida por persona por día (el id es fecha_uid); se anota al empezar y se cierra una sola vez al terminar
+      match /partidas/{pid} {
+        allow read: if miembro();
+        allow create: if miembro() && request.resource.data.uid == request.auth.uid
+          && pid == request.resource.data.fecha + '_' + request.auth.uid
+          && request.resource.data.terminada == false && request.resource.data.puntos == 0;
+        allow update: if miembro() && resource.data.uid == request.auth.uid && resource.data.terminada == false
+          && request.resource.data.uid == resource.data.uid && request.resource.data.fecha == resource.data.fecha
+          && request.resource.data.correctas is int && request.resource.data.correctas <= 50
+          && request.resource.data.puntos <= request.resource.data.correctas * 10 + 10;
+        allow delete: if false;
+      }
+    }
+  }
+}

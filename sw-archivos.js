@@ -1,9 +1,11 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "a787de9891";
+self.RG_VERSION = "96725fc427";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
+ "config/firebase.js",
  "css/app.css",
+ "css/juegos.css",
  "css/repaso.css",
  "datos/angulacion-rotacion.js",
  "datos/cap01-torax.js",
@@ -27,6 +29,7 @@ self.RG_ARCHIVOS = [
  "iconos/icono-192.png",
  "iconos/icono-512.png",
  "iconos/icono-maskable-512.png",
+ "iconos/juegos-512.jpg",
  "ilustraciones/.gitkeep",
  "ilustraciones/abdomen-ap-bipedestacion.svg",
  "ilustraciones/abdomen-ap-supino.svg",
@@ -274,16 +277,20 @@ self.RG_ARCHIVOS = [
  "js/edicion.js",
  "js/ficha.js",
  "js/glosario.js",
+ "js/grupos.js",
  "js/imagenes.js",
  "js/imprimir.js",
+ "js/juegos.js",
  "js/listas-ui.js",
  "js/main.js",
  "js/menu.js",
+ "js/nube.js",
  "js/pwa.js",
  "js/repaso-preguntas.js",
  "js/repaso.js",
  "js/util.js",
  "js/validacion.js",
+ "js/vendor/firebase.js",
  "js/vistas.js",
  "manifest.webmanifest"
 ];

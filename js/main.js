@@ -1,5 +1,5 @@
 // Arranque y navegación por #hash:
-// #  inicio · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #calc · #calc-<proyección> · #ajustes
+// #  inicio · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #calc · #calc-<proyección> · #ajustes · #repaso… (js/repaso.js)
 import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { favoritos, preferencias, aplicarPreferencias } from "./almacen.js";
 import { estado, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
@@ -10,6 +10,7 @@ import { ampliar } from "./imagenes.js";
 import { pwa } from "./pwa.js";
 import { edicion, vistaEditar, leerFormulario } from "./edicion.js";
 import { grupoPorId, grupoDeRegion } from "./menu.js";
+import { vistaRepaso, iniciarRepaso } from "./repaso.js";
 
 const app = document.getElementById("app");
 aplicarPreferencias();
@@ -33,6 +34,7 @@ function ruta() {
   if (h.startsWith("#editar-") && proyeccionPorId[h.slice(8)] && edicion.activa()) return { tipo: "editar", p: proyeccionPorId[h.slice(8)] };
   if (h === "#favoritos") return { tipo: "favoritos" };
   if (h === "#ajustes") return { tipo: "ajustes" };
+  if (h.startsWith("#repaso")) return { tipo: "repaso", h };
   if (h === "#calc" || h.startsWith("#calc-")) return { tipo: "calc", id: h.slice(6) || null };
   return { tipo: "inicio" };
 }
@@ -55,6 +57,7 @@ function render() {
     case "ajustes": app.innerHTML = vistaAjustes(); break;
     case "calc": app.innerHTML = vistaCalculadora(r.id, vuelta); break;
     case "editar": app.innerHTML = vistaEditar(r.p, vuelta); break;
+    case "repaso": app.innerHTML = vistaRepaso(r.h); break;
     default: app.innerHTML = vistaInicio();
   }
   document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : "RadioGuía";
@@ -150,6 +153,7 @@ app.addEventListener("submit", async (e) => {
   }
 });
 
+iniciarRepaso(app, render);
 pwa.iniciar(() => { if (["inicio", "ajustes"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
 render();

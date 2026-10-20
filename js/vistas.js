@@ -50,6 +50,7 @@ export function vistaInicio() {
       <div class="accesos">
         <a class="acceso" href="#favoritos">${icono.estrella(true)}<span>Favoritos</span><b>${nFav}</b></a>
         <a class="acceso" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
+        <a class="acceso" href="#repaso">${icono.repaso}<span>Repaso</span></a>
       </div>
       ${pwa.aviso()}
       ${menuRegiones(todos)}`}

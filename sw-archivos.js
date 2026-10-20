@@ -1,9 +1,10 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "c4b20e056f";
+self.RG_VERSION = "7a2af57f08";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
  "css/app.css",
+ "css/repaso.css",
  "datos/angulacion-rotacion.js",
  "datos/cap01-torax.js",
  "datos/cap02-extremidad-superior.js",
@@ -279,6 +280,8 @@ self.RG_ARCHIVOS = [
  "js/main.js",
  "js/menu.js",
  "js/pwa.js",
+ "js/repaso-preguntas.js",
+ "js/repaso.js",
  "js/util.js",
  "js/validacion.js",
  "js/vistas.js",

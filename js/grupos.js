@@ -1,5 +1,5 @@
 // Juegos en grupo: cuenta (apodo o Google), grupos con link de invitación o código, desafío del día con vidas y ranking.
-// Rutas: #juegos-cuenta · #juegos-grupos · #juegos-nuevo · #juegos-grupo-<gid>[-historico] · #juegos-editar-<gid>
+// Rutas: #juegos-cuenta · #juegos-foto · #juegos-grupos · #juegos-nuevo · #juegos-grupo-<gid>[-historico] · #juegos-editar-<gid>
 //        #juegos-unirse-<gid> (link de invitación) · #juegos-desafio[-<gid>]
 // Los datos viven en Firebase (js/nube.js). Las pantallas se dibujan con lo que haya y se vuelven a dibujar cuando llega la respuesta.
 import { proyecciones, proyeccionPorId } from "./datos.js";
@@ -9,6 +9,7 @@ import { GRUPOS, grupoDeRegion } from "./menu.js";
 import { ASPECTOS, CAMPOS, generarPreguntas } from "./repaso-preguntas.js";
 import * as nube from "./nube.js";
 import { registrarDesafio } from "./juegos.js";
+import { vistaFoto, avatar, iniciarFoto } from "./foto.js";
 
 let rerender = () => {};
 const local = (() => { try { return localStorage; } catch { return null; } })();
@@ -56,12 +57,29 @@ function conCuenta(titulo, atras, fn) {
     history.replaceState(null, "", "#juegos-cuenta");
     return vistaCuenta();
   }
+  // la foto de perfil es obligatoria antes de jugar en grupo
+  if (!nube.estado().perfil.foto) {
+    escribir("radioguia.juegos.despues", location.hash);
+    history.replaceState(null, "", "#juegos-foto");
+    return pantallaFoto();
+  }
   return fn();
+}
+
+const pantallaFoto = () => vistaFoto({ titulo: "Tu foto", sub: nube.estado().perfil?.apodo, atras: nube.estado().perfil?.foto ? "#juegos-cuenta" : "#juegos", listo: despues });
+
+// vuelve a la pantalla que pidió la cuenta o la foto (por ejemplo, el link de invitación)
+function despues() {
+  const h = leer("radioguia.juegos.despues", null);
+  escribir("radioguia.juegos.despues", null);
+  if (h && h !== "#juegos-foto") location.hash = h;
+  else if (location.hash === "#juegos-foto") location.hash = "#juegos-grupos";
 }
 
 // ---------- pantallas ----------
 export function vistaGrupos(h) {
   if (h === "#juegos-cuenta") return vistaCuenta();
+  if (h === "#juegos-foto") return nube.estado().perfil?.apodo ? pantallaFoto() : vistaCuenta();
   if (h === "#juegos-grupos") return conCuenta("Grupos", "#juegos", vistaListaGrupos);
   if (h === "#juegos-nuevo") return conCuenta("Nuevo grupo", "#juegos-grupos", () => vistaFormGrupo(null));
   if (h.startsWith("#juegos-editar-")) return conCuenta("Editar grupo", "#juegos-grupos", () => vistaFormGrupo(h.slice(15)));
@@ -93,8 +111,12 @@ function vistaCuenta() {
     </section>
     ${err}
   </main>`;
+  if (!perfil.foto) return pantallaFoto();
   return cabecera({ titulo: "Tu cuenta", atras: "#juegos" }) + `
   <main class="wrap juegos">
+    <section class="panel ft-cuenta">${avatar(perfil.foto, perfil.apodo, "grande")}
+      <button class="btn" data-gr="cambiar-foto">Cambiar foto</button>
+    </section>
     <section class="panel"><h2>Tu apodo</h2>
       <form id="gr-apodo" class="jg-form"><input name="apodo" maxlength="24" value="${esc(perfil.apodo)}" required>
         <button class="btn" type="submit">Guardar</button></form>
@@ -202,13 +224,15 @@ function vistaGrupo(gid, hist) {
   if (lista.error) filas = `<div class="vacio">${esc(lista.error)}</div>`;
   else if (!lista.ok) filas = `<div class="vacio">Cargando…</div>`;
   else {
-    const rk = hist ? lista.datos.map((m) => ({ uid: m.uid, apodo: m.apodo, puntos: m.puntos || 0, det: `${m.partidas || 0} ${m.partidas === 1 ? "desafío" : "desafíos"}${m.racha > 1 ? ` · ${m.racha} días seguidos` : ""}`, t: 0 }))
+    const rk = hist ? lista.datos.map((m) => ({ uid: m.uid, apodo: m.apodo, foto: m.foto, puntos: m.puntos || 0, det: `${m.partidas || 0} ${m.partidas === 1 ? "desafío" : "desafíos"}${m.racha > 1 ? ` · ${m.racha} días seguidos` : ""}`, t: 0 }))
       : Object.values(lista.datos.filter((p) => p.terminada).reduce((a, p) => {
           const x = (a[p.uid] ||= { uid: p.uid, apodo: p.apodo, puntos: 0, n: 0, ok: 0, t: 0 });
           x.puntos += p.puntos; x.n++; x.ok += p.correctas; x.t += p.duracionMs || 0; x.apodo = p.apodo; return a;
         }, {})).map((x) => ({ ...x, det: `${x.n} ${x.n === 1 ? "desafío" : "desafíos"} · ${x.ok} correctas` }));
+    // las fotos están en los miembros; el ranking de la semana sale de las partidas
+    const fotos = Object.fromEntries((hist ? lista : dato(`miembros:${gid}`, () => nube.miembros(gid))).datos?.map((m) => [m.uid, m.foto]) || []);
     rk.sort((a, b) => b.puntos - a.puntos || a.t - b.t);
-    filas = rk.length ? `<ol class="jg-ranking">${rk.map((x, i) => `<li class="${x.uid === yo ? "yo" : ""}"><span class="jg-pos">${i + 1}</span><span><b>${esc(x.apodo)}</b><small>${esc(x.det)}</small></span><b class="jg-pts">${x.puntos}</b></li>`).join("")}</ol>`
+    filas = rk.length ? `<ol class="jg-ranking">${rk.map((x, i) => `<li class="${x.uid === yo ? "yo" : ""}"><span class="jg-pos">${i + 1}</span>${avatar(fotos[x.uid], x.apodo)}<span><b>${esc(x.apodo)}</b><small>${esc(x.det)}</small></span><b class="jg-pts">${x.puntos}</b></li>`).join("")}</ol>`
       : `<div class="vacio">${hist ? "Todavía nadie jugó." : "Esta semana todavía nadie jugó el desafío. ¡Sé el primero!"}</div>`;
   }
   const jugado = hoyP.ok && hoyP.datos;
@@ -393,6 +417,7 @@ export function iniciarGrupos(app, render) {
     if (!t) return;
     const gid = t.dataset.gid;
     switch (t.dataset.gr) {
+      case "cambiar-foto": escribir("radioguia.juegos.despues", "#juegos-cuenta"); location.hash = "#juegos-foto"; return;
       case "reintentar": Object.keys(cache).forEach((k) => cache[k]?.error && delete cache[k]); return rerender();
       case "google": return hacer(t, "errCuenta", async () => { await nube.entrarGoogle(); olvidar("grupos"); despues(); });
       case "salir":
@@ -450,10 +475,5 @@ export function iniciarGrupos(app, render) {
     }
   });
 
-  // vuelve a la pantalla que pidió la cuenta (por ejemplo, el link de invitación)
-  function despues() {
-    const h = leer("radioguia.juegos.despues", null);
-    escribir("radioguia.juegos.despues", null);
-    if (h && h !== "#juegos-cuenta") location.hash = h;
-  }
+  iniciarFoto(app, rerender);
 }

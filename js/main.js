@@ -1,8 +1,8 @@
 // Arranque y navegación por #hash:
-// #  inicio · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #calc · #calc-<proyección> · #ajustes · #repaso… (js/repaso.js) · #juegos… (js/juegos.js)
+// #  portada (Enfoques o Juegos) · #enfoques inicio de enfoques · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #calc · #calc-<proyección> · #ajustes · #repaso… (js/repaso.js) · #juegos… (js/juegos.js)
 import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { favoritos, preferencias, aplicarPreferencias } from "./almacen.js";
-import { estado, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
+import { estado, vistaPortada, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
 import { mostrarTermino } from "./glosario.js";
@@ -35,10 +35,11 @@ function ruta() {
   if (h.startsWith("#editar-") && proyeccionPorId[h.slice(8)] && edicion.activa()) return { tipo: "editar", p: proyeccionPorId[h.slice(8)] };
   if (h === "#favoritos") return { tipo: "favoritos" };
   if (h === "#ajustes") return { tipo: "ajustes" };
+  if (h === "#enfoques") return { tipo: "inicio" };
   if (h.startsWith("#repaso")) return { tipo: "repaso", h };
   if (h.startsWith("#juegos")) return { tipo: "juegos", h };
   if (h === "#calc" || h.startsWith("#calc-")) return { tipo: "calc", id: h.slice(6) || null };
-  return { tipo: "inicio" };
+  return { tipo: "portada" };
 }
 
 function volverA(r) {
@@ -61,7 +62,8 @@ function render() {
     case "editar": app.innerHTML = vistaEditar(r.p, vuelta); break;
     case "repaso": app.innerHTML = vistaRepaso(r.h); break;
     case "juegos": app.innerHTML = vistaJuegos(r.h); break;
-    default: app.innerHTML = vistaInicio();
+    case "inicio": app.innerHTML = vistaInicio(); break;
+    default: app.innerHTML = vistaPortada();
   }
   document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : "RadioGuía";
   altoCabecera();
@@ -158,6 +160,6 @@ app.addEventListener("submit", async (e) => {
 
 iniciarRepaso(app, render);
 iniciarJuegos(app);
-pwa.iniciar(() => { if (["inicio", "ajustes"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
+pwa.iniciar(() => { if (["portada", "inicio", "ajustes"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
 render();

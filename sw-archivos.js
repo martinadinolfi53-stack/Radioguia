@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "bb27ae002b";
+self.RG_VERSION = "c4b20e056f";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -274,6 +274,8 @@ self.RG_ARCHIVOS = [
  "js/ficha.js",
  "js/glosario.js",
  "js/imagenes.js",
+ "js/imprimir.js",
+ "js/listas-ui.js",
  "js/main.js",
  "js/menu.js",
  "js/pwa.js",

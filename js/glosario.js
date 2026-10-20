@@ -1,6 +1,6 @@
 // Glosario interactivo: marca los términos en el texto de las fichas y muestra la explicación en una hoja inferior.
 import { GLOSARIO, terminoPorId, norm } from "./datos.js";
-import { esc, icono } from "./util.js";
+import { esc, abrirHoja } from "./util.js";
 
 // una sola expresión con todas las formas, de la más larga a la más corta, para que "decúbito supino" gane a "decúbito"
 const formas = GLOSARIO.flatMap((t) => t.formas.map((f) => ({ id: t.id, f: norm(f), sigla: /^[A-ZÁÉÍÓÚÑ]{2,}$/.test(f) ? f : null }))).sort((a, b) => b.f.length - a.f.length);
@@ -49,24 +49,7 @@ export const definicionHTML = (t) => `
   ${t.sinonimo ? `<p class="sin"><b>También:</b> ${esc(t.sinonimo)}</p>` : ""}
   ${t.estado !== "aprobado" ? `<p class="pend">Definición pendiente de aprobación</p>` : ""}`;
 
-// hoja inferior; no cambia la posición de lectura
-let hoja;
 export function mostrarTermino(id) {
   const t = terminoPorId[id];
-  if (!t) return;
-  hoja?.remove();
-  hoja = document.createElement("div");
-  hoja.className = "hoja";
-  hoja.innerHTML = `<div class="hoja-fondo" data-cerrar-hoja></div>
-    <div class="hoja-panel" role="dialog" aria-modal="true" aria-labelledby="hoja-t">
-      <div class="hoja-cab"><h3 id="hoja-t">${esc(t.termino)}</h3><button class="ico" data-cerrar-hoja aria-label="Cerrar">${icono.cerrar}</button></div>
-      ${definicionHTML(t)}
-    </div>`;
-  document.body.appendChild(hoja);
-  const anterior = document.activeElement;
-  hoja.querySelector(".hoja-cab .ico").focus();
-  const cerrar = () => { hoja?.remove(); hoja = null; anterior?.focus?.({ preventScroll: true }); document.removeEventListener("keydown", tecla); };
-  const tecla = (e) => e.key === "Escape" && cerrar();
-  document.addEventListener("keydown", tecla);
-  hoja.addEventListener("click", (e) => e.target.closest("[data-cerrar-hoja]") && cerrar());
+  if (t) abrirHoja(t.termino, definicionHTML(t));
 }

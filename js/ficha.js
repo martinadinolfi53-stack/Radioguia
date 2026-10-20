@@ -2,13 +2,12 @@
 // A Factores técnicos (desplegable) · B Rayo central (siempre visible) · C Posición (desplegable)
 // D Criterios (desplegable) · E Ilustración (siempre visible) · términos, fuente y avisos al final.
 import { regionPorId, proyeccionesDe, FUENTE } from "./datos.js";
-import { favoritos } from "./almacen.js";
 import { marcar, terminosDe, definicionHTML } from "./glosario.js";
 import { bloqueIlustracion } from "./imagenes.js";
 import { esc, icono, cabecera, botonFav } from "./util.js";
 import { edicion } from "./edicion.js";
 
-const RC_ETIQUETA = { perpendicular: "Perpendicular", "cefálico": "Cefálico", caudal: "Caudal", horizontal: "Horizontal", angulado: "Angulado", variable: "Variable", "sin-dato": "" };
+export const RC_ETIQUETA = { perpendicular: "Perpendicular", "cefálico": "Cefálico", caudal: "Caudal", horizontal: "Horizontal", angulado: "Angulado", variable: "Variable", "sin-dato": "" };
 // flecha que muestra hacia dónde apunta el RC: abajo = perpendicular, inclinada hacia la cabeza o hacia los pies
 const RC_FLECHA = {
   perpendicular: '<path d="M16 3v22M9 18l7 7 7-7"/>',
@@ -20,6 +19,7 @@ const RC_FLECHA = {
 };
 const FACTORES = [["ri", "Tamaño del RI"], ["dfri", "DFRI"], ["respiracion", "Respiración"], ["angulacion", "Angulación del rayo"], ["rotacion", "Rotación de la región"]];
 const FACTORES_EXTRA = [["parrilla", "Parrilla (Bucky)"], ["colimacion", "Colimación"]];
+export const FACTORES_FICHA = [...FACTORES, ...FACTORES_EXTRA];
 
 export function vistaFicha(p, volver) {
   const r = regionPorId[p.region];
@@ -28,7 +28,6 @@ export function vistaFicha(p, volver) {
   const sec = (titulo, cuerpo, abierta) => { v.clear(); return `<details class="sec"${abierta ? " open" : ""}><summary><span>${titulo}</span>${icono.chev}</summary><div class="body">${cuerpo()}</div></details>`; };
   const lista = (items) => `<ul>${items.map((x) => `<li>${m(x)}</li>`).join("")}</ul>`;
   const hermanas = proyeccionesDe(p.region);
-  const fav = favoritos.tiene(p.id);
   const terminos = terminosDe(p);
   const dir = p.rc?.direccion || "perpendicular";
   // una versión de la posición (datos/versiones.js): sus pasos, su RC si difiere del general y su esquema
@@ -37,7 +36,7 @@ export function vistaFicha(p, volver) {
     ${x.rc ? `<div class="ver-rc rc-${x.rc.direccion === "cefálico" ? "cefalico" : x.rc.direccion || "sin-dato"}"><h4>Rayo central</h4>${RC_ETIQUETA[x.rc.direccion] ? `<p class="rc-dir">${esc(RC_ETIQUETA[x.rc.direccion])}${x.rc.angulo ? ` <b>${esc(x.rc.angulo)}</b>` : ""}</p>` : ""}<p>${m(x.rc.texto)}</p></div>` : ""}
     ${x.ilustracion?.src ? bloqueIlustracion(x.ilustracion, `${p.nombre} · ${x.nombre}`) : ""}</div></details>`;
 
-  return cabecera({ titulo: r?.nombre || "", sub: r?.detalle, atras: volver, derecha: botonFav(p.id, fav, "ico fav") }) + `
+  return cabecera({ titulo: r?.nombre || "", sub: r?.detalle, atras: volver, derecha: botonFav(p.id, "ico fav") }) + `
   <main class="wrap ficha">
     <div class="ficha-cab">
       <h2>${esc(p.nombre)}</h2>
@@ -50,7 +49,7 @@ export function vistaFicha(p, volver) {
       </div>
     </div>
 
-    ${sec("Factores técnicos", () => `<dl class="tabla">${[...FACTORES, ...FACTORES_EXTRA].filter(([k]) => p.factores?.[k] || (p.factores && k in p.factores && p.factores[k] === null))
+    ${sec("Factores técnicos", () => `<dl class="tabla">${FACTORES_FICHA.filter(([k]) => p.factores?.[k] || (p.factores && k in p.factores && p.factores[k] === null))
       .map(([k, n]) => `<div class="it"><dt>${m(n)}</dt><dd>${p.factores[k] === null ? "" : m(p.factores[k]).replace(/^(Sí|No)(?=\s|;|$)/, "<b>$1</b>")}</dd></div>`).join("")}</dl>`)}
 
     <section class="rc rc-${dir === "cefálico" ? "cefalico" : dir}" aria-labelledby="rc-t">

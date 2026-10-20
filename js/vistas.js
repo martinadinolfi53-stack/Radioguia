@@ -1,6 +1,6 @@
 // Pantallas de navegación: Inicio, Región, Favoritos, resultados del buscador y Ajustes.
 import { capitulos, regiones, regionPorId, proyecciones, proyeccionesDe, CATEGORIAS, norm, FUENTE } from "./datos.js";
-import { favoritos, preferencias } from "./almacen.js";
+import { listas, preferencias } from "./almacen.js";
 import { esc, icono, cabecera, botonFav } from "./util.js";
 import { panelEdicionAjustes } from "./edicion.js";
 import { pwa } from "./pwa.js";
@@ -11,7 +11,7 @@ export const estado = { q: "", qFav: "", filtro: {} }; // texto de búsqueda y f
 const filaProyeccion = (p, conRegion) => `<div class="row">
   <a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span>
     <span class="s">${conRegion ? esc(regionPorId[p.region]?.nombre) + " · " : ""}${esc([...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "))}</span></a>
-  ${botonFav(p.id, favoritos.tiene(p.id))}</div>`;
+  ${botonFav(p.id)}</div>`;
 
 const buscador = (id, valor, placeholder) => `<div class="search"><span class="lupa" aria-hidden="true">${icono.lupa}</span>
   <input id="${id}" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="${placeholder}" value="${esc(valor)}" aria-label="Buscar">
@@ -42,13 +42,13 @@ const todos = () => true;
 
 export function vistaInicio() {
   const q = estado.q.trim();
-  const nFav = favoritos.lista().length;
+  const act = listas.activa();
   return cabecera({ titulo: "RadioGuía", sub: "Técnicas y proyecciones radiológicas", derecha: `<a class="ico" href="#ajustes" aria-label="Ajustes">${icono.ajustes}</a>` }) + `
   <div class="buscar-barra"><div class="wrap">${buscador("q-inicio", estado.q, "Región, proyección o método")}</div></div>
   <main class="wrap">
     ${q ? resultados(proyecciones, q) : `
       <div class="accesos">
-        <a class="acceso" href="#favoritos">${icono.estrella(true)}<span>Favoritos</span><b>${nFav}</b></a>
+        <a class="acceso fav" href="#favoritos" style="--lc: var(--lc-${act.color})">${icono.estrella(true)}<span>${listas.todas().length > 1 ? esc(act.nombre) : "Favoritos"}</span><b>${act.ids.length}</b></a>
         <a class="acceso" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
       </div>
       ${pwa.aviso()}
@@ -58,12 +58,13 @@ export function vistaInicio() {
 }
 
 export function vistaRegion(r, soloFav) {
-  const todas = proyeccionesDe(r.id).filter((p) => !soloFav || favoritos.tiene(p.id));
+  const act = listas.activa();
+  const todas = proyeccionesDe(r.id).filter((p) => !soloFav || act.ids.includes(p.id));
   const cats = CATEGORIAS.filter((c) => todas.some((p) => p.categoria.includes(c)));
   const f = estado.filtro[r.id];
   const lista = f ? todas.filter((p) => p.categoria.includes(f)) : todas;
   const chip = (c, txt) => `<button class="chip${(f || "") === c ? " on" : ""}" data-filtro="${esc(r.id)}" data-cat="${esc(c)}">${esc(txt)}</button>`;
-  return cabecera({ titulo: r.nombre, sub: soloFav ? "Favoritos" : r.detalle, atras: soloFav ? "#favoritos" : "#" }) + `
+  return cabecera({ titulo: r.nombre, sub: soloFav ? act.nombre : r.detalle, atras: soloFav ? "#favoritos" : "#" }) + `
   <div class="filtros"><div class="wrap filtros-row">
     <div class="chips" role="group" aria-label="Filtrar por proyección">${cats.length > 1 ? chip("", "Todas") + cats.map((c) => chip(c, c)).join("") : cats.map((c) => `<span class="chip on">${esc(c)}</span>`).join("")}</div>
     <a class="btn-calc" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
@@ -75,7 +76,8 @@ export function vistaRegion(r, soloFav) {
 
 // índice de una región del menú: sus partes como subtítulos y las proyecciones de cada una
 export function vistaGrupo(g, soloFav) {
-  const de = (id) => proyeccionesDe(id).filter((p) => !soloFav || favoritos.tiene(p.id));
+  const act = listas.activa();
+  const de = (id) => proyeccionesDe(id).filter((p) => !soloFav || act.ids.includes(p.id));
   const todas = g.regiones.flatMap(de);
   const cats = CATEGORIAS.filter((c) => todas.some((p) => p.categoria.includes(c)));
   const f = estado.filtro[g.id];
@@ -87,7 +89,7 @@ export function vistaGrupo(g, soloFav) {
     return `<section class="parte"><h2 class="sub"><span>${esc(r.nombre)}</span>${r.detalle ? `<small>${esc(r.detalle)}</small>` : ""}</h2>
       <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></section>`;
   }).join("");
-  return cabecera({ titulo: g.nombre, sub: `${soloFav ? "Favoritos · " : ""}${todas.length} ${todas.length === 1 ? "proyección" : "proyecciones"}`, atras: soloFav ? "#favoritos" : "#" }) + `
+  return cabecera({ titulo: g.nombre, sub: `${soloFav ? act.nombre + " · " : ""}${todas.length} ${todas.length === 1 ? "proyección" : "proyecciones"}`, atras: soloFav ? "#favoritos" : "#" }) + `
   <div class="filtros"><div class="wrap filtros-row">
     ${cats.length > 1 ? `<div class="chips" role="group" aria-label="Filtrar por proyección">${chip("", "Todas") + cats.map((c) => chip(c, c)).join("")}</div>` : ""}
     <a class="btn-calc" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
@@ -97,16 +99,25 @@ export function vistaGrupo(g, soloFav) {
   </main>`;
 }
 
+// lista activa de favoritos: selector de listas arriba, acciones (editar, nueva, imprimir) y el menú filtrado
 export function vistaFavoritos() {
-  const favs = proyecciones.filter((p) => favoritos.tiene(p.id));
+  const act = listas.activa(), todas = listas.todas();
+  const favs = proyecciones.filter((p) => act.ids.includes(p.id));
   const q = estado.qFav.trim();
   let cuerpo;
-  if (!favs.length) cuerpo = `<div class="vacio"><b>Todavía no tenés favoritos.</b><br>Abrí una proyección y tocá la estrella para que aparezca acá, ordenada por región.</div>`;
+  if (!favs.length) cuerpo = `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
   else if (q) cuerpo = resultados(favs, q);
-  else cuerpo = menuRegiones((p) => favoritos.tiene(p.id));
-  return cabecera({ titulo: "Favoritos", sub: `${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#" }) +
-    (favs.length ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, "Buscar en favoritos")}</div></div>` : "") +
-    `<main class="wrap">${cuerpo}</main>`;
+  else cuerpo = menuRegiones((p) => act.ids.includes(p.id));
+  const selector = `<div class="lst-selector" role="group" aria-label="Listas de favoritos">${todas.map((l) =>
+      `<button class="lst-chip${l.id === act.id ? " on" : ""}" data-lista="${esc(l.id)}" aria-pressed="${l.id === act.id}" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}<span>${esc(l.nombre)}</span><b>${l.ids.length}</b></button>`).join("")}
+    <button class="lst-chip nueva" data-lista-nueva>${icono.mas}<span>Nueva lista</span></button></div>
+    <div class="lst-acciones">
+      <button class="btn-sec" data-lista-editar="${esc(act.id)}">${icono.lapiz}<span>Nombre y color</span></button>
+      ${favs.length ? `<a class="btn-sec" href="#imprimir">${icono.imprimir}<span>Imprimir o PDF</span></a>` : ""}
+    </div>`;
+  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: `${todas.length > 1 ? "Favoritos · " : ""}${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#" }) +
+    (favs.length ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
+    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>`;
 }
 
 export function vistaAjustes() {
@@ -118,6 +129,6 @@ export function vistaAjustes() {
     <section class="panel"><h2>Sin conexión</h2><p>${pwa.estadoOffline()}</p></section>
     ${panelEdicionAjustes()}
     <section class="panel"><h2>Fuente</h2><p>${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del manual, pendiente de revisión.</p></section>
-    <p class="pie">Favoritos y ajustes se guardan solo en este dispositivo.</p>
+    <p class="pie">Listas de favoritos y ajustes se guardan solo en este dispositivo.</p>
   </main>`;
 }

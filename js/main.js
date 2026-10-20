@@ -1,7 +1,9 @@
 // Arranque y navegación por #hash:
-// #  inicio · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #calc · #calc-<proyección> · #ajustes
+// #  inicio · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #imprimir (lista activa) · #calc · #calc-<proyección> · #ajustes
 import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
-import { favoritos, preferencias, aplicarPreferencias } from "./almacen.js";
+import { listas, preferencias, aplicarPreferencias } from "./almacen.js";
+import { tocarEstrella, hojaLista } from "./listas-ui.js";
+import { vistaImprimir, opcionesImpresion, imprimir } from "./imprimir.js";
 import { estado, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
@@ -13,7 +15,7 @@ import { grupoPorId, grupoDeRegion } from "./menu.js";
 
 const app = document.getElementById("app");
 aplicarPreferencias();
-favoritos.limpiar(new Set(proyecciones.map((p) => p.id)));
+listas.limpiar(new Set(proyecciones.map((p) => p.id)));
 
 // de dónde se llegó a cada pantalla, para que "Volver" lleve al lugar correcto
 let pantallaAnterior = "#";
@@ -32,6 +34,7 @@ function ruta() {
   }
   if (h.startsWith("#editar-") && proyeccionPorId[h.slice(8)] && edicion.activa()) return { tipo: "editar", p: proyeccionPorId[h.slice(8)] };
   if (h === "#favoritos") return { tipo: "favoritos" };
+  if (h === "#imprimir") return { tipo: "imprimir" };
   if (h === "#ajustes") return { tipo: "ajustes" };
   if (h === "#calc" || h.startsWith("#calc-")) return { tipo: "calc", id: h.slice(6) || null };
   return { tipo: "inicio" };
@@ -52,12 +55,14 @@ function render() {
     case "grupo": app.innerHTML = vistaGrupo(r.g, r.fav); break;
     case "region": app.innerHTML = vistaRegion(r.r, r.fav); break;
     case "favoritos": app.innerHTML = vistaFavoritos(); break;
+    case "imprimir": app.innerHTML = vistaImprimir(); break;
     case "ajustes": app.innerHTML = vistaAjustes(); break;
     case "calc": app.innerHTML = vistaCalculadora(r.id, vuelta); break;
     case "editar": app.innerHTML = vistaEditar(r.p, vuelta); break;
     default: app.innerHTML = vistaInicio();
   }
-  document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : "RadioGuía";
+  // el título es el nombre sugerido del PDF
+  document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : r.tipo === "imprimir" ? `${listas.activa().nombre} · RadioGuía` : "RadioGuía";
   altoCabecera();
 }
 
@@ -86,7 +91,7 @@ function refrescarMain() {
 }
 
 app.addEventListener("click", async (e) => {
-  const t = e.target.closest("[data-desconectar],[data-exportar],[data-salir-edicion],[data-restaurar],[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso]");
+  const t = e.target.closest("[data-desconectar],[data-exportar],[data-salir-edicion],[data-restaurar],[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir]");
   if (!t) return;
   if ("exportar" in t.dataset) return edicion.exportar();
   if ("desconectar" in t.dataset) { edicion.configurarGithub(null); return render(); }
@@ -96,11 +101,13 @@ app.addEventListener("click", async (e) => {
     try { await edicion.restaurar(t.dataset.restaurar); } catch (err) { return alert(err.message); }
     location.hash = `#p-${t.dataset.restaurar}`; return location.reload();
   }
-  if (t.dataset.fav) {
-    e.preventDefault();
-    favoritos.alternar(t.dataset.fav);
-    const y = scrollY; render(); scrollTo(0, y);
-  } else if (t.dataset.term) mostrarTermino(t.dataset.term);
+  const rehacer = () => { const y = scrollY; render(); scrollTo(0, y); };
+  if (t.dataset.fav) { e.preventDefault(); tocarEstrella(t.dataset.fav, rehacer); }
+  else if (t.dataset.lista) { listas.elegir(t.dataset.lista); estado.qFav = ""; rehacer(); }
+  else if ("listaNueva" in t.dataset) hojaLista(null, rehacer);
+  else if (t.dataset.listaEditar) hojaLista(t.dataset.listaEditar, rehacer);
+  else if (t.dataset.impOp) { opcionesImpresion[t.dataset.impOp] = !opcionesImpresion[t.dataset.impOp]; rehacer(); }
+  else if ("imprimir" in t.dataset) imprimir(app); else if (t.dataset.term) mostrarTermino(t.dataset.term);
   else if (t.dataset.ampliar) ampliar(t.dataset.ampliar, t.dataset.alt);
   else if (t.dataset.filtro) { estado.filtro[t.dataset.filtro] = t.dataset.cat || undefined; const y = scrollY; render(); scrollTo(0, y); }
   else if (t.dataset.borrar) {

@@ -20,7 +20,9 @@ const zonaDe = (region) => [grupoDeRegion[region]?.id || "", grupoDeRegion[regio
 // listas de favoritos: las arma el módulo de favoritos (almacen.listas); mientras no exista, la lista única de favoritos
 function listas() {
   try { const l = almacen.listas?.todas?.(); if (Array.isArray(l) && l.length) return l; } catch {}
-  return [{ id: "favoritos", nombre: "Favoritos", ids: almacen.favoritos.lista() }];
+  let ids = [];
+  try { ids = almacen.favoritos?.lista?.() || []; } catch {}
+  return [{ id: "favoritos", nombre: "Favoritos", ids }];
 }
 
 // cantidad 0 = todas las que se puedan armar
@@ -61,6 +63,8 @@ function guardarResultado(s) {
     detalle: s.preguntas.map((q, i) => ({ ficha: q.ficha, aspecto: q.aspecto, campo: q.campo, ok: s.respuestas[i] === q.correcta })),
   };
   escribir(local, K_RES, [res, ...resultados()].slice(0, 50));
+  // aviso para el ranking de grupo (js de cuentas y grupos), sin que tenga que leer el almacenamiento
+  try { dispatchEvent(new CustomEvent("rg:repaso-resultado", { detail: res })); } catch {}
   return res;
 }
 

@@ -77,6 +77,13 @@ function empezar({ fichas, aspectos, cantidad, semilla = Math.random().toString(
   return true;
 }
 
+// para otras pantallas (ej. estadísticas): arranca un repaso con esas fichas y va a la pregunta 1. Devuelve false si no hay preguntas.
+export function empezarRepaso({ fichas, aspectos = ASPECTOS.map((a) => a.id), cantidad = 10, origen = { tipo: "otro", nombre: "Repaso" } }) {
+  const ok = empezar({ fichas, aspectos, cantidad, origen });
+  if (ok) location.hash = "#repaso-jugar";
+  return ok;
+}
+
 // partida compartida: la configuración en el link, para que todos respondan las mismas preguntas
 const codificar = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const decodificar = (c) => { try { return JSON.parse(decodeURIComponent(escape(atob(c.replace(/-/g, "+").replace(/_/g, "/"))))); } catch { return null; } };

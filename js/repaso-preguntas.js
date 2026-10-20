@@ -13,6 +13,22 @@ export const ASPECTOS = [
   { id: "criterios", nombre: "Criterios de evaluación", detalle: "Estructuras que se ven" },
 ];
 
+// cada tipo de pregunta, para poder sacar los que no se quieren (ej. sin preguntas de DFRI)
+export const CAMPOS = [
+  { id: "esquema", aspecto: "general", nombre: "Esquema → proyección" },
+  { id: "rc-a-proyeccion", aspecto: "general", nombre: "Rayo central → proyección" },
+  { id: "ri", aspecto: "factores", nombre: "Tamaño del RI" },
+  { id: "dfri", aspecto: "factores", nombre: "DFRI" },
+  { id: "parrilla", aspecto: "factores", nombre: "Parrilla (Bucky)" },
+  { id: "respiracion", aspecto: "factores", nombre: "Respiración" },
+  { id: "angulacion", aspecto: "factores", nombre: "Angulación del rayo" },
+  { id: "rotacion", aspecto: "factores", nombre: "Rotación de la región" },
+  { id: "rc-direccion", aspecto: "rc", nombre: "Dirección del RC" },
+  { id: "rc-centrado", aspecto: "rc", nombre: "Punto de centrado" },
+  { id: "posicion", aspecto: "posicion", nombre: "Pasos de la posición" },
+  { id: "estructuras", aspecto: "criterios", nombre: "Estructuras que se ven" },
+];
+
 const RC_ETIQUETA = { perpendicular: "Perpendicular", "cefálico": "Cefálico", caudal: "Caudal", horizontal: "Horizontal", angulado: "Angulado" };
 const N_OPCIONES = 4;
 
@@ -48,7 +64,7 @@ const limpio = (s) => norm(s).replace(/[^a-z0-9]+/g, " ").trim();
 const contiene = (a, b) => { const x = limpio(a), y = limpio(b); return x.includes(y) || y.includes(x); };
 
 // ---------- reglas de "no se confunde con el correcto" por dato ----------
-const TAMANOS = (s) => new Set((norm(s).match(/\d+\s*x\s*\d+/g) || []).map((x) => x.replace(/\s/g, "")));
+const TAMANOS = (s) => new Set((norm(s).match(/\d+\s*[x×]\s*\d+/g) || []).map((x) => x.replace(/\s/g, "").replace("×", "x")));
 const ORIENT = (s) => new Set(["vertical", "horizontal"].filter((w) => norm(s).includes(w)));
 const subconj = (A, B) => [...A].every((x) => B.has(x));
 const RESP = ["inspiracion", "espiracion", "apnea", "respiracion", "deglucion", "ortostatica"];
@@ -109,8 +125,10 @@ const FACTORES = [
 // ---------- generación ----------
 // fichas: proyecciones a repasar · todas: todas las proyecciones (de ahí salen los distractores)
 // zonaDe(regionId) → [botón del menú, familia], para buscar distractores primero en la misma zona (más difíciles de descartar)
-export function generarPreguntas({ fichas, todas, zonaDe = () => ["", ""], aspectos, cantidad, semilla }) {
-  const r = azar(`${semilla}|${fichas.map((p) => p.id).join(",")}|${[...aspectos].sort().join(",")}|${cantidad}`);
+// excluir: ids de CAMPOS que no se preguntan
+export function generarPreguntas({ fichas, todas, zonaDe = () => ["", ""], aspectos, excluir = [], cantidad, semilla }) {
+  const r = azar(`${semilla}|${fichas.map((p) => p.id).join(",")}|${[...aspectos].sort().join(",")}|${cantidad}${excluir.length ? `|-${[...excluir].sort().join(",")}` : ""}`);
+  const fuera = new Set(excluir);
   const elegidas = new Set(fichas.map((p) => p.id));
   // orden de búsqueda de distractores: misma zona del menú, misma familia, las otras fichas elegidas y el resto
   const cercanas = (p) => {
@@ -131,7 +149,7 @@ export function generarPreguntas({ fichas, todas, zonaDe = () => ["", ""], aspec
     return res;
   };
   const armar = (p, aspecto, campo, enunciado, correcta, distractores, extra = {}) => {
-    if (distractores.length < 1) return null;
+    if (distractores.length < 1 || fuera.has(campo)) return null;
     const opciones = mezclar([correcta, ...distractores], r);
     return { ficha: p.id, aspecto, campo, enunciado, opciones, correcta: opciones.indexOf(correcta), conNombre: aspecto !== "general", ...extra };
   };

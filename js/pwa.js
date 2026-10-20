@@ -29,6 +29,8 @@ export const pwa = {
     return `<div class="aviso-inst"><b>Tenela en tu pantalla de inicio</b><span>${como}</span>
       <div class="acc">${evtInstalar ? `<button class="pri" data-instalar>Instalar</button>` : ""}<button data-cerrar-aviso>Ahora no</button></div></div>`;
   },
+  puedeInstalar: () => !!evtInstalar,
+  instalada: () => standalone(),
   async instalar() { if (!evtInstalar) return; evtInstalar.prompt(); await evtInstalar.userChoice.catch(() => {}); evtInstalar = null; },
   estadoOffline() {
     if (window.RADIOGUIA_VISTA_PREVIA) return "Esta es una vista previa: el modo sin conexión funciona en la versión instalada.";

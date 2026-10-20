@@ -5,6 +5,7 @@ import { esc, icono, cabecera, botonFav } from "./util.js";
 import { panelEdicionAjustes } from "./edicion.js";
 import { pwa } from "./pwa.js";
 import { GRUPOS } from "./menu.js";
+import { nombre as nombreUsuario } from "./identificacion.js";
 
 export const estado = { q: "", qFav: "", filtro: {}, sel: null }; // búsqueda, filtro de categoría por región y selección en Favoritos (Set o null)
 
@@ -41,15 +42,58 @@ function menuRegiones(filtro) {
 const todos = () => true;
 
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
+const AYUDA_ICONO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>';
+
 export function vistaPortada() {
   return `<main class="portada">
-    <p class="portada-nombre">RadioGuía</p>
-    <p class="portada-ayuda">¿Por dónde empezamos?</p>
+    <div class="portada-barra">
+      <a class="portada-boton" href="#ayuda-app" aria-label="Cómo usarla como app en el celular">${AYUDA_ICONO}<span>Usarla como app</span></a>
+      <h1 class="portada-rx">RX</h1>
+      <a class="portada-boton" href="#ajustes" aria-label="Ajustes">${icono.ajustes}<span>Ajustes</span></a>
+    </div>
+    <p class="portada-hola">Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
     <div class="portada-ops">
       <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
       <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
     </div>
-    <div class="portada-pie">${pwa.aviso()}<a href="#ajustes">${icono.ajustes}<span>Ajustes</span></a></div>
+  </main>`;
+}
+
+// cómo instalarla desde el link en el celular o la tablet
+export function vistaAyudaApp() {
+  const link = location.origin + location.pathname;
+  const ya = pwa.instalada();
+  return cabecera({ titulo: "Usarla como app", sub: "En el celular o la tablet", atras: "#" }) + `
+  <main class="wrap ayuda-app">
+    ${ya ? `<p class="aviso-ok">Ya la estás usando como app. Funciona sin internet.</p>` : ""}
+    <section class="panel"><h2>El link de la app</h2>
+      <p>Compartilo con tus compañeros. Se abre en el navegador y desde ahí se agrega a la pantalla de inicio.</p>
+      <div class="ayuda-link"><code>${esc(link)}</code><button class="btn" data-copiar-link="${esc(link)}">Copiar</button></div>
+    </section>
+    ${pwa.puedeInstalar() ? `<section class="panel"><h2>Instalar ahora</h2><p>Este navegador permite instalarla con un toque.</p><button class="rp-empezar" data-instalar>Instalar</button></section>` : ""}
+    <section class="panel"><h2>iPhone o iPad</h2>
+      <ol>
+        <li>Abrí el link en <b>Safari</b> (en otros navegadores del iPhone puede no aparecer la opción).</li>
+        <li>Tocá el botón <b>Compartir</b> (el cuadrado con la flecha hacia arriba).</li>
+        <li>Elegí <b>Agregar a inicio</b> y después <b>Agregar</b>.</li>
+        <li>Abrila desde el ícono del pulgar en tu pantalla de inicio.</li>
+      </ol>
+    </section>
+    <section class="panel"><h2>Android</h2>
+      <ol>
+        <li>Abrí el link en <b>Chrome</b>.</li>
+        <li>Tocá el menú <b>⋮</b> (arriba a la derecha).</li>
+        <li>Elegí <b>Instalar app</b> o <b>Agregar a la pantalla principal</b> y confirmá.</li>
+        <li>Abrila desde el ícono del pulgar.</li>
+      </ol>
+    </section>
+    <section class="panel"><h2>Bueno saber</h2>
+      <ul>
+        <li>La primera vez abrila con internet: así se guardan todas las fichas y después funciona sin conexión.</li>
+        <li>Tu identificación queda guardada; no hace falta entrar cada vez.</li>
+        <li>Cuando hay una versión nueva, la app se actualiza sola al abrirla con internet.</li>
+      </ul>
+    </section>
   </main>`;
 }
 

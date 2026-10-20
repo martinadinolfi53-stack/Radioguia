@@ -1,10 +1,10 @@
 // Arranque y navegación por #hash:
-// #  portada (Enfoques o Juegos) · #enfoques inicio de enfoques · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #imprimir (lista activa) · #calc · #calc-<proyección> · #ajustes · #repaso… (js/repaso.js) · #juegos… (js/juegos.js)
+// #  portada (Enfoques o Juegos) · #enfoques inicio de enfoques · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #imprimir (lista activa) · #calc · #calc-<proyección> · #ajustes · #ayuda-app (instalar en el celular) · #repaso… (js/repaso.js) · #juegos… (js/juegos.js)
 import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { listas, preferencias, aplicarPreferencias } from "./almacen.js";
 import { tocarEstrella, hojaLista, quitarDeLista } from "./listas-ui.js";
 import { vistaImprimir, opcionesImpresion, preguntarEImprimir } from "./imprimir.js";
-import { estado, vistaPortada, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
+import { estado, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
 import { mostrarTermino } from "./glosario.js";
@@ -15,6 +15,7 @@ import { grupoPorId, grupoDeRegion } from "./menu.js";
 import { vistaRepaso, iniciarRepaso } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
 import { iniciarGrupos } from "./grupos.js";
+import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificacion } from "./identificacion.js";
 
 const app = document.getElementById("app");
 aplicarPreferencias();
@@ -39,6 +40,7 @@ function ruta() {
   if (h === "#favoritos") return { tipo: "favoritos" };
   if (h === "#imprimir") return { tipo: "imprimir" };
   if (h === "#ajustes") return { tipo: "ajustes" };
+  if (h === "#ayuda-app") return { tipo: "ayuda-app" };
   if (h === "#enfoques") return { tipo: "inicio" };
   if (h.startsWith("#repaso")) return { tipo: "repaso", h };
   if (h.startsWith("#juegos")) return { tipo: "juegos", h };
@@ -54,6 +56,13 @@ function volverA(r) {
 }
 
 function render() {
+  // primero hay que identificarse (una sola vez por dispositivo)
+  if (!identificado()) {
+    recordarDestino(location.hash);
+    app.innerHTML = vistaIdentificacion();
+    document.title = "RX";
+    return;
+  }
   const r = ruta();
   const vuelta = volverA(r);
   switch (r.tipo) {
@@ -63,6 +72,7 @@ function render() {
     case "favoritos": app.innerHTML = vistaFavoritos(); break;
     case "imprimir": app.innerHTML = vistaImprimir(); break;
     case "ajustes": app.innerHTML = vistaAjustes(); break;
+    case "ayuda-app": app.innerHTML = vistaAyudaApp(); break;
     case "calc": app.innerHTML = vistaCalculadora(r.id, vuelta); break;
     case "editar": app.innerHTML = vistaEditar(r.p, vuelta); break;
     case "repaso": app.innerHTML = vistaRepaso(r.h); break;
@@ -178,9 +188,10 @@ app.addEventListener("submit", async (e) => {
   }
 });
 
+iniciarIdentificacion(app, render);
 iniciarRepaso(app, render);
 iniciarJuegos(app);
 iniciarGrupos(app, render);
-pwa.iniciar(() => { if (["portada", "inicio", "ajustes"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
+pwa.iniciar(() => { if (["portada", "inicio", "ajustes", "ayuda-app"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
 render();

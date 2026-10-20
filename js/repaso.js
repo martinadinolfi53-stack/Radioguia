@@ -16,6 +16,7 @@ const local = (() => { try { return localStorage; } catch { return null; } })();
 const sesionSt = (() => { try { return sessionStorage; } catch { return null; } })();
 
 const CANTIDADES = [10, 20, 30];
+const regionNombre = (id) => regionPorId[id]?.nombre || id;
 const zonaDe = (region) => [grupoDeRegion[region]?.id || "", grupoDeRegion[region]?.familia.nombre || ""];
 
 // listas de favoritos: las arma el módulo de favoritos (almacen.listas); mientras no exista, la lista única de favoritos
@@ -48,14 +49,7 @@ const pasaFiltros = (p, f = conf.filtros) =>
   (!f.familias.length || f.familias.includes(grupoDeRegion[p.region]?.familia.nombre)) &&
   (!f.tipos.length || f.tipos.includes(p.tipo)) &&
   (!f.cats.length || (p.categoria || []).some((c) => f.cats.includes(c)));
-// complementarios: con cada enfoque elegido entran las otras proyecciones de rutina de su región (la serie básica del manual)
-function conComplementarios(lista) {
-  if (!conf.complementarios) return lista;
-  const ids = new Set(lista.map((p) => p.id));
-  for (const p of lista) for (const x of proyecciones) if (x.region === p.region && x.tipo === "R") ids.add(x.id);
-  return proyecciones.filter((p) => ids.has(p.id));
-}
-const fichasElegidas = () => conComplementarios(fichasDelOrigen()).filter((p) => pasaFiltros(p));
+const fichasElegidas = () => fichasDelOrigen().filter((p) => pasaFiltros(p));
 function origenActual() {
   if (conf.origen === "sueltos") return { tipo: "sueltos", nombre: "Enfoques elegidos" };
   if (conf.origen === "todas") return { tipo: "todas", nombre: "Todas las fichas" };
@@ -70,6 +64,15 @@ function validarOrigen() {
 }
 
 export function resultados() { return leer(local, K_RES, []); }
+
+// preguntas reportadas por el usuario (dos opciones válidas, respuesta mal, etc.): se guardan acá y se mandan como texto
+const K_REP = "radioguia.repaso.reportes";
+const MOTIVOS = ["Hay más de una correcta", "La respuesta correcta está mal", "La pregunta es confusa", "Otro"];
+export const reportes = () => leer(local, K_REP, []);
+const reportada = (q) => reportes().some((x) => x.ficha === q.ficha && x.campo === q.campo && x.enunciado === q.enunciado && x.correcta === q.opciones[q.correcta]);
+function textoReportes() {
+  return "Preguntas reportadas en RadioGuía:\n\n" + reportes().map((x, i) => `${i + 1}. ${x.fichaNombre} · ${x.enunciado}\n   Opciones: ${x.opciones.join(" | ")}\n   Correcta según la app: ${x.correcta}${x.elegida ? `\n   Elegí: ${x.elegida}` : ""}\n   Motivo: ${x.motivo}${x.comentario ? `\n   Comentario: ${x.comentario}` : ""}`).join("\n\n");
+}
 
 // formato de resultado (v1), pensado para un ranking de grupo:
 // { v, id, fecha, semilla, fichas, aspectos, excluir, preguntas, correctas, puntaje, duracionMs, origen: {tipo, id?, nombre}, soloErrores, detalle: [{ficha, aspecto, campo, ok}] }
@@ -90,7 +93,7 @@ function guardarResultado(s) {
 
 function empezar({ fichas, aspectos, excluir = [], cantidad, semilla = Math.random().toString(36).slice(2, 10), origen, preguntas, soloErrores = false }) {
   const lista = fichas.map((id) => proyeccionPorId[id]).filter(Boolean);
-  preguntas ||= generarPreguntas({ fichas: lista, todas: proyecciones, zonaDe, aspectos, excluir, cantidad: cantidad || Infinity, semilla });
+  preguntas ||= generarPreguntas({ fichas: lista, todas: proyecciones, zonaDe, regionNombre, aspectos, excluir, cantidad: cantidad || Infinity, semilla });
   if (!preguntas.length) return false;
   sesion = { semilla, fichas: lista.map((p) => p.id), aspectos, excluir, cantidad, origen, soloErrores, preguntas, respuestas: [], actual: 0, inicio: Date.now(), fin: null, resultado: null };
   guardarSesion();
@@ -127,13 +130,12 @@ let memo = {};
 function maximo(fichas, aspectos, excluir) {
   if (!fichas.length) return 0;
   const k = fichas.map((p) => p.id).join(",") + "|" + aspectos.join(",") + "|" + excluir.join(",");
-  return (memo = memo.k === k ? memo : { k, n: generarPreguntas({ fichas, todas: proyecciones, zonaDe, aspectos, excluir, cantidad: Infinity, semilla: "x" }).length }).n;
+  return (memo = memo.k === k ? memo : { k, n: generarPreguntas({ fichas, todas: proyecciones, zonaDe, regionNombre, aspectos, excluir, cantidad: Infinity, semilla: "x" }).length }).n;
 }
 
 function vistaElegir(aviso) {
   validarOrigen();
-  const propias = fichasDelOrigen(), delOrigen = conComplementarios(propias), fichas = delOrigen.filter((p) => pasaFiltros(p));
-  const sumados = delOrigen.length - propias.length;
+  const delOrigen = fichasDelOrigen(), fichas = delOrigen.filter((p) => pasaFiltros(p));
   const max = maximo(fichas, conf.aspectos, conf.excluir);
   const nFiltros = conf.filtros.familias.length + conf.filtros.tipos.length + conf.filtros.cats.length;
   const n = conf.cantidad ? Math.min(conf.cantidad, max) : max;
@@ -152,8 +154,7 @@ function vistaElegir(aviso) {
     ${aviso ? `<div class="vacio">${esc(aviso)}</div>` : ""}
     ${enCurso ? `<a class="rp-seguir" href="#repaso-jugar"><span><b>Seguir el repaso</b><small>Vas por la pregunta ${sesion.actual + 1} de ${sesion.preguntas.length}</small></span>${icono.chev}</a>` : ""}
     <section class="panel"><h2>¿Qué enfoques?</h2><div class="opciones rp-col">${origenes}</div>
-      ${conf.origen === "sueltos" ? selectorSueltos() : ""}
-      ${conf.origen === "todas" ? "" : `<div class="opciones rp-col rp-compl">${op(!!conf.complementarios, 'data-rp="complementarios"', "Sumar los complementarios", conf.complementarios ? `${sumados ? `Se suman ${sumados} ${sumados === 1 ? "enfoque" : "enfoques"}: ` : ""}las otras proyecciones de rutina de la misma región` : "Con cada enfoque entran las otras proyecciones de rutina de su región (ej. AP + lateral + oblicua)")}</div>`}</section>
+      ${conf.origen === "sueltos" ? selectorSueltos() : ""}</section>
     <details class="panel rp-filtros"${nFiltros ? " open" : ""}><summary><h2>Filtrar enfoques</h2><span>${nFiltros ? `${fichas.length} de ${delOrigen.length} enfoques` : "Sin filtros"}</span>${icono.chev}</summary>
       ${filaFiltro("familias", "Región", FAMILIAS.map((x) => [x.nombre, x.nombre]))}
       ${filaFiltro("tipos", "Rutina o especial", TIPOS)}
@@ -169,6 +170,8 @@ function vistaElegir(aviso) {
     ${fichas.length ? "" : `<div class="vacio">${delOrigen.length ? "<b>Ningún enfoque pasa los filtros.</b><br>Sacá alguno de los filtros de arriba." : conf.origen === "sueltos" ? "Elegí al menos un enfoque de la lista de arriba." : "<b>Esta lista está vacía.</b><br>Agregá enfoques con la estrella o elegí enfoques sueltos."}</div>`}
     ${fichas.length && !max ? `<div class="vacio">Con estos enfoques y estos tipos de pregunta no se puede armar ninguna pregunta. Prendé más tipos de pregunta.</div>` : ""}
     <button class="rp-empezar" data-rp="empezar" ${n ? "" : "disabled"}>Empezar · ${n} ${n === 1 ? "pregunta" : "preguntas"}</button>
+    ${reportes().length ? `<section class="panel"><h2>Preguntas reportadas (${reportes().length})</h2><p>Mandalas por WhatsApp o pegalas en el chat del proyecto para revisarlas.</p>
+      <div class="opciones rp-rep-acc"><button class="opcion" data-rp="enviar-reportes">Enviar reportes</button><button class="opcion" data-rp="borrar-reportes">Borrar</button></div><p class="pie" id="rp-rep-aviso" hidden></p></section>` : ""}
     ${ultimos.length ? `<section class="panel"><h2>Últimos resultados</h2><div class="rp-hist">${ultimos.map((r) => `<div><span>${esc(r.origen?.nombre || "")}<small>${new Date(r.fecha).toLocaleDateString("es-AR", { day: "numeric", month: "short" })} · ${r.preguntas} preguntas</small></span><b>${r.correctas}/${r.preguntas}</b></div>`).join("")}</div></section>` : ""}
     <p class="pie">Preguntas armadas con los datos de las fichas (Bontrager 9ª ed.). Los resultados se guardan en este dispositivo.</p>
   </main>`;
@@ -205,6 +208,12 @@ function vistaPregunta() {
       <p><b>${resp === q.correcta ? "¡Correcto!" : "Incorrecto."}</b> ${resp === q.correcta ? "" : `La respuesta era <b>${"ABCD"[q.correcta]}</b>.`}</p>
       ${q.completa ? `<p>En la ficha: ${esc(q.completa)}</p>` : ""}
       <a class="rp-link" href="#p-${esc(q.ficha)}">${icono.libro}<span>Ver la ficha de ${esc(p?.nombre)}</span></a>
+      ${reportada(q) ? `<p class="rp-reportada">Pregunta reportada. Gracias.</p>` : s.reportando ? `<div class="rp-reporte">
+        <label for="rp-coment">¿Qué está mal? <small>(opcional)</small></label>
+        <input id="rp-coment" type="text" autocomplete="off" placeholder="Por ejemplo: la B también es correcta">
+        <div class="rp-chips">${MOTIVOS.map((m) => `<button class="rp-chip" data-rp="reportar" data-val="${esc(m)}">${esc(m)}</button>`).join("")}</div>
+        <button class="rp-limpiar" data-rp="no-reportar">Cancelar</button></div>`
+      : `<button class="rp-reportar" data-rp="abrir-reporte">Reportar esta pregunta</button>`}
     </section>
     <button class="rp-empezar" data-rp="siguiente">${s.actual + 1 < total ? "Siguiente" : "Ver resultado"}</button>` : ""}
   </main>`;
@@ -276,6 +285,7 @@ export function iniciarRepaso(app, render) {
         if (sesion.respuestas[sesion.actual] !== undefined) return;
         sesion.respuestas[sesion.actual] = +v; guardarSesion(); break;
       case "siguiente":
+        sesion.reportando = false;
         if (sesion.actual + 1 < sesion.preguntas.length) sesion.actual++;
         else { sesion.fin = Date.now(); sesion.resultado = guardarResultado(sesion); }
         guardarSesion(); render(); return scrollTo(0, 0);
@@ -289,9 +299,28 @@ export function iniciarRepaso(app, render) {
         empezar({ fichas: sesion.fichas, aspectos: sesion.aspectos, excluir: sesion.excluir, cantidad: sesion.cantidad, semilla: sesion.semilla, origen: sesion.origen,
           ...(sesion.soloErrores ? { soloErrores: true, preguntas: sesion.preguntas.map((q) => ({ ...q })) } : {}) });
         render(); return scrollTo(0, 0);
-      case "complementarios": conf.complementarios = !conf.complementarios; break;
       case "otra":
         empezar({ fichas: sesion.fichas, aspectos: sesion.aspectos, excluir: sesion.excluir, cantidad: sesion.cantidad, origen: sesion.origen }); render(); return scrollTo(0, 0);
+      case "abrir-reporte": sesion.reportando = true; break;
+      case "no-reportar": sesion.reportando = false; break;
+      case "reportar": {
+        const q = sesion.preguntas[sesion.actual], elegida = sesion.respuestas[sesion.actual];
+        const rep = { fecha: new Date().toISOString(), ficha: q.ficha, fichaNombre: proyeccionPorId[q.ficha]?.nombre || q.ficha, campo: q.campo, enunciado: q.enunciado,
+          opciones: q.opciones, correcta: q.opciones[q.correcta], elegida: elegida !== undefined ? q.opciones[elegida] : null, motivo: v, comentario: document.getElementById("rp-coment")?.value.trim() || "" };
+        escribir(local, K_REP, [...reportes(), rep]);
+        sesion.reportando = false; break;
+      }
+      case "enviar-reportes": {
+        const texto = textoReportes(), aviso = document.getElementById("rp-rep-aviso");
+        try {
+          if (navigator.share) await navigator.share({ title: "RadioGuía · preguntas reportadas", text: texto });
+          else { await navigator.clipboard.writeText(texto); aviso.textContent = "Reportes copiados. Pegalos en el chat."; aviso.hidden = false; }
+        } catch (err) { if (err?.name !== "AbortError") { aviso.textContent = "No se pudo compartir; probá de nuevo."; aviso.hidden = false; } }
+        return;
+      }
+      case "borrar-reportes":
+        if (!confirm("¿Borrar las preguntas reportadas de este dispositivo?")) return;
+        escribir(local, K_REP, []); break;
       case "compartir": {
         const url = linkPartida(sesion), aviso = document.getElementById("rp-compartido");
         const texto = "Partida de repaso de RadioGuía: respondé las mismas preguntas que yo.";
@@ -304,6 +333,7 @@ export function iniciarRepaso(app, render) {
       default: return;
     }
     guardarConf();
+    if (sesion) guardarSesion();
     const y = scrollY; render(); scrollTo(0, y);
   });
 

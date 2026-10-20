@@ -52,14 +52,14 @@ function validarOrigen() {
 export function resultados() { return leer(local, K_RES, []); }
 
 // formato de resultado (v1), pensado para un ranking de grupo:
-// { v, id, fecha, semilla, fichas, aspectos, preguntas, correctas, puntaje, duracionMs, origen: {tipo, id?, nombre}, detalle: [{ficha, aspecto, campo, ok}] }
+// { v, id, fecha, semilla, fichas, aspectos, preguntas, correctas, puntaje, duracionMs, origen: {tipo, id?, nombre}, soloErrores, detalle: [{ficha, aspecto, campo, ok}] }
 // con semilla + fichas + aspectos + preguntas cualquiera vuelve a generar exactamente las mismas preguntas.
 function guardarResultado(s) {
   const correctas = s.respuestas.filter((r, i) => r === s.preguntas[i].correcta).length;
   const res = {
     v: 1, id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`, fecha: new Date().toISOString(),
     semilla: s.semilla, fichas: s.fichas, aspectos: s.aspectos, preguntas: s.preguntas.length, correctas, puntaje: correctas * 100,
-    duracionMs: Math.max(0, (s.fin || Date.now()) - s.inicio), origen: s.origen,
+    duracionMs: Math.max(0, (s.fin || Date.now()) - s.inicio), origen: s.origen, soloErrores: !!s.soloErrores,
     detalle: s.preguntas.map((q, i) => ({ ficha: q.ficha, aspecto: q.aspecto, campo: q.campo, ok: s.respuestas[i] === q.correcta })),
   };
   escribir(local, K_RES, [res, ...resultados()].slice(0, 50));

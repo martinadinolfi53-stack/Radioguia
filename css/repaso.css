@@ -103,3 +103,8 @@
 .rp-reporte input:focus { border-color: var(--accent); outline: none; }
 .rp-reporte .rp-limpiar { margin-top: 0; justify-self: start; }
 .rp-rep-acc { margin-top: 10px; }
+
+/* contrarreloj */
+.rp-min { margin-top: 10px; }
+.rp-reloj { flex: none; min-width: 64px; text-align: right; font-size: 1.35em; font-variant-numeric: tabular-nums; color: var(--accent); }
+.rp-barra.reloj span { background: var(--warn); transition: width .25s linear; }

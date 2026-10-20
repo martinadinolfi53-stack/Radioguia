@@ -1,7 +1,6 @@
 // Sección Juegos: menú de juegos, Mi perfil (nivel, racha, medallas y estadísticas por pilar y por zona).
-// Rutas: #juegos · #juegos-perfil
-// Todo lo de esta pantalla vive en este dispositivo y funciona sin cuenta. Desafío del día, Grupos y Ranking necesitan
-// la cuenta (Firebase) y se muestran como "próximamente" hasta que estén conectados.
+// Rutas: #juegos · #juegos-perfil · las de grupos, cuenta y desafío del día están en js/grupos.js
+// Mi perfil vive en este dispositivo y funciona sin cuenta. Desafío del día, Grupos y Ranking usan la cuenta (js/grupos.js).
 // Las estadísticas se acumulan con cada repaso terminado (evento rg:repaso-resultado de js/repaso.js), así no se pierden
 // cuando el repaso descarta resultados viejos (guarda los últimos 50).
 import { proyeccionPorId } from "./datos.js";
@@ -9,6 +8,7 @@ import { esc, icono, cabecera } from "./util.js";
 import { GRUPOS, grupoDeRegion } from "./menu.js";
 import { ASPECTOS } from "./repaso-preguntas.js";
 import { resultados, empezarRepaso } from "./repaso.js";
+import { vistaGrupos } from "./grupos.js";
 
 const K_STATS = "radioguia.juegos.stats";
 const local = (() => { try { return localStorage; } catch { return null; } })();
@@ -99,8 +99,12 @@ function debiles() {
 
 // ---------- pantallas ----------
 export function vistaJuegos(h) {
-  return h.startsWith("#juegos-perfil") ? vistaPerfil() : vistaMenu();
+  if (h.startsWith("#juegos-perfil")) return vistaPerfil();
+  return vistaGrupos(h) ?? vistaMenu();
 }
+
+// el desafío del día también suma experiencia y estadísticas personales
+export function registrarDesafio(res) { if (contar(res)) guardar(); }
 
 function vistaMenu() {
   const nv = nivel(), r = racha(), deb = debiles();
@@ -114,17 +118,16 @@ function vistaMenu() {
       <span><b>${esc(nv.nombre)}</b><small>${st.xp} de experiencia${r ? ` · ${r} ${r === 1 ? "día seguido" : "días seguidos"}` : ""}</small></span>${icono.chev}
     </a>
     <div class="jg-lista">
-      ${tarjeta("", "Desafío del día", "Las mismas preguntas para todo tu grupo, con 5 vidas. Suma al ranking.")}
+      ${tarjeta("#juegos-desafio", "Desafío del día", "Las mismas preguntas para todo tu grupo, con vidas. Suma al ranking.")}
       ${tarjeta("#repaso", "Práctica libre", "Todas las veces que quieras, para parciales y exámenes. Suma experiencia y estadísticas.")}
       ${deb.pilares.length || deb.zonas.length
         ? `<button class="jg-tarjeta debiles" data-jg="debiles"><span><b>Repasar mis débiles</b><small>${[...deb.pilares, ...deb.zonas].map((x) => esc(x.nombre)).join(" · ")}</small></span>${icono.chev}</button>`
         : `<div class="jg-tarjeta pronto"><span><b>Repasar mis débiles</b><small>Aparece cuando tengas algunos repasos hechos y algo para reforzar.</small></span></div>`}
-      ${tarjeta("", "Grupos", "Creá un grupo e invitá a tus compañeros con un link.")}
-      ${tarjeta("", "Ranking", "Semanal e histórico de tu grupo.")}
+      ${tarjeta("#juegos-grupos", "Grupos y ranking", "Creá un grupo, invitá a tus compañeros con un link y mirá el ranking semanal e histórico.")}
       ${tarjeta("#juegos-perfil", "Mi perfil", "Tu nivel, medallas, pilares fuertes y para mejorar.")}
     </div>
     <p class="pie" id="jg-aviso" hidden></p>
-    <p class="pie">Desafío, grupos y ranking necesitan una cuenta; se activan cuando estén listos.</p>
+    <p class="pie">Para jugar en grupo entrás con un apodo o con tu cuenta de Google.</p>
   </main>`;
 }
 

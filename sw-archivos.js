@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "a9aee67a55";
+self.RG_VERSION = "518ebcd50d";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -29,6 +29,7 @@ self.RG_ARCHIVOS = [
  "iconos/icono-192.png",
  "iconos/icono-512.png",
  "iconos/icono-maskable-512.png",
+ "iconos/juegos-512.jpg",
  "ilustraciones/.gitkeep",
  "ilustraciones/abdomen-ap-bipedestacion.svg",
  "ilustraciones/abdomen-ap-supino.svg",
@@ -276,10 +277,12 @@ self.RG_ARCHIVOS = [
  "js/edicion.js",
  "js/ficha.js",
  "js/glosario.js",
+ "js/grupos.js",
  "js/imagenes.js",
  "js/juegos.js",
  "js/main.js",
  "js/menu.js",
+ "js/nube.js",
  "js/pwa.js",
  "js/repaso-preguntas.js",
  "js/repaso.js",

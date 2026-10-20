@@ -261,8 +261,6 @@ a.row.reg .chev { grid-row: 1 / 3; grid-column: 2; align-self: center; color: va
 .portada-op small { color: #93a0b2; }
 .portada-img { display: grid; place-items: center; width: min(40vw, 200px); aspect-ratio: 1; border-radius: 22%; overflow: hidden; background: #000; box-shadow: 0 0 0 1px #1d3a55, 0 0 40px #1f6fae55; animation: latido 2.4s ease-in-out infinite; }
 .portada-img img { display: block; width: 100%; height: 100%; }
-.portada-img.juegos { background: radial-gradient(circle at 50% 40%, #12324d, #000 75%); color: #5bc4ff; }
-.portada-img.juegos svg { width: 46%; height: 46%; }
 .portada-op:active .portada-img { transform: scale(.96); }
 .portada-pie { display: grid; justify-items: center; gap: 12px; margin-top: 28px; width: min(100%, 520px); text-align: left; }
 .portada-pie > a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; color: #93a0b2; }

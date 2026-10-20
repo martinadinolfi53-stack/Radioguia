@@ -47,7 +47,7 @@ export function vistaPortada() {
     <p class="portada-ayuda">¿Por dónde empezamos?</p>
     <div class="portada-ops">
       <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
-      <a class="portada-op" href="#juegos"><span class="portada-img juegos">${icono.repaso}</span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
+      <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
     </div>
     <div class="portada-pie">${pwa.aviso()}<a href="#ajustes">${icono.ajustes}<span>Ajustes</span></a></div>
   </main>`;

@@ -12,6 +12,7 @@ import { edicion, vistaEditar, leerFormulario } from "./edicion.js";
 import { grupoPorId, grupoDeRegion } from "./menu.js";
 import { vistaRepaso, iniciarRepaso } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
+import { iniciarGrupos } from "./grupos.js";
 
 const app = document.getElementById("app");
 aplicarPreferencias();
@@ -160,6 +161,7 @@ app.addEventListener("submit", async (e) => {
 
 iniciarRepaso(app, render);
 iniciarJuegos(app);
+iniciarGrupos(app, render);
 pwa.iniciar(() => { if (["portada", "inicio", "ajustes"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
 render();

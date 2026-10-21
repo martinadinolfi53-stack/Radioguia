@@ -157,26 +157,25 @@ def _tapar_agujeros(im, maximo=0.01, zonas=None):
     hueco = ndimage.binary_fill_holes(A) & ~A
     lab, n = ndimage.label(hueco)
     rgb = a[..., :3].reshape(-1, 3)[A.ravel()]; color = _color_piel(rgb)
-    cerca = np.zeros_like(A)
+    cerca = np.zeros_like(A); yy, xx = np.mgrid[0:A.shape[0], 0:A.shape[1]]; dentro = np.zeros_like(A)
+    for (qx, qy), rr in (zonas or ()): dentro |= (xx - qx) ** 2 + (yy - qy) ** 2 < rr * rr
     if n:
         tam = ndimage.sum(hueco, lab, range(1, n + 1)); tope = maximo * A.sum()
         ok = tam < tope
         if zonas is not None:
-            yy, xx = np.mgrid[0:A.shape[0], 0:A.shape[1]]; dentro = np.zeros_like(A)
-            for (qx, qy), rr in zonas: dentro |= (xx - qx) ** 2 + (yy - qy) ** 2 < rr * rr
             ok &= ndimage.minimum(dentro, lab, range(1, n + 1)) > 0
         chicos = np.isin(lab, 1 + np.nonzero(ok)[0])
         zona = ndimage.binary_dilation(chicos, iterations=4)
         a[zona, :3] = color; a[zona, 3] = 255
         cerca = ndimage.binary_dilation(chicos, iterations=40)
-    # trocitos sueltos de contorno (menos de 40 px) cerca de esos agujeros: restos de bordes de la malla
-    A = a[..., 3] > 128; oscuro = cerca & A & (a[..., :3].astype(int).sum(2) < color.astype(int).sum() - 120)
+    # trocitos sueltos de contorno (menos de 80 px) cerca de esos agujeros o en la axila: restos de bordes de la malla
+    cerca |= dentro; A = a[..., 3] > 128; oscuro = cerca & A & (a[..., :3].astype(int).sum(2) < color.astype(int).sum() - 120)
     lo, m = ndimage.label(oscuro, structure=np.ones((3, 3)))
     if m:
         tam = ndimage.sum(oscuro, lo, range(1, m + 1))
         interior = ndimage.binary_erosion(A, iterations=6)
         toca = ndimage.maximum(interior, lo, range(1, m + 1))
-        sueltos = np.isin(lo, 1 + np.nonzero((tam < 40) & (toca > 0))[0])
+        sueltos = np.isin(lo, 1 + np.nonzero((tam < 80) & (toca > 0))[0])
         a[ndimage.binary_dilation(sueltos, iterations=1) & interior, :3] = color
     return Image.fromarray(a)
 

@@ -17,7 +17,7 @@ service cloud.firestore {
 
     // preguntas reportadas en el repaso: cualquiera con cuenta reporta; solo los ADMINS las leen y las borran.
     // Para sumar a alguien, se agrega su código de usuario (Ajustes > Ver reportes) a esta lista.
-    function admin() { return logueado() && request.auth.uid in []; }
+    function admin() { return logueado() && request.auth.uid in ['igedxRAEYVWLCPaXRNe18Wsj5JE3']; }
     match /reportes/{rid} {
       allow create: if logueado() && request.resource.data.uid == request.auth.uid
         && texto(request.resource.data.enunciado, 600) && texto(request.resource.data.motivo, 60)

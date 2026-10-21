@@ -1,3 +1,4 @@
 .modelo/
 .cache/
 render/
+__pycache__/

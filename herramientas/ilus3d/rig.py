@@ -219,23 +219,9 @@ class Cuerpo:
     # ---- posar ----
     def posar(self, pose, raiz=np.eye(4)):
         """pose: dict segmento -> lista de (eje, grados) en el marco de reposo; 'radio_X' admite ('prono', grados)."""
-        T = {}; self.prono = {}
+        T = {}; self.prono = {}; self._pose = pose
         for s in ORDEN:
-            M = np.eye(4)
-            for eje, g in pose.get(s, []):
-                if eje == 'prono':
-                    a, b = self.eje_prono[s[-1]]; ax = b - a
-                    # pronación positiva: la palma gira hacia medial (eje hacia distal: signo negativo en el lado derecho)
-                    Rr = rotm(ax, np.radians(g) * (-1 if s[-1] == 'R' else 1)); c = a
-                    self.prono[s[-1]] = self.prono.get(s[-1], 0) + np.radians(g) * (-1 if s[-1] == 'R' else 1)
-                elif eje in ('flex', 'abd', 'abd_palmar', 'rot'):
-                    Rr = rotm({'flex': self.eje_flex, 'abd': self.eje_abd, 'abd_palmar': self.eje_abd_palmar, 'rot': self.eje_rot}[eje][s], np.radians(g)); c = self.C[s]
-                elif eje == 'bisagra':
-                    Rr = rotm(self.bisagra[s], np.radians(g)); c = self.C[s]
-                else:
-                    Rr = rotm(eje, np.radians(g)); c = self.C[s]
-                Mi = np.eye(4); Mi[:3, :3] = Rr; Mi[:3, 3] = c - Rr @ c; M = M @ Mi
-            T[s] = (raiz if PADRE[s] is None else T[PADRE[s]]) @ M
+            T[s] = (raiz if PADRE[s] is None else T[PADRE[s]]) @ self._local(s, pose.get(s, []))
         if 'rotula_media' not in pose:   # la rótula acompaña a medias la flexión de la rodilla
             for s in 'RL':
                 Tm, Tp = T['muslo_' + s], T['pierna_' + s]
@@ -248,6 +234,25 @@ class Cuerpo:
         self.T = T
         return T
 
+    def _local(self, s, movs, giro=1.0):
+        """Transformación local del segmento s. giro escala solo la rotación axial del húmero (eje Y en el brazo)."""
+        M = np.eye(4)
+        for eje, g in movs:
+            if eje == 'prono':
+                a, b = self.eje_prono[s[-1]]; ax = b - a
+                # pronación positiva: la palma gira hacia medial (eje hacia distal: signo negativo en el lado derecho)
+                Rr = rotm(ax, np.radians(g) * (-1 if s[-1] == 'R' else 1)); c = a
+                self.prono[s[-1]] = self.prono.get(s[-1], 0) + np.radians(g) * (-1 if s[-1] == 'R' else 1)
+            elif eje in ('flex', 'abd', 'abd_palmar', 'rot'):
+                Rr = rotm({'flex': self.eje_flex, 'abd': self.eje_abd, 'abd_palmar': self.eje_abd_palmar, 'rot': self.eje_rot}[eje][s], np.radians(g)); c = self.C[s]
+            elif eje == 'bisagra':
+                Rr = rotm(self.bisagra[s], np.radians(g)); c = self.C[s]
+            else:
+                if s.startswith('brazo_') and tuple(eje) == (0, 1, 0): g = g * giro
+                Rr = rotm(eje, np.radians(g)); c = self.C[s]
+            Mi = np.eye(4); Mi[:3, :3] = Rr; Mi[:3, 3] = c - Rr @ c; M = M @ Mi
+        return M
+
     def pesos_piel(self, sigma=0.012):
         P = self.piel_P; nombres = list(PADRE)
         D = np.stack([cKDTree(self.segs[s]).query(P)[0] for s in nombres], 1)
@@ -256,6 +261,15 @@ class Cuerpo:
         cerca = D.argmin(1)
         # corregir islas: vértices cuyo segmento más cercano no está conectado por la malla con el resto de ese segmento
         cerca = self._sin_islas(cerca, D, nombres)
+        # franja donde el brazo en reposo se apoya en el costado: la malla comparte esa piel entre brazo y tórax. Se la da al brazo
+        # (queda un cilindro cerrado que se separa entero) y el tórax pierde esa franja, que mira al brazo y casi no se ve.
+        for lado_ in 'RL':
+            ib = nombres.index('brazo_' + lado_); C = self.C['brazo_' + lado_]
+            H = self.segs['brazo_' + lado_]; ax = np.linalg.svd(H - H.mean(0))[2][0]; ax = ax if ax[1] < 0 else -ax
+            t = (P - C) @ ax; r = np.linalg.norm((P - C) - np.outer(t, ax), axis=1)
+            rb = np.quantile(r[cerca == ib], 0.8)
+            m = np.isin(cerca, [nombres.index('torax'), nombres.index('cintura_' + lado_)]) & (r < rb) & (t > 0.06) & (t < 0.30)
+            cerca[m] = ib
         W = np.zeros_like(D)
         for i, s in enumerate(nombres):
             m = cerca == i
@@ -263,6 +277,25 @@ class Cuerpo:
             cols = [nombres.index(x) for x in ady[s] if x]
             dm = D[m][:, [i]]
             W[np.ix_(m, cols)] = np.exp(-(D[m][:, cols] - dm) / sigma)
+        # la piel del costado del tórax que queda cerca de la escápula no debe seguir al brazo: la mezcla escápula-húmero
+        # solo vale alrededor del hombro (no más de 4 cm por debajo del centro de la cabeza humeral)
+        for lado_ in 'RL':
+            ic, ib = nombres.index('cintura_' + lado_), nombres.index('brazo_' + lado_)
+            m = (cerca == ic) & (P[:, 1] < self.C['brazo_' + lado_][1] - 0.04)
+            W[m, ib] = 0
+        W /= W.sum(1, keepdims=True)
+        # deltoides: la piel que queda por fuera del centro de la cabeza humeral (hacia lateral) acompaña al húmero aunque esté
+        # más cerca del acromion; transición de 3 cm. Si no, al separar el brazo la piel del hombro se queda abajo y el húmero
+        # asoma por encima.
+        for lado_ in 'RL':
+            ib = nombres.index('brazo_' + lado_); C = self.C['brazo_' + lado_]
+            lat = -1 if lado_ == 'R' else 1
+            sx = (P[:, 0] - C[0]) * lat
+            zona = (np.linalg.norm(P - C, axis=1) < 0.13) & (P[:, 1] > C[1] - 0.03) & np.isin(cerca, [nombres.index('cintura_' + lado_), nombres.index('torax'), ib])
+            t = np.clip(sx / 0.03 + 0.2, 0, 1); t = t * t * (3 - 2 * t)
+            m = zona & (t > W[:, ib])
+            W[m] *= ((1 - t[m]) / np.maximum(1 - W[m, ib], 1e-9))[:, None]
+            W[m, ib] = t[m]
         W /= W.sum(1, keepdims=True); self.nombres_w = nombres
         for lado_ in 'RL': self._pesos_mano(W, lado_)
         self.W = W
@@ -358,6 +391,15 @@ class Cuerpo:
                 for i in np.unique(k):
                     Rr = rotm(ax, self.prono.get(s[-1], 0) * i / 40); Mi = np.eye(4); Mi[:3, :3] = Rr; Mi[:3, 3] = a - Rr @ a
                     sel = k == i; Q[sel] = aplicar(self.T[s] @ Mi, P[m][sel])
+                out[m] += w[m, None] * Q
+            elif s.startswith('brazo_') and any(not isinstance(e, str) and tuple(e) == (0, 1, 0) for e, _ in self._pose.get(s, [])):
+                # rotación interna/externa: la piel del hombro casi no gira y el giro completo se alcanza hacia la mitad del
+                # húmero (inserción del deltoides). Si girara entera con el hueso, el deltoides se retuerce.
+                C = self.C[s]; H = self.segs[s]; ax = np.linalg.svd(H - H.mean(0))[2][0]; ax = ax if ax[1] < 0 else -ax
+                t = np.clip((P[m] - C) @ ax / 0.15, 0, 1); t = t * t * (3 - 2 * t)
+                k = np.round(t * 30).astype(int); Q = np.zeros((m.sum(), 3)); Tp = self.T[PADRE[s]]
+                for i in np.unique(k):
+                    sel = k == i; Q[sel] = aplicar(Tp @ self._local(s, self._pose[s], i / 30), P[m][sel])
                 out[m] += w[m, None] * Q
             else:
                 out[m] += w[m, None] * aplicar(self.T[s], P[m])

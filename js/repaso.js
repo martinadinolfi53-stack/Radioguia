@@ -75,7 +75,7 @@ const MOTIVOS = ["Hay más de una correcta", "La respuesta correcta está mal", 
 export const reportes = () => leer(local, K_REP, []);
 const reportada = (q) => reportes().some((x) => x.ficha === q.ficha && x.campo === q.campo && x.enunciado === q.enunciado && x.correcta === q.opciones[q.correcta]);
 // los reportes se guardan en el dispositivo y se mandan a la nube (nube.enviarReporte); si no hay internet, quedan
-// pendientes y se vuelven a mandar al abrir el repaso. Los lee Martin en #repaso-reportes (Ajustes, modo edición).
+// pendientes y se vuelven a mandar al abrir el repaso. Los lee Martin en #repaso-reportes (Ajustes).
 const pendientes = () => reportes().filter((x) => !x.enviado);
 let mandando = null;
 function mandarPendientes() {

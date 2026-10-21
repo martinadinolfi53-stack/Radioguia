@@ -5,7 +5,6 @@ import { regionPorId, proyeccionesDe, FUENTE } from "./datos.js";
 import { marcar, terminosDe, definicionHTML } from "./glosario.js";
 import { bloqueIlustracion } from "./imagenes.js";
 import { esc, icono, cabecera, botonFav } from "./util.js";
-import { edicion } from "./edicion.js";
 
 export const RC_ETIQUETA = { perpendicular: "Perpendicular", "cefálico": "Cefálico", caudal: "Caudal", horizontal: "Horizontal", angulado: "Angulado", variable: "Variable", "sin-dato": "" };
 // flecha que muestra hacia dónde apunta el RC: abajo = perpendicular, inclinada hacia la cabeza o hacia los pies
@@ -45,7 +44,6 @@ export function vistaFicha(p, volver) {
         ${p.tipo ? `<span class="tag ${p.tipo === "R" ? "rut" : "esp"}">${p.tipo === "R" ? "Rutina" : "Especial"}</span>` : ""}
         ${p.metodo ? `<span class="tag">${esc(p.metodo)}</span>` : ""}
         ${p.estado !== "validado" ? `<span class="tag pend">Pendiente de revisión</span>` : ""}
-        ${p._editada ? `<span class="tag ed">${p._editada === "local" ? "Editada en este celular" : "Corregida"}</span>` : ""}
       </div>
     </div>
 
@@ -75,7 +73,6 @@ export function vistaFicha(p, volver) {
     ${hermanas.length > 1 ? `<details class="sec"><summary><span>Otras proyecciones de ${esc(r?.nombre)} (${hermanas.length - 1})</span>${icono.chev}</summary><div class="body"><nav class="serie" aria-label="Otras proyecciones de ${esc(r?.nombre)}">${hermanas.map((h) => `<a class="chip${h.id === p.id ? " on" : ""}" href="#p-${h.id}">${esc(h.nombre)}</a>`).join("")}</nav></div></details>` : ""}
 
     <div class="pie-ficha">
-      ${edicion.activa() ? `<a class="btn" href="#editar-${p.id}">✎<span>Editar esta ficha</span></a>` : ""}
       <a class="btn" href="#calc-${p.id}">${icono.calc}<span>Calculadora de técnica</span></a>
       <p class="fuente">${icono.libro} ${esc(FUENTE.corto)}, pág${p.fuente.paginas.length > 1 ? "s" : ""}. ${p.fuente.paginas.join(", ")}</p>
     </div>

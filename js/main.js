@@ -10,7 +10,6 @@ import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calcula
 import { mostrarTermino } from "./glosario.js";
 import { ampliar } from "./imagenes.js";
 import { pwa } from "./pwa.js";
-import { edicion, vistaEditar, leerFormulario } from "./edicion.js";
 import { grupoPorId, grupoDeRegion } from "./menu.js";
 import { vistaRepaso, iniciarRepaso } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
@@ -38,7 +37,6 @@ function ruta() {
     const fav = h.endsWith("-fav"), id = h.slice(3, fav ? -4 : undefined);
     if (regionPorId[id]) return { tipo: "region", r: regionPorId[id], fav };
   }
-  if (h.startsWith("#editar-") && proyeccionPorId[h.slice(8)] && edicion.activa()) return { tipo: "editar", p: proyeccionPorId[h.slice(8)] };
   if (h === "#favoritos") return { tipo: "favoritos" };
   if (h === "#imprimir") return { tipo: "imprimir" };
   if (h === "#ajustes") return { tipo: "ajustes" };
@@ -53,7 +51,6 @@ function ruta() {
 function volverA(r) {
   if (r.tipo === "ficha") return historial.findLast((x) => !x.startsWith("#p-") && !x.startsWith("#calc")) || `#g-${grupoDeRegion[r.p.region]?.id}`;
   if (r.tipo === "calc") return pantallaAnterior;
-  if (r.tipo === "editar") return `#p-${r.p.id}`;
   return "#";
 }
 
@@ -83,7 +80,6 @@ function render() {
     case "ajustes": app.innerHTML = vistaAjustes(); break;
     case "ayuda-app": app.innerHTML = vistaAyudaApp(); break;
     case "calc": app.innerHTML = vistaCalculadora(r.id, vuelta); break;
-    case "editar": app.innerHTML = vistaEditar(r.p, vuelta); break;
     case "repaso": app.innerHTML = vistaRepaso(r.h); break;
     case "juegos": app.innerHTML = vistaJuegos(r.h); break;
     case "inicio": app.innerHTML = vistaInicio(); break;
@@ -120,16 +116,8 @@ function refrescarMain() {
 }
 
 app.addEventListener("click", async (e) => {
-  const t = e.target.closest("[data-desconectar],[data-exportar],[data-salir-edicion],[data-restaurar],[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir]");
+  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir]");
   if (!t) return;
-  if ("exportar" in t.dataset) return edicion.exportar();
-  if ("desconectar" in t.dataset) { edicion.configurarGithub(null); return render(); }
-  if ("salirEdicion" in t.dataset) { edicion.salir(); return render(); }
-  if (t.dataset.restaurar) {
-    if (!confirm("¿Volver a los datos originales de esta ficha? Se pierden tus cambios.")) return;
-    try { await edicion.restaurar(t.dataset.restaurar); } catch (err) { return alert(err.message); }
-    location.hash = `#p-${t.dataset.restaurar}`; return location.reload();
-  }
   const rehacer = () => { const y = scrollY; render(); scrollTo(0, y); };
   if (t.dataset.fav) { e.preventDefault(); tocarEstrella(t.dataset.fav, rehacer); }
   else if (t.dataset.lista) { listas.elegir(t.dataset.lista); estado.qFav = ""; rehacer(); }
@@ -168,32 +156,6 @@ app.addEventListener("input", (e) => {
     calcEstado.espesor = el.value;
     const r = ruta();
     document.getElementById("calc-res").innerHTML = resultadoHTML(calcular(el.value, r.id ? proyeccionPorId[r.id] : null));
-  }
-});
-
-app.addEventListener("submit", async (e) => {
-  const f = e.target;
-  if (f.id === "form-clave") {
-    e.preventDefault();
-    const ok = await edicion.entrar(f.elements.clave.value);
-    if (ok) render(); else document.getElementById("clave-error").hidden = false;
-  } else if (f.id === "form-edicion") {
-    e.preventDefault();
-    const id = f.dataset.id, estadoEl = document.getElementById("ed-estado"), btn = f.querySelector('[type="submit"]');
-    btn.disabled = true; estadoEl.textContent = "Guardando…";
-    try { estadoEl.textContent = await edicion.guardar(id, leerFormulario(f)); }
-    catch (err) { estadoEl.textContent = "Quedó guardado en este celular, pero no se pudo publicar: " + err.message; }
-    // se recarga para que el buscador y el glosario tomen los datos nuevos
-    setTimeout(() => { location.hash = `#p-${id}`; location.reload(); }, 1600);
-  } else if (f.id === "form-github") {
-    e.preventDefault();
-    const est = document.getElementById("gh-estado");
-    const repo = f.elements.repo.value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, ""), token = f.elements.token.value.trim();
-    if (!/^[\w.-]+\/[\w.-]+$/.test(repo) || !token) { est.textContent = "Completá el repositorio (usuario/nombre) y el token."; return; }
-    edicion.configurarGithub({ repo, token, rama: "main" });
-    est.textContent = "Probando…";
-    try { await edicion.probarGithub(); est.textContent = "Conectado."; setTimeout(render, 900); }
-    catch (err) { edicion.configurarGithub(null); est.textContent = "No se pudo conectar: " + err.message; }
   }
 });
 

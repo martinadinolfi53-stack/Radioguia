@@ -5,7 +5,6 @@ import CON_ESQUEMA from "../datos/ilustraciones.js";
 import ANG_ROT from "../datos/angulacion-rotacion.js";
 import VERSIONES from "../datos/versiones.js";
 import { validarDatos } from "./validacion.js";
-import { aplicarEdiciones, cargarCompartidas } from "./edicion.js";
 
 export { FUENTE, GLOSARIO };
 
@@ -31,8 +30,6 @@ for (const p of proyecciones) {
     return { ...x, posicion: [...x.posicion], ilustracion: esquemas.has(id) ? { src: `ilustraciones/${id}.svg`, alt: `Esquema: ${p.nombre} · ${x.nombre}`, verificada: false } : null };
   });
 }
-// correcciones del modo edición: las publicadas en GitHub y, encima, las de este dispositivo
-aplicarEdiciones(proyecciones, await cargarCompartidas());
 
 export const regionPorId = Object.fromEntries(regiones.map((r) => [r.id, r]));
 export const proyeccionPorId = Object.fromEntries(proyecciones.map((p) => [p.id, p]));

@@ -9,6 +9,8 @@
 //   grupos/{gid}                           { nombre, codigo, creador, creado, fichas, aspectos, excluir, origen }
 //   grupos/{gid}/miembros/{uid}            { uid, apodo, foto, puntos, partidas, racha, ultimaFecha }  acumulado para el ranking histórico
 //   grupos/{gid}/partidas/{fecha}_{uid}    { uid, apodo, fecha, semana, correctas, respondidas, vidas, sinVidas, puntos, bonus, duracionMs, terminada, detalle }
+//   reportes/{id}                          { uid, apodo, creado, ficha, fichaNombre, campo, enunciado, opciones, correcta, elegida, motivo, comentario }
+//                                          preguntas reportadas en el repaso; los escribe cualquiera y solo los lee quien figura en ADMINS de las reglas
 import { firebaseConfig } from "../config/firebase.js";
 
 export const DESAFIO = { preguntas: 15, vidas: 5, puntosPorAcierto: 10, bonusPorDia: 2, bonusMax: 10 };
@@ -227,3 +229,23 @@ export async function partidasDesde(gid, fecha) {
 }
 
 export const uid = () => auth?.currentUser?.uid || null;
+
+// ---------- reportes de preguntas ----------
+export async function enviarReporte(rep) {
+  await iniciar();
+  if (!auth.currentUser) throw new Error("Sin cuenta.");
+  const t = (x, n) => String(x ?? "").slice(0, n);
+  await fb.setDoc(fb.doc(fb.collection(db, "reportes")), {
+    uid: auth.currentUser.uid, apodo: t(perfil?.apodo, 24), creado: fb.serverTimestamp(),
+    ficha: t(rep.ficha, 80), fichaNombre: t(rep.fichaNombre, 160), campo: t(rep.campo, 40), enunciado: t(rep.enunciado, 600),
+    opciones: (rep.opciones || []).slice(0, 6).map((o) => t(o, 600)), correcta: t(rep.correcta, 600), elegida: rep.elegida == null ? "" : t(rep.elegida, 600),
+    motivo: t(rep.motivo, 60), comentario: t(rep.comentario, 500),
+  });
+}
+// solo funciona para quien figura en ADMINS de las reglas; a los demás Firestore les responde permission-denied
+export async function leerReportes() {
+  await iniciar();
+  const docs = (await fb.getDocs(fb.collection(db, "reportes"))).docs.map((d) => ({ id: d.id, ...d.data(), creado: d.data().creado?.toMillis?.() || 0 }));
+  return docs.sort((a, b) => b.creado - a.creado);
+}
+export async function borrarReporte(id) { await iniciar(); await fb.deleteDoc(fb.doc(db, "reportes", id)); }

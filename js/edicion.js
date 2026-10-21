@@ -162,6 +162,9 @@ export function panelEdicionAjustes() {
   return `<section class="panel"><h2>Modo edición activado</h2>
     <p>En cada ficha aparece el botón «Editar». ${n ? `Tenés ${n} ${n === 1 ? "ficha editada" : "fichas editadas"} en este celular.` : "Todavía no editaste ninguna ficha."}</p>
     <div class="opciones">${n ? `<button class="opcion" data-exportar>Exportar cambios</button>` : ""}<button class="opcion" data-salir-edicion>Salir del modo edición</button></div></section>
+  <section class="panel"><h2>Reportes de preguntas</h2>
+    <p>Las preguntas del repaso que reportaron todos los que usan la app.</p>
+    <div class="opciones"><a class="opcion" href="#repaso-reportes">Ver reportes</a></div></section>
   <section class="panel"><h2>Publicar en GitHub</h2>
     <p>${edicion.github() ? `Conectado a <b>${esc(edicion.github().repo)}</b>. Lo que guardes se publica para todos.` : "Con esto, lo que edites le llega a todos los que usan la app."}</p>
     <form id="form-github" class="edicion">

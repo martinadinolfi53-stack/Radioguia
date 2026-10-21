@@ -22,11 +22,6 @@ self.addEventListener("fetch", (e) => {
   e.respondWith((async () => {
     const c = await caches.open(CACHE);
     if (req.mode === "navigate") return (await c.match("./index.html")) || fetch(req);
-    // las correcciones hechas desde el modo edición: primero la red, para ver siempre lo último
-    if (new URL(req.url).pathname.endsWith("/datos/ediciones.json")) {
-      try { const r = await fetch(req, { cache: "no-cache" }); if (r.ok) { c.put(req, r.clone()); return r; } } catch {}
-      return (await c.match(req, { ignoreSearch: true })) || new Response('{"ediciones":{}}', { headers: { "Content-Type": "application/json" } });
-    }
     const hit = await c.match(req, { ignoreSearch: true });
     if (hit) return hit;
     try { const r = await fetch(req); if (r.ok) c.put(req, r.clone()); return r; }

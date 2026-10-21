@@ -8,6 +8,7 @@ import * as almacen from "./almacen.js";
 import { esc, icono, cabecera } from "./util.js";
 import { GRUPOS, grupoDeRegion } from "./menu.js";
 import { ASPECTOS, CAMPOS, generarPreguntas } from "./repaso-preguntas.js";
+import * as nube from "./nube.js";
 
 const K_RES = "radioguia.repaso.resultados", K_SUELTOS = "radioguia.repaso.sueltos", K_CONF = "radioguia.repaso.config", K_SESION = "radioguia.repaso.sesion";
 const leer = (st, k, def) => { try { const v = st.getItem(k); return v == null ? def : JSON.parse(v); } catch { return def; } };
@@ -73,8 +74,18 @@ const K_REP = "radioguia.repaso.reportes";
 const MOTIVOS = ["Hay más de una correcta", "La respuesta correcta está mal", "La pregunta es confusa", "Otro"];
 export const reportes = () => leer(local, K_REP, []);
 const reportada = (q) => reportes().some((x) => x.ficha === q.ficha && x.campo === q.campo && x.enunciado === q.enunciado && x.correcta === q.opciones[q.correcta]);
-function textoReportes() {
-  return "Preguntas reportadas en RadioGuía:\n\n" + reportes().map((x, i) => `${i + 1}. ${x.fichaNombre} · ${x.enunciado}\n   Opciones: ${x.opciones.join(" | ")}\n   Correcta según la app: ${x.correcta}${x.elegida ? `\n   Elegí: ${x.elegida}` : ""}\n   Motivo: ${x.motivo}${x.comentario ? `\n   Comentario: ${x.comentario}` : ""}`).join("\n\n");
+// los reportes se guardan en el dispositivo y se mandan a la nube (nube.enviarReporte); si no hay internet, quedan
+// pendientes y se vuelven a mandar al abrir el repaso. Los lee Martin en #repaso-reportes (Ajustes).
+const pendientes = () => reportes().filter((x) => !x.enviado);
+let mandando = null;
+function mandarPendientes() {
+  if (mandando || !pendientes().length || !navigator.onLine) return mandando;
+  return (mandando = (async () => {
+    for (const x of pendientes()) {
+      try { await nube.enviarReporte(x); } catch { break; }
+      escribir(local, K_REP, reportes().map((y) => (y.fecha === x.fecha && y.enunciado === x.enunciado ? { ...y, enviado: true } : y)));
+    }
+  })().finally(() => { mandando = null; }));
 }
 
 // formato de resultado (v1), pensado para un ranking de grupo:
@@ -140,6 +151,7 @@ export function vistaRepaso(h) {
     if (!ok) return vistaElegir("El link de la partida no es válido o no tiene preguntas.");
   }
   if (h.startsWith("#repaso-l-")) { conf.origen = `lista:${h.slice(10)}`; guardarConf(); history.replaceState(null, "", "#repaso"); }
+  if (h.startsWith("#repaso-reportes")) return vistaAdmin();
   if (sesion?.reloj && !sesion.resultado && Date.now() >= sesion.limite) terminar();
   if (h.startsWith("#repaso-jugar") || h.startsWith("#repaso-partida-")) return sesion ? (sesion.resultado ? vistaResultado() : vistaPregunta()) : vistaElegir();
   return vistaElegir();
@@ -194,8 +206,8 @@ function vistaElegir(aviso) {
     ${fichas.length ? "" : `<div class="vacio">${delOrigen.length ? "<b>Ningún enfoque pasa los filtros.</b><br>Sacá alguno de los filtros de arriba." : conf.origen === "sueltos" ? "Elegí al menos un enfoque de la lista de arriba." : "<b>Esta lista está vacía.</b><br>Agregá enfoques con la estrella o elegí enfoques sueltos."}</div>`}
     ${fichas.length && !max ? `<div class="vacio">Con estos enfoques y estos tipos de pregunta no se puede armar ninguna pregunta. Prendé más tipos de pregunta.</div>` : ""}
     <button class="rp-empezar" data-rp="empezar" ${n ? "" : "disabled"}>Empezar · ${conf.modo === "reloj" ? `${conf.minutos} ${conf.minutos === 1 ? "minuto" : "minutos"}` : `${n} ${n === 1 ? "pregunta" : "preguntas"}`}</button>
-    ${reportes().length ? `<section class="panel"><h2>Preguntas reportadas (${reportes().length})</h2><p>Mandalas por WhatsApp o pegalas en el chat del proyecto para revisarlas.</p>
-      <div class="opciones rp-rep-acc"><button class="opcion" data-rp="enviar-reportes">Enviar reportes</button><button class="opcion" data-rp="borrar-reportes">Borrar</button></div><p class="pie" id="rp-rep-aviso" hidden></p></section>` : ""}
+    ${pendientes().length ? `<section class="panel"><h2>Reportes sin mandar (${pendientes().length})</h2><p>No se pudieron mandar porque no había internet. Se mandan solos cuando vuelve la conexión.</p>
+      <div class="opciones rp-rep-acc"><button class="opcion" data-rp="mandar-reportes">Mandar ahora</button></div><p class="pie" id="rp-rep-aviso" hidden></p></section>` : ""}
     ${ultimos.length ? `<section class="panel"><h2>Últimos resultados</h2><div class="rp-hist">${ultimos.map((r) => `<div><span>${esc(r.origen?.nombre || "")}<small>${new Date(r.fecha).toLocaleDateString("es-AR", { day: "numeric", month: "short" })} · ${r.preguntas} preguntas</small></span><b>${r.correctas}/${r.preguntas}</b></div>`).join("")}</div></section>` : ""}
     <p class="pie">Preguntas armadas con los datos de las fichas (Bontrager 9ª ed.). Los resultados se guardan en este dispositivo.</p>
   </main>`;
@@ -274,7 +286,40 @@ function vistaResultado() {
 }
 
 // ---------- eventos ----------
+// ---------- reportes de todos (solo para quien figura en ADMINS de herramientas/firestore.rules) ----------
+let admin = null, renderRepaso = () => {};
+function vistaAdmin() {
+  if (!admin) {
+    admin = { cargando: true };
+    nube.leerReportes().then((lista) => { admin = { lista }; }, (e) => { admin = { error: e?.code || e?.message || "error" }; })
+      .then(() => { if (location.hash.startsWith("#repaso-reportes")) renderRepaso(); });
+  }
+  const cab = cabecera({ titulo: "Reportes de preguntas", sub: "Lo que reportaron todos", atras: "#ajustes" });
+  if (admin.cargando) return cab + `<main class="wrap repaso"><div class="vacio">Cargando reportes…</div></main>`;
+  if (admin.error) {
+    const sinPermiso = String(admin.error).includes("permission"), uid = nube.uid();
+    return cab + `<main class="wrap repaso">${sinPermiso ? `<section class="panel"><h2>Todavía no tenés permiso</h2>
+      <p>Solo pueden ver los reportes las cuentas anotadas en las reglas de Firebase. Este es tu código de usuario: mandáselo a Claude para que te anote.</p>
+      ${uid ? `<p class="rp-uid"><code>${esc(uid)}</code> <button class="rp-limpiar" data-rp="copiar-uid" data-val="${esc(uid)}">Copiar</button></p>` : "<p>No hay una cuenta abierta en este dispositivo.</p>"}</section>`
+      : `<div class="vacio">No se pudieron cargar los reportes. Fijate que tengas internet.</div>`}
+      <button class="rp-limpiar" data-rp="admin-recargar">Probar de nuevo</button></main>`;
+  }
+  const lista = admin.lista;
+  return cab + `<main class="wrap repaso">
+    ${lista.length ? lista.map((x) => `<section class="panel rp-adm">
+      <p class="rp-ficha"><a href="#p-${esc(x.ficha)}">${esc(x.fichaNombre || x.ficha)}</a><small>${esc(x.apodo || "Sin apodo")} · ${x.creado ? new Date(x.creado).toLocaleString("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}</small></p>
+      <p><b>${esc(x.motivo)}</b>${x.comentario ? `: ${esc(x.comentario)}` : ""}</p>
+      <p>${esc(x.enunciado)}</p>
+      <ul>${(x.opciones || []).map((o) => `<li class="${o === x.correcta ? "ok" : o === x.elegida ? "mal" : ""}">${esc(o)}${o === x.correcta ? " <small>(correcta según la app)</small>" : o === x.elegida ? " <small>(eligió esta)</small>" : ""}</li>`).join("")}</ul>
+      <button class="rp-limpiar" data-rp="admin-borrar" data-val="${esc(x.id)}">Revisado, borrar</button></section>`).join("")
+      : `<div class="vacio">No hay reportes. Cuando alguien reporte una pregunta, aparece acá.</div>`}
+    <button class="rp-limpiar" data-rp="admin-recargar">Actualizar</button></main>`;
+}
+
 export function iniciarRepaso(app, render) {
+  renderRepaso = render;
+  mandarPendientes();
+  addEventListener("online", () => mandarPendientes());
   // reloj del contrarreloj: actualiza el tiempo que queda y termina la partida al llegar a cero
   setInterval(() => {
     if (!sesion?.reloj || sesion.resultado) return;
@@ -357,19 +402,25 @@ export function iniciarRepaso(app, render) {
         const rep = { fecha: new Date().toISOString(), ficha: q.ficha, fichaNombre: proyeccionPorId[q.ficha]?.nombre || q.ficha, campo: q.campo, enunciado: q.enunciado,
           opciones: q.opciones, correcta: q.opciones[q.correcta], elegida: elegida !== undefined ? q.opciones[elegida] : null, motivo: v, comentario: document.getElementById("rp-coment")?.value.trim() || "" };
         escribir(local, K_REP, [...reportes(), rep]);
+        mandarPendientes();
         sesion.reportando = false; break;
       }
-      case "enviar-reportes": {
-        const texto = textoReportes(), aviso = document.getElementById("rp-rep-aviso");
-        try {
-          if (navigator.share) await navigator.share({ title: "RadioGuía · preguntas reportadas", text: texto });
-          else { await navigator.clipboard.writeText(texto); aviso.textContent = "Reportes copiados. Pegalos en el chat."; aviso.hidden = false; }
-        } catch (err) { if (err?.name !== "AbortError") { aviso.textContent = "No se pudo compartir; probá de nuevo."; aviso.hidden = false; } }
+      case "mandar-reportes": {
+        const aviso = document.getElementById("rp-rep-aviso");
+        await mandarPendientes();
+        if (pendientes().length) { aviso.textContent = "Todavía no se pudo. Fijate que tengas internet."; aviso.hidden = false; return; }
+        break;
+      }
+      case "admin-borrar": {
+        if (!confirm("¿Marcar este reporte como revisado? Se borra para todos.")) return;
+        try { await nube.borrarReporte(v); admin.lista = admin.lista.filter((x) => x.id !== v); } catch (err) { alert(err?.message || "No se pudo borrar."); return; }
+        break;
+      }
+      case "admin-recargar": admin = null; break;
+      case "copiar-uid": {
+        try { await navigator.clipboard.writeText(v); t.textContent = "Copiado"; } catch { getSelection().selectAllChildren(t.previousElementSibling); }
         return;
       }
-      case "borrar-reportes":
-        if (!confirm("¿Borrar las preguntas reportadas de este dispositivo?")) return;
-        escribir(local, K_REP, []); break;
       case "compartir": {
         const url = linkPartida(sesion), aviso = document.getElementById("rp-compartido");
         const texto = "Partida de repaso de RadioGuía: respondé las mismas preguntas que yo.";

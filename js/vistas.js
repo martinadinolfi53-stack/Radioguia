@@ -2,7 +2,6 @@
 import { capitulos, regiones, regionPorId, proyecciones, proyeccionesDe, CATEGORIAS, norm, FUENTE } from "./datos.js";
 import { listas, preferencias } from "./almacen.js";
 import { esc, icono, cabecera, botonFav } from "./util.js";
-import { panelEdicionAjustes } from "./edicion.js";
 import { pwa } from "./pwa.js";
 import { GRUPOS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
@@ -207,7 +206,9 @@ export function vistaAjustes() {
     <section class="panel"><h2>Tema</h2><div class="opciones">${op("tema", "oscuro", "Oscuro")}${op("tema", "claro", "Claro")}${op("tema", "sistema", "Como el teléfono")}</div></section>
     <section class="panel"><h2>Tamaño del texto</h2><div class="opciones">${op("texto", "normal", "Normal")}${op("texto", "grande", "Grande")}</div></section>
     <section class="panel"><h2>Sin conexión</h2><p>${pwa.estadoOffline()}</p></section>
-    ${panelEdicionAjustes()}
+    <section class="panel"><h2>Reportes de preguntas</h2>
+      <p>Las preguntas del repaso que reportaron todos los que usan la app. Solo las ve la cuenta de Martin.</p>
+      <div class="opciones"><a class="opcion" href="#repaso-reportes">Ver reportes</a></div></section>
     <section class="panel"><h2>Fuente</h2><p>${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del manual, pendiente de revisión.</p></section>
     <p class="pie">Listas de favoritos y ajustes se guardan solo en este dispositivo.</p>
   </main>`;

@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "86e565663d";
+self.RG_VERSION = "2cfb1f8fb4";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -18,7 +18,6 @@ self.RG_ARCHIVOS = [
  "datos/cap08-craneo-cara-senos.js",
  "datos/cap09-abdomen-contraste.js",
  "datos/cap10-portatiles.js",
- "datos/ediciones.json",
  "datos/glosario.js",
  "datos/ilustraciones.js",
  "datos/indice.js",
@@ -274,7 +273,6 @@ self.RG_ARCHIVOS = [
  "js/almacen.js",
  "js/calculadora.js",
  "js/datos.js",
- "js/edicion.js",
  "js/ficha.js",
  "js/foto.js",
  "js/glosario.js",

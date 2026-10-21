@@ -239,22 +239,17 @@ a.row.reg .chev { grid-row: 1 / 3; grid-column: 2; align-self: center; color: va
 .parte .sub { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0 0 8px; padding-left: 10px; border-left: 3px solid var(--c); font-size: 1em; font-weight: 600; line-height: 1.3; }
 .parte .sub small { font-size: .8em; font-weight: 400; color: var(--mute); }
 
-/* modo edición */
-.tag.ed { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
-.edicion .panel { display: grid; gap: 12px; }
+/* formularios (listas de favoritos) */
 .ed-campo { display: grid; gap: 6px; }
 .ed-campo span { font-size: .82em; color: var(--mute); }
-.ed-campo input, .ed-campo textarea, .ed-campo select, .ed-clave input { font: inherit; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+.ed-campo input, .ed-campo textarea, .ed-campo select { font: inherit; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
 .ed-campo textarea { resize: vertical; line-height: 1.45; }
-.ed-campo input:focus, .ed-campo textarea:focus, .ed-campo select:focus, .ed-clave input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.ed-campo input:focus, .ed-campo textarea:focus, .ed-campo select:focus { outline: 2px solid var(--accent); outline-offset: 0; }
 .ayuda { margin: 0; font-size: .85em; color: var(--mute); }
 .ed-acciones { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 0; }
-.ed-acciones button, .ed-clave button { padding: 12px 18px; border-radius: 12px; border: 1px solid var(--line); font-weight: 600; }
-.ed-acciones .pri, .ed-clave .pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.ed-clave { display: flex; gap: 8px; }
+.ed-acciones button { padding: 12px 18px; border-radius: 12px; border: 1px solid var(--line); font-weight: 600; }
+.ed-acciones .pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .ed-error { color: var(--warn); margin: 0; }
-.edicion { display: grid; gap: 12px; }
-.ed-estado { margin: 0; font-size: .9em; color: var(--accent); min-height: 1.2em; }
 
 /* Portada (vistaPortada en js/vistas.js): la pantalla del pulgar, donde se elige Enfoques o Juegos */
 .portada { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px); background: #000; color: #e7edf5; text-align: center; }

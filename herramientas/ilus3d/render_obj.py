@@ -30,6 +30,8 @@ def render(modo):
         tipo = 'hueso' if o.name.startswith('hueso') else 'ropa' if o.name.startswith('ropa') else 'piel'
         o.data.materials.clear(); o.data.materials.append(mats[tipo])
         o.hide_render = (tipo == 'hueso') != (modo == 'hueso')
+        if tipo == 'piel' and S.get('suavizar', 1):     # malla de piel de pocos polígonos: subdividir para que no queden facetas ni pliegues falsos
+            md = o.modifiers.new('sub', 'SUBSURF'); md.levels = md.render_levels = S.get('suavizar', 1)
     cam = bpy.data.cameras.new('cam'); cam.type = 'ORTHO'; cam.ortho_scale = escala
     co = bpy.data.objects.new('cam', cam); sc.collection.objects.link(co); sc.camera = co
     M = Mc.to_4x4(); M.translation = Mc.col[0] * mid[0] + Mc.col[1] * mid[1] - f * 5.0

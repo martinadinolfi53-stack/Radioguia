@@ -13,6 +13,18 @@ def lado(n):
     l = n.lower()
     return 'R' if re.search(r'\bright\b', l) else 'L' if re.search(r'\bleft\b', l) else ''
 
+DEDOS = {'thumb': 1, 'index': 2, 'middle': 3, 'ring': 4, 'little': 5}
+def dedo(n):
+    """segmento propio de cada falange (y del 1.er metacarpiano): 'f<dedo><m|a|b|c>_<lado>' (m = metacarpiano, a/b/c = falange
+    proximal/media/distal)"""
+    l = n.lower(); s = lado(n)
+    if 'first metacarpal' in l: return 'f1m_' + s
+    m = re.match(r'(proximal|middle|distal) phalanx of (right|left) (thumb|index finger|middle finger|ring finger|little finger)', l)
+    if m: return 'f%d%s_%s' % (DEDOS[m.group(3).split()[0]], {'proximal': 'a', 'middle': 'b', 'distal': 'c'}[m.group(1)], s)
+    return None
+
+def es_mano(n): return segmento(n) is not None and (segmento(n).startswith('mano_') or dedo(n) is not None)
+
 def segmento(n):
     l = n.lower(); s = lado(n)
     if n in CERV: return 'C%d' % (CERV.index(n) + 1)
@@ -24,6 +36,8 @@ def segmento(n):
     if 'humerus' in l: return 'brazo_' + s
     if 'ulna' in l: return 'cubito_' + s
     if 'radius' in l: return 'radio_' + s
+    d = dedo(n)
+    if d: return d
     if re.search(r'scaphoid|lunate|triquetr|pisiform|trapezi|trapezoid|capitate|hamate|metacarpal|finger|thumb|sesamoid bone of (right|left) hand', l): return 'mano_' + s
     if 'femur' in l: return 'muslo_' + s
     if 'patella' in l: return 'rotula_' + s
@@ -36,7 +50,9 @@ PADRE = {'pelvis': None, 'L5': 'pelvis', 'L4': 'L5', 'L3': 'L4', 'L2': 'L3', 'L1
          'C7': 'torax', 'C6': 'C7', 'C5': 'C6', 'C4': 'C5', 'C3': 'C4', 'C2': 'C3', 'C1': 'C2', 'cabeza': 'C1'}
 for s in 'RL':
     PADRE.update({'cintura_' + s: 'torax', 'brazo_' + s: 'cintura_' + s, 'cubito_' + s: 'brazo_' + s, 'radio_' + s: 'cubito_' + s,
-                  'mano_' + s: 'radio_' + s, 'muslo_' + s: 'pelvis', 'rotula_' + s: 'muslo_' + s, 'pierna_' + s: 'muslo_' + s, 'pie_' + s: 'pierna_' + s})
+                  'mano_' + s: 'radio_' + s, 'f1m_' + s: 'mano_' + s, 'f1a_' + s: 'f1m_' + s, 'f1c_' + s: 'f1a_' + s, 'muslo_' + s: 'pelvis', 'rotula_' + s: 'muslo_' + s, 'pierna_' + s: 'muslo_' + s, 'pie_' + s: 'pierna_' + s})
+    for d in '2345':
+        PADRE.update({f'f{d}a_' + s: 'mano_' + s, f'f{d}b_' + s: f'f{d}a_' + s, f'f{d}c_' + s: f'f{d}b_' + s})
 ORDEN = []
 def _ord(p):
     for k, v in PADRE.items():
@@ -101,7 +117,7 @@ class Cuerpo:
                     for k in r[j:]:
                         Mk, t = T[k]; T[k] = (Rr @ Mk, Rr @ (t - ce) + ce)
             # piel de la mano: mezcla con los 2 huesos de la mano más cercanos
-            ks = [k for k, h in self.huesos.items() if segmento(h['nombre']) == 'mano_' + s]
+            ks = [k for k, h in self.huesos.items() if es_mano(h['nombre']) and lado(h['nombre']) == s]
             hand = np.vstack([self.huesos[k]['P'] for k in ks])
             cerca = cKDTree(hand).query(Pp)[0] < 0.03
             arm = np.vstack([self.huesos[k]['P'] for k, h in self.huesos.items() if segmento(h['nombre']) in ('radio_' + s, 'cubito_' + s)])
@@ -144,6 +160,7 @@ class Cuerpo:
                 C[s] = esfera(Q)[0] if k in ('cubito', 'pierna') and len(Q) > 20 else Q.mean(0)
         C['rotula_R'], C['rotula_L'] = C['pierna_R'], C['pierna_L']
         self.C = C
+        self._dedos()
         # ejes de bisagra (codo y rodilla): línea entre epicóndilos, orientada para que + sea flexión
         self.bisagra = {}
         for s in 'RL':
@@ -159,17 +176,60 @@ class Cuerpo:
             r, u = self.segs['radio_' + s], self.segs['cubito_' + s]
             self.eje_prono[s] = (r[r[:, 1].argmax()], u[u[:, 1].argmin()])
 
+    def _dedos(self):
+        """centros y ejes de las articulaciones de los dedos (mano en reposo con los dedos extendidos).
+        eje_flex[seg]: + = flexión (la punta va hacia la palma). eje_abd[seg]: + = se separa del dedo medio (para el medio:
+        hacia radial). Pulgar: eje_flex = flexión hacia el meñique; f1m además tiene eje_abd_palmar y eje_rot (eje largo)."""
+        self.eje_flex, self.eje_abd = {}, {}; self.eje_abd_palmar, self.eje_rot = {}, {}
+        def eje(P):
+            c = P.mean(0); a = np.linalg.svd(P - c)[2][0]
+            if a[1] > 0: a = -a
+            t = (P - c) @ a; return a, c + a * t.min(), c + a * t.max()       # dirección distal, extremo proximal, distal
+        for s in 'RL':
+            S = 'Right' if s == 'R' else 'Left'; sl = S.lower()
+            mc = {2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth'}
+            M = np.vstack([self.puntos(f'{S} {mc[d]} metacarpal bone') for d in mc]); n = np.linalg.svd(M - M.mean(0))[2][2]
+            if n[2] < 0: n = -n                                           # normal palmar (hacia anterior en reposo)
+            radial = np.array([-1. if s == 'R' else 1., 0, 0])               # el pulgar queda hacia lateral en reposo
+            u3 = eje(self.puntos(f'{S} third metacarpal bone'))[0]
+            for d, nom in ((2, 'index'), (3, 'middle'), (4, 'ring'), (5, 'little')):
+                cadena = [f'{S} {mc[d]} metacarpal bone'] + [f'{k} phalanx of {sl} {nom} finger' for k in ('Proximal', 'Middle', 'Distal')]
+                for j, k in enumerate('abc'):
+                    up, _, dP = eje(self.puntos(cadena[j])); uc, pC, _ = eje(self.puntos(cadena[j + 1]))
+                    seg = f'f{d}{k}_{s}'; self.C[seg] = (dP + pC) / 2
+                    a = np.cross(uc, n); self.eje_flex[seg] = a / np.linalg.norm(a)
+                    lejos = (radial if d <= 3 else -radial) if d != 3 else radial
+                    b = n.copy() if np.cross(n, uc) @ lejos > 0 else -n      # rotar uc alrededor de b lo lleva hacia 'lejos'
+                    self.eje_abd[seg] = b
+            # pulgar
+            cad = [f'{S} first metacarpal bone', f'Proximal phalanx of {sl} thumb', f'Distal phalanx of {sl} thumb']
+            u1, p1, _ = eje(self.puntos(cad[0]))
+            self.C['f1m_' + s] = p1
+            hacia5 = self.puntos(f'{S} fifth metacarpal bone').mean(0) - self.puntos(cad[0]).mean(0)
+            for j, k in enumerate('mac'):
+                uc, pC, dC = eje(self.puntos(cad[j]))
+                if j: self.C[f'f1{k}_{s}'] = (eje(self.puntos(cad[j - 1]))[2] + pC) / 2
+                t = hacia5 - (hacia5 @ uc) * uc; a = np.cross(uc, t); self.eje_flex[f'f1{k}_{s}'] = a / np.linalg.norm(a)
+            a = np.cross(u1, n); self.eje_abd_palmar['f1m_' + s] = a / np.linalg.norm(a)    # el pulgar se aleja de la palma
+            self.eje_rot['f1m_' + s] = u1 * (1 if s == 'R' else -1)
+            b = n.copy() if np.cross(n, u1) @ radial > 0 else -n
+            self.eje_abd['f1m_' + s] = b                                    # abducción radial (en el plano de la palma)
+            self.normal_palma = getattr(self, 'normal_palma', {}); self.normal_palma[s] = n
+
     # ---- posar ----
     def posar(self, pose, raiz=np.eye(4)):
         """pose: dict segmento -> lista de (eje, grados) en el marco de reposo; 'radio_X' admite ('prono', grados)."""
-        T = {}
+        T = {}; self.prono = {}
         for s in ORDEN:
             M = np.eye(4)
             for eje, g in pose.get(s, []):
                 if eje == 'prono':
                     a, b = self.eje_prono[s[-1]]; ax = b - a
-                    # pronación positiva: el pulgar va hacia medial
-                    Rr = rotm(ax, np.radians(g) * (1 if s[-1] == 'R' else -1)); c = a
+                    # pronación positiva: la palma gira hacia medial (eje hacia distal: signo negativo en el lado derecho)
+                    Rr = rotm(ax, np.radians(g) * (-1 if s[-1] == 'R' else 1)); c = a
+                    self.prono[s[-1]] = self.prono.get(s[-1], 0) + np.radians(g) * (-1 if s[-1] == 'R' else 1)
+                elif eje in ('flex', 'abd', 'abd_palmar', 'rot'):
+                    Rr = rotm({'flex': self.eje_flex, 'abd': self.eje_abd, 'abd_palmar': self.eje_abd_palmar, 'rot': self.eje_rot}[eje][s], np.radians(g)); c = self.C[s]
                 elif eje == 'bisagra':
                     Rr = rotm(self.bisagra[s], np.radians(g)); c = self.C[s]
                 else:
@@ -203,8 +263,58 @@ class Cuerpo:
             cols = [nombres.index(x) for x in ady[s] if x]
             dm = D[m][:, [i]]
             W[np.ix_(m, cols)] = np.exp(-(D[m][:, cols] - dm) / sigma)
-        W /= W.sum(1, keepdims=True); self.W = W; self.nombres_w = nombres
+        W /= W.sum(1, keepdims=True); self.nombres_w = nombres
+        for lado_ in 'RL': self._pesos_mano(W, lado_)
+        self.W = W
         return W
+
+    def _pesos_mano(self, W, s, ancho=0.012):
+        """Piel de la mano: cada vértice se asigna al rayo (dedo) más cercano y, a lo largo de ese rayo, a la falange en la que
+        cae; cerca de cada articulación se mezcla con la vecina (transición de +-ancho). Así la piel de los dedos se dobla
+        con ellos sin estirarse hacia la palma."""
+        nw = self.nombres_w; idx = {k: i for i, k in enumerate(nw)}
+        cols = [idx['mano_' + s]] + [idx[k] for k in nw if k.startswith('f') and k.endswith('_' + s)]
+        wm = W[:, cols].sum(1); sel = np.where(wm > 1e-4)[0]
+        if not len(sel): return
+        Q = self.piel_P[sel]
+        S = 'Right' if s == 'R' else 'Left'; sl = S.lower()
+        rayos = []
+        for d, nom in ((2, 'index'), (3, 'middle'), (4, 'ring'), (5, 'little')):
+            punta = self.puntos(f'Distal phalanx of {sl} {nom} finger')
+            mcb = self.puntos(f'{S} ' + {2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth'}[d] + ' metacarpal bone')
+            j = [self.C[f'f{d}{k}_{s}'] for k in 'abc']
+            ax = j[2] - j[1]; ax /= np.linalg.norm(ax)
+            tip = punta[((punta - j[2]) @ ax).argmax()]
+            base = mcb[((mcb - j[0]) @ (j[0] - j[1])).argmax()]
+            rayos.append(([base] + j + [tip], ['mano_' + s] + [f'f{d}{k}_{s}' for k in 'abc']))
+        punta = self.puntos(f'Distal phalanx of {sl} thumb'); j = [self.C[f'f1{k}_{s}'] for k in 'mac']
+        ax = j[2] - j[1]; ax /= np.linalg.norm(ax); tip = punta[((punta - j[2]) @ ax).argmax()]
+        base = j[0] - (j[1] - j[0]) * 0.3
+        rayos.append(([base] + j + [tip], ['mano_' + s] + [f'f1{k}_{s}' for k in 'mac']))
+        # distancia de cada vértice a cada rayo (polilínea) y parámetro a lo largo
+        def proy(P, A, B):
+            v = B - A; t = np.clip(((P - A) @ v) / (v @ v), 0, 1); return np.linalg.norm(P - (A + t[:, None] * v), axis=1)
+        D = np.stack([np.min(np.stack([proy(Q, r[0][i], r[0][i + 1]) for i in range(len(r[0]) - 1)], 1), 1) for r in rayos], 1)
+        cual = D.argmin(1)
+        nuevo = np.zeros((len(sel), len(nw)))
+        for ri, (pts, segs) in enumerate(rayos):
+            m = cual == ri
+            if not m.any(): continue
+            P = Q[m]; wv = np.zeros((m.sum(), len(segs)))
+            # posición a lo largo del rayo: por cada articulación k (pts[1..3]), lado distal si (P - Jk)·dir_k > 0
+            lado_d = []
+            for k in range(1, 4):
+                dk = pts[k + 1] - pts[k - 1]; dk /= np.linalg.norm(dk)
+                lado_d.append(np.clip(((P - pts[k]) @ dk) / ancho * 0.5 + 0.5, 0, 1))   # 0 = proximal, 1 = distal
+            # peso de cada segmento: producto de estar distal a su articulación proximal y proximal a la distal
+            wv[:, 0] = 1 - lado_d[0]
+            wv[:, 1] = lado_d[0] * (1 - lado_d[1])
+            wv[:, 2] = lado_d[1] * (1 - lado_d[2])
+            wv[:, 3] = lado_d[2]
+            for c_, sg in enumerate(segs): nuevo[m, idx[sg]] += wv[:, c_]
+        nuevo /= np.maximum(nuevo.sum(1, keepdims=True), 1e-9)
+        W[sel[:, None], cols] = 0
+        W[sel] += nuevo * wm[sel, None]
 
     def _sin_islas(self, cerca, D, nombres):
         I = self.piel_I; n = len(self.piel_P)
@@ -233,10 +343,24 @@ class Cuerpo:
         return cerca
 
     def piel_posada(self):
-        P = self.piel_P; out = np.zeros_like(P)
-        for j, s in enumerate(self.nombres_w):
-            w = self.W[:, j]; m = w > 1e-4
-            if m.any(): out[m] += w[m, None] * aplicar(self.T[s], P[m])
+        P = self.piel_P; out = np.zeros_like(P); nw = self.nombres_w
+        for j, s in enumerate(nw):
+            if s.startswith('radio_'): continue
+            w = self.W[:, j].copy(); m = w > 1e-4
+            if not m.any(): continue
+            if s.startswith('cubito_'):
+                # piel del antebrazo: la pronosupinación se reparte a lo largo del antebrazo (0 en el codo, todo en la muñeca),
+                # en vez de que la piel sobre el radio gire y la de sobre el cúbito no (eso la rasga)
+                w = w + self.W[:, nw.index('radio_' + s[-1])]; m = w > 1e-4
+                a, b = self.eje_prono[s[-1]]; ax = b - a
+                t = np.clip((P[m] - a) @ ax / (ax @ ax), 0, 1)
+                k = np.round(t * 40).astype(int); Q = np.zeros((m.sum(), 3))
+                for i in np.unique(k):
+                    Rr = rotm(ax, self.prono.get(s[-1], 0) * i / 40); Mi = np.eye(4); Mi[:3, :3] = Rr; Mi[:3, 3] = a - Rr @ a
+                    sel = k == i; Q[sel] = aplicar(self.T[s] @ Mi, P[m][sel])
+                out[m] += w[m, None] * Q
+            else:
+                out[m] += w[m, None] * aplicar(self.T[s], P[m])
         return out
 
     def huesos_posados(self):

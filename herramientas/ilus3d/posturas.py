@@ -20,6 +20,22 @@ class Pose(dict):
     def prono(self, s, g): return self.mov('radio_' + s, 'prono', g)        # 0 = supinación (posición anatómica), 90 = neutra, 180 = pronación
     def muneca_flex(self, s, g): return self.mov('mano_' + s, X, -g)        # flexión palmar (+) / dorsal (-)
     def muneca_desv_cubital(self, s, g): return self.mov('mano_' + s, Z, -_sg(s) * g)
+    # dedos: d = 1..5 (o lista). Grados + = flexión / separación (abducción respecto del dedo medio).
+    def dedos_flex(self, s, mcf=0, ifp=0, ifd=None, d=(2, 3, 4, 5)):
+        for k in ([d] if isinstance(d, int) else d):
+            if k == 1: self.mov('f1a_' + s, 'flex', mcf); self.mov('f1c_' + s, 'flex', ifp); continue
+            self.mov(f'f{k}a_' + s, 'flex', mcf); self.mov(f'f{k}b_' + s, 'flex', ifp)
+            self.mov(f'f{k}c_' + s, 'flex', ifp * 0.7 if ifd is None else ifd)
+        return self
+    def dedos_separar(self, s, g, d=(2, 3, 4, 5)):
+        for k in ([d] if isinstance(d, int) else d): self.mov(f'f{k}a_' + s, 'abd', g * (0.3 if k == 3 else 1))
+        return self
+    def pulgar(self, s, abd_radial=0, abd_palmar=0, rot=0, flex_cmc=0):
+        if abd_radial: self.mov('f1m_' + s, 'abd', abd_radial)
+        if abd_palmar: self.mov('f1m_' + s, 'abd_palmar', abd_palmar)
+        if flex_cmc: self.mov('f1m_' + s, 'flex', flex_cmc)
+        if rot: self.mov('f1m_' + s, 'rot', rot)
+        return self
     # miembro inferior
     def cadera_flex(self, s, g): return self.mov('muslo_' + s, X, -g)
     def cadera_abd(self, s, g): return self.mov('muslo_' + s, Z, _sg(s) * g)

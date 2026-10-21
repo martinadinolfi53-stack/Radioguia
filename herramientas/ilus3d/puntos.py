@@ -23,6 +23,17 @@ class Puntos:
 
     # --- definiciones: nombre -> (segmento, función que da el punto en reposo) ---
     def definir(self, nombre):
+        m = __import__('re').match(r'(mcf|ifp|ifd|if|cmc)(\d)_([RL])$', nombre)
+        if m:   # articulaciones de los dedos: centro articular, atado al segmento proximal
+            k, d, s_ = m.groups(); seg = {'mcf': 'f%sa', 'ifp': 'f%sb', 'ifd': 'f%sc', 'if': 'f%sc', 'cmc': 'f%sm'}[k] % d + '_' + s_
+            return __import__('rig').PADRE[seg], (lambda: self.c.C[seg])
+        m = __import__('re').match(r'punta_dedo(\d)_([RL])$', nombre)
+        if m:
+            d, s_ = m.groups(); L_ = _lado(s_).lower(); nm = 'thumb' if d == '1' else {'2': 'index', '3': 'middle', '4': 'ring', '5': 'little'}[d] + ' finger'
+            seg = f'f{d}c_{s_}'
+            return seg, lambda: self.extremo(f'Distal phalanx of {L_} {nm}', self._dir_dedo(d, s_))
+        if nombre.startswith('centro:'):      # centro de cualquier hueso por su nombre en el modelo, p. ej. 'centro:Right capitate'
+            hb = nombre[7:]; return self.c.huesos[self.c.id_por_nombre[hb]]['seg'], lambda: self.centro(hb)
         k, _, s = nombre.rpartition('_') if nombre[-2:] in ('_R', '_L') else (nombre, '', '')
         L = _lado(s) if s else ''; sg = _sg(s) if s else 0
         X, Y, Z = np.eye(3)
@@ -30,8 +41,8 @@ class Puntos:
         D = {
             # miembro superior
             'mcf3': ('mano_' + s, lambda: (self.extremo(f'{L} third metacarpal bone', -Y) + self.extremo(f'Proximal phalanx of {L.lower()} middle finger', Y)) / 2),
-            'punta_dedo3': ('mano_' + s, lambda: self.extremo(f'Distal phalanx of {L.lower()} middle finger', -Y)),
             'grande': ('mano_' + s, lambda: self.centro(f'{L} capitate')),
+            'base_mc3': ('mano_' + s, lambda: self.extremo(f'{L} third metacarpal bone', Y, 0.02)),
             'escafoides': ('mano_' + s, lambda: self.centro(f'{L} scaphoid')),
             'estiloides_radio': ('radio_' + s, lambda: self.extremo(f'{L} radius', -Y + 0.6 * lat, 0.01)),
             'estiloides_cubito': ('cubito_' + s, lambda: self.extremo(f'{L} ulna', -Y - 0.6 * lat, 0.01)),
@@ -82,6 +93,10 @@ class Puntos:
         }
         if k not in D: raise KeyError('punto desconocido: ' + nombre)
         return D[k]
+
+    def _dir_dedo(self, d, s):
+        a, b = (self.c.C[f'f{d}b_{s}'], self.c.C[f'f{d}c_{s}']) if d != '1' else (self.c.C[f'f1a_{s}'], self.c.C[f'f1c_{s}'])
+        v = b - a; return v / np.linalg.norm(v)
 
     def _epic(self, hueso, s, lado):     # lado +1 lateral, -1 medial
         P = self.P(f'{_lado(s)} {hueso}'); low = P[P[:, 1] < P[:, 1].min() + 0.07]

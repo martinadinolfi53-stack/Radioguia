@@ -37,7 +37,8 @@ for (const f of archivos) {
     const mal = claveInvalida(id);
     if (mal) { problemas.push(`${f}: "${id}": ${mal}`); continue; }
     const s = dibujar();
-    if (!s.startsWith("<svg") || /NaN|undefined/.test(s)) { problemas.push(`${f}: "${id}" generó un SVG inválido`); continue; }
+    // (las figuras del modelo van embebidas en base64: se excluyen del control, su texto puede contener "NaN" por azar)
+    if (!s.startsWith("<svg") || /NaN|undefined/.test(s.replace(/data:image\/[a-z]+;base64,[A-Za-z0-9+/=]+/g, ""))) { problemas.push(`${f}: "${id}" generó un SVG inválido`); continue; }
     writeFileSync(join(raiz, "ilustraciones", id + ".svg"), s);
     n++;
   }

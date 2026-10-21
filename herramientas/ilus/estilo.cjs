@@ -140,4 +140,83 @@ function cabezaFrente(cx, cy, r = 24, rot = 0) {
     `<path d="M${cx - r * 0.25},${cy + r * 0.55} Q${cx},${cy + r * 0.68} ${cx + r * 0.25},${cy + r * 0.55}" fill="none" stroke="${SKO}" stroke-width="1.4"/></g>`;
 }
 
-module.exports = { SK, SKO, RED, BLUE, AMB, INK, MUTE, W, H, BONE, BONEO, body, table, wall, ri, riTop, beam, tube, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, mk, cabezaPerfil, cabezaFrente };
+// ---------- figuras del modelo anatómico (herramientas/ilus3d) ----------
+// figura(id, opts) inserta el dibujo render/<id>.webp (generado con herramientas/ilus3d/figuras/<zona>.py) y devuelve
+// { svg, p(nombre) -> [x, y] del punto de referencia en coordenadas del esquema, ppc (unidades por cm), x, y, w, h }.
+// opts: caja [x, y, w, h] (encaja centrado) | en [nombre, X, Y] + ppc (el punto nombre cae en X,Y a esa escala).
+const _fs = require("node:fs"), _path = require("node:path");
+const RENDER = _path.join(__dirname, "..", "ilus3d", "render");
+function figura(id, opts = {}) {
+  const info = JSON.parse(_fs.readFileSync(_path.join(RENDER, id + ".json"), "utf8"));
+  const [rw, rh] = info.res;
+  let k, x, y;
+  if (opts.caja) {
+    const [bx, by, bw, bh] = opts.caja; k = Math.min(bw / rw, bh / rh);
+    x = bx + (bw - rw * k) / 2; y = by + (bh - rh * k) / 2;
+  } else {
+    k = opts.ppc / info.ppc; const [n, X, Y] = opts.en; const q = info.puntos[n];
+    if (!q) throw new Error(`figura ${id}: no tiene el punto ${n}`);
+    x = X - q[0] * k; y = Y - q[1] * k;
+  }
+  const r = (v) => Math.round(v * 10) / 10;
+  const b64 = _fs.readFileSync(_path.join(RENDER, id + ".webp")).toString("base64");
+  const p = (n) => {
+    const q = info.puntos[n]; if (!q) throw new Error(`figura ${id}: no tiene el punto ${n}`);
+    return [r(x + q[0] * k), r(y + q[1] * k)];
+  };
+  // borde(lado, y0, y1): x extremo ('izq' = mínimo, 'der' = máximo) del dibujo entre las alturas y0 e y1 del esquema
+  const borde = (lado, y0 = -1e9, y1 = 1e9) => {
+    const fs = (info.silueta || []).filter(([yy]) => y + yy * k >= y0 && y + yy * k <= y1);
+    if (!fs.length) throw new Error(`figura ${id}: sin silueta en ese rango`);
+    return r(lado === "izq" ? x + Math.min(...fs.map((q) => q[1])) * k : x + Math.max(...fs.map((q) => q[2])) * k);
+  };
+  // filas: [[y, xmin, xmax], …] de la silueta en coordenadas del esquema
+  const filas = (info.silueta || []).map(([yy, a, b]) => [y + yy * k, x + a * k, x + b * k]);
+  // abajo(x0, x1): y más bajo del dibujo entre esas x (p. ej. dónde apoya sobre el RI una parte determinada)
+  const rango = (x0, x1) => { const cs = (info.columnas || []).filter(([xx]) => x + xx * k >= x0 && x + xx * k <= x1);
+    return [r(Math.min(...cs.map((c) => y + c[1] * k))), r(Math.max(...cs.map((c) => y + c[2] * k)))]; };
+  const abajo = (x0, x1) => r(Math.max(...(info.columnas || []).filter(([xx]) => x + xx * k >= x0 && x + xx * k <= x1).map((c) => y + c[2] * k)));
+  return { svg: `<image x="${r(x)}" y="${r(y)}" width="${r(rw * k)}" height="${r(rh * k)}" href="data:image/webp;base64,${b64}"/>`,
+    p, borde, filas, abajo, rango, ppc: info.ppc * k, x: r(x), y: r(y), w: r(rw * k), h: r(rh * k) };
+}
+
+// corte(id, opts): corte transversal vectorial (render/<id>.json de escena.corte, en cm). opts: caja [x,y,w,h] | en [nombre|"apoyo", X, Y] + ppc.
+// Devuelve { svg, p(nombre), apoyo: [x,y] (punto más bajo de la piel), ppc, hueso(nombreModelo) -> centro [x,y] }.
+function corte(id, opts = {}) {
+  const d = JSON.parse(_fs.readFileSync(_path.join(RENDER, id + ".json"), "utf8"));
+  const todos = d.piel.flat();
+  const mnx = Math.min(...todos.map((q) => q[0])), mxx = Math.max(...todos.map((q) => q[0]));
+  const mny = Math.min(...todos.map((q) => q[1])), mxy = Math.max(...todos.map((q) => q[1]));
+  let k, ox, oy;
+  if (opts.caja) {
+    const [bx, by, bw, bh] = opts.caja; k = Math.min(bw / (mxx - mnx), bh / (mxy - mny));
+    ox = bx + (bw - (mxx - mnx) * k) / 2 - mnx * k; oy = by + (bh - (mxy - mny) * k) / 2 - mny * k;
+  } else {
+    k = opts.ppc; const [n, X, Y] = opts.en; const q = n === "apoyo" ? d.apoyo : d.puntos[n];
+    ox = X - q[0] * k; oy = Y - q[1] * k;
+  }
+  const r = (v) => Math.round(v * 10) / 10, T = (q) => [r(ox + q[0] * k), r(oy + q[1] * k)];
+  const path = (l) => "M" + l.map((q) => T(q).join(",")).join(" L") + " Z";
+  const svg = d.piel.map((l) => piel(path(l))).join("") + Object.values(d.huesos).flat().map((l) => hueso(path(l))).join("");
+  const centro = (n) => { const l = d.huesos[n]; if (!l) throw new Error(`corte ${id}: no corta ${n}`);
+    const q = l.flat(); return T([q.reduce((a, b) => a + b[0], 0) / q.length, q.reduce((a, b) => a + b[1], 0) / q.length]); };
+  // extremo(fx): punto del contorno de piel principal (el más grande) que maximiza fx([x, y]) en coordenadas del esquema,
+  // p. ej. para apoyar una cuña tangente
+  const extremo = (fx, todos = false) => (todos ? d.piel.flat() : d.piel[0]).map(T).reduce((m, q) => (fx(q) > fx(m) ? q : m));
+  const primero = (...ns) => { const n = ns.find((q) => d.huesos[q]); return n ? centro(n) : null; };   // el primero de los huesos que el plano corta (o null)
+  return { svg, p: (n) => T(d.puntos[n]), apoyo: T(d.apoyo), ppc: k, hueso: centro, primero, extremo,
+    caja: [r(ox + mnx * k), r(oy + mny * k), r((mxx - mnx) * k), r((mxy - mny) * k)] };
+}
+
+// separación horizontal mínima entre la figura A (a la izquierda) y B (a la derecha), fila por fila (negativa = se superponen)
+function hueco(A, B, y0 = -1e9, y1 = 1e9) {
+  let m = Infinity;
+  for (const [y, , xa] of A.filas) {
+    if (y < y0 || y > y1) continue;
+    const fb = B.filas.reduce((best, f) => (Math.abs(f[0] - y) < Math.abs(best[0] - y) ? f : best), [Infinity]);
+    if (Math.abs(fb[0] - y) < 4) m = Math.min(m, fb[1] - xa);
+  }
+  return m;
+}
+
+module.exports = { SK, SKO, RED, BLUE, AMB, INK, MUTE, W, H, BONE, BONEO, body, table, wall, ri, riTop, beam, tube, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, mk, cabezaPerfil, cabezaFrente, figura, corte, hueco };

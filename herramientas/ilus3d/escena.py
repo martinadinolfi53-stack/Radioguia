@@ -94,7 +94,8 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     ppc = info['pxm'] / 100
     for i in range(len(planos)):
         a = np.array(info['puntos'][f'_corte{i}']); b = np.array(info['puntos'][f'_corte{i}n']); u = b - a
-        if np.linalg.norm(u) < 1e-6: continue
+        if np.linalg.norm(u) < 0.5 * 5 * ppc:     # plano casi de frente a la cámara: el corte queda oculto, no se desvanece
+            del info['puntos'][f'_corte{i}'], info['puntos'][f'_corte{i}n']; continue
         u /= np.linalg.norm(u); dist = (xx - a[0]) * u[0] + (yy - a[1]) * u[1]
         A *= np.clip(dist / (fundido * 100 * ppc), 0, 1)
         del info['puntos'][f'_corte{i}'], info['puntos'][f'_corte{i}n']

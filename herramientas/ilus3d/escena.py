@@ -23,7 +23,7 @@ def cuerpo():
 def ropa(c, Pp):
     """Short de paciente que cubre la pelvis: envolvente convexa de la piel de esa zona, ya posada."""
     R = c.piel_P; dom = np.array(c.nombres_w)[c.W.argmax(1)]
-    m = np.isin(dom, ['pelvis', 'muslo_R', 'muslo_L', 'L5', 'L4']) & (R[:, 1] > 0.79) & (R[:, 1] < 1.0)
+    m = np.isin(dom, ['pelvis', 'muslo_R', 'muslo_L', 'L5']) & (R[:, 1] > 0.72) & (R[:, 1] < 0.98)
     Q = Pp[m]; h = ConvexHull(Q); cen = Q.mean(0)
     return Q + (Q - cen) / np.linalg.norm(Q - cen, axis=1, keepdims=True) * 0.004, h.simplices
 
@@ -58,16 +58,17 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     # (en la mano no: ahí los pliegues entre dedos se estiran sin ser puentes falsos)
     mano = np.char.startswith(dom.astype(str), 'f') | np.char.startswith(dom.astype(str), 'mano')
     # en la axila sí se conserva la piel estirada: forma los pliegues axilares (pectoral y dorsal) al separar el brazo
+    # (solo la que sigue cerca de la cabeza humeral: al rotar el brazo, esa piel puede quedar estirada hacia abajo)
     cen0 = c.piel_P[I].mean(1)
     axila = np.zeros(len(I), bool)
-    for s_ in 'RL': axila |= np.linalg.norm(cen0 - c.C['brazo_' + s_], axis=1) < 0.09
+    for s_ in 'RL': axila |= (np.linalg.norm(cen0 - c.C['brazo_' + s_], axis=1) < 0.09) & (np.linalg.norm(Pp[I].mean(1) - pts.posado('cabeza_humero_' + s_), axis=1) < 0.12)
     I = I[~((lados(Pp) > 2.5 * lados(c.piel_P)) & (lados(Pp) > 0.025)) | mano[I].all(1) | axila]
     # puentes entre el brazo y el tronco (en reposo el brazo toca el costado): triángulos que mezclan vértices del brazo y del
     # tronco y que se estiran al separar el brazo
-    ds = dom.astype(str); brazo = np.char.startswith(ds, 'brazo') | np.char.startswith(ds, 'cubito') | np.char.startswith(ds, 'radio')
-    tronco = np.char.startswith(ds, 'cintura') | np.isin(ds, ['torax', 'L1', 'L2', 'L3', 'L4', 'L5', 'pelvis'])
+    ds = dom.astype(str); brazo = np.char.startswith(ds, 'brazo') | np.char.startswith(ds, 'cubito') | np.char.startswith(ds, 'radio') | mano
+    tronco = np.char.startswith(ds, 'cintura') | np.char.startswith(ds, 'muslo') | np.isin(ds, ['torax', 'L1', 'L2', 'L3', 'L4', 'L5', 'pelvis'])
     cen0 = c.piel_P[I].mean(1); axila = np.zeros(len(I), bool)
-    for s_ in 'RL': axila |= np.linalg.norm(cen0 - c.C['brazo_' + s_], axis=1) < 0.09
+    for s_ in 'RL': axila |= (np.linalg.norm(cen0 - c.C['brazo_' + s_], axis=1) < 0.09) & (np.linalg.norm(Pp[I].mean(1) - pts.posado('cabeza_humero_' + s_), axis=1) < 0.12)
     mezcla = brazo[I].any(1) & tronco[I].any(1) & ~axila
     I = I[~(mezcla & (lados(Pp) > 1.15 * lados(c.piel_P)))]
     if region is not None: I = I[np.isin(dom[I], list(region)).all(1)]
@@ -102,8 +103,8 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     if r.returncode or 'Traceback' in r.stderr: raise RuntimeError(r.stderr[-3000:])
     info = json.load(open(os.path.join(CACHE, id + '.json')))
     p = Image.open(spec['salida'] + '-piel.png').convert('RGBA'); h = Image.open(spec['salida'] + '-hueso.png').convert('RGBA')
-    p = _tapar_agujeros(p)
     ax_ = [info['puntos'].pop('_axila' + s_) for s_ in 'RL']
+    p = _tapar_agujeros(p, zonas=[(q, 12 * info['pxm'] / 100) for q in ax_])
     if suavizar:
         r_, zc, ld = (tuple(suavizar) + ('RL',))[:3] if isinstance(suavizar, tuple) else (suavizar, 15, 'RL')
         p = _suavizar_silueta(p, r_, [(q, zc * info['pxm'] / 100) for q, s_ in zip(ax_, 'RL') if s_ in ld])
@@ -142,19 +143,29 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     out.save(os.path.join(CACHE, id + '.png'))
     return info
 
-def _tapar_agujeros(im, maximo=0.01):
+def _color_piel(rgb):
+    """color más frecuente del dibujo (la piel; con short, la mediana de los claros podía dar el celeste de la ropa)"""
+    v, k = np.unique(rgb // 4, axis=0, return_counts=True)
+    return (v[k.argmax()] * 4 + 2).astype(np.uint8)
+
+def _tapar_agujeros(im, maximo=0.01, zonas=None):
     """Rellena con color piel los agujeros chicos de la silueta (piel compartida entre brazo y tórax que se pierde al separar
-    el brazo) y borra las líneas de contorno que los rodean."""
+    el brazo) y borra las líneas de contorno que los rodean. zonas: [((x, y), radio px)]; solo se tapan los agujeros que caen
+    enteros dentro de alguna (cerca de la axila); un hueco real entre el brazo y el tronco llega más lejos y se respeta."""
     from scipy import ndimage
     a = np.asarray(im).copy(); A = a[..., 3] > 128
     hueco = ndimage.binary_fill_holes(A) & ~A
     lab, n = ndimage.label(hueco)
-    rgb = a[..., :3].reshape(-1, 3)[A.ravel()]; claros = rgb[rgb.sum(1) > np.quantile(rgb.sum(1), 0.5)]
-    color = np.median(claros, 0).astype(np.uint8)
+    rgb = a[..., :3].reshape(-1, 3)[A.ravel()]; color = _color_piel(rgb)
     cerca = np.zeros_like(A)
     if n:
         tam = ndimage.sum(hueco, lab, range(1, n + 1)); tope = maximo * A.sum()
-        chicos = np.isin(lab, 1 + np.nonzero(tam < tope)[0])
+        ok = tam < tope
+        if zonas is not None:
+            yy, xx = np.mgrid[0:A.shape[0], 0:A.shape[1]]; dentro = np.zeros_like(A)
+            for (qx, qy), rr in zonas: dentro |= (xx - qx) ** 2 + (yy - qy) ** 2 < rr * rr
+            ok &= ndimage.minimum(dentro, lab, range(1, n + 1)) > 0
+        chicos = np.isin(lab, 1 + np.nonzero(ok)[0])
         zona = ndimage.binary_dilation(chicos, iterations=4)
         a[zona, :3] = color; a[zona, 3] = 255
         cerca = ndimage.binary_dilation(chicos, iterations=40)
@@ -182,7 +193,7 @@ def _suavizar_silueta(im, r, zonas=()):
         for (qx, qy), rr in zonas: dentro |= (xx - qx) ** 2 + (yy - qy) ** 2 < rr * rr
         B = np.where(dentro, B, A)
     if (B == A).all(): return im
-    rgb = a[..., :3].reshape(-1, 3)[A.ravel()]; color = np.median(rgb[rgb.sum(1) > np.quantile(rgb.sum(1), 0.5)], 0).astype(np.uint8)
+    rgb = a[..., :3].reshape(-1, 3)[A.ravel()]; color = _color_piel(rgb)
     linea = np.median(rgb[rgb.sum(1) < np.quantile(rgb.sum(1), 0.03)], 0).astype(np.uint8)
     cambio = ndimage.binary_dilation(A ^ B, iterations=6)
     viejo = A & ~ndimage.binary_erosion(A, iterations=4)             # franja del contorno anterior
@@ -191,6 +202,37 @@ def _suavizar_silueta(im, r, zonas=()):
     borde = B & ~ndimage.binary_erosion(B, iterations=2)
     a[borde & cambio, :3] = linea; a[borde & cambio, 3] = 255
     return Image.fromarray(a)
+
+def _alisar_lazo(q, r, k=10):
+    """Contorno de piel de un corte sin pliegues ni dientes (donde la malla se dobla en la axila): se rasteriza a k px/cm, se
+    cierra y abre con un disco de r cm y se vuelve a trazar como el borde más externo visto desde el centro, cada medio grado."""
+    from scipy import ndimage
+    from PIL import ImageDraw
+    q = np.asarray(q, float); lo = q.min(0) - 2 * r - 1
+    W, H = ((q.max(0) - lo + 2 * r + 1) * k).astype(int) + 1
+    im = Image.new('L', (W, H), 0); ImageDraw.Draw(im).polygon([tuple(v) for v in (q - lo) * k], fill=1)
+    A = np.asarray(im) > 0; rr = int(r * k); yy, xx = np.mgrid[-rr:rr + 1, -rr:rr + 1]; disco = xx * xx + yy * yy <= rr * rr
+    A = ndimage.binary_opening(ndimage.binary_closing(A, disco), disco); A = ndimage.binary_fill_holes(A)
+    lab, n = ndimage.label(A)
+    if n > 1: A = lab == 1 + np.argmax(ndimage.sum(A, lab, range(1, n + 1)))
+    c = _borde(A).astype(float)                        # borde exterior, en píxeles, en orden
+    g = np.exp(-0.5 * (np.arange(-3 * k, 3 * k + 1) / (0.4 * k)) ** 2); g /= g.sum()
+    c = np.stack([np.convolve(np.r_[c[-3 * k:, i], c[:, i], c[:3 * k, i]], g, 'valid') for i in (0, 1)], 1)
+    out = c[::max(1, k // 3), ::-1]                    # (fila, col) → (x, y), un punto cada ~3 mm
+    return np.array(out) / k + lo
+
+def _borde(A):
+    """Seguimiento de Moore del borde exterior de una máscara binaria (una sola pieza): lista de (fila, col) en orden."""
+    A = np.pad(A, 1); ys, xs = np.nonzero(A); i = np.lexsort((xs, ys))[0]; ini = (ys[i], xs[i])
+    V = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
+    p, d, out = ini, 2, [ini]
+    for _ in range(A.size):
+        for j in range(8):
+            dd = (d + 5 + j) % 8; q = (p[0] + V[dd][0], p[1] + V[dd][1])
+            if A[q]: p, d = q, dd; break
+        if p == ini: break
+        out.append(p)
+    return np.array(out) - 1
 
 def _dir(c, pts, d, ref):
     """dirección de corte: vector, o 'distal'/'proximal' a lo largo del segmento del punto de referencia."""
@@ -219,7 +261,7 @@ def _con_dedos(segs):
         if s.startswith('mano_'): segs += [k for k in rig.PADRE if k.startswith('f') and k.endswith(s[-2:])]
     return segs
 
-def corte(id, pose, punto, normal=None, arriba=(0, 1, 0), huesos=(), region=None, puntos=(), desde_normal=True, radio=8):
+def corte(id, pose, punto, normal=None, arriba=(0, 1, 0), huesos=(), region=None, puntos=(), desde_normal=True, radio=8, alisar=0):
     """Corte transversal (vector): interseca piel y huesos con un plano y guarda render/<id>.json con polígonos en cm,
     vistos desde el lado hacia el que apunta normal (desde_normal=True; p. ej. normal = hacia distal -> visto desde la punta
     de los dedos) o desde el lado opuesto.
@@ -276,6 +318,7 @@ def corte(id, pose, punto, normal=None, arriba=(0, 1, 0), huesos=(), region=None
     externos = []
     for q in L:
         if not any(_dentro(q.mean(0), e) for e in externos): externos.append(q)
+    if alisar and externos: externos[0] = _alisar_lazo(externos[0], alisar)
     info = {'piel': [q.tolist() for q in externos], 'huesos': {}}
     # huesos: el corte de una diáfisis es casi convexo; la envolvente convexa evita contornos abiertos por mallas imperfectas
     for k, (P, Ih) in c.huesos_posados().items():

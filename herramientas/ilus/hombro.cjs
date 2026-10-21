@@ -1,617 +1,337 @@
-// Esquemas de cintura escapular y húmero (clavícula, escápula, hombro, acromioclaviculares, húmero).
-// Estilo aprobado: persona = contorno continuo color piel; huesos de referencia "por transparencia".
-// Helpers copiados/adaptados de referencia-tecnicas1-superior.cjs y referencia-tecnicas1-columna.cjs.
+// Esquemas de húmero y cintura escapular (húmero, hombro, clavícula, escápula, acromioclaviculares).
+// Las figuras salen del modelo anatómico: herramientas/ilus3d/figuras/hombro.py (render/<id>.webp y cortes render/<id>.json).
+// Vista desde el tubo: el lado derecho del paciente queda a la izquierda del dibujo (AP) o a la derecha (PA, vista por detrás).
+// Vista superior: corte horizontal a la altura de los hombros, visto desde la cabeza, con el tubo arriba y el RI abajo.
 const E = require("./estilo.cjs");
-const { SK, SKO, RED, BLUE, AMB, INK, MUTE, BONEO, table, wall, ri, riTop, beam, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, mk, cabezaPerfil, cabezaFrente } = E;
+const { RED, BLUE, AMB, INK, MUTE, BONEO, wall, riTop, beam, cross, coll, refline, note, view, txt, svg, dot, side, etiquetaHueso } = E;
 
 // ---------- helpers ----------
 const f1 = (n) => +(+n).toFixed(1);
-const P = (pts) => pts.map(([x, y]) => `${f1(x)},${f1(y)}`).join(" L");
 const rad = (d) => (d * Math.PI) / 180;
+const add = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k];
+const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 const lab = (px, py, tx, ty, t, anchor = "start") =>
-  `<line x1="${px}" y1="${py}" x2="${anchor === "start" ? tx - 3 : tx + 3}" y2="${ty - 4}" stroke="${BONEO}" stroke-width=".8"/>` + etiquetaHueso(tx, ty, t, anchor);
-const circ = (cx, cy, r) => `M${cx - r},${cy} a${r},${r} 0 1,0 ${2 * r},0 a${r},${r} 0 1,0 ${-2 * r},0 Z`;
-const azul = (px, py, tx, ty, t, anchor = "middle") =>
-  txt(tx, ty, t, 11, BLUE, anchor) + `<line x1="${tx}" y1="${ty + 4}" x2="${px}" y2="${py}" stroke="${BLUE}" stroke-width="1"/>`;
-const panelSep = (title) => `<line x1="388" y1="14" x2="388" y2="322" stroke="#e2e4ea"/>` +
-  `<text x="402" y="20" font-size="12" font-weight="700" fill="${MUTE}" letter-spacing=".06em">${title.toUpperCase()}</text>`;
-const g = (tr, inner) => `<g transform="${tr}">${inner}</g>`;
-// línea de cota azul con rótulo
-const cota = (x1, y1, x2, y2, t, tx, ty, anchor = "middle") =>
-  `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${BLUE}" stroke-width="1.4" stroke-dasharray="4 3"/>` + txt(tx, ty, t, 11, BLUE, anchor, 700);
-const arcoAzul = (cx, cy, r, a1, a2, label, lx, ly) => {
-  const p1 = [cx + r * Math.cos(rad(a1)), cy + r * Math.sin(rad(a1))], p2 = [cx + r * Math.cos(rad(a2)), cy + r * Math.sin(rad(a2))];
-  return `<path d="M${f1(p1[0])},${f1(p1[1])} A${r},${r} 0 0 ${a2 > a1 ? 1 : 0} ${f1(p2[0])},${f1(p2[1])}" fill="none" stroke="${BLUE}" stroke-width="1.5"/>` + txt(lx, ly, label, 12, BLUE, "middle", 700);
-};
-
-function boneAlong(p1, p2, perfil) {
-  const dx = p2[0] - p1[0], dy = p2[1] - p1[1], L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
-  const a = perfil.map(([t, h]) => [p1[0] + dx * t + nx * h, p1[1] + dy * t + ny * h]);
-  const b = perfil.map(([t, , h]) => [p1[0] + dx * t - nx * h, p1[1] + dy * t - ny * h]).reverse();
-  const cap = (q1, q2, sign) => {
-    const k = Math.hypot(q1[0] - q2[0], q1[1] - q2[1]) * 0.35;
-    return `Q${f1((q1[0] + q2[0]) / 2 + sign * ux * k)},${f1((q1[1] + q2[1]) / 2 + sign * uy * k)} ${f1(q2[0])},${f1(q2[1])}`;
-  };
-  return hueso(`M${P(a)} ${cap(a[a.length - 1], b[0], 1)} L${P(b)} ${cap(b[b.length - 1], a[0], -1)} Z`);
+  `<line x1="${f1(px)}" y1="${f1(py)}" x2="${f1(anchor === "start" ? tx - 3 : tx + 3)}" y2="${f1(ty - 4)}" stroke="${BONEO}" stroke-width=".8"/>` + etiquetaHueso(f1(tx), f1(ty), t, anchor);
+const azul = (p, tx, ty, t, anchor = "middle") =>
+  txt(tx, ty, t, 11, BLUE, anchor) + `<line x1="${tx}" y1="${ty + 4}" x2="${f1(p[0])}" y2="${f1(p[1])}" stroke="${BLUE}" stroke-width="1"/>`;
+const panelSep = (x, title) => `<line x1="${x}" y1="14" x2="${x}" y2="322" stroke="#e2e4ea"/>` +
+  `<text x="${x + 14}" y="20" font-size="12" font-weight="700" fill="${MUTE}" letter-spacing=".06em">${title.toUpperCase()}</text>`;
+const col = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
+const crossP = (p) => cross(f1(p[0]), f1(p[1]));
+const redDot = (p, r = 4.5) => `<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${r}" fill="${RED}"/>`;
+const bluePt = (p) => dot(f1(p[0]), f1(p[1]));
+const ring = (p, r = 8) => `<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${r}" fill="none" stroke="${BLUE}" stroke-width="2.2"/>`;
+const angulo = (a, b) => (Math.atan2(b[1] - a[1], b[0] - a[0]) * 180) / Math.PI;
+function arco(c, r, a1, a2, label, color = BLUE, lr = 16) {
+  const p1 = [c[0] + r * Math.cos(rad(a1)), c[1] + r * Math.sin(rad(a1))], p2 = [c[0] + r * Math.cos(rad(a2)), c[1] + r * Math.sin(rad(a2))];
+  const sweep = ((a2 - a1 + 360) % 360) < 180 ? 1 : 0, am = a1 + (((a2 - a1 + 540) % 360) - 180) / 2;
+  const m = [c[0] + (r + lr) * Math.cos(rad(am)), c[1] + (r + lr) * Math.sin(rad(am)) + 4];
+  return `<path d="M${f1(p1[0])},${f1(p1[1])} A${r},${r} 0 0 ${sweep} ${f1(p2[0])},${f1(p2[1])}" fill="none" stroke="${color}" stroke-width="1.8"/>` +
+    txt(f1(m[0]), f1(m[1]), label, 13, color, "middle", 700);
 }
-function tip(x1, x2, y) {
-  const r = (x2 - x1) / 2, c = (x1 + x2) / 2, out = [];
-  for (let i = 0; i <= 6; i++) { const a = Math.PI - (i * Math.PI) / 6; out.push([c + r * Math.cos(a), y + r * Math.sin(a)]); }
-  return out;
+// RI visto desde el tubo, centrado en c, de ancho x alto cm
+const riEn = (f, c, ancho, alto) => riTop(f1(c[0] - (ancho * f.ppc) / 2), f1(c[1] - (alto * f.ppc) / 2), f1(ancho * f.ppc), f1(alto * f.ppc));
+// RI de canto: barra negra entre x1 y x2 a la altura y
+const riBar = (x1, x2, y, label = "RI") => `<rect x="${f1(x1)}" y="${f1(y)}" width="${f1(x2 - x1)}" height="8" fill="${INK}"/>` + (label ? txt(f1(x2 + 6), f1(y + 8), label, 12, INK) : "");
+// RI de canto en cualquier dirección: segmento centrado en c, perpendicular a la dirección (grados SVG) dir, de largo L
+function riCanto(c, dir, L, label, lx, ly) {
+  const n = [-Math.sin(rad(dir)), Math.cos(rad(dir))], a = add(c, n, -L / 2), b = add(c, n, L / 2);
+  return `<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="${INK}" stroke-width="7"/>` + (label ? txt(lx, ly, label, 12, INK, "start", 700) : "");
 }
-function handLocal(tipo) {
-  if (tipo === "canto") {
-    const pts = [[-10, 0], [-13, 8], [-14.5, 16], [-13, 24], [-12, 34], [-12, 44], ...tip(-12, -3, 44), [-2.5, 40], ...tip(-3, 3.5, 41).slice(1), [3.5, 37], ...tip(3.5, 8.5, 37).slice(1), [8.5, 33], ...tip(8.5, 11.5, 33).slice(1), [11, 18], [10, 0]];
-    const det = [`M-4,4 C-10,12 -10,26 -4,33 C1,36 5,30 5,9`, `M-2.5,29.5 Q0,27.5 3,29.5`, `M-12,36 Q-4,38 0,35`];
-    return { pts, det };
-  }
-  const pts = [[-10, 0], [-11, 5], [-17, 13], [-22, 21], [-23.5, 26], ...tip(-24, -18, 27).slice(1, 6), [-16, 24], [-12.5, 21],
-    [-12, 27], [-12, 49], ...tip(-12, -6.5, 49), [-6.2, 30], [-6, 52], ...tip(-6, 0, 52), [0.2, 30], [0.5, 50], ...tip(0.5, 6, 50),
-    [6.2, 30], [6.5, 43], ...tip(6.5, 11.5, 43), [11.5, 20], [10, 0]];
-  const det = tipo === "palma"
-    ? [`M-8,20 Q-2,24 9,19`, `M-7,9 Q-10,16 -11,24`]
-    : [`M-10.8,46 Q-9.2,44 -7.6,46`, `M-4.8,49 Q-3,47 -1.2,49`, `M1.4,47 Q3.2,45 5,47`, `M7.4,40 Q9,38 10.6,40`, `M-22,23 Q-20.5,21 -19,23`];
-  return { pts, det };
-}
-function mano(cx, cy, ang, s, tipo, espejo = false, invertir = false) {
-  const { pts, det } = handLocal(tipo);
-  const T = mk(s, 0, 0, cx, cy, ang - 90, espejo);
-  let p = pts.map(([x, y]) => T(x, y));
-  if (invertir) p = p.reverse();
-  const detS = det.map((d) => linea(d.replace(/(-?[\d.]+),(-?[\d.]+)/g, (_, x, y) => T(+x, +y)), 1.3)).join("");
-  return { seg: "L" + p.join(" L"), det: detS, a: p[0], b: p[p.length - 1] };
-}
-// unión de piezas de piel (paths, segmentos [x1,y1,x2,y2,w], círculos [cx,cy,r]) con un solo contorno continuo
-function union(parts) {
-  const o = [], f = [];
-  for (const p of parts) {
-    if (typeof p === "string") {
-      o.push(`<path d="${p}" fill="${SKO}" stroke="${SKO}" stroke-width="3" stroke-linejoin="round"/>`);
-      f.push(`<path d="${p}" fill="${SK}"/>`);
-    } else if (p.length === 3) {
-      o.push(`<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${p[2] + 1.5}" fill="${SKO}"/>`);
-      f.push(`<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${p[2]}" fill="${SK}"/>`);
-    } else {
-      const [x1, y1, x2, y2, w] = p.map(f1);
-      o.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${SKO}" stroke-width="${w + 3}" stroke-linecap="round"/>`);
-      f.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${SK}" stroke-width="${w}" stroke-linecap="round"/>`);
-    }
-  }
-  return o.join("") + f.join("");
-}
-// cabeza vista desde atrás (PA): orejas, nuca, remolino
-function cabezaAtras(cx, cy, r = 24) {
-  return `<ellipse cx="${cx - r * 0.98}" cy="${cy}" rx="${r * 0.16}" ry="${r * 0.28}" fill="${SK}" stroke="${SKO}" stroke-width="1.6"/>` +
-    `<ellipse cx="${cx + r * 0.98}" cy="${cy}" rx="${r * 0.16}" ry="${r * 0.28}" fill="${SK}" stroke="${SKO}" stroke-width="1.6"/>` +
-    `<ellipse cx="${cx}" cy="${cy}" rx="${r * 0.92}" ry="${r * 1.12}" fill="${SK}" stroke="${SKO}" stroke-width="2"/>` +
-    linea(`M${cx - r * 0.62},${cy + r * 0.72} Q${cx},${cy + r * 0.92} ${cx + r * 0.62},${cy + r * 0.72}`, 1.3) +
-    linea(`M${cx - 3},${cy - r * 0.55} C${cx + 6},${cy - r * 0.7} ${cx + 8},${cy - r * 0.3} ${cx + 2},${cy - r * 0.3} C${cx - 4},${cy - r * 0.28} ${cx - 4},${cy - r * 0.5} ${cx},${cy - r * 0.48}`, 1.2);
-}
-
-// ---------- persona de frente (o de espaldas) con brazos configurables ----------
-// Coordenadas base: cx = línea media, cuello y 72-90, articulación del hombro en (cx ∓ 78, 126); dy baja todo.
-// o.R / o.L = { ang: [ángulo brazo, ángulo antebrazo] (grados SVG), mano: "palma"|"dorso"|"canto", esp }.
-// De frente el lado derecho del paciente queda a la izquierda del dibujo; de espaldas (back), a la derecha.
-const SCAP = "M215,114 L228,106 L258,104 L266,106 L258,146 L248,192 L241,190 L226,146 L217,134 Z";
-const ACRO = "M258,102 L212,96 C204,96 197,100 195,107 L204,108 L213,103 L258,107 Z";
-const CORA = "M228,106 C223,110 219,116 220,123 L225,123 C225,116 229,112 235,109 Z";
-const CLAV = "M270,96 C256,90 238,102 214,94 L212,100 C238,108 256,96 270,102 Z";
-let clipN = 0;
-function frontal(o = {}) {
-  const cx = o.cx ?? 280, dy = o.dy ?? 0, back = !!o.back, bottom = o.bottom ?? 316;
-  const Y = (y) => f1(y + dy);
-  const tor = `M${cx - 12},${Y(72)} L${cx - 12},${Y(90)} C${cx - 26},${Y(96)} ${cx - 48},${Y(98)} ${cx - 66},${Y(102)} C${cx - 82},${Y(106)} ${cx - 92},${Y(116)} ${cx - 92},${Y(130)} C${cx - 92},${Y(140)} ${cx - 78},${Y(146)} ${cx - 60},${Y(152)} L${cx - 58},${Y(200)} L${cx - 58},${bottom} L${cx + 58},${bottom} L${cx + 58},${Y(200)} L${cx + 60},${Y(152)} C${cx + 78},${Y(146)} ${cx + 92},${Y(140)} ${cx + 92},${Y(130)} C${cx + 92},${Y(116)} ${cx + 82},${Y(106)} ${cx + 66},${Y(102)} C${cx + 48},${Y(98)} ${cx + 26},${Y(96)} ${cx + 12},${Y(90)} L${cx + 12},${Y(72)} Z`;
-  const parts = [tor], bones = [], dets = [], info = {};
-  for (const lado of ["R", "L"]) {
-    const a = o[lado];
-    const sg = (lado === "R") !== back ? -1 : 1;
-    const X = (x) => cx - sg * (x - 280);
-    const tp = (d) => d.replace(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g, (_, x, y) => `${f1(X(+x))},${f1(+y + dy)}`);
-    const S = [cx + sg * 78, 126 + dy];
-    bones.push(hueso(tp(SCAP)) + hueso(tp(ACRO)) + hueso(tp(CORA)) + hueso(tp(CLAV)));
-    info[lado] = { S, X, tp, sg, Y: (y) => y + dy };
-    if (!a) continue;
-    const [a1, a2] = a.ang, L1 = a.l1 ?? 78, L2 = a.l2 ?? 54;
-    const El = [S[0] + L1 * Math.cos(rad(a1)), S[1] + L1 * Math.sin(rad(a1))];
-    const W = [El[0] + L2 * Math.cos(rad(a2)), El[1] + L2 * Math.sin(rad(a2))];
-    parts.push([...S, ...El, 25], [...El, ...W, 19]);
-    const m = mano(f1(W[0]), f1(W[1]), a2, 1.0, a.mano || "palma", !!a.esp, false);
-    parts.push(`M${m.a} ${m.seg} Z`);
-    dets.push(m.det);
-    const H0 = [S[0] + 7 * Math.cos(rad(a1)), S[1] + 7 * Math.sin(rad(a1))];
-    const ep = a.epi ?? 8;
-    bones.push(boneAlong(H0, El, [[0, 5.5, 5.5], [0.74, 5.5, 5.5], [0.88, ep, ep], [0.97, ep - 2, ep - 2], [1, 6.5, 6.5]]) + hueso(circ(f1(S[0]), f1(S[1] - 1), 12)));
-    const n = [-Math.sin(rad(a2)), Math.cos(rad(a2))];
-    const off = (p, k) => [p[0] + n[0] * k, p[1] + n[1] * k];
-    bones.push(boneAlong(off(El, 4.5), off(W, 4.5), [[0, 4, 4], [0.1, 3, 3], [0.9, 3, 3], [1, 4, 4]]) + boneAlong(off(El, -4.5), off(W, -4.5), [[0, 3.5, 3.5], [0.1, 2.5, 2.5], [0.85, 3, 3], [1, 5, 5]]));
-    Object.assign(info[lado], { E: El, W, mid: [(S[0] + El[0]) / 2, (S[1] + El[1]) / 2] });
-  }
-  const cabeza = back ? cabezaAtras(cx, 44 + dy, 26) : cabezaFrente(cx, 44 + dy, 26);
-  let draw = union(parts) + bones.join("") + dets.join("") + cabeza;
-  if (o.clip !== null) { const id = "fc" + (++clipN); draw = `<clipPath id="${id}"><rect x="0" y="0" width="760" height="${o.clip ?? 318}"/></clipPath><g clip-path="url(#${id})">${draw}</g>`; }
-  return { draw, info, cx, dy };
-}
-
-// ---------- hombro de frente (silueta del ejemplo aprobado, brazo derecho a la izquierda) ----------
-function hombroFig(rotacion) {
-  const cfg = {
-    neutro: { mano: "canto", esp: false, epi: [7, 8], rad: [[186, 214], [185, 254]] },
-    externo: { mano: "palma", esp: false, epi: [11, 12], rad: [[186, 214], [179, 254]] },
-    interno: { mano: "dorso", esp: true, epi: [4.5, 5.5], rad: [[186, 214], [195, 254]] },
-  }[rotacion];
-  const m = mano(185, 255, 98.7, 1.0, cfg.mano, cfg.esp, cfg.esp);
-  const cuerpo = `M268,72 L268,90 C254,96 232,98 214,102 C198,106 187,116 186,130 L182,168 L178,206 L175,254 ${m.seg} L195,256 L206,208 L212,168 L220,146 L222,200 L222,316 L338,316 L338,200 L340,146 L346,168 L350,240 L352,316 L382,316 L378,240 L376,168 L374,130 C373,116 362,106 346,102 C328,98 306,96 292,90 L292,72 Z`;
-  const [lat, med] = cfg.epi;
-  const humero = boneAlong([202, 132], [192, 212], [[0, 5.5, 5.5], [0.74, 5.5, 5.5], [0.88, lat, med], [0.97, lat - 2, med - 2], [1, 6.5, 6.5]]);
-  const [r1, r2] = cfg.rad;
-  const huesos =
-    hueso(SCAP) + hueso(ACRO) + humero + hueso(circ(202, 124, 12)) +
-    boneAlong([198, 214], [191, 254], [[0, 4, 4], [0.1, 3, 3], [0.9, 3, 3], [1, 4, 4]]) +
-    boneAlong(r1, r2, [[0, 3.5, 3.5], [0.1, 2.5, 2.5], [0.85, 3, 3], [1, 5, 5]]) +
-    hueso(CORA) + hueso(CLAV) +
-    hueso(`M290,96 C304,90 322,102 346,94 L348,100 C322,108 304,96 290,102 Z`);
-  const epiMark = rotacion === "interno"
-    ? `<circle cx="194" cy="203" r="6.5" fill="none" stroke="${BLUE}" stroke-width="2"/>`
-    : rotacion === "externo" ? refline(176, 201, 212, 205) : "";
-  return piel(cuerpo) + huesos + m.det + cabezaFrente(280, 44, 26) + epiMark;
-}
-
-// ---------- persona de pie vista de costado, mirando a la derecha ----------
-function costado(dx, conBrazo = true) {
-  const h = cabezaPerfil(436 + dx, 80, { s: 0.3, rot: 90 });
-  const X = (x) => x + dx;
-  const d = h.d + ` L${X(454)},132 C${X(468)},138 ${X(490)},146 ${X(496)},172 L${X(498)},210 C${X(498)},240 ${X(492)},262 ${X(494)},290 L${X(496)},316 L${X(426)},316 L${X(424)},290 C${X(420)},260 ${X(420)},180 ${X(422)},150 C${X(424)},140 ${X(428)},134 ${X(430)},124 L${X(434)},96 Z`;
-  const brazo = conBrazo ? linea(`M${X(442)},176 C${X(440)},152 ${X(450)},138 ${X(462)},137 C${X(476)},138 ${X(482)},152 ${X(478)},176 L${X(476)},250 L${X(474)},316 M${X(442)},176 L${X(444)},250 L${X(446)},316`) : "";
-  const huesos =
-    hueso(`M${X(432)},136 L${X(444)},140 L${X(449)},150 L${X(446)},172 L${X(440)},214 L${X(432)},213 L${X(429)},170 Z`) +
-    hueso(`M${X(431)},141 L${X(452)},132 L${X(470)},132 L${X(471)},138 L${X(452)},139 Z`) +
-    boneAlong([X(459), 150], [X(459), 232], [[0, 6, 6], [0.1, 6, 6], [0.9, 6, 6], [1, 8, 8]]) +
-    hueso(circ(X(459), 152, 11)) +
-    hueso(`M${X(449)},147 C${X(460)},143 ${X(472)},145 ${X(479)},151 L${X(477)},156 C${X(468)},152 ${X(458)},152 ${X(449)},154 Z`) +
-    hueso(`M${X(464)},130 C${X(474)},129 ${X(482)},136 ${X(488)},146 L${X(485)},150 C${X(479)},141 ${X(472)},136 ${X(464)},136 Z`);
-  return { piel: piel(d), cara: h.cara, brazo, huesos, X };
-}
-// panel derecho: de costado con la espalda contra el RI (pared a la izquierda, tubo a la derecha)
-const costadoEspalda = (c) => wall(418, 44, 300, "") + txt(424, 38, "Bucky / RI", 10, MUTE, "middle") + c.piel + c.huesos + c.brazo + c.cara;
-// panel derecho: de costado mirando al RI (pared a la derecha, tubo detrás)
-const costadoFrente = (c) => wall(706, 44, 300, "") + txt(712, 38, "Bucky / RI", 10, MUTE, "middle") + c.piel + c.huesos + c.brazo + c.cara;
-
-// ---------- vista superior del paciente rotado contra el Bucky ----------
-// ap = false: oblicua anterior (mira al RI, haz PA). ap = true: oblicua posterior (espalda al RI, haz AP).
-// En coordenadas locales (convención PA) el hombro afectado (derecho) es (-100,0) y la nariz va hacia +y.
-function superior(rotDeg, { ap = false, brazo = false } = {}) {
-  const cx = ap ? 250 : 236;
-  const r = rad(ap ? rotDeg : -rotDeg), c = Math.cos(r), s = Math.sin(r);
-  const cy = ap ? 252 - 100 * s : 252 + 100 * s;
-  const T = (x, y) => { const [px, py] = ap ? [-x, -y] : [x, y]; return [cx + px * c - py * s, cy + px * s + py * c]; };
-  const Ts = (x, y) => T(x, y).map(f1).join(",");
-  const angT = ap ? rotDeg + 180 : -rotDeg; // rotación total aplicada a las piezas locales
-  let d = `M${P([[-58, -36], [0, -38], [58, -36], [84, -30], [98, -18], [101, 2], [99, 22]].map(([x, y]) => T(x, y)))}`;
-  let det = "";
-  if (brazo) {
-    const ms = mano(...T(84, 66), 90 + angT, 0.9, "dorso", true, true);
-    d += ` L${Ts(98, 66)} ${ms.seg} L${Ts(70, 66)} L${Ts(70, 36)}`;
-    det = ms.det;
-  } else d += ` L${Ts(92, 30)}`;
-  d += ` L${P([[40, 38], [0, 40], [-58, 36], [-86, 28], [-99, 14], [-101, -8], [-90, -26]].map(([x, y]) => T(x, y)))} Z`;
-  const [hx, hy] = T(0, 2), nose = [T(-7, 21), T(0, 36), T(7, 21)];
-  const ear = (x) => { const [ex, ey] = T(x, 4).map(f1); return `<ellipse cx="${ex}" cy="${ey}" rx="4.5" ry="7" transform="rotate(${f1(angT)} ${ex} ${ey})" fill="${SK}" stroke="${SKO}" stroke-width="1.5"/>`; };
-  const cabeza = ear(-23) + ear(23) + `<path d="M${P(nose)} Z" fill="${SK}" stroke="${SKO}" stroke-width="1.6" stroke-linejoin="round"/>` +
-    `<circle cx="${f1(hx)}" cy="${f1(hy)}" r="23" fill="${SK}" stroke="${SKO}" stroke-width="2"/>` +
-    `<path d="M${P([T(-6, 22), T(0, 33), T(6, 22)])}" fill="${SK}" stroke="none"/>` + linea(`M${P([T(-6, 22.5), T(0, 35), T(6, 22.5)])}`, 1.6) +
-    linea(`M${Ts(-3, -6)} C${Ts(6, -10)} ${Ts(8, 0)} ${Ts(2, 1)} C${Ts(-4, 2)} ${Ts(-4, -4)} ${Ts(0, -4)}`, 1.2);
-  const huesos =
-    hueso(`M${P([[-74, -6], [-66, -12], [-38, -36], [-32, -32], [-62, -4], [-70, 4]].map(([x, y]) => T(x, y)))} Z`) +
-    hueso(`M${P([[-88, -10], [-60, 12], [-30, 24], [-6, 30], [-6, 35], [-32, 30], [-62, 18], [-90, -4]].map(([x, y]) => T(x, y)))} Z`) +
-    hueso(circ(...T(-84, 2).map(f1), 11));
-  return { piel: piel(d), cabeza, huesos, det, T };
-}
-// panel izquierdo: vista superior con el ángulo de rotación y el haz (vertical en el dibujo)
-function topPanel(rotDeg, { ap = false, brazo = false, beamLocal = [-80, -2], angLabel, haz }) {
-  const v = superior(rotDeg, { ap, brazo });
-  const [bx, by] = v.T(...beamLocal).map(f1);
-  const cont = v.T(-100, 0).map(f1), otro = v.T(100, 0);
-  const u = [otro[0] - cont[0], otro[1] - cont[1]], L = Math.hypot(...u);
-  const sx = Math.sign(u[0]), arcR = 104;
-  const a2 = [f1(cont[0] + arcR * u[0] / L), f1(cont[1] + arcR * u[1] / L)];
-  const sweep = sx > 0 ? 0 : 1;
-  const lx = f1(cont[0] + sx * (arcR + 8));
-  const sc = v.T(-52, -20).map(f1), hh = v.T(-90, 8).map(f1), nz = v.T(0, 36).map(f1);
-  const labX = ap ? 372 : 112, labA = ap ? "end" : "end";
-  return view("1 · Vista superior (desde arriba)") +
-    `<rect x="30" y="252" width="330" height="12" fill="#cfd3dc"/>` + txt(36, 280, "Bucky vertical (RI)", 11, MUTE) +
-    `<path d="M${cont[0] + sx * arcR},252 A${arcR},${arcR} 0 0 ${sweep} ${a2[0]},${a2[1]}" fill="none" stroke="${BLUE}" stroke-width="1.8"/>` +
-    v.piel + v.huesos + v.det + v.cabeza +
-    `<line x1="${cont[0]}" y1="${cont[1]}" x2="${f1(cont[0] + 60 * u[0] / L)}" y2="${f1(cont[1] + 60 * u[1] / L)}" stroke="${BLUE}" stroke-width="1.2" stroke-dasharray="4 4"/>` +
-    txt(sx > 0 ? lx : lx, 240, angLabel, 13, BLUE, sx > 0 ? "start" : "end", 700) +
-    (ap
-      ? ""
-      : lab(sc[0], sc[1], labX, 150, "escápula", labA) + lab(hh[0], hh[1], labX, 232, "cabeza humeral", labA)) +
-    txt(nz[0] + 4, nz[1] + (ap ? -4 : 10), "nariz", 10, MUTE) +
-    `<line x1="${bx}" y1="40" x2="${bx}" y2="${f1(by - 8)}" stroke="${RED}" stroke-width="3" marker-end="url(#ar)"/>` + txt(bx + 8, 52, haz, 11.5, RED, "start", 700);
-}
-
-// ---------- persona de frente apoyada de costado contra el Bucky (laterales transtorácicas) ----------
-function transtoracica(target, rcTxt, extra) {
-  const F = frontal({ cx: 300, dy: 70, R: { ang: [94, 94], mano: "canto" }, L: { ang: [-84, -94], mano: "palma", esp: true } });
-  const R = F.info.R;
-  const tgt = target(R);
-  return svg(
-    view("Vista de frente · lado afectado contra el RI") +
-    `<rect x="186" y="60" width="12" height="250" fill="#cfd3dc"/>` + txt(192, 54, "Bucky / RI", 10, MUTE, "middle") +
-    F.draw +
-    beam(tgt[0], tgt[1], 180, 250, { ref: 180 }) +
-    `<circle cx="${tgt[0]}" cy="${tgt[1]}" r="4" fill="${RED}"/>` +
-    side(150, 128, "D") + txt(96, 152, "lado afectado", 10.5, MUTE) +
-    extra(F, tgt) +
-    rcTxt
-  );
-}
+// sentido de cada cm: punto p corrido dx, dy cm en el dibujo
+const cm = (f, p, dx, dy) => [f1(p[0] + dx * f.ppc), f1(p[1] + dy * f.ppc)];
 
 const I = {};
 
-// ======================= HÚMERO =======================
-function humeroFrente(perfil) {
-  const elbow = [196, 202];
-  const wr = perfil ? [210, 262] : [176, 262];
-  const v = [wr[0] - elbow[0], wr[1] - elbow[1]], L = Math.hypot(...v), nn = [v[1] / L, -v[0] / L];
-  const ang = (Math.atan2(v[1], v[0]) * 180) / Math.PI;
-  const m = mano(wr[0], wr[1], ang, 1.0, perfil ? "dorso" : "palma", perfil, perfil);
-  const wA = [wr[0] - nn[0] * 10, wr[1] - nn[1] * 10], wB = [wr[0] + nn[0] * 10, wr[1] + nn[1] * 10];
-  const d = `M288,74 L288,92 C274,98 254,100 238,104 C224,108 214,116 212,128 L198,160 L184,196 L${P([wA])} ${m.seg} L${P([wB])} L208,206 L226,170 L244,148 L248,220 L246,318 L354,318 L352,220 L356,148 L364,180 L368,318 L394,318 L390,200 L388,150 C386,122 376,108 362,104 C346,100 326,98 312,92 L312,74 Z`;
-  const humero = boneAlong([230, 130], [197, 202], perfil
-    ? [[0, 5.5, 5.5], [0.78, 5.5, 5.5], [0.9, 6, 7], [0.97, 5, 6], [1, 6, 6]]
-    : [[0, 5.5, 5.5], [0.78, 5.5, 5.5], [0.9, 12, 12], [0.97, 9, 9], [1, 7, 7]]);
-  const forearm = perfil
-    ? boneAlong([201, 205], [210, 262], [[0, 4, 4], [0.1, 3, 3], [0.9, 3, 3], [1, 4, 4]]) + boneAlong([191, 204], [219, 260], [[0, 3.5, 3.5], [0.1, 2.5, 2.5], [0.85, 3, 3], [1, 5, 5]])
-    : boneAlong([201, 205], [181, 263], [[0, 4, 4], [0.1, 3, 3], [0.9, 3, 3], [1, 4, 4]]) + boneAlong([191, 201], [171, 260], [[0, 3.5, 3.5], [0.1, 2.5, 2.5], [0.85, 3, 3], [1, 5, 5]]);
-  const huesos =
-    hueso(`M243,112 L256,104 L284,102 L292,104 L284,144 L274,192 L267,190 L254,146 L245,132 Z`) +
-    hueso(`M284,100 L238,94 C230,94 223,98 221,105 L230,106 L239,101 L284,105 Z`) +
-    humero + hueso(circ(230, 121, 12)) + forearm +
-    hueso(`M296,94 C282,88 264,100 240,92 L238,98 C264,106 282,94 296,100 Z`) +
-    hueso(`M304,94 C318,88 336,100 360,92 L362,98 C336,106 318,94 304,100 Z`);
-  return { piel: piel(d), huesos, det: m.det, cabeza: cabezaFrente(300, 52, 23) };
+// ---------- vista superior (corte a la altura de los hombros) ----------
+// Pone el corte con su punto más bajo apoyado en el RI (y = yRI), dibuja el RI, el RC perpendicular hacia el blanco y el ángulo
+// entre el plano frontal del paciente (línea de las dos cabezas humerales) y el RI.
+function superior(id, { x = 200, yRI = 286, ppc = 6.2, blanco = "cabeza_humero_R", ang, rcTxt = "RC ⟂ al RI", largo = 60 } = {}) {
+  const k = E.corte(id, { en: ["apoyo", x, yRI], ppc });
+  const R = k.p("cabeza_humero_R"), L = k.p("cabeza_humero_L");
+  const t = blanco === "escapula" ? k.hueso("Right scapula") : k.p(blanco);
+  const [a, b] = R[1] > L[1] ? [R, L] : [L, R];         // a: el hombro que apoya en el RI
+  const giro = angulo(a, b), ref = b[0] > a[0] ? 0 : 180;
+  let s = riBar(x - 150, x + 150, yRI + 2, "") + txt(f1(x + 150), f1(yRI + 22), "RI", 12, INK, "end", 700) +
+    txt(f1(x - 150), f1(yRI + 22), "Bucky vertical", 10, MUTE) + k.svg;
+  s += refline(...lerp(a, b, -0.15).map(f1), ...lerp(a, b, 1.15).map(f1)) +
+    `<line x1="${f1(a[0] - 70)}" y1="${f1(a[1])}" x2="${f1(a[0] + 70)}" y2="${f1(a[1])}" stroke="${MUTE}" stroke-width="1" stroke-dasharray="3 4"/>`;
+  if (ang) s += arco(a, 46, ref === 0 ? giro : ref, ref === 0 ? 0 : giro, ang, BLUE, 18);
+  s += `<line x1="${f1(t[0])}" y1="38" x2="${f1(t[0])}" y2="${f1(t[1] - 6)}" stroke="${RED}" stroke-width="3" marker-end="url(#ar)"/>` +
+    redDot(t) + txt(f1(t[0] + 8), 46, rcTxt, 11.5, RED, "start", 700);
+  return { k, a, b, t, svg: s };
 }
-const humeroComun = (h, riLabel) =>
-  riTop(116, 46, 190, 272, riLabel, 122, 62) +
-  h.piel + h.huesos + h.det + h.cabeza +
-  side(60, 70, "D") + txt(30, 96, "lado derecho", 10.5, MUTE) + txt(30, 108, "del paciente", 10.5, MUTE) +
-  coll(158, 80, 116, 150) + cross(213, 166) +
-  lab(222, 114, 204, 100, "cabeza humeral", "end") + lab(208, 150, 190, 142, "húmero", "end");
 
+// ======================= HÚMERO =======================
 I["humero-ap"] = () => {
-  const h = humeroFrente(false);
+  const f = E.figura("humero-ap", { caja: [40, 34, 340, 290] });
+  const c = f.p("centro:Right humerus");
   return svg(
-    view("Vista desde el tubo · de pie o decúbito supino") +
-    humeroComun(h, "RI 35 x 43 vertical") +
-    refline(180, 189, 216, 205) + dot(187, 192) + dot(210, 202) +
-    lab(176, 236, 156, 240, "radio", "end") + lab(188, 246, 200, 254, "cúbito") +
-    note(224, 166, 420, 100, ["RC perpendicular, en la parte", "media del húmero"], RED) +
-    note(216, 205, 420, 162, ["Epicóndilos paralelos al RI"], BLUE) +
-    note(170, 296, 420, 204, ["Brazo un poco separado y mano", "supinada (AP verdadera)"]) +
-    note(274, 226, 420, 256, ["Colimar a los lados, hasta partes", "blandas de húmero y hombro"], AMB) +
+    view("Vista desde el tubo · de pie o decúbito supino") + side(24, 52, "D") +
+    riEn(f, c, 35, 43) + txt(f1(c[0] - 17.5 * f.ppc + 6), f1(c[1] - 21.5 * f.ppc + 16), "RI 35 x 43 vertical", 11.5, INK) +
+    f.svg + coll(f1(c[0] - 9 * f.ppc), f1(f.p("acromion_R")[1] - 3 * f.ppc), f1(16 * f.ppc), f1(f.p("codo_R")[1] - f.p("acromion_R")[1] + 6 * f.ppc)) +
+    crossP(c) + refline(...lerp(f.p("epicondilo_lat_R"), f.p("epicondilo_med_R"), -0.6).map(f1), ...lerp(f.p("epicondilo_lat_R"), f.p("epicondilo_med_R"), 1.6).map(f1)) +
+    bluePt(f.p("epicondilo_lat_R")) + bluePt(f.p("epicondilo_med_R")) +
+    note(c[0] + 10, c[1] + 2, 420, 100, ["RC perpendicular, en la parte", "media del húmero"], RED) +
+    note(...f.p("epicondilo_med_R"), 420, 162, ["Epicóndilos paralelos al RI"], BLUE) +
+    note(...cm(f, f.p("codo_R"), 0, 6), 420, 204, ["Brazo un poco separado y mano", "supinada (AP verdadera)"]) +
+    note(f1(c[0] + 7 * f.ppc), f1(c[1] - 6 * f.ppc), 420, 256, ["Colimar a los lados, hasta partes", "blandas de húmero y hombro"], AMB) +
     txt(420, 304, "DFRI 100 cm · parrilla si el grosor supera 10 cm", 11.5, MUTE) +
     txt(420, 318, "Incluir codo y hombro (en diagonal si hace falta)", 11.5, MUTE)
   );
 };
 
-I["humero-lateral-trauma"] = () => {
-  const F = frontal({ cx: 330, R: { ang: [115, 115], mano: "canto", epi: 6 }, L: { ang: [86, 88], mano: "palma", esp: true } });
-  const R = F.info.R, S = R.S, u = [Math.cos(rad(115)), Math.sin(rad(115))], n = [Math.sin(rad(115)), -Math.cos(rad(115))];
-  const at = (t, k) => [f1(S[0] + u[0] * t + n[0] * k), f1(S[1] + u[1] * t + n[1] * k)];
-  const r1 = at(22, 24), r2 = at(132, 24);
-  const tgt = at(56, 0);
-  const b1 = at(10, -20), b2 = at(150, -20), b3 = at(150, 20), b4 = at(10, 20);
+I["humero-lateral-rotacion--v1"] = () => {
+  const s = superior("humero-lateral-rotacion--v1", { ang: "15-20°", blanco: "cabeza_humero_R" });
   return svg(
-    view("Vista desde arriba · brazo apoyado, RI entre brazo y tórax") +
-    `<path d="M${P([at(30, -24), at(150, -24), at(150, 18), at(30, 18)])} Z" fill="#d7dbe3" stroke="#8a8f9c"/>` +
-    F.draw +
-    `<line x1="${r1[0]}" y1="${r1[1]}" x2="${r2[0]}" y2="${r2[1]}" stroke="${INK}" stroke-width="7"/>` +
-    beam(tgt[0], tgt[1], 25, 180, { ref: 25 }) +
-    `<circle cx="${tgt[0]}" cy="${tgt[1]}" r="4" fill="${RED}"/>` +
-    side(300, 300, "D") +
-    note(r1[0] + 2, r1[1] + 4, 470, 92, ["RI paralelo al húmero, entre", "brazo y tórax, borde superior", "en la axila"]) +
-    note(tgt[0] + 2, tgt[1] - 4, 470, 160, ["RC horizontal, ⟂ al RI,", "en el tercio distal del húmero"], RED) +
-    note(at(140, -10)[0], at(140, -10)[1], 470, 222, ["Brazo elevado con suavidad", "sobre un bloque de apoyo"]) +
-    txt(470, 270, "Mano en lateral verdadera del codo, si se puede", 11.5, INK) +
-    txt(470, 288, "RI 30 x 35 o 24 x 30 horizontal · sin parrilla", 11.5, MUTE) +
-    txt(470, 302, "Protección entre RI y paciente · DFRI 100 cm", 11.5, MUTE) +
-    txt(470, 316, "Colimar: húmero medio y distal, codo y antebrazo", 11.5, AMB)
+    view("De pie en PA · vista superior") + s.svg +
+    lab(...s.k.hueso("Right scapula"), 70, 120, "escápula", "end") + lab(...s.a, 70, 250, "cabeza humeral", "end") +
+    col(430, 70, [["RC perpendicular, en la parte", RED, 700, 12], ["media del húmero", RED, 700, 12]]) +
+    col(430, 120, [["Paciente rotado 15-20° desde la PA,", INK], ["lo necesario para que húmero y", INK], ["hombro toquen el soporte del RI", INK]]) +
+    col(430, 180, [["Codo flexionado 90°, antebrazo por", INK, 700], ["delante del abdomen", INK, 700], ["Epicóndilos perpendiculares al RI", INK], ["(lateral verdadera)", INK]]) +
+    col(430, 262, [["RI 35 x 43 o 30 x 35 vertical · DFRI 100 cm", MUTE, 400, 11], ["Incluir codo y hombro", MUTE, 400, 11], ["No rotar si hay sospecha de fractura", MUTE, 400, 11]])
+  );
+};
+I["humero-lateral-rotacion--v2"] = () => {
+  const f = E.figura("humero-lateral-rotacion--v2", { caja: [40, 30, 340, 296] });
+  const c = f.p("centro:Right humerus"), el = lerp(f.p("epicondilo_lat_R"), f.p("epicondilo_med_R"), 0.5);
+  return svg(
+    view("AP de pie o en decúbito · vista desde el tubo") + side(24, 52, "D") +
+    riEn(f, c, 35, 43) + txt(f1(c[0] - 17.5 * f.ppc + 6), f1(c[1] - 21.5 * f.ppc + 16), "RI 35 x 43 vertical", 11.5, INK) +
+    f.svg + crossP(c) + ring(el) + bluePt(el) +
+    note(c[0] + 10, c[1] + 2, 420, 92, ["RC perpendicular, en la parte", "media del húmero"], RED) +
+    note(el[0] + 8, el[1], 420, 146, ["Epicóndilos perpendiculares al RI", "(lateral verdadera): superpuestos"], BLUE) +
+    note(...f.p("grande_R"), 420, 204, ["Codo un poco flexionado, brazo y", "muñeca rotados: palma hacia atrás", "(pronación)"]) +
+    col(420, 282, [["Incluir codo y hombro · DFRI 100 cm", MUTE, 400, 11], ["No rotar si hay sospecha de fractura", MUTE, 400, 11]])
   );
 };
 
-I["humero-transtoracica"] = () => transtoracica(
-  (R) => [f1(R.S[0] + 1), f1(R.S[1] + 40)],
-  txt(520, 248, "RC perpendicular al RI, en la parte", 12, INK, "start", 700) +
-  txt(520, 264, "media de la diáfisis del húmero afectado", 12, INK, "start", 700) +
-  txt(520, 288, "RI 35 x 43 vertical · parrilla · DFRI 100 cm", 11, MUTE) +
-  txt(520, 302, "Respiración suave (ortostática),", 11, MUTE) + txt(520, 316, "exposición de 3 s o más", 11, MUTE),
-  (F, t) => {
-    const L = F.info.L;
-    return note(L.E[0] + 10, L.E[1], 520, 70, ["Brazo opuesto por", "encima de la cabeza"]) +
-      txt(20, 70, "Lado afectado", 12, INK, "start", 700) + txt(20, 86, "pegado al RI", 12, INK) +
-      lab(t[0] - 6, t[1] + 20, 130, 250, "húmero", "end") +
-      txt(520, 180, "De pie o en decúbito", 12, INK, "start", 700);
-  });
+// por traumatismo: decúbito supino, rayo horizontal desde lateral; el dibujo es lo que ve el tubo (frente del paciente arriba)
+I["humero-lateral-trauma"] = () => {
+  const f = E.figura("humero-lateral-trauma", { caja: [20, 40, 420, 270] });
+  const h = f.p("cabeza_humero_R"), e = f.p("codo_R"), t = lerp(e, h, 1 / 3);
+  const w = Math.abs(e[0] - h[0]) * 0.75, x0 = Math.min(e[0], h[0]) + Math.abs(e[0] - h[0]) * 0.05;
+  return svg(
+    view("Vista desde el tubo · decúbito supino, rayo horizontal") +
+    f.svg + `<rect x="${f1(x0)}" y="${f1(t[1] - 12 * f.ppc)}" width="${f1(w)}" height="${f1(15 * f.ppc)}" fill="none" stroke="${INK}" stroke-width="2.5" stroke-dasharray="10 5"/>` +
+    txt(f1(x0 + 4), f1(t[1] - 12 * f.ppc - 6), "RI detrás del brazo (entre brazo y tórax)", 11, INK) + crossP(t) +
+    txt(f1(f.x + 4), f1(f.y + f.h + 14), "← cabeza", 11, MUTE) +
+    note(t[0] + 6, t[1] + 8, 470, 92, ["RC horizontal, ⟂ al RI,", "en el tercio distal del húmero"], RED) +
+    note(f1(x0 + w), f1(t[1] - 6 * f.ppc), 470, 150, ["RI paralelo al húmero, entre", "brazo y tórax, borde superior", "en la axila"]) +
+    note(...f.p("grande_R"), 470, 222, ["Codo flexionado, mano en", "lateral verdadera del codo"]) +
+    txt(470, 270, "Brazo elevado con suavidad sobre un bloque de apoyo", 11, INK) +
+    txt(470, 288, "RI 30 x 35 o 24 x 30 horizontal · sin parrilla", 11, MUTE) +
+    txt(470, 302, "Protección entre RI y paciente · DFRI 100 cm", 11, MUTE) +
+    txt(470, 316, "Colimar: húmero medio y distal, codo y antebrazo", 11, AMB)
+  );
+};
+
+// transtorácicas: lado afectado contra el RI; el rayo atraviesa el tórax desde el otro lado
+function transtoracica(id, blanco, extra) {
+  const f = E.figura(id, { caja: [70, 30, 300, 296] });
+  const t = blanco(f), xRI = f1(f.x - 14);
+  return svg(
+    view("Vista de frente · lado afectado contra el RI") + side(24, 52, "D") +
+    wall(xRI - 12, 44, 300, "") + txt(xRI - 6, 38, "RI", 11, INK, "middle", 700) + f.svg +
+    beam(f1(t[0]), f1(t[1]), 180, f1(f.x + f.w + 70 - t[0]), {}) + redDot(t) +
+    extra(f, t)
+  );
+}
+I["humero-transtoracica"] = () => transtoracica("humero-transtoracica", (f) => f.p("centro:Right humerus"), (f, t) =>
+  txt(20, 76, "Lado afectado", 12, INK, "start", 700) + txt(20, 92, "pegado al RI", 12, INK) +
+  note(...f.p("codo_L"), 520, 70, ["Brazo opuesto por", "encima de la cabeza"]) +
+  lab(t[0], t[1] + 6, 20, 290, "húmero", "start") +
+  txt(520, 180, "De pie o en decúbito", 12, INK, "start", 700) +
+  txt(520, 230, "RC perpendicular al RI, en la parte", 12, RED, "start", 700) + txt(520, 246, "media de la diáfisis del húmero afectado", 12, RED, "start", 700) +
+  txt(520, 276, "RI 35 x 43 vertical · parrilla · DFRI 100 cm", 11, MUTE) +
+  txt(520, 290, "Respiración suave (ortostática):", 11, MUTE) + txt(520, 304, "exposición de 3 s o más", 11, MUTE));
 
 // ======================= HOMBRO =======================
-function hombroPanel(rot, dx, titulo, lineas) {
-  return g(`translate(${dx} 34) scale(.78)`,
-    riTop(150, 60, 180, 136) + hombroFig(rot) + `<circle cx="222" cy="137" r="5" fill="${RED}"/>`) +
-    txt(dx + 2, 210, titulo, 12.5, INK, "start", 700) + lineas.map((l, i) => txt(dx + 2, 228 + i * 14, l, 11, MUTE)).join("");
+// AP con rotación: RC 2,5 cm por debajo de la coracoides
+function hombroAP(id, titulo, rc, notas) {
+  const f = E.figura(id, { caja: [30, 30, 380, 296] });
+  const t = cm(f, f.p("coracoides_R"), 0, rc);
+  return { f, t, svg: view(titulo) + side(24, 52, "D") + riEn(f, t, 30, 24) + txt(f1(t[0] - 15 * f.ppc + 6), f1(t[1] + 12 * f.ppc - 6), "RI 24 x 30 horizontal", 11, INK) +
+    f.svg + crossP(t) + notas(f, t) };
 }
+const epis = (f) => [f.p("epicondilo_lat_R"), f.p("epicondilo_med_R")];
+const hombroRotTxt = () =>
+  col(430, 196, [["De pie o en decúbito supino, brazo", INK], ["en leve abducción; tórax rotado para", INK], ["apoyar el hombro posterior en el RI", INK]]) +
+  col(430, 258, [["RI 24 x 30 horizontal · parrilla", MUTE, 400, 11], ["Apnea · DFRI 100 cm", MUTE, 400, 11], ["No hacerla si se sospecha fractura o luxación", MUTE, 400, 11]]);
+I["hombro-ap-rotacion--v1"] = () => svg(hombroAP("hombro-ap-rotacion--v1", "Rotación externa · vista desde el tubo", 2.5, (f, t) => {
+  const [l, m] = epis(f);
+  return refline(...lerp(l, m, -0.6).map(f1), ...lerp(l, m, 1.6).map(f1)) + bluePt(l) + bluePt(m) +
+    note(t[0] + 10, t[1], 430, 60, ["RC perpendicular, 2,5 cm por", "debajo de la apófisis coracoides"], RED) +
+    note(...m, 430, 120, ["Brazo rotado hacia afuera: mano en", "supinación, epicóndilos paralelos al RI"], BLUE) +
+    lab(...f.p("coracoides_R"), 40, 92, "coracoides", "start");
+}).svg + hombroRotTxt());
+I["hombro-ap-rotacion--v2"] = () => svg(hombroAP("hombro-ap-rotacion--v2", "Rotación interna · vista desde el tubo", 2.5, (f, t) => {
+  const [l, m] = epis(f), e = lerp(l, m, 0.5);
+  return ring(e) + bluePt(e) +
+    note(t[0] + 10, t[1], 430, 60, ["RC perpendicular, 2,5 cm por", "debajo de la apófisis coracoides"], RED) +
+    note(e[0] + 8, e[1], 430, 120, ["Brazo rotado hacia adentro: mano en", "pronación, epicóndilos ⟂ al RI"], BLUE) +
+    lab(...f.p("coracoides_R"), 40, 92, "coracoides", "start");
+}).svg + hombroRotTxt());
+I["hombro-ap-neutra"] = () => svg(hombroAP("hombro-ap-neutra", "Vista desde el tubo · rotación neutra", 2, (f, t) =>
+  note(t[0] + 10, t[1], 430, 60, ["RC perpendicular, unos 2 cm", "debajo de la apófisis coracoides"], RED) +
+  note(...f.p("codo_R"), 430, 120, ["Brazo en posición neutra: palma", "hacia el muslo (si no hay trauma agudo)"]) +
+  lab(...f.p("coracoides_R"), 40, 92, "coracoides", "start") +
+  col(430, 186, [["Erguido (sentado o de pie) o en", INK], ["decúbito supino; brazo en abducción", INK], ["ligera. Girar el tórax lo necesario", INK], ["para apoyar el hombro posterior", INK]]) +
+  col(430, 262, [["RI 24 x 30 horizontal (o vertical para más", MUTE, 400, 11], ["húmero) · parrilla · DFRI 100 cm", MUTE, 400, 11], ["Colimar a los cuatro lados", AMB, 400, 11]])).svg);
+
+// AP axial apical: de frente (desde el tubo) y de costado con el RC 30° caudal
 I["hombro-ap-axial-apical"] = () => {
-  const c = costado(8);
+  const f = E.figura("hombro-ap-axial-apical", { caja: [16, 30, 300, 296] });
+  const s = E.figura("hombro-ap-axial-apical-costado", { caja: [440, 30, 150, 296] });
+  const t = cm(f, f.p("coracoides_R"), 0, -1.25), ts = cm(s, s.p("coracoides_R"), 0, -1.25);
   return svg(
-    view("1 · De frente (desde el tubo)") +
-    riTop(150, 60, 180, 136) + txt(16, 176, "RI 18 x 24 o", 12, INK) + txt(16, 190, "24 x 30 horizontal", 12, INK) +
-    hombroFig("neutro") +
-    `<circle cx="222" cy="111" r="4.5" fill="${RED}"/>` +
-    note(218, 110, 140, 112, ["RC 1,25 cm por", "encima de la", "coracoides"], RED, "end") +
-    lab(224, 121, 268, 138, "coracoides") + lab(212, 128, 268, 152, "cabeza humeral") + lab(252, 172, 268, 176, "escápula") +
-    side(30, 44, "D") + txt(46, 48, "hombro derecho", 10.5, MUTE) +
-    txt(16, 238, "Sin rotación", 12, INK, "start", 700) + txt(16, 254, "mano en posición", 11, MUTE) + txt(16, 268, "neutra", 11, MUTE) +
-    panelSep("2 · De costado (de pie, espalda al RI)") +
-    costadoEspalda(c) +
-    `<circle cx="486" cy="146" r="4" fill="${RED}"/>` +
-    beam(486, 146, 150, 185, { ref: 180, angLabel: "30°" }) +
-    lab(486, 155, 520, 196, "coracoides") + lab(474, 162, 520, 210, "cabeza humeral") +
-    txt(530, 252, "RC 30° caudal, entra 1,25 cm", 12, INK, "start", 700) +
-    txt(530, 268, "por encima de la coracoides", 12, INK, "start", 700) +
-    txt(530, 290, "DFRI 100 cm · parrilla · apnea", 11, MUTE) +
-    txt(530, 304, "Colimar hasta partes blandas", 11, AMB) + txt(530, 318, "del hombro", 11, AMB)
+    view("1 · De frente (desde el tubo)") + side(24, 52, "D") + f.svg + redDot(t) +
+    lab(...f.p("coracoides_R"), 40, 250, "coracoides", "start") +
+    note(t[0] + 6, t[1] - 4, 250, 60, ["RC 1,25 cm por", "encima de la", "coracoides"], RED, "start") +
+    col(200, 250, [["Sin rotación", INK, 700, 12], ["mano en posición neutra", MUTE, 400, 11]]) +
+    panelSep(388, "2 · De costado (espalda al RI)") + wall(f1(s.x - 16), 44, 300, "") + s.svg +
+    beam(f1(ts[0]), f1(ts[1]), 150, 150, { ref: 180, angLabel: "30°" }) + redDot(ts) +
+    col(600, 230, [["RC 30° caudal, entra", RED, 700, 12], ["1,25 cm por encima", RED, 700, 12], ["de la coracoides", RED, 700, 12]]) +
+    col(600, 286, [["DFRI 100 cm · parrilla", MUTE, 400, 11], ["Colimar hasta partes", AMB, 400, 11], ["blandas del hombro", AMB, 400, 11]])
   );
 };
 
-I["hombro-grashey"] = () => svg(
-  topPanel(40, { ap: true, beamLocal: [-79, -3], angLabel: "35-45°", haz: "AP: RC ⟂ al RI" }) +
-  txt(30, 300, "Oblicua hacia el lado afectado: cuerpo de la", 11, INK) +
-  txt(30, 314, "escápula paralelo al RI. Brazo en rotación neutra.", 11, INK) +
-  panelSep("2 · Punto de centrado (desde el tubo)") +
-  g("translate(330 40) scale(.8)", hombroFig("neutro") +
-    cota(188, 104, 188, 134, "", 0, 0) + cota(188, 134, 216, 134, "", 0, 0) + dot(188, 104)) +
-  cross(f1(330 + 216 * 0.8), f1(40 + 134 * 0.8)) +
-  txt(f1(330 + 182 * 0.8), f1(40 + 122 * 0.8), "5 cm", 11, BLUE, "end", 700) +
-  txt(f1(330 + 202 * 0.8), f1(40 + 170 * 0.8), "5 cm", 11, BLUE, "middle", 700) +
-  azul(f1(330 + 188 * 0.8), f1(40 + 103 * 0.8), 470, 64, "borde superolateral del hombro") +
-  txt(560, 220, "RC perpendicular, en la", 12, INK, "start", 700) +
-  txt(560, 236, "articulación escapulohumeral:", 12, INK, "start", 700) +
-  txt(560, 252, "≈5 cm abajo y medial del borde", 12, INK) + txt(560, 268, "superolateral del hombro", 12, INK) +
-  txt(560, 292, "De pie (preferible) o supino", 11, MUTE) + txt(560, 306, "RI 18 x 24 horizontal · parrilla", 11, MUTE) + txt(560, 320, "apnea · DFRI 100 cm", 11, MUTE)
-);
+// Grashey: vista superior (oblicua posterior 35-45°) y punto de centrado desde el tubo
+I["hombro-grashey"] = () => {
+  const s = superior("hombro-grashey", { x: 196, ang: "35-45°" });
+  const f = E.figura("hombro-grashey-tubo", { caja: [400, 34, 150, 240] });
+  const t = f.p("cabeza_humero_R");
+  return svg(
+    view("1 · Vista superior (desde arriba)") + s.svg +
+    lab(...s.k.hueso("Right scapula"), 330, 250, "escápula ∥ RI", "start") +
+    txt(30, 312, "Oblicua hacia el lado afectado: cuerpo de la escápula paralelo al RI. Brazo en rotación neutra.", 10.5, INK) +
+    panelSep(388, "2 · Desde el tubo") + f.svg + crossP(t) +
+    col(566, 70, [["RC perpendicular, en la", RED, 700, 12], ["articulación escapulohumeral:", RED, 700, 12], ["≈5 cm abajo y medial del", INK], ["borde superolateral del hombro", INK]]) +
+    col(566, 150, [["De pie (preferible) o supino", INK]]) +
+    col(566, 250, [["RI 18 x 24 horizontal", MUTE, 400, 11], ["parrilla · apnea · DFRI 100 cm", MUTE, 400, 11]])
+  );
+};
 
+// Garth: vista superior (oblicua posterior 45°) y vista desde el tubo
 I["hombro-garth"] = () => {
-  const c = costado(8, false);
-  const X = c.X;
-  const brazo = piel(`M${X(446)},144 C${X(456)},136 ${X(474)},138 ${X(480)},156 L${X(482)},194 L${X(484)},166 C${X(485)},158 ${X(493)},158 ${X(493)},166 L${X(490)},214 C${X(484)},236 ${X(460)},242 ${X(448)},226 C${X(443)},210 ${X(442)},180 ${X(443)},160 Z`);
+  const s = superior("hombro-garth", { x: 196, ang: "45°", rcTxt: "AP: 45° caudal" });
+  const f = E.figura("hombro-garth-tubo", { caja: [400, 34, 150, 240] });
+  const t = f.p("cabeza_humero_R");
   return svg(
-    topPanel(45, { ap: true, beamLocal: [-82, -2], angLabel: "45°", haz: "AP · 45° caudal" }) +
-    txt(30, 300, "Tórax rotado 45°, hombro afectado apoyado en", 11, INK) +
-    txt(30, 314, "el RI (oblicua posterior). De pie, de preferencia.", 11, INK) +
-    panelSep("2 · De costado (espalda al RI)") +
-    wall(418, 44, 300, "") + txt(424, 38, "Bucky / RI", 10, MUTE, "middle") + c.piel + brazo + c.huesos + c.cara +
-    `<circle cx="462" cy="156" r="4" fill="${RED}"/>` +
-    beam(462, 156, 135, 115, { ref: 180, angLabel: "45°" }) +
-    note(X(494), 170, 640, 210, ["Codo flexionado,", "mano sobre el", "otro hombro"]) +
-    txt(530, 262, "RC 45° caudal, a la cara medial", 12, INK, "start", 700) +
-    txt(530, 278, "de la articulación escapulohumeral", 12, INK, "start", 700) +
-    txt(530, 300, "RI 24 x 30 vertical, centrado en la", 11, MUTE) + txt(530, 314, "salida del RC · parrilla · apnea", 11, MUTE)
+    view("1 · Vista superior (desde arriba)") + s.svg +
+    txt(30, 312, "Tórax rotado 45°, hombro afectado apoyado en el RI (oblicua posterior). De pie, de preferencia.", 10.5, INK) +
+    panelSep(388, "2 · Desde el tubo") + f.svg + redDot(t) +
+    note(...f.p("grande_R"), 566, 150, ["Codo flexionado,", "mano sobre el", "otro hombro"]) +
+    col(566, 70, [["RC 45° caudal, a la", RED, 700, 12], ["cara medial de la", RED, 700, 12], ["articulación", RED, 700, 12], ["escapulohumeral", RED, 700, 12]]) +
+    col(566, 250, [["RI 24 x 30 vertical,", MUTE, 400, 11], ["centrado en la salida", MUTE, 400, 11], ["del RC · parrilla · apnea", MUTE, 400, 11]])
   );
 };
 
+// Y de escápula / Neer: vista superior (desde la PA, oblicua anterior 45-60°) y vista desde el tubo (por detrás)
 I["hombro-y-escapula-neer"] = () => {
-  const c = costado(196);
+  const s = superior("hombro-y-escapula-neer", { x: 196, ang: "45-60°", rcTxt: "Y de escápula: RC ⟂ (PA)" });
+  const f = E.figura("hombro-y-escapula-neer-tubo", { caja: [400, 34, 160, 240] });
+  const t = f.p("cabeza_humero_R");
   return svg(
-    topPanel(52, { brazo: true, beamLocal: [-79, -3], angLabel: "45-60°", haz: "Y de escápula: RC ⟂ (PA)" }) +
-    txt(30, 300, "Desde la PA, rotar con el hombro afectado contra el RI.", 11, INK) +
-    txt(30, 314, "Brazo sano adelante y arriba; afectado hacia abajo.", 11, INK) +
-    panelSep("2 · Método de Neer (de costado)") +
-    costadoFrente(c) +
-    dot(655, 141) +
-    beam(655, 141, 12.5, 210, { horizontal: true, angLabel: "10-15°" }) +
-    azul(652, 136, 540, 40, "borde superior de la cabeza humeral") +
-    lab(636, 206, 610, 222, "escápula", "end") + lab(664, 134, 610, 238, "acromion", "end") +
-    txt(402, 262, "Neer: RC 10-15° caudal, al borde", 12, INK, "start", 700) +
-    txt(402, 278, "superior de la cabeza humeral", 12, INK, "start", 700) +
-    txt(402, 298, "RI 24 x 30 vertical · parrilla · apnea", 11, MUTE) +
-    txt(402, 312, "Con trauma: no mover el brazo afectado", 11, MUTE)
+    view("1 · Vista superior (desde arriba)") + s.svg +
+    lab(...s.k.hueso("Right scapula"), 330, 250, "escápula ⟂ RI", "start") +
+    txt(30, 312, "Desde la PA, rotar con el hombro afectado contra el RI. Brazo sano adelante y arriba; afectado abajo.", 10.5, INK) +
+    panelSep(388, "2 · Desde el tubo (por detrás)") + f.svg + crossP(t) +
+    col(574, 70, [["Neer: RC 10-15° caudal,", RED, 700, 12], ["al borde superior de la", RED, 700, 12], ["cabeza humeral", RED, 700, 12]]) +
+    col(574, 250, [["RI 24 x 30 vertical", MUTE, 400, 11], ["parrilla · apnea", MUTE, 400, 11], ["Con trauma: no mover", MUTE, 400, 11], ["el brazo afectado", MUTE, 400, 11]])
   );
 };
 
-I["hombro-transtoracica-lawrence"] = () => transtoracica(
-  (R) => [f1(R.S[0] + 2), f1(R.S[1] + 16)],
-  txt(520, 236, "RC perpendicular al RI, atraviesa", 12, INK, "start", 700) +
-  txt(520, 252, "el tórax hasta el cuello quirúrgico", 12, INK, "start", 700) +
-  txt(520, 272, "Si no se puede elevar el hombro sano:", 11.5, RED) + txt(520, 286, "RC 10-15° cefálico", 11.5, RED, "start", 700) +
-  txt(520, 306, "RI 24 x 30 vertical · parrilla · inspiración", 11, MUTE) + txt(520, 320, "completa (o respiración suave)", 11, MUTE),
-  (F, t) => {
-    const L = F.info.L;
-    return note(L.E[0] + 10, L.E[1], 520, 70, ["Brazo y hombro sanos", "elevados, por encima", "de la cabeza"]) +
-      txt(20, 64, "Brazo afectado al", 12, INK, "start", 700) + txt(20, 80, "costado, en rotación", 12, INK) + txt(20, 96, "neutra, contra el RI", 12, INK) +
-      lab(t[0] - 6, t[1] - 10, 130, 250, "cuello quirúrgico", "end") +
-      txt(520, 180, "De pie o en decúbito supino", 12, INK, "start", 700);
-  });
+I["hombro-transtoracica-lawrence"] = () => transtoracica("hombro-transtoracica-lawrence", (f) => lerp(f.p("cabeza_humero_R"), f.p("centro:Right humerus"), 0.3), (f, t) =>
+  txt(20, 70, "Brazo afectado al", 12, INK, "start", 700) + txt(20, 86, "costado, en rotación", 12, INK) + txt(20, 102, "neutra, contra el RI", 12, INK) +
+  note(...f.p("codo_L"), 520, 64, ["Brazo y hombro sanos", "elevados, por encima", "de la cabeza"]) +
+  lab(t[0], t[1] + 6, 20, 290, "cuello quirúrgico", "start") +
+  txt(520, 168, "De pie o en decúbito supino", 12, INK, "start", 700) +
+  txt(520, 206, "RC perpendicular al RI, atraviesa", 12, RED, "start", 700) + txt(520, 222, "el tórax hasta el cuello quirúrgico", 12, RED, "start", 700) +
+  txt(520, 244, "Si no se puede elevar el hombro sano:", 11.5, RED) + txt(520, 258, "RC 10-15° cefálico", 11.5, RED, "start", 700) +
+  txt(520, 286, "RI 24 x 30 vertical · parrilla · inspiración", 11, MUTE) + txt(520, 300, "completa (o respiración suave)", 11, MUTE));
 
+// Lawrence axial: decúbito supino visto desde arriba; RC horizontal desde abajo (caudal), 25-30° hacia medial, a la axila
 I["hombro-axial-lawrence"] = () => {
-  const F = frontal({ cx: 330, R: { ang: [180, 180], mano: "palma" }, L: { ang: [86, 88], mano: "palma", esp: true } });
-  const S = F.info.R.S, tgt = [f1(S[0] + 2), f1(S[1] + 2)];
-  const u = [Math.cos(rad(-62.5)), Math.sin(rad(-62.5))], n = [-u[1], u[0]];
-  const c = [tgt[0] + u[0] * 44, tgt[1] + u[1] * 44];
-  const r1 = [f1(c[0] - n[0] * 34), f1(c[1] - n[1] * 34)], r2 = [f1(c[0] + n[0] * 34), f1(c[1] + n[1] * 34)];
+  const f = E.figura("hombro-axial-lawrence", { caja: [16, 40, 430, 220] });
+  const t = f.p("cabeza_humero_R"), dir = 270 + 27.5;
+  const rIn = add(t, [Math.cos(rad(dir)), Math.sin(rad(dir))], 26);
   return svg(
-    view("Vista desde arriba · decúbito supino") +
-    `<rect x="30" y="160" width="160" height="150" fill="none"/>` +
-    F.draw +
-    `<line x1="${r1[0]}" y1="${r1[1]}" x2="${r2[0]}" y2="${r2[1]}" stroke="${INK}" stroke-width="7"/>` + txt(r1[0] - 8, r1[1] + 4, "RI", 12, INK, "end", 700) +
-    beam(tgt[0], tgt[1], -62.5, 180, { ref: -90, angLabel: "25-30°" }) +
-    `<circle cx="${tgt[0]}" cy="${tgt[1]}" r="4" fill="${RED}"/>` +
-    side(40, 50, "D") +
-    txt(70, 82, "Brazo a 90° de abducción,", 12, INK, "start", 700) + txt(70, 98, "rotación externa (supinación)", 12, INK) +
-    txt(470, 70, "RC horizontal, 25-30° hacia medial,", 12, RED, "start", 700) +
-    txt(470, 86, "apuntando a la axila", 12, RED, "start", 700) +
-    txt(470, 104, "Menos ángulo si no llega a 90° de abducción.", 11, INK) +
-    txt(470, 118, "Tubo cerca de la mesa, a la altura de la axila.", 11, INK) +
-    txt(470, 160, "Hombro en el borde de la mesa, sobre un", 11.5, INK) +
-    txt(470, 174, "apoyo; cabeza girada al lado opuesto.", 11.5, INK) +
-    txt(470, 206, "Alternativa (Hill-Sachs): rotación externa", 11.5, INK) +
-    txt(470, 220, "exagerada, pulgar abajo y atrás (~45°).", 11.5, INK) +
-    txt(470, 270, "RI 18 x 24 horizontal · parrilla (a menudo", 11, MUTE) + txt(470, 284, "sin ella en hombros pequeños) · apnea", 11, MUTE) +
-    txt(470, 304, "No hacer si se sospecha fractura o luxación", 11, MUTE)
+    view("Vista desde arriba · decúbito supino") + side(24, 52, "D") + f.svg +
+    riCanto(rIn, dir, 90, "RI", f1(rIn[0] + 34), f1(rIn[1] - 30)) +
+    beam(f1(t[0]), f1(t[1]), dir, 160, { ref: 270, angLabel: "25-30°" }) + redDot(t) +
+    txt(30, 292, "Brazo a 90° de abducción, rotación externa (mano en supinación)", 11.5, INK, "start", 700) +
+    txt(470, 70, "RC horizontal, 25-30° hacia medial,", 12, RED, "start", 700) + txt(470, 86, "apuntando a la axila", 12, RED, "start", 700) +
+    txt(470, 104, "Menos ángulo si no llega a 90° de abducción.", 11, INK) + txt(470, 118, "Tubo cerca de la mesa, a la altura de la axila.", 11, INK) +
+    txt(470, 150, "Hombro en el borde de la mesa, sobre un", 11.5, INK) + txt(470, 164, "apoyo; cabeza girada al lado opuesto.", 11.5, INK) +
+    txt(470, 196, "Alternativa (Hill-Sachs): rotación externa", 11.5, INK) + txt(470, 210, "exagerada, pulgar abajo y atrás (~45°)", 11.5, INK) +
+    txt(470, 262, "RI 18 x 24 horizontal · parrilla (a menudo", 11, MUTE) + txt(470, 276, "sin ella en hombros pequeños) · DFRI 100 cm", 11, MUTE) +
+    txt(470, 300, "No hacer si se sospecha fractura o luxación", 11, MUTE)
   );
 };
 
+// Hobbs: PA (vista por detrás), brazo elevado
 I["hombro-transaxilar-hobbs"] = () => {
-  const F = frontal({ back: true, cx: 270, dy: 80, R: { ang: [-84, -92], mano: "dorso", esp: true }, L: { ang: [92, 92], mano: "dorso", esp: true } });
-  const S = F.info.R.S, j = [f1(S[0] - 12), f1(S[1] + 2)];
+  const f = E.figura("hombro-transaxilar-hobbs", { caja: [130, 28, 300, 298] });
+  const t = f.p("cabeza_humero_R");
   return svg(
-    view("Vista desde el tubo · PA, de pie o en decúbito") +
-    riTop(j[0] - 64, j[1] - 84, 128, 170) +
-    F.draw +
-    cross(...j) +
-    side(80, 70, "D") + txt(30, 96, "vista por detrás:", 10.5, MUTE) + txt(30, 108, "el lado derecho", 10.5, MUTE) + txt(30, 120, "queda a la derecha", 10.5, MUTE) +
-    note(j[0] + 10, j[1] + 6, 470, 210, ["RC perpendicular, centrado en", "la articulación glenohumeral"], RED) +
-    note(f1(F.info.R.E[0] + 12), f1(F.info.R.E[1]), 470, 90, ["Brazo afectado elevado,", "en extensión completa"]) +
-    note(282, 130, 470, 150, ["Cabeza girada hacia", "el otro lado"]) +
+    view("Vista desde el tubo · PA, de pie o en decúbito") + side(48, 70, "D") +
+    txt(30, 96, "vista por detrás:", 10.5, MUTE) + txt(30, 108, "el lado derecho", 10.5, MUTE) + txt(30, 120, "queda a la derecha", 10.5, MUTE) +
+    riEn(f, t, 18, 24) + f.svg + crossP(t) +
+    note(t[0] + 10, t[1] + 6, 470, 210, ["RC perpendicular, centrado en", "la articulación glenohumeral"], RED) +
+    note(...f.p("codo_R"), 470, 90, ["Brazo afectado elevado,", "en extensión completa"]) +
+    note(f1(f.x + f.w * 0.35), f1(f.y + f.h * 0.42), 470, 150, ["Cabeza girada hacia", "el otro lado"]) +
     txt(470, 264, "RI 18 x 24 vertical", 11.5, INK) + txt(470, 280, "Parrilla · apnea · DFRI 100 cm", 11.5, MUTE) +
     txt(470, 296, "Colimación ajustada a los cuatro lados", 11.5, AMB)
   );
 };
 
+// Clements: decúbito lateral sobre el lado sano, visto de frente; brazo afectado hacia arriba; RI contra la parte superior del
+// hombro (del lado de la cabeza) y RC horizontal desde los pies
 I["hombro-axial-clements"] = () => {
-  const F = frontal({ cx: 280, clip: null, R: { ang: [180, 180], mano: "palma" }, L: { ang: [92, 92], mano: "palma", esp: true } });
-  const Tx = 260, Ty = 218, k = 0.72;
-  const tr = (x, y) => [f1(Tx - k * (y - 160)), f1(Ty + k * (x - 280))];
-  const sh = tr(202, 132);
+  const f = E.figura("hombro-axial-clements", { caja: [70, 30, 330, 290] });
+  const t = f.p("cabeza_humero_R"), cab = f.p("acromion_L");
+  const der = cab[0] > t[0];                            // la cabeza del paciente, hacia la derecha del dibujo
+  const xRI = f1(t[0] + (der ? 1 : -1) * 4.5 * f.ppc);
   return svg(
-    view("Vista de frente · decúbito lateral sobre el lado sano") +
-    table(40, 430, 287) +
-    g(`translate(${Tx} ${Ty}) rotate(90) scale(${k}) translate(-280 -160)`, F.draw) +
-    `<rect x="${sh[0] + 26}" y="${sh[1] - 62}" width="7" height="78" fill="${INK}"/>` + txt(sh[0] + 40, sh[1] - 50, "RI", 12, INK, "start", 700) +
-    beam(sh[0], sh[1], 0, 200, { horizontal: true }) +
-    `<circle cx="${sh[0]}" cy="${sh[1]}" r="4" fill="${RED}"/>` +
-    note(sh[0] - 6, 50, 150, 40, ["Brazo afectado elevado,", "90° de abducción"], INK, "end") +
-    txt(470, 70, "RC perpendicular al RI", 12.5, RED, "start", 700) +
-    txt(470, 88, "Sin 90° de abducción: angular", 11.5, INK) + txt(470, 102, "el tubo 5-15° hacia la axila", 11.5, INK) +
-    txt(470, 150, "Paciente acostado sobre el lado sano;", 11.5, INK) + txt(470, 164, "hombro afectado arriba", 11.5, INK) +
+    view("Vista de frente · decúbito lateral sobre el lado sano") + f.svg +
+    `<rect x="${f1(xRI - 4)}" y="${f1(t[1] - 11 * f.ppc)}" width="8" height="${f1(22 * f.ppc)}" fill="${INK}"/>` + txt(f1(xRI + 8), f1(t[1] - 9 * f.ppc), "RI", 12, INK, "start", 700) +
+    beam(f1(t[0]), f1(t[1]), der ? 0 : 180, f1(Math.abs(t[0] - (der ? 30 : 420)) + 0)) + redDot(t) +
+    note(...f.p("codo_R"), 430, 40, ["Brazo afectado elevado,", "90° de abducción"]) +
+    txt(470, 100, "RC perpendicular al RI", 12.5, RED, "start", 700) +
+    txt(470, 118, "Sin 90° de abducción: angular", 11.5, INK) + txt(470, 132, "el tubo 5-15° hacia la axila", 11.5, INK) +
+    txt(470, 170, "Paciente acostado sobre el lado sano;", 11.5, INK) + txt(470, 184, "hombro afectado arriba", 11.5, INK) +
     txt(470, 270, "RI 18 x 24 vertical · sin parrilla (o con ella", 11, MUTE) + txt(470, 284, "si el RC le queda perpendicular) · apnea", 11, MUTE) +
     txt(470, 304, "DFRI 100 cm · colimar a los cuatro lados", 11, MUTE)
   );
 };
 
-// ======================= CLAVÍCULA =======================
-// ======================= ESCÁPULA =======================
-I["escapula-ap"] = () => {
-  const F = frontal({ cx: 330, R: { ang: [180, 180], mano: "palma" }, L: { ang: [86, 88], mano: "palma", esp: true } });
-  const R = F.info.R, X = R.X;
-  const rc = [X(240), 152], cor = [X(222), 120], latx = 330 - 92;
-  return svg(
-    view("Vista desde el tubo · de pie o decúbito supino") +
-    riTop(X(196), 70, 104, 150) +
-    F.draw +
-    coll(X(212), 92, 62, 112) +
-    dot(...cor) + cota(cor[0], cor[1], cor[0], rc[1], "", 0, 0) + txt(cor[0] + 6, 132, "5 cm", 11, BLUE, "start", 700) +
-    cota(latx, rc[1], rc[0], rc[1], "", 0, 0) + txt(257, rc[1] + 16, "5 cm", 11, BLUE, "end", 700) +
-    cross(...rc) +
-    lab(cor[0] - 2, cor[1] - 2, 200, 66, "coracoides", "end") + lab(X(258), 184, 300, 240, "escápula") +
-    side(40, 50, "D") +
-    note(rc[0] + 10, rc[1] + 6, 470, 110, ["RC perpendicular, en la parte", "media de la escápula"], RED) +
-    txt(470, 150, "≈5 cm debajo de la coracoides y", 12, INK) + txt(470, 166, "≈5 cm medial del borde lateral", 12, INK) +
-    note(110, 120, 120, 250, ["Brazo abducido 90°, mano", "supinada: menos costillas", "sobre la escápula"], INK, "start") +
-    txt(470, 254, "RI 24 x 30 vertical", 11, INK) + txt(470, 270, "Respiración suave o apnea · parrilla", 11, MUTE) +
-    txt(470, 286, "DFRI 100 cm", 11, MUTE) + txt(470, 302, "Colimar hasta los bordes de la escápula", 11, AMB)
-  );
-};
-
-// ======================= ACROMIOCLAVICULARES =======================
-I["ac-pearson"] = () => {
-  const F = frontal({ cx: 230, R: { ang: [96, 92], mano: "palma" }, L: { ang: [84, 88], mano: "palma", esp: true } });
-  const R = F.info.R, L = F.info.L;
-  const peso = (W) => `<line x1="${f1(W[0])}" y1="${f1(W[1] + 6)}" x2="${f1(W[0])}" y2="${f1(W[1] + 58)}" stroke="${MUTE}" stroke-width="1.5"/>` +
-    `<rect x="${f1(W[0] - 13)}" y="${f1(W[1] + 58)}" width="26" height="20" rx="3" fill="#8a8f9c"/>`;
-  const acR = [R.X(206), 100], acL = [L.X(206), 100], yug = [230, 94];
-  const Z = ([x, y]) => [f1(x * 0.85 + 34.5), f1(y * 0.85 + 14)];
-  return svg(
-    view("Vista desde el tubo · de pie, brazos a los costados") +
-    g("translate(34.5 14) scale(.85)", riTop(100, 64, 260, 80) + F.draw + peso(R.W) + peso(L.W) + coll(112, 72, 236, 56) + dot(...acR) + dot(...acL)) +
-    cross(...Z(yug)) +
-    azul(...Z(acR), 60, 44, "AC derecha") + azul(...Z(acL), 400, 44, "AC izquierda") +
-    note(...Z([L.W[0] + 13, L.W[1] + 70]), 360, 300, ["Toma con pesos"]) +
-    note(Z(yug)[0] + 12, Z(yug)[1] + 6, 470, 92, ["RC perpendicular, centrado", "en la escotadura yugular"], RED) +
-    txt(16, 200, "RI 35 x 43", 11.5, INK) + txt(16, 214, "horizontal", 11.5, INK) +
-    txt(470, 140, "Dos tomas bilaterales:", 12, INK, "start", 700) +
-    txt(470, 156, "1) sin pesos; 2) con pesos de 3,6-4,5 kg", 11.5, INK) + txt(470, 170, "atados a las muñecas (2,25-3,6 kg en", 11.5, INK) + txt(470, 184, "pacientes chicos), hombros relajados", 11.5, INK) +
-    txt(470, 204, "Marcadores «con pesos» y «sin pesos»", 11.5, INK) +
-    txt(470, 228, "Campo horizontal, largo y estrecho", 11.5, AMB) +
-    txt(470, 252, "DFRI 180 cm si es un solo RI bilateral", 11.5, MUTE) + txt(470, 266, "(si no, 100 cm) · apnea", 11.5, MUTE) +
-    txt(470, 280, "Descartar fractura antes de los pesos", 11.5, MUTE)
-  );
-};
-
-// ======================= VERSIONES (un esquema por posición; ver datos/versiones.js) =======================
-const col = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
-const vista = (html, viejo, nuevo) => html.replace(view(viejo), view(nuevo));
-
-// ---- AP de hombro con rotación externa e interna ----
-function hombroRot(rot) {
-  return g("translate(-30 12) scale(.96)", riTop(150, 60, 180, 136) + hombroFig(rot) + `<circle cx="222" cy="137" r="5" fill="${RED}"/>`);
-}
-const HT = (x, y) => [f1(-30 + 0.96 * x), f1(12 + 0.96 * y)];
-const hombroRotTxt = () =>
-  col(430, 196, [["De pie o en decúbito supino, brazo", INK], ["en leve abducción; tórax rotado para", INK], ["apoyar el hombro posterior en el RI", INK]]) +
-  col(430, 258, [["RI 24 x 30 horizontal · parrilla", MUTE, 400, 11], ["Apnea · DFRI 100 cm", MUTE, 400, 11], ["No hacerla si se sospecha fractura o luxación", MUTE, 400, 11]]);
-I["hombro-ap-rotacion--v1"] = () => svg(
-  view("Rotación externa · vista desde el tubo") + hombroRot("externo") +
-  note(...HT(222, 137), 430, 60, ["RC perpendicular, 2,5 cm por", "debajo de la apófisis coracoides"], RED) +
-  note(...HT(212, 205), 430, 120, ["Brazo rotado hacia afuera: mano en", "supinación, epicóndilos paralelos al RI"], BLUE) +
-  hombroRotTxt()
-);
-I["hombro-ap-rotacion--v2"] = () => svg(
-  view("Rotación interna · vista desde el tubo") + hombroRot("interno") +
-  note(...HT(222, 137), 430, 60, ["RC perpendicular, 2,5 cm por", "debajo de la apófisis coracoides"], RED) +
-  note(...HT(200, 203), 430, 120, ["Brazo rotado hacia adentro: mano en", "pronación, epicóndilos ⟂ al RI"], BLUE) +
-  hombroRotTxt()
-);
-
-// ---- Tangencial del surco intertubercular (Fisk) ----
+// Fisk: v1 decúbito supino de costado (frente arriba); v2 de pie inclinado sobre la mesa
 I["hombro-fisk--v1"] = () => {
-  const NX = 105.28, NY = 252;
-  const h = cabezaPerfil(NX, NY, { s: 0.42 });
-  const cuerpo = h.d + " C176,226 180,212 196,200 C222,184 256,178 286,182 C312,188 336,196 362,198 C380,199 396,198 412,198 L412,252 Z";
-  const brazo = linea("M206,206 C240,214 272,224 300,230 C330,234 360,232 384,228");
-  const tgt = [206, 200];
-  const u = [Math.cos(rad(167.5)), Math.sin(rad(167.5))], n = [-u[1], u[0]];
-  const rc = [tgt[0] + u[0] * 22, tgt[1] + u[1] * 22];
-  const r1 = [f1(rc[0] - n[0] * 30), f1(rc[1] - n[1] * 30)], r2 = [f1(rc[0] + n[0] * 30), f1(rc[1] + n[1] * 30)];
+  const f = E.figura("hombro-fisk--v1", { caja: [20, 120, 420, 150] });
+  const t = f.p("troquiter_R"), dir = 180 - 12.5;
+  const rIn = add(t, [Math.cos(rad(dir)), Math.sin(rad(dir))], 30);
   return svg(
-    view("Decúbito supino · de costado") +
-    `<clipPath id="cf"><rect x="0" y="30" width="420" height="300"/></clipPath><g clip-path="url(#cf)">` +
-    table(20, 420, 252) + piel(cuerpo) + brazo + h.cara + hueso(circ(206, 208, 9)) + `</g>` +
-    `<line x1="${r1[0]}" y1="${r1[1]}" x2="${r2[0]}" y2="${r2[1]}" stroke="${INK}" stroke-width="6"/>` +
-    beam(tgt[0], tgt[1], 167.5, 160, { ref: 180, angLabel: "10-15°" }) +
-    `<circle cx="${tgt[0]}" cy="${tgt[1]}" r="4" fill="${RED}"/>` +
-    note(r2[0] + 2, r2[1] - 2, 200, 92, ["RI vertical sobre el", "hombro, ⟂ al RC"], INK, "start") +
-    col(470, 140, [["Tubo angulado 10-15° hacia", RED, 700, 12], ["posterior desde la horizontal:", RED, 700, 12], ["haz tangencial al surco bicipital", INK]]) +
-    col(470, 200, [["Leve abducción del brazo y mano", INK], ["en supinación; centrar el RI y el", INK], ["surco en el RC", INK], ["Palpar la cabeza humeral anterior", MUTE], ["para ubicar el surco", MUTE]]) +
+    view("Decúbito supino · de costado") + f.svg +
+    riCanto(rIn, dir, 70) + note(f1(rIn[0]), f1(rIn[1] - 34), 200, 80, ["RI vertical sobre el", "hombro, ⟂ al RC"], INK, "start") +
+    beam(f1(t[0]), f1(t[1]), dir, 170, { ref: 180, angLabel: "10-15°" }) + redDot(t) +
+    col(470, 120, [["Tubo angulado 10-15° hacia", RED, 700, 12], ["posterior desde la horizontal:", RED, 700, 12], ["haz tangencial al surco bicipital", INK]]) +
+    col(470, 180, [["Leve abducción del brazo y mano", INK], ["en supinación; centrar el RI y el", INK], ["surco en el RC", INK], ["Palpar la cabeza humeral anterior", MUTE], ["para ubicar el surco", MUTE]]) +
     col(470, 300, [["RI 18 x 24 horizontal · sin parrilla · apnea", MUTE, 400, 11]])
   );
 };
 I["hombro-fisk--v2"] = () => {
-  const c = costado(110, false);
-  const sh = [643, 158];
-  const el = [sh[0] + 78 * Math.sin(rad(12.5)), sh[1] + 78 * Math.cos(rad(12.5))].map(f1);
-  const m = mano(700, el[1] + 2, 0, 1.0, "palma", false, true);
-  const arm = union([[...sh, ...el, 24], [...el, 700, el[1] + 2, 18], `M${m.a} ${m.seg} Z`]);
+  const f = E.figura("hombro-fisk--v2", { caja: [30, 40, 380, 260] });
+  const sh = f.p("cabeza_humero_R"), el = f.p("codo_R"), t = f.p("troquiter_R");
+  const mesa = f1(f.abajo(el[0] + 10, f.x + f.w) + 2);
+  const yRI = f1(mesa - 3.4 * f.ppc - 8);
   return svg(
     view("De pie (alternativa) · de costado") +
-    g("translate(-330 0)",
-      `<rect x="672" y="${el[1] + 12}" width="88" height="12" fill="#cfd3dc"/>` + txt(700, el[1] + 38, "Mesa", 10, MUTE) +
-      g(`rotate(25 570 316)`, c.piel + c.cara) + arm + m.det +
-      boneAlong([sh[0] + 1.5, sh[1] + 7], el, [[0, 6, 6], [0.9, 6, 6], [1, 8, 8]]) + hueso(circ(sh[0], sh[1], 10)) +
-      `<rect x="${el[0] - 8}" y="${el[1] - 16}" width="60" height="6" fill="${INK}"/>` + txt(el[0] + 56, el[1] - 10, "RI", 11, INK, "start", 700) +
-      `<line x1="${sh[0]}" y1="${sh[1]}" x2="${sh[0]}" y2="${sh[1] + 66}" stroke="${BLUE}" stroke-width="1.2" stroke-dasharray="4 4"/>` +
-      arcoAzul(sh[0], sh[1], 50, 90, 77.5, "10-15°", sh[0] - 22, sh[1] + 74) +
-      beam(sh[0], sh[1] - 8, 90, 92)) +
+    `<rect x="${f1(el[0] - 20)}" y="${mesa}" width="${f1(f.x + f.w - el[0] + 40)}" height="12" fill="#cfd3dc"/>` + txt(f1(f.x + f.w - 30), f1(mesa + 26), "Mesa", 10, MUTE) +
+    f.svg + riBar(el[0] + 10, el[0] + 22 * f.ppc, yRI, "") + txt(f1(el[0] + 22 * f.ppc + 6), f1(yRI + 8), "RI", 12, INK, "start", 700) +
+    `<line x1="${f1(sh[0])}" y1="${f1(sh[1])}" x2="${f1(sh[0])}" y2="${f1(sh[1] + 120)}" stroke="${BLUE}" stroke-width="1.2" stroke-dasharray="4 4"/>` +
+    arco(sh, 70, 90, angulo(sh, el), "10-15°", BLUE, 22) +
+    beam(f1(t[0]), f1(t[1]), 90, f1(Math.max(70, t[1] - 50))) + redDot(t) +
     col(470, 70, [["RC vertical, perpendicular al RI", RED, 700, 12]]) +
     col(470, 110, [["De pie, inclinado hacia adelante", INK, 700], ["sobre el extremo de la mesa", INK, 700], ["Húmero a 10-15° de la vertical", INK]]) +
     col(470, 180, [["Palpar la cabeza humeral anterior", MUTE], ["para ubicar el surco", MUTE]]) +
@@ -619,49 +339,30 @@ I["hombro-fisk--v2"] = () => {
   );
 };
 
-// ---- Lateral de húmero con rotación ----
-I["humero-lateral-rotacion--v1"] = () => svg(
-  vista(topPanel(17.5, { beamLocal: [-84, 2], angLabel: "15-20°", haz: "RC ⟂ al RI" }), "1 · Vista superior (desde arriba)", "De pie en PA · vista superior")
-    .replace(/<text x="([\d.]+)" y="240"([^>]*)>15-20°<\/text>/, (_, x, r) => `<text x="${f1(+x - 6)}" y="300"${r}>15-20°</text>`) +
-  col(430, 70, [["RC perpendicular, en la parte", RED, 700, 12], ["media del húmero", RED, 700, 12]]) +
-  col(430, 120, [["Paciente rotado 15-20° desde la PA,", INK], ["lo necesario para que húmero y", INK], ["hombro toquen el soporte del RI", INK]]) +
-  col(430, 180, [["Codo flexionado 90°", INK, 700], ["Epicóndilos perpendiculares al RI", INK], ["(lateral verdadera)", INK]]) +
-  col(430, 250, [["RI 35 x 43 o 30 x 35 vertical · DFRI 100 cm", MUTE, 400, 11], ["Incluir codo y hombro", MUTE, 400, 11], ["No rotar si hay sospecha de fractura", MUTE, 400, 11]])
-);
-I["humero-lateral-rotacion--v2"] = () => {
-  const h = humeroFrente(true);
+// ======================= CLAVÍCULA =======================
+I["clavicula-ap-axial--v1"] = () => {
+  const f = E.figura("clavicula-ap", { caja: [40, 30, 360, 296] });
+  const c = f.p("clavicula_media_R"), ac = f.p("acromion_R"), y = f.p("yugular");
   return svg(
-    view("AP de pie o en decúbito · vista desde el tubo") +
-    humeroComun(h, "RI 35 x 43 vertical") +
-    `<circle cx="197" cy="200" r="8" fill="none" stroke="${BLUE}" stroke-width="2.2"/>` + dot(197, 200) +
-    lab(201, 236, 176, 244, "radio y cúbito", "end") +
-    note(224, 166, 420, 92, ["RC perpendicular, en la parte", "media del húmero"], RED) +
-    note(205, 200, 420, 146, ["Epicóndilos perpendiculares al RI", "(lateral verdadera)"], BLUE) +
-    note(222, 296, 420, 200, ["Codo un poco flexionado, brazo y", "muñeca rotados: palma hacia atrás", "(pronación)"]) +
-    col(420, 282, [["Incluir codo y hombro · DFRI 100 cm", MUTE, 400, 11], ["No rotar si hay sospecha de fractura", MUTE, 400, 11]])
+    view("AP · vista desde el tubo") + side(24, 44, "D") +
+    riEn(f, c, 30, 24) + f.svg +
+    coll(f1(ac[0] - 2 * f.ppc), f1(c[1] - 5 * f.ppc), f1(y[0] - ac[0] + 4 * f.ppc), f1(10 * f.ppc)) +
+    bluePt(ac) + bluePt(y) + crossP(c) +
+    azul(ac, 110, 52, "articulación AC") + azul(y, f1(y[0] + 20), f1(y[1] + 90), "escotadura yugular") +
+    note(c[0] + 10, c[1] - 4, 430, 70, ["RC perpendicular, en la", "parte media de la clavícula"], RED) +
+    col(430, 128, [["De pie o en decúbito", INK, 700], ["Clavícula y RI centrados en el RC:", INK], ["a mitad de camino entre la escotadura", INK], ["yugular y la articulación AC", INK]]) +
+    col(430, 220, [["Colimar incluyendo las articulaciones", AMB, 400, 11], ["AC y esternoclavicular", AMB, 400, 11]]) +
+    col(430, 270, [["RI 24 x 30 horizontal · parrilla", MUTE, 400, 11], ["Inspiración completa · DFRI 100 cm", MUTE, 400, 11]])
   );
 };
-
-// ---- Clavícula: AP y AP axial ----
-I["clavicula-ap-axial--v1"] = () => svg(
-  view("AP · vista desde el tubo") +
-  riTop(150, 54, 180, 100) + hombroFig("neutro") +
-  coll(186, 76, 104, 44) + dot(280, 94) + dot(204, 100) + cross(238, 100) +
-  txt(300, 240, "escotadura yugular", 11, BLUE, "middle") + `<line x1="280" y1="98" x2="300" y2="228" stroke="${BLUE}" stroke-width="1"/>` + azul(204, 98, 120, 56, "articulación AC", "middle") +
-  side(30, 44, "D") +
-  note(248, 100, 430, 70, ["RC perpendicular, en la", "parte media de la clavícula"], RED) +
-  col(430, 128, [["De pie o en decúbito", INK, 700], ["Clavícula y RI centrados en el RC:", INK], ["a mitad de camino entre la escotadura", INK], ["yugular y la articulación AC", INK]]) +
-  col(430, 220, [["Colimar incluyendo las articulaciones", AMB, 400, 11], ["AC y esternoclavicular", AMB, 400, 11]]) +
-  col(430, 270, [["RI 24 x 30 horizontal · parrilla", MUTE, 400, 11], ["Inspiración completa · DFRI 100 cm", MUTE, 400, 11]])
-);
 I["clavicula-ap-axial--v2"] = () => {
-  const c = costado(-200);
+  const f = E.figura("clavicula-costado", { caja: [150, 30, 150, 296] });
+  const c = f.p("clavicula_media_R");
   return svg(
     view("AP axial · de costado, espalda al RI") +
-    wall(218, 44, 300, "") + txt(224, 38, "Bucky / RI", 10, MUTE, "middle") + c.piel + c.huesos + c.brazo + c.cara +
-    `<circle cx="284" cy="139" r="4" fill="${RED}"/>` +
-    beam(284, 139, 202.5, 110, { ref: 180, angLabel: "15-30°" }) +
-    lab(290, 142, 300, 100, "clavícula") +
+    wall(f1(f.x - 18), 44, 300, "") + txt(f1(f.x - 12), 38, "Bucky / RI", 10, MUTE, "middle") + f.svg +
+    beam(f1(c[0]), f1(c[1]), 202.5, 140, { ref: 180, angLabel: "15-30°" }) + redDot(c) +
+    lab(c[0] + 4, c[1] - 2, f1(c[0] + 20), f1(c[1] - 40), "clavícula") +
     col(470, 70, [["RC 15-30° cefálico, en la parte", RED, 700, 12], ["media de la clavícula", RED, 700, 12]]) +
     col(470, 116, [["Hombros delgados: hacen falta", INK], ["5-15° más que en hombros gruesos", INK]]) +
     col(470, 168, [["De pie o en decúbito", INK, 700], ["En lugar de angular el RC, se puede", INK], ["usar una posición AP lordótica", INK]]) +
@@ -670,30 +371,62 @@ I["clavicula-ap-axial--v2"] = () => {
   );
 };
 
-// ---- Lateral de escápula ----
+// ======================= ESCÁPULA =======================
+I["escapula-ap"] = () => {
+  const f = E.figura("escapula-ap", { caja: [16, 40, 430, 250] });
+  const t = f.p("centro:Right scapula");
+  return svg(
+    view("Vista desde el tubo · de pie o decúbito supino") + side(24, 52, "D") +
+    riEn(f, t, 24, 30) + f.svg + crossP(t) +
+    lab(...f.p("coracoides_R"), 120, 300, "coracoides", "end") +
+    note(t[0] + 10, t[1] + 6, 470, 110, ["RC perpendicular, en la parte", "media de la escápula"], RED) +
+    txt(470, 150, "≈5 cm debajo de la coracoides y", 12, INK) + txt(470, 166, "≈5 cm medial del borde lateral", 12, INK) +
+    note(...f.p("codo_R"), 470, 206, ["Brazo abducido 90°, mano", "supinada: menos costillas", "sobre la escápula"]) +
+    txt(470, 270, "RI 24 x 30 vertical", 11, INK) + txt(470, 284, "Respiración suave o apnea · parrilla · DFRI 100 cm", 11, MUTE) +
+    txt(470, 300, "Colimar hasta los bordes de la escápula", 11, AMB)
+  );
+};
 const escapulaTxt = () =>
   col(430, 70, [["RC perpendicular al RI, en el borde", RED, 700, 12], ["medial de la escápula, a mitad", RED, 700, 12], ["de su altura", RED, 700, 12]]) +
   col(430, 130, [["De pie (preferible) o en decúbito", INK, 700], ["Palpar los bordes de la escápula y", INK], ["rotar el tórax hasta que su cuerpo", INK], ["quede ⟂ al RI (45-60°)", INK]]);
-// brazo del lado del RI cruzado por delante del tórax, con la mano en el hombro opuesto (vista superior)
-function brazoCruzado(rotDeg) {
-  const { T } = superior(rotDeg);
-  const sh = T(-80, 26), el = T(-30, 62), wr = T(58, 42);
-  const ang = (Math.atan2(wr[1] - el[1], wr[0] - el[0]) * 180) / Math.PI;
-  const m = mano(f1(wr[0]), f1(wr[1]), ang, 0.85, "dorso", false, false);
-  return `<g>${union([[...sh, ...el, 22], [...el, ...wr, 17], `M${m.a} ${m.seg} Z`])}${m.det}</g>`;
-}
-I["escapula-lateral--v1"] = () => svg(
-  vista(topPanel(52, { beamLocal: [-36, -32], angLabel: "45-60°", haz: "RC ⟂ al RI" }), "1 · Vista superior (desde arriba)", "Cuerpo de la escápula · vista superior").replace(/<text [^>]*>nariz<\/text>/, "").replace(/<text x="([\d.]+)" y="240"([^>]*)>45-60°<\/text>/, (_, x, r) => `<text x="${x}" y="300"${r}>45-60°</text>`) +
-  brazoCruzado(52) +
-  escapulaTxt() +
-  col(430, 214, [["Cruzar el brazo por delante y", INK, 700], ["tomarse el hombro opuesto", INK, 700]]) +
-  col(430, 270, [["RI 24 x 30 vertical · apnea", MUTE, 400, 11], ["DFRI 100 cm", MUTE, 400, 11]])
-);
-I["escapula-lateral--v2"] = () => svg(
-  vista(topPanel(52, { beamLocal: [-36, -32], angLabel: "45-60°", haz: "RC ⟂ al RI" }), "1 · Vista superior (desde arriba)", "Escápula superior · vista superior").replace(/<text x="([\d.]+)" y="240"([^>]*)>45-60°<\/text>/, (_, x, r) => `<text x="${x}" y="300"${r}>45-60°</text>`) +
-  escapulaTxt() +
-  col(430, 214, [["Acromion o coracoides: brazo", INK, 700], ["hacia abajo, codo flexionado", INK, 700], ["y palma hacia afuera", INK, 700]]) +
-  col(430, 270, [["RI 24 x 30 vertical · apnea", MUTE, 400, 11], ["DFRI 100 cm", MUTE, 400, 11]])
-);
+I["escapula-lateral--v1"] = () => {
+  const s = superior("escapula-lateral--v1", { ang: "45-60°", blanco: "escapula" });
+  return svg(
+    view("Cuerpo de la escápula · vista superior") + s.svg + lab(...s.t, 70, 120, "escápula", "end") +
+    escapulaTxt() + col(430, 214, [["Cruzar el brazo por delante y", INK, 700], ["tomarse el hombro opuesto", INK, 700]]) +
+    col(430, 270, [["RI 24 x 30 vertical · apnea", MUTE, 400, 11], ["DFRI 100 cm", MUTE, 400, 11]])
+  );
+};
+I["escapula-lateral--v2"] = () => {
+  const s = superior("escapula-lateral--v2", { ang: "45-60°", blanco: "escapula" });
+  return svg(
+    view("Escápula superior · vista superior") + s.svg + lab(...s.t, 70, 120, "escápula", "end") +
+    escapulaTxt() + col(430, 214, [["Acromion o coracoides: brazo", INK, 700], ["hacia abajo, codo flexionado", INK, 700], ["y palma hacia afuera", INK, 700]]) +
+    col(430, 270, [["RI 24 x 30 vertical · apnea", MUTE, 400, 11], ["DFRI 100 cm", MUTE, 400, 11]])
+  );
+};
+
+// ======================= ACROMIOCLAVICULARES =======================
+I["ac-pearson"] = () => {
+  const f = E.figura("ac-pearson", { caja: [130, 30, 280, 290] });
+  const y = f.p("yugular"), R = f.p("acromion_R"), L = f.p("acromion_L");
+  const peso = (p) => `<line x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(p[0])}" y2="${f1(p[1] + 16)}" stroke="${INK}" stroke-width="1.5"/>` +
+    `<rect x="${f1(p[0] - 9)}" y="${f1(p[1] + 16)}" width="18" height="14" rx="2" fill="#7b8190"/>`;
+  return svg(
+    view("Vista desde el tubo · de pie, brazos a los costados") +
+    riTop(f1(R[0] - 6 * f.ppc), f1(y[1] - 13 * f.ppc), f1(L[0] - R[0] + 12 * f.ppc), f1(22 * f.ppc)) + f.svg +
+    coll(f1(R[0] - 3 * f.ppc), f1(y[1] - 7 * f.ppc), f1(L[0] - R[0] + 6 * f.ppc), f1(11 * f.ppc)) +
+    bluePt(R) + bluePt(L) + crossP(y) + azul(R, 80, 60, "AC derecha") + azul(L, 470, 60, "AC izquierda") +
+    peso(cm(f, f.p("grande_R"), 0, 2)) + note(...cm(f, f.p("grande_R"), 1.5, 4), 40, 300, ["Toma con pesos"]) +
+    note(y[0] + 12, y[1] + 6, 470, 100, ["RC perpendicular, centrado", "en la escotadura yugular"], RED) +
+    txt(16, 200, "RI 35 x 43", 11.5, INK) + txt(16, 214, "horizontal", 11.5, INK) +
+    txt(470, 150, "Dos tomas bilaterales:", 12, INK, "start", 700) +
+    txt(470, 166, "1) sin pesos; 2) con pesos de 3,6-4,5 kg", 11.5, INK) + txt(470, 180, "atados a las muñecas (2,25-3,6 kg en", 11.5, INK) + txt(470, 194, "pacientes chicos), hombros relajados", 11.5, INK) +
+    txt(470, 214, "Marcadores «con pesos» y «sin pesos»", 11.5, INK) +
+    txt(470, 238, "Campo horizontal, largo y estrecho", 11.5, AMB) +
+    txt(470, 262, "DFRI 180 cm si es un solo RI bilateral", 11.5, MUTE) + txt(470, 276, "(si no, 100 cm) · apnea", 11.5, MUTE) +
+    txt(470, 290, "Descartar fractura antes de los pesos", 11.5, MUTE)
+  );
+};
 
 module.exports = I;

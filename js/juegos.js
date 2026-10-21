@@ -9,6 +9,8 @@ import { GRUPOS, grupoDeRegion } from "./menu.js";
 import { ASPECTOS } from "./repaso-preguntas.js";
 import { resultados, empezarRepaso } from "./repaso.js";
 import { vistaGrupos } from "./grupos.js";
+import { avatar } from "./foto.js";
+import * as nube from "./nube.js";
 
 const K_STATS = "radioguia.juegos.stats";
 const local = (() => { try { return localStorage; } catch { return null; } })();
@@ -150,9 +152,11 @@ function vistaPerfil() {
   const nv = nivel(), r = racha(), deb = debiles();
   const pct = st.respuestas ? Math.round((st.aciertos / st.respuestas) * 100) : 0;
   const hayDebiles = deb.pilares.length || deb.zonas.length;
-  return cabecera({ titulo: "Mi perfil", sub: "Tu desempeño en este dispositivo", atras: "#juegos" }) + `
+  const yo = nube.estado().perfil; // si ya entró con su cuenta en esta sesión
+  return cabecera({ titulo: "Mi perfil", sub: yo?.apodo || "Tu desempeño en este dispositivo", atras: "#juegos" }) + `
   <main class="wrap juegos">
     <section class="jg-perfil">
+      ${yo?.foto ? avatar(yo.foto, yo.apodo, "grande") : ""}
       <span class="jg-nivel grande">${nv.numero}</span>
       <div><b>${esc(nv.nombre)}</b>
         <small>${nv.sig ? `${st.xp} / ${nv.sig.desde} de experiencia para ${esc(nv.sig.nombre)}` : `${st.xp} de experiencia · nivel máximo`}</small>

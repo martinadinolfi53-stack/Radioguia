@@ -37,20 +37,25 @@ function recorte(f, x, y, w, h) {
 }
 // punto de la piel más bajo (apoyo sobre la mesa o el RI) cerca de la x dada
 const apoyo = (f, x, d = 6) => f.abajo(x - d, x + d);
+// RI visto desde el tubo, recortado al área útil del dibujo (lim = [x0, y0, x1, y1]); rótulo arriba a la izquierda
+function riC(x, y, w, h, label, lim = [6, 30, 754, 326]) {
+  const x0 = Math.max(lim[0], x), y0 = Math.max(lim[1], y), x1 = Math.min(lim[2], x + w), y1 = Math.min(lim[3], y + h);
+  return riTop(f1(x0), f1(y0), f1(x1 - x0), f1(y1 - y0), label, f1(x0 + 6), f1(y0 + 16));
+}
 
 const I = {};
 
 // ======================= TOBILLO =======================
 // panel izquierdo común: decúbito supino, pierna extendida, vista de costado; RC perpendicular entre los maléolos
 function tobilloCostado(id, riTxt = "RI 24 × 30 vert.") {
-  const f = E.figura(id, { en: ["tobillo_R", 430, 196], ppc: 3.6 });
+  const f = E.figura(id, { en: ["tobillo_R", 410, 214], ppc: 5 });
   const t = f.p("tobillo_R"), yMesa = apoyo(f, t[0]) + 1;
   const ta = f.p("talon_R");
-  return { f, t, svg: table(0, 548, f1(yMesa + 9), "") + riBar(t[0] - 60, t[0] + 60, yMesa) + txt(f1(t[0] - 60), f1(yMesa + 38), riTxt, 11.5, INK) +
+  return { f, t, svg: table(0, 548, f1(yMesa + 9), "") + riBar(t[0] - 60, t[0] + 60, yMesa) + txt(f1(t[0] + 60), f1(yMesa + 38), riTxt, 11.5, INK, "end") +
     recorte(f, 0, 30, 548, 300) + redDot(t) +
     tube(t[0], t[1] - 8, 0, 150) +
-    note(t[0], 100, 330, 60, ["RC perpendicular al RI,", "a mitad de camino entre", "los maléolos · DFRI 100 cm"], RED, "end") +
-    lab(...f.p("centro:Right tibia"), 160, 150, "tibia", "middle") + lab(...ta, f1(ta[0] - 30), f1(yMesa - 22), "talón", "end") };
+    note(t[0], 90, 300, 60, ["RC perpendicular al RI,", "a mitad de camino entre", "los maléolos · DFRI 100 cm"], RED, "end") +
+    lab(...f.p("centro:Right tibia"), 150, 150, "tibia", "middle") + lab(...ta, f1(ta[0] - 80), f1(yMesa + 38), "talón", "end") };
 }
 const PX = 560; // inicio del panel derecho
 // panel derecho: desde los pies, con la línea intermaleolar
@@ -59,15 +64,15 @@ function desdePies(id) {
   const yRI = apoyo(f, f.p("talon_R")[0], 30) + 1;
   const mm = f.p("maleolo_med_R"), ml = f.p("maleolo_lat_R");
   return { f, mm, ml, yRI, svg: panelSep(PX, "Desde los pies") + `<rect x="${PX + 20}" y="${f1(yRI)}" width="170" height="9" fill="${INK}"/>` + f.svg +
-    linea(mm, ml) + dot(mm[0], mm[1]) + dot(ml[0], ml[1]) + txt(PX + 190, f1(yRI - 6), "medial", 10, MUTE, "end") + txt(PX + 22, f1(yRI - 6), "lateral", 10, MUTE) };
+    linea(mm, ml) + dot(mm[0], mm[1]) + dot(ml[0], ml[1]) + txt(PX + 190, f1(yRI + 22), "medial", 10, MUTE, "end") + txt(PX + 22, f1(yRI + 22), "lateral", 10, MUTE) };
 }
 
 I["tobillo-ap"] = () => {
   const c = tobilloCostado("tobillo-ap"), p = desdePies("tobillo-ap-pies");
-  const ta = p.f.p("talon_R"), m1 = p.f.p("cabeza_mt1_R"), m5 = p.f.p("base_mt5_R");
+  const ta = p.f.p("talon_R"), b3 = p.f.p("base_mt3_R");
   return svg(
     view("Vista lateral · decúbito supino, pierna extendida") + c.svg + p.svg +
-    refline(f1(ta[0]), 40, f1(ta[0]), f1(p.yRI - 2)) +
+    refline(f1(ta[0]), 40, f1(ta[0]), f1(p.yRI - 2)) + linea(ta, lerp(ta, b3, 1.6)) +
     txt(PX + 14, 270, "Sin rotación: eje del pie", 11.5, BLUE, "start", 700) +
     txt(PX + 14, 286, "vertical, paralelo al RC", 11.5, BLUE) +
     txt(PX + 14, 304, "Pierna paralela al borde del RI", 11, MUTE)
@@ -87,27 +92,28 @@ I["tobillo-ap-mortaja"] = () => {
 
 I["tobillo-ap-oblicua-45"] = () => {
   const c = tobilloCostado("tobillo-ap-oblicua-45"), p = desdePies("tobillo-ap-oblicua-45-pies");
-  const [a, b] = p.mm[0] < p.ml[0] ? [p.mm, p.ml] : [p.ml, p.mm];
+  const ta = p.f.p("talon_R"), b3 = p.f.p("base_mt3_R"), eje = lerp(ta, b3, 1.6);
   return svg(
     view("Vista lateral · decúbito supino, pierna extendida") + c.svg + p.svg +
-    refline(PX + 24, f1(p.ml[1]), PX + 186, f1(p.ml[1])) + arco(p.ml, 40, 0, angulo(p.ml, p.mm), "45°") +
+    refline(f1(ta[0]), 40, f1(ta[0]), f1(p.yRI - 2)) + linea(ta, eje) + arco(ta, 70, -90, angulo(ta, b3), "45°", BLUE, 18) +
     txt(PX + 14, 270, "Pierna y pie rotados 45°", 11.5, BLUE, "start", 700) +
-    txt(PX + 14, 286, "hacia medial (línea", 11.5, BLUE) + txt(PX + 14, 302, "intermaleolar a 45° del RI)", 11.5, BLUE)
+    txt(PX + 14, 286, "hacia medial (eje del pie", 11.5, BLUE) + txt(PX + 14, 302, "a 45° de la vertical)", 11.5, BLUE)
   );
 };
 
 // decúbito sobre el lado afectado: cara lateral contra el RI; vista desde el tubo = desde medial (dedos a la izquierda)
 I["tobillo-lateral"] = () => {
-  const f = E.figura("tobillo-lateral", { caja: [70, 30, 300, 290] });
+  const f = E.figura("tobillo-lateral", { caja: [70, 30, 300, 254] });
   const mm = f.p("maleolo_med_R"), ta = f.p("talon_R"), as = f.p("centro:Right talus");
   return svg(
     view("Vista desde el tubo · decúbito sobre el lado afectado") +
-    riTop(f1(mm[0] - 15 * 0 - 12 * f.ppc), f1(mm[1] - 15 * f.ppc), f1(24 * f.ppc), f1(30 * f.ppc), "RI 24 × 30 vert.", f1(mm[0] - 12 * f.ppc + 6), f1(mm[1] + 15 * f.ppc - 6)) +
+    riC(mm[0] - 12 * f.ppc, mm[1] - 15 * f.ppc, 24 * f.ppc, 30 * f.ppc, "", [6, 30, 440, 290]) +
+    txt(f1(mm[0] + 12 * f.ppc + 6), f1(Math.max(42, mm[1] - 15 * f.ppc + 12)), "RI 24 × 30 vert.", 11.5, INK) +
     f.svg + coll(f1(mm[0] - 10 * f.ppc), f1(mm[1] - 11 * f.ppc), f1(19 * f.ppc), f1(17 * f.ppc)) + crossP(mm) +
     note(mm[0] + 12, mm[1] + 4, 470, 226, ["RC perpendicular,", "centrado en el maléolo medial"], RED) +
     note(...f.p("cabeza_mt1_R"), 470, 96, ["Flexión dorsal del pie", "a 90° con la pierna (si tolera)"], BLUE) +
     note(...as, 470, 160, ["astrágalo"], INK) + note(...ta, 470, 280, ["calcáneo"], INK) +
-    lab(...f.p("centro:Right tibia"), 40, 80, "tibia", "start") +
+    lab(...f.p("centro:Right tibia"), 120, 80, "tibia", "end") +
     txt(16, 306, "Rodilla algo flexionada · pie y tobillo en lateral verdadera · DFRI 100 cm", 11, MUTE) +
     txt(470, 316, "Colimar: tibia y peroné distales + MT proximales", 11, AMB)
   );
@@ -116,13 +122,13 @@ I["tobillo-lateral"] = () => {
 // AP con sobrecarga: vista desde el tubo, pie hacia abajo del dibujo
 function estres(v, nombre, sentido) {
   const id = "tobillo-ap-estres--" + v;
-  const f = E.figura(id, { caja: [90, 30, 260, 288] });
+  const f = E.figura(id, { caja: [90, 34, 260, 280] });
   const t = f.p("tobillo_R");
   return svg(
     view(`${nombre} · vista desde el tubo`) +
-    riTop(f1(t[0] - 12 * f.ppc), f1(t[1] - 18 * f.ppc), f1(24 * f.ppc), f1(30 * f.ppc), "RI", f1(t[0] - 12 * f.ppc + 6), f1(t[1] - 18 * f.ppc + 16)) +
+    riC(t[0] - 12 * f.ppc, t[1] - 18 * f.ppc, 24 * f.ppc, 30 * f.ppc, "RI", [6, 30, 410, 322]) +
     f.svg + crossP(t) +
-    txt(20, 300, "← lateral", 10.5, MUTE) + txt(420, 300, "medial →", 10.5, MUTE, "end") +
+    txt(20, 280, "← lateral", 10.5, MUTE) + txt(404, 280, "medial →", 10.5, MUTE, "end") +
     note(t[0] + 12, t[1], 430, 60, ["RC perpendicular al RI, a mitad", "de camino entre los maléolos"], RED) +
     col(430, 120, [["Decúbito supino o sentado,", INK, 700], ["pierna extendida, sin rotar la", INK, 700], ["pierna ni el tobillo (AP verdadera)", INK, 700]]) +
     col(430, 180, [[`Forzar el tobillo girando la planta`, INK], [sentido, INK]]) +
@@ -136,19 +142,19 @@ I["tobillo-ap-estres--v2"] = () => estres("v2", "Eversión", "hacia afuera (ever
 // ======================= PIE =======================
 // decúbito supino con la rodilla flexionada y la planta apoyada en el RI, visto de costado (dedos a la derecha)
 I["pie-ap-dorsoplantar"] = () => {
-  const f = E.figura("pie-ap-dorsoplantar", { caja: [240, 30, 500, 236] });
+  const f = E.figura("pie-ap-dorsoplantar", { caja: [300, 34, 450, 232] });
   const b3 = f.p("base_mt3_R"), yRI = apoyo(f, b3[0], 60) + 1;
   const ta = f.p("talon_R");
   return svg(
     view("Vista lateral · rodilla flexionada, planta apoyada en el RI") +
-    table(0, 760, f1(yRI + 10)) + riBar(ta[0] - 30, f.p("punta_dedo1_pie_R")[0] + 24, yRI) + txt(f1(ta[0] - 30), f1(yRI + 36), "RI 24 × 30 vert.", 11.5, INK) +
+    table(0, 760, f1(yRI + 10)) + riBar(ta[0] - 30, f.p("punta_dedo1_pie_R")[0] + 24, yRI) + txt(f1(ta[0] - 36), f1(yRI + 8), "RI 24 × 30 vert.", 11.5, INK, "end") +
     f.svg + redDot(b3) +
     tube(b3[0], b3[1] - 4, -10, 190, { angLabel: "10°" }) +
-    note(b3[0] + 12, 130, 380, 70, ["RC 10° hacia el talón (posterior),", "perpendicular a los metatarsianos", "DFRI 100 cm"], RED, "end") +
-    txt(380, 138, "Flexión plantar: pie y RI deslizados", 11.5, MUTE, "end") + txt(380, 154, "hacia distal; bolsas de arena", 11.5, MUTE, "end") +
-    note(b3[0] - 2, b3[1] + 6, 520, 318, ["Base del 3.er MT"], RED, "end") +
-    note(...f.p("centro:Right third metatarsal bone"), 650, 300, ["metatarsianos"], INK) +
-    note(...ta, 200, 300, ["calcáneo (talón)"], INK, "end")
+    note(b3[0] + 12, 130, 290, 70, ["RC 10° hacia el talón (posterior),", "perpendicular a los metatarsianos", "DFRI 100 cm"], RED, "end") +
+    txt(290, 138, "Flexión plantar: pie y RI deslizados", 11.5, MUTE, "end") + txt(290, 154, "hacia distal; bolsas de arena", 11.5, MUTE, "end") +
+    note(b3[0] - 2, b3[1] + 6, f1(b3[0] - 20), 300, ["Base del 3.er MT"], RED, "end") +
+    note(...f.p("centro:Right third metatarsal bone"), 640, 300, ["metatarsianos"], INK) +
+    note(...f.p("centro:Right calcaneus"), 290, 230, ["calcáneo (talón)"], INK, "end")
   );
 };
 
@@ -185,16 +191,16 @@ I["pie-ap-oblicua-medial"] = () => {
 
 // decúbito sobre el lado afectado (mediolateral), vista desde el tubo = desde medial
 I["pie-lateral"] = () => {
-  const f = E.figura("pie-lateral", { caja: [120, 30, 290, 290] });
+  const f = E.figura("pie-lateral", { caja: [190, 34, 260, 280] });
   const b3 = f.p("base_mt3_R"), ta = f.p("talon_R"), as = f.p("centro:Right talus");
   const x0 = f.p("punta_dedo1_pie_R")[0] - 2 * f.ppc, x1 = ta[0] + 2 * f.ppc;
   return svg(
     view("Vista desde el tubo · decúbito sobre el lado afectado") +
-    riTop(f1(x0 - 2 * f.ppc), f1(b3[1] - 12 * f.ppc), f1(x1 - x0 + 4 * f.ppc), f1(18 * f.ppc)) +
+    riC(x0 - 2 * f.ppc, b3[1] - 12 * f.ppc, x1 - x0 + 4 * f.ppc, 18 * f.ppc, "", [180, 30, 460, 326]) +
     f.svg + coll(f1(x0), f1(b3[1] - 11 * f.ppc), f1(x1 - x0), f1(16 * f.ppc)) + crossP(b3) +
-    note(b3[0] - 8, b3[1] - 8, 110, 70, ["RC perpendicular", "en la base del 3.er MT"], RED, "end") +
-    note(...f.p("centro:Right tibia"), 470, 80, ["Rodilla flexionada,", "pierna sana por detrás"], INK) +
-    note(...f.p("cabeza_mt1_R"), 110, 250, ["Planta perpendicular", "al RI (apoyo bajo la", "rodilla si hace falta)"], BLUE, "end") +
+    note(b3[0] - 8, b3[1] - 8, 176, 70, ["RC perpendicular", "en la base del 3.er MT"], RED, "end") +
+    note(...lerp(f.p("maleolo_med_R"), f.p("centro:Right tibia"), 0.45), 470, 80, ["Rodilla flexionada,", "pierna sana por detrás"], INK) +
+    note(...f.p("cabeza_mt1_R"), 176, 250, ["Planta perpendicular", "al RI (apoyo bajo la", "rodilla si hace falta)"], BLUE, "end") +
     note(...ta, 470, 250, ["calcáneo"], INK) + note(...as, 470, 200, ["astrágalo"], INK) +
     txt(470, 288, "RI 18 × 24 (o 24 × 30) horiz.", 12, INK) +
     txt(470, 304, "Mediolateral · DFRI 100 cm", 11.5, MUTE) + txt(470, 318, "Campo: todo el pie + parte distal del tobillo", 11, AMB)
@@ -223,11 +229,11 @@ I["calcaneo-plantodorsal-axial"] = () => {
 };
 
 I["calcaneo-lateral"] = () => {
-  const f = E.figura("calcaneo-lateral", { caja: [60, 30, 340, 290] });
+  const f = E.figura("calcaneo-lateral", { caja: [60, 34, 340, 236] });
   const mm = f.p("maleolo_med_R"), rc = cm(f, mm, 0, 2.5), ta = f.p("talon_R");
   return svg(
     view("Vista desde el tubo · decúbito sobre el lado afectado") +
-    riTop(f1(rc[0] - 12 * f.ppc), f1(rc[1] - 9 * f.ppc), f1(24 * f.ppc), f1(18 * f.ppc), "RI 18 × 24 vert.", f1(rc[0] - 12 * f.ppc + 6), f1(rc[1] + 9 * f.ppc - 6)) +
+    riC(rc[0] - 12 * f.ppc, rc[1] - 9 * f.ppc, 24 * f.ppc, 18 * f.ppc, "RI 18 × 24 vert.", [6, 30, 440, 274]) +
     f.svg + coll(f1(rc[0] - 7 * f.ppc), f1(mm[1] - 2 * f.ppc), f1(ta[0] - rc[0] + 9 * f.ppc), f1(10 * f.ppc)) + crossP(rc) +
     note(rc[0] + 12, rc[1] + 6, 470, 250, ["RC perpendicular,", "2,5 cm por debajo del", "maléolo medial"], RED) +
     note(mm[0] + 4, mm[1] - 6, 470, 160, ["Maléolo medial"], INK) +
@@ -269,7 +275,8 @@ function dedosOblicua(v, medial) {
     table(30, 420, f1(d.yRI + 9), "") + riBar(50, 400, d.yRI) +
     d.wedge + f.svg + ringR(blanco, 3.4 * f.ppc) +
     refline(f1(d.base0[0]), f1(d.yRI), f1(d.base0[0] + 150 * Math.cos(rad(ang))), f1(d.yRI + 150 * Math.sin(rad(ang)))) +
-    arco(d.base0, 80, ang, medial ? 0 : 180, "30-45°") +
+    arco(d.base0, 80, ang, medial ? 0 : 180, "") +
+    txt(f1(d.base0[0] + (medial ? 96 : -96)), f1(d.yRI - 8), "30-45°", 13, BLUE, medial ? "start" : "end", 700) +
     tube(blanco[0], blanco[1] - 3.6 * f.ppc, 0, 110) +
     txt(f1(d.base0[0]), f1(d.yRI + 26), medial ? "medial" : "lateral", 10.5, MUTE, medial ? "start" : "end") +
     pieOblTxt(medial)
@@ -281,9 +288,9 @@ I["dedos-pie-ap-oblicua--v2"] = () => dedosOblicua("v2", false);
 // lateral de dedos, vista desde el tubo: v1 lateromedial (desde lateral, dedos a la derecha), v2 mediolateral (desde medial)
 function dedosLateral(v) {
   const id = "dedos-pie-lateral--" + v, med = v === "v2";
-  const f = E.figura(id, { caja: med ? [300, 50, 440, 250] : [20, 50, 440, 250] });
+  const f = E.figura(id, { caja: med ? [330, 50, 400, 230] : [30, 50, 400, 230] });
   const j = f.p(med ? "ifp_dedo3_pie_R" : "if_dedo1_pie_R");
-  return { f, j, svg: riTop(f1(j[0] - 12 * f.ppc), f1(j[1] - 9 * f.ppc), f1(24 * f.ppc), f1(18 * f.ppc)) + f.svg +
+  return { f, j, svg: riC(j[0] - 12 * f.ppc, j[1] - 9 * f.ppc, 24 * f.ppc, 18 * f.ppc, "RI", med ? [310, 34, 750, 326] : [10, 34, 450, 326]) + f.svg +
     coll(f1(j[0] - 3 * f.ppc), f1(j[1] - 2.5 * f.ppc), f1(6 * f.ppc), f1(5 * f.ppc)) + crossP(j) };
 }
 I["dedos-pie-lateral--v1"] = () => {
@@ -291,10 +298,10 @@ I["dedos-pie-lateral--v1"] = () => {
   return svg(
     view("Dedos 1.º a 3.º · lateromedial · desde el tubo") + d.svg +
     note(j[0] - 6, j[1] - 12, 300, 56, ["RC perpendicular a la IF del 1.er dedo", "(IFP del 2.º o el 3.er dedo)"], RED, "end") +
-    note(f1(j[0] + 3 * d.f.ppc), f1(j[1] + 2.5 * d.f.ppc), 520, 300, ["Colimar al dedo de interés"], AMB, "end") +
-    col(560, 200, [["Lateromedial:", INK, 700, 12], ["1.er dedo abajo, contra el RI", INK]]) +
-    col(560, 250, [["RI 18 × 24 horiz.", INK]]) +
-    col(560, 280, [["Separar los otros dedos con", MUTE, 400, 11], ["cinta o gasa · DFRI 100 cm", MUTE, 400, 11]])
+    note(f1(j[0] + 3 * d.f.ppc), f1(j[1] - 2.5 * d.f.ppc), 480, 150, ["Colimar al dedo", "de interés"], AMB) +
+    col(480, 200, [["Lateromedial:", INK, 700, 12], ["1.er dedo abajo, contra el RI", INK]]) +
+    col(480, 250, [["RI 18 × 24 horiz.", INK]]) +
+    col(480, 280, [["Separar los otros dedos con", MUTE, 400, 11], ["cinta o gasa · DFRI 100 cm", MUTE, 400, 11]])
   );
 };
 I["dedos-pie-lateral--v2"] = () => {
@@ -302,7 +309,7 @@ I["dedos-pie-lateral--v2"] = () => {
   return svg(
     view("Dedos 4.º y 5.º · mediolateral · desde el tubo") + d.svg +
     note(j[0] + 6, j[1] - 12, 460, 56, ["RC perpendicular a la IFP", "del dedo a estudiar"], RED, "start") +
-    note(f1(j[0] - 3 * d.f.ppc), f1(j[1] + 2.5 * d.f.ppc), 240, 300, ["Colimar al dedo de interés"], AMB, "start") +
+    note(f1(j[0] - 3 * d.f.ppc), f1(j[1] - 2.5 * d.f.ppc), 280, 150, ["Colimar al dedo", "de interés"], AMB, "end") +
     col(20, 200, [["Mediolateral:", INK, 700, 12], ["1.er dedo arriba", INK]]) +
     col(20, 250, [["RI 18 × 24 horiz.", INK]]) +
     col(20, 280, [["Separar los otros dedos con", MUTE, 400, 11], ["cinta o gasa · DFRI 100 cm", MUTE, 400, 11]])
@@ -322,9 +329,9 @@ I["dedos-pie-tangencial-sesamoideos--v1"] = () => {
     table(0, 760, f1(yRI + 9)) + riBar(h[0] - 80, h[0] + 80, yRI) + txt(f1(h[0] - 80), f1(yRI + 36), "RI 18 × 24 horiz.", 11.5, INK) +
     recorte(f, 0, 30, 760, 300) +
     linea(h, e2) + refline(f1(h[0]), f1(h[1]), f1(h[0]), f1(h[1] - 120)) +
-    arco(h, 70, -90, ang, "") + txt(f1(h[0] - 40), f1(h[1] - 130), "Planta a 15-20°", 12.5, BLUE, "end", 700) + txt(f1(h[0] - 40), f1(h[1] - 115), "de la vertical", 11.5, BLUE, "end") +
+    arco(h, 70, -90, ang, "") + txt(f1(h[0] - 70), f1(h[1] - 130), "Planta a 15-20°", 12.5, BLUE, "end", 700) + txt(f1(h[0] - 70), f1(h[1] - 115), "de la vertical", 11.5, BLUE, "end") +
     tube(h[0], h[1] - 2, 0, 150) + redDot(h) +
-    note(h[0] + 4, h[1] + 4, 640, 236, ["Cabeza del", "1.er MT"], RED) +
+    note(h[0] + 4, h[1] + 4, 650, f1(yRI + 34), ["Cabeza del 1.er MT"], RED) +
     note(h[0], 130, 642, 100, ["RC perpendicular,", "tangente a la", "cabeza del 1.er MT", "(angulado si falta", "flexión dorsal)"], RED) +
     txt(16, 290, "Pie y 1.er dedo en flexión dorsal, apoyados sobre el RI.", 11.5, INK, "start", 700) +
     txt(16, 306, "Si no se logra la planta a 15-20° de la vertical, ajustar el ángulo del RC · DFRI 100 cm", 11, MUTE)
@@ -342,7 +349,7 @@ I["dedos-pie-tangencial-sesamoideos--v2"] = () => {
     `<path d="M${f1(tip[0])},${f1(tip[1])} Q${f1((tip[0] + mano[0]) / 2)},${f1(Math.min(tip[1], mano[1]) - 30)} ${mano[0]},${mano[1]}" fill="none" stroke="#9fc3e8" stroke-width="3"/>` +
     txt(mano[0], mano[1] - 14, "← gasa: la sostiene el paciente", 11, MUTE, "start") +
     tube(h[0], h[1] - 2, 0, 80) + redDot(h) +
-    note(h[0] + 4, h[1] + 4, 600, 200, ["Cabeza del", "1.er MT"], RED) +
+    note(h[0] + 4, h[1] + 4, 600, 160, ["Cabeza del", "1.er MT"], RED) +
     note(h[0] + 6, 60, 600, 70, ["RC perpendicular, o", "angulado según la", "flexión dorsal, centrado", "en la cabeza del 1.er MT"], RED) +
     txt(16, 296, "Suele tolerarse mejor si el paciente tiene mucho dolor.", 11.5, INK, "start", 700) +
     txt(16, 312, "El paciente sostiene los dedos con una tira larga de gasa · DFRI 100 cm", 11, MUTE)
@@ -366,7 +373,7 @@ I["pie-ap-lateral-carga--v1"] = () => {
 };
 // desde arriba: los dos pies; el derecho del paciente queda a la derecha del dibujo (se mira desde la cabeza)
 I["pie-ap-lateral-carga--v2"] = () => {
-  const f = E.figura("pie-ap-lateral-carga--v2", { caja: [30, 40, 400, 240] });
+  const f = E.figura("pie-ap-lateral-carga--v2", { caja: [30, 60, 400, 220] });
   const m5 = f.p("base_mt5_R"), cR = f.p("tobillo_R");
   const xm = f.x + f.w / 2;                                        // entre los dos pies
   const blk = (x0, x1) => `<rect x="${f1(x0)}" y="${f1(f.y - 6)}" width="${f1(x1 - x0)}" height="${f1(f.h + 12)}" rx="4" fill="#e3e6ec" stroke="#8a8f9c" stroke-width="1.2"/>`;
@@ -374,13 +381,13 @@ I["pie-ap-lateral-carga--v2"] = () => {
     view("Lateral · vista desde arriba") +
     blk(f.x - 4, xm - 8) + blk(xm + 8, f.x + f.w + 4) + txt(f1(xm), f1(f.y + f.h + 22), "bloques", 10.5, MUTE, "middle") +
     f.svg + `<rect x="${f1(xm - 3.5)}" y="${f1(f.y - 16)}" width="7" height="${f1(f.h + 30)}" fill="${INK}"/>` + txt(f1(xm), f1(f.y - 22), "RI vertical entre los pies", 11, INK, "middle") +
-    beam(f1(m5[0] + 2), f1(m5[1]), 180, f1(Math.max(60, 470 - m5[0] - 20)), { ref: 180 }) + redDot(m5) +
+    beam(f1(m5[0] + 2), f1(m5[1]), 180, f1(Math.max(60, 490 - m5[0] - 20)), { ref: 180 }) + redDot(m5) +
     txt(30, 300, "← pie izquierdo", 10.5, MUTE) + txt(430, 300, "pie derecho →", 10.5, MUTE, "end") +
-    note(m5[0] + 4, m5[1] + 4, 470, 250, ["RC horizontal, hacia", "la base del 5.º MT"], RED) +
-    col(470, 70, [["De pie, con todo el peso sobre", INK, 700], ["los dos pies y el RI vertical", INK, 700], ["entre ellos", INK, 700]]) +
-    col(470, 130, [["Pies sobre bloques lo bastante altos", INK], ["como para usar un RC horizontal", INK]]) +
-    col(470, 180, [["Se radiografían el pie derecho y el", INK], ["izquierdo para comparar", INK]]) +
-    col(470, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
+    note(m5[0] + 4, m5[1] + 4, 520, 250, ["RC horizontal, hacia", "la base del 5.º MT"], RED) +
+    col(520, 70, [["De pie, con todo el peso sobre", INK, 700], ["los dos pies y el RI vertical", INK, 700], ["entre ellos", INK, 700]]) +
+    col(520, 130, [["Pies sobre bloques lo bastante altos", INK], ["como para usar un RC horizontal", INK]]) +
+    col(520, 180, [["Se radiografían el pie derecho y el", INK], ["izquierdo para comparar", INK]]) +
+    col(520, 300, [["DFRI 100 cm · sin parrilla", MUTE, 400, 11]])
   );
 };
 

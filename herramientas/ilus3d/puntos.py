@@ -62,6 +62,7 @@ class Puntos:
             'vertice_rotula': ('rotula_' + s, lambda: self.extremo(f'{L} patella', -Y)),
             'base_rotula': ('rotula_' + s, lambda: self.extremo(f'{L} patella', Y)),
             'tuberosidad_tibial': ('pierna_' + s, lambda: self._tuberosidad(s)),
+            'cabeza_perone': ('pierna_' + s, lambda: self.extremo(f'{L} fibula', Y, 0.01)),
             'maleolo_med': ('pierna_' + s, lambda: self.extremo(f'{L} tibia', -Y - 0.5 * lat, 0.005)),
             'maleolo_lat': ('pierna_' + s, lambda: self.extremo(f'{L} fibula', -Y + 0.5 * lat, 0.005)),
             'tobillo': ('pierna_' + s, lambda: (self.extremo(f'{L} tibia', -Y - 0.5 * lat, 0.005) + self.extremo(f'{L} fibula', -Y + 0.5 * lat, 0.005)) / 2),

@@ -114,7 +114,7 @@ I["humero-lateral-trauma"] = () => {
   return svg(
     view("Vista desde el tubo · decúbito supino, rayo horizontal") +
     f.svg + `<rect x="${f1(x0)}" y="${f1(t[1] - 12 * f.ppc)}" width="${f1(w)}" height="${f1(15 * f.ppc)}" fill="none" stroke="${INK}" stroke-width="2.5" stroke-dasharray="10 5"/>` +
-    txt(f1(x0 + 4), f1(t[1] + 3 * f.ppc + 15), "RI detrás del brazo (entre brazo y tórax)", 11, INK) + crossP(t) +
+    txt(f1(f.x + 4), f1(t[1] - 12 * f.ppc - 14), "RI detrás del brazo (entre brazo y tórax)", 11, INK) + crossP(t) +
     txt(f1(f.x + 4), f1(f.y + f.h + 14), "← cabeza", 11, MUTE) +
     note(t[0] + 6, t[1] + 8, 470, 92, ["RC horizontal, ⟂ al RI,", "en el tercio distal del húmero"], RED) +
     note(f1(x0 + w), f1(t[1] - 6 * f.ppc), 470, 150, ["RI paralelo al húmero, entre", "brazo y tórax, borde superior", "en la axila"]) +
@@ -362,7 +362,7 @@ I["clavicula-ap-axial--v2"] = () => {
     view("AP axial · de costado, espalda al RI") +
     wall(f1(f.x - 18), 44, 300, "") + txt(f1(f.x - 12), 38, "Bucky / RI", 10, MUTE, "middle") + f.svg +
     beam(f1(c[0]), f1(c[1]), 202.5, 140, { ref: 180, angLabel: "15-30°" }) + redDot(c) +
-    lab(c[0] + 4, c[1] + 2, f1(c[0] + 7 * f.ppc), f1(c[1] + 6 * f.ppc), "clavícula", "start") +
+    lab(c[0] - 2, c[1], f1(f.x - 26), f1(c[1] - 30), "clavícula", "end") +
     col(470, 70, [["RC 15-30° cefálico, en la parte", RED, 700, 12], ["media de la clavícula", RED, 700, 12]]) +
     col(470, 116, [["Hombros delgados: hacen falta", INK], ["5-15° más que en hombros gruesos", INK]]) +
     col(470, 168, [["De pie o en decúbito", INK, 700], ["En lugar de angular el RC, se puede", INK], ["usar una posición AP lordótica", INK]]) +

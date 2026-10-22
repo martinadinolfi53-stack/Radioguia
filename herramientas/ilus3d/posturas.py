@@ -43,6 +43,7 @@ class Pose(dict):
     def rodilla_flex(self, s, g): return self.mov('pierna_' + s, 'bisagra', g)
     def tobillo_dorsi(self, s, g): return self.mov('pie_' + s, X, -g)        # dorsiflexión (+) / flexión plantar (-)
     def pie_inversion(self, s, g): return self.mov('pie_' + s, Z, -_sg(s) * g)
+    def dedos_pie_dorsi(self, s, g): return self.mov('dedos_pie_' + s, X, -g)    # flexión dorsal de los dedos del pie en las MTF (+)
     def pie_rot_int(self, s, g): return self.mov('pie_' + s, Y, -_sg(s) * g)
     # columna y cabeza (repartido entre vértebras)
     def _rep(self, segs, eje, g):

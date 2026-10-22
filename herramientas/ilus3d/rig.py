@@ -42,6 +42,7 @@ def segmento(n):
     if 'femur' in l: return 'muslo_' + s
     if 'patella' in l: return 'rotula_' + s
     if re.search(r'tibia|fibula', l): return 'pierna_' + s
+    if re.search(r'phalanx of (right|left) .*toe', l): return 'dedos_pie_' + s          # falanges del pie: dedos en bloque
     if re.search(r'talus|calcaneus|navicular|cuboid|cuneiform|metatarsal|toe|sesamoid bone of (right|left) foot', l): return 'pie_' + s
     if re.search(r'frontal|parietal|occipital|temporal|sphenoid|ethmoid|maxilla|mandible|nasal|palatine|zygomatic|vomer|lacrimal|concha|tooth', l): return 'cabeza'
     return None
@@ -50,7 +51,7 @@ PADRE = {'pelvis': None, 'L5': 'pelvis', 'L4': 'L5', 'L3': 'L4', 'L2': 'L3', 'L1
          'C7': 'torax', 'C6': 'C7', 'C5': 'C6', 'C4': 'C5', 'C3': 'C4', 'C2': 'C3', 'C1': 'C2', 'cabeza': 'C1'}
 for s in 'RL':
     PADRE.update({'cintura_' + s: 'torax', 'brazo_' + s: 'cintura_' + s, 'cubito_' + s: 'brazo_' + s, 'radio_' + s: 'cubito_' + s,
-                  'mano_' + s: 'radio_' + s, 'f1m_' + s: 'mano_' + s, 'f1a_' + s: 'f1m_' + s, 'f1c_' + s: 'f1a_' + s, 'muslo_' + s: 'pelvis', 'rotula_' + s: 'muslo_' + s, 'pierna_' + s: 'muslo_' + s, 'pie_' + s: 'pierna_' + s})
+                  'mano_' + s: 'radio_' + s, 'f1m_' + s: 'mano_' + s, 'f1a_' + s: 'f1m_' + s, 'f1c_' + s: 'f1a_' + s, 'muslo_' + s: 'pelvis', 'rotula_' + s: 'muslo_' + s, 'pierna_' + s: 'muslo_' + s, 'pie_' + s: 'pierna_' + s, 'dedos_pie_' + s: 'pie_' + s})
     for d in '2345':
         PADRE.update({f'f{d}a_' + s: 'mano_' + s, f'f{d}b_' + s: f'f{d}a_' + s, f'f{d}c_' + s: f'f{d}b_' + s})
 ORDEN = []
@@ -298,8 +299,26 @@ class Cuerpo:
             W[m, ib] = t[m]
         W /= W.sum(1, keepdims=True); self.nombres_w = nombres
         for lado_ in 'RL': self._pesos_mano(W, lado_)
+        for lado_ in 'RL': self._pesos_dedos_pie(W, lado_)
         self.W = W
         return W
+
+    def _pesos_dedos_pie(self, W, s, ancho=0.012):
+        """Piel del antepié: lo que queda por delante de la línea de las cabezas de los metatarsianos va con los dedos (transición
+        de +-ancho), así toda la piel de los dedos acompaña la flexión dorsal en las MTF."""
+        nw = self.nombres_w; ip, idd = nw.index('pie_' + s), nw.index('dedos_pie_' + s)
+        S = 'Right' if s == 'R' else 'Left'
+        T = self.segs['dedos_pie_' + s]; C = self.C['dedos_pie_' + s]
+        a = T.mean(0) - C; a[1] = 0; a /= np.linalg.norm(a)                     # hacia los dedos, en el plano horizontal
+        cab = []
+        for m in ('first', 'second', 'third', 'fourth', 'fifth'):
+            M = self.puntos(f'{S} {m} metatarsal bone'); cab.append(M[((M - C) @ a).argmax()])
+        cab = np.array(sorted(cab, key=lambda q: q[0]))
+        P = self.piel_P; wpd = W[:, ip] + W[:, idd]
+        sel = (wpd > 0.5) & (np.linalg.norm(P - C, axis=1) < 0.14)
+        Q = P[sel]; hx = np.stack([np.interp(Q[:, 0], cab[:, 0], cab[:, k]) for k in range(3)], 1)
+        t = np.clip(((Q - hx) @ a) / (2 * ancho) + 0.5, 0, 1); t = t * t * (3 - 2 * t)
+        W[sel, idd] = t * wpd[sel]; W[sel, ip] = (1 - t) * wpd[sel]
 
     def _pesos_mano(self, W, s, ancho=0.012):
         """Piel de la mano: cada vértice se asigna al rayo (dedo) más cercano y, a lo largo de ese rayo, a la falange en la que

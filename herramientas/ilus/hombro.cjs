@@ -97,7 +97,7 @@ I["humero-lateral-rotacion--v2"] = () => {
   const c = f.p("centro:Right humerus"), el = lerp(f.p("epicondilo_lat_R"), f.p("epicondilo_med_R"), 0.5);
   return svg(
     view("AP de pie o en decúbito · vista desde el tubo") + side(24, 52, "D") +
-    riEn(f, c, 35, 43) + txt(f1(c[0] - 17.5 * f.ppc + 6), f1(c[1] + 21.5 * f.ppc - 8), "RI 35 x 43 vertical", 11.5, INK) +
+    riEn(f, c, 35, 43) + txt(f1(c[0] - 17.5 * f.ppc - 6), f1(c[1] - 21.5 * f.ppc + 14), "RI 35 x 43", 11.5, INK, "end") + txt(f1(c[0] - 17.5 * f.ppc - 6), f1(c[1] - 21.5 * f.ppc + 28), "vertical", 11.5, INK, "end") +
     f.svg + crossP(c) + ring(el) + bluePt(el) +
     note(c[0] + 10, c[1] + 2, 420, 92, ["RC perpendicular, en la parte", "media del húmero"], RED) +
     note(el[0] + 8, el[1], 420, 146, ["Epicóndilos perpendiculares al RI", "(lateral verdadera): superpuestos"], BLUE) +
@@ -133,7 +133,7 @@ function transtoracica(id, blanco, extra) {
   return svg(
     view("Vista de frente · lado afectado contra el RI") + side(24, 52, "D") +
     wall(xRI - 12, 44, 300, "") + txt(xRI - 6, 38, "RI", 11, INK, "middle", 700) + f.svg +
-    beam(f1(t[0]), f1(t[1]), 180, f1(f.x + f.w + 70 - t[0]), { horizontal: true }) + redDot(t) +
+    beam(f1(t[0]), f1(t[1]), 180, f1(f.x + f.w + 70 - t[0]), { ref: 180 }) + redDot(t) +
     extra(f, t)
   );
 }
@@ -186,7 +186,7 @@ I["hombro-ap-axial-apical"] = () => {
   const t = cm(f, f.p("coracoides_R"), 0, -1.25), ts = cm(s, s.p("coracoides_R"), 0, -1.25);
   return svg(
     view("1 · De frente (desde el tubo)") + side(24, 52, "D") + f.svg + redDot(t) +
-    lab(...f.p("coracoides_R"), 40, 150, "coracoides", "start") +
+    lab(...f.p("coracoides_R"), 40, 100, "coracoides", "start") +
     note(t[0] + 6, t[1] - 4, 250, 60, ["RC 1,25 cm por", "encima de la", "coracoides"], RED, "start") +
     col(200, 250, [["Sin rotación", INK, 700, 12], ["mano en posición neutra", MUTE, 400, 11]]) +
     panelSep(388, "2 · De costado (espalda al RI)") + wall(f1(s.x - 16), 44, 300, "") + s.svg +
@@ -328,7 +328,7 @@ I["hombro-fisk--v2"] = () => {
   return svg(
     view("De pie (alternativa) · de costado") +
     `<rect x="${f1(el[0] - 20)}" y="${mesa}" width="${f1(f.x + f.w - el[0] + 40)}" height="12" fill="#cfd3dc"/>` + txt(f1(f.x + f.w - 30), f1(mesa + 26), "Mesa", 10, MUTE) +
-    f.svg + riBar(f1(t[0] - 6 * f.ppc), f1(t[0] + 12 * f.ppc), yRI, "") + txt(f1(t[0] + 12 * f.ppc), f1(yRI - 10), "RI (sobre el antebrazo)", 11, INK, "end", 700) +
+    f.svg + riBar(f1(t[0] - 6 * f.ppc), f1(t[0] + 12 * f.ppc), yRI, "") + txt(f1(t[0] - 6 * f.ppc - 6), f1(yRI + 5), "RI", 12, INK, "end", 700) +
     `<line x1="${f1(sh[0])}" y1="${f1(sh[1])}" x2="${f1(sh[0])}" y2="${f1(sh[1] + 120)}" stroke="${BLUE}" stroke-width="1.2" stroke-dasharray="4 4"/>` +
     arco(sh, 70, 90, angulo(sh, el), "10-15°", BLUE, 22) +
     beam(f1(t[0]), f1(t[1]), 90, f1(Math.max(70, t[1] - 50))) + redDot(t) +
@@ -362,7 +362,7 @@ I["clavicula-ap-axial--v2"] = () => {
     view("AP axial · de costado, espalda al RI") +
     wall(f1(f.x - 18), 44, 300, "") + txt(f1(f.x - 12), 38, "Bucky / RI", 10, MUTE, "middle") + f.svg +
     beam(f1(c[0]), f1(c[1]), 202.5, 140, { ref: 180, angLabel: "15-30°" }) + redDot(c) +
-    lab(c[0] + 4, c[1] - 2, f1(f.x + f.w + 10), f1(c[1] - 70), "clavícula", "start") +
+    lab(c[0] + 4, c[1] + 2, f1(c[0] + 7 * f.ppc), f1(c[1] + 6 * f.ppc), "clavícula", "start") +
     col(470, 70, [["RC 15-30° cefálico, en la parte", RED, 700, 12], ["media de la clavícula", RED, 700, 12]]) +
     col(470, 116, [["Hombros delgados: hacen falta", INK], ["5-15° más que en hombros gruesos", INK]]) +
     col(470, 168, [["De pie o en decúbito", INK, 700], ["En lugar de angular el RC, se puede", INK], ["usar una posición AP lordótica", INK]]) +

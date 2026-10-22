@@ -158,7 +158,9 @@ def _tapar_agujeros(im, maximo=0.01, zonas=None):
     lab, n = ndimage.label(hueco)
     rgb = a[..., :3].reshape(-1, 3)[A.ravel()]; color = _color_piel(rgb)
     cerca = np.zeros_like(A); yy, xx = np.mgrid[0:A.shape[0], 0:A.shape[1]]; dentro = np.zeros_like(A)
-    for (qx, qy), rr in (zonas or ()): dentro |= (xx - qx) ** 2 + (yy - qy) ** 2 < rr * rr
+    limpiar = np.zeros_like(A)
+    for (qx, qy), rr in (zonas or ()):
+        d2 = (xx - qx) ** 2 + (yy - qy) ** 2; dentro |= d2 < rr * rr; limpiar |= d2 < (1.6 * rr) ** 2
     if n:
         tam = ndimage.sum(hueco, lab, range(1, n + 1)); tope = maximo * A.sum()
         ok = tam < tope
@@ -168,14 +170,14 @@ def _tapar_agujeros(im, maximo=0.01, zonas=None):
         zona = ndimage.binary_dilation(chicos, iterations=4)
         a[zona, :3] = color; a[zona, 3] = 255
         cerca = ndimage.binary_dilation(chicos, iterations=40)
-    # trocitos sueltos de contorno (menos de 80 px) cerca de esos agujeros o en la axila: restos de bordes de la malla
-    cerca |= dentro; A = a[..., 3] > 128; oscuro = cerca & A & (a[..., :3].astype(int).sum(2) < color.astype(int).sum() - 120)
+    # trocitos sueltos de contorno (menos de 150 px) cerca de esos agujeros o de la axila: restos de bordes de la malla
+    cerca |= limpiar; A = a[..., 3] > 128; oscuro = cerca & A & (np.abs(a[..., :3].astype(int) - color.astype(int)).sum(2) > 25)
     lo, m = ndimage.label(oscuro, structure=np.ones((3, 3)))
     if m:
         tam = ndimage.sum(oscuro, lo, range(1, m + 1))
-        interior = ndimage.binary_erosion(A, iterations=6)
+        interior = ndimage.binary_erosion(A, iterations=3)
         toca = ndimage.maximum(interior, lo, range(1, m + 1))
-        sueltos = np.isin(lo, 1 + np.nonzero((tam < 80) & (toca > 0))[0])
+        sueltos = np.isin(lo, 1 + np.nonzero((tam < 150) & (toca > 0))[0])
         a[ndimage.binary_dilation(sueltos, iterations=1) & interior, :3] = color
     return Image.fromarray(a)
 
@@ -199,8 +201,23 @@ def _suavizar_silueta(im, r, zonas=()):
     a[cambio & viejo & B, :3] = color                                  # borrar el contorno viejo donde cambió el borde
     a[B & ~A, :3] = color; a[B & ~A, 3] = 255; a[A & ~B, 3] = 0
     borde = B & ~ndimage.binary_erosion(B, iterations=2)
-    a[borde & cambio, :3] = linea; a[borde & cambio, 3] = 255
+    cerca = ndimage.binary_dilation(cambio, iterations=30)
+    _limpiar_trazos(a, color, cerca)
+    a[borde & cerca, :3] = linea; a[borde & cerca, 3] = 255
     return Image.fromarray(a)
+
+def _limpiar_trazos(a, color, donde, maximo=150):
+    """Pinta de color piel los trocitos sueltos de contorno (menos de maximo px, lejos del borde) dentro de la máscara donde."""
+    from scipy import ndimage
+    lleno = ndimage.binary_erosion(a[..., 3] > 0, iterations=3)
+    tenue = donde & lleno & (a[..., 3] < 250); a[tenue, :3] = color; a[tenue, 3] = 255     # trazos semitransparentes
+    A = a[..., 3] > 128; raro = donde & A & (np.abs(a[..., :3].astype(int) - color.astype(int)).sum(2) > 25)
+    lo, m = ndimage.label(raro, structure=np.ones((3, 3)))
+    if not m: return
+    tam = ndimage.sum(raro, lo, range(1, m + 1)); interior = ndimage.binary_erosion(A, iterations=3)
+    toca = ndimage.maximum(interior, lo, range(1, m + 1))
+    sueltos = np.isin(lo, 1 + np.nonzero((tam < maximo) & (toca > 0))[0])
+    a[ndimage.binary_dilation(sueltos, iterations=1) & interior, :3] = color
 
 def _alisar_lazo(q, r, k=10):
     """Contorno de piel de un corte sin pliegues ni dientes (donde la malla se dobla en la axila): se rasteriza a k px/cm, se

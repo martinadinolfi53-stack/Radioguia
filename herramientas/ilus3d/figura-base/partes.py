@@ -11,6 +11,15 @@ import os
 TG={'caucasian-male-young':1/3,'african-male-young':1/3,'asian-male-young':1/3,'universal-male-young-maxmuscle-averageweight':float(os.environ.get('MUSC','0.6')),'universal-male-young-averagemuscle-minweight':float(os.environ.get('MAGRO','0.25'))}
 for s_ in 'lr':
     TG[f'{s_}-eye-height2-incr']=float(os.environ.get('OJO2','0.7')); TG[f'{s_}-eye-height1-incr']=float(os.environ.get('OJO1','0.3')); TG[f'{s_}-eye-scale-incr']=float(os.environ.get('OJOS','0.2'))
+# variantes de cara (targets de MakeHuman, CC0), elegidas con CARA=
+LR=lambda n,w: {f'l-{n}':w, f'r-{n}':w}
+CARAS={
+ 'actual':{},
+ 'mandibula':{'head-square':0.6,'chin-width-incr':0.5,'chin-bones-incr':0.6,'chin-prominent-incr':0.3,**LR('cheek-bones-incr',0.4),**LR('cheek-volume-decr',0.3),'eyebrows-trans-down':0.4,'nose-width1-incr':0.3,'neck-scale-horiz-incr':0.3},
+ 'ovalada':{'head-oval':0.4,'chin-width-decr':0.7,'chin-height-decr':0.2,**LR('cheek-volume-decr',0.5),'nose-scale-horiz-decr':0.35,'nose-point-width-decr':0.3,'eyebrows-angle-up':0.3,'neck-scale-horiz-incr':-0.0},
+ 'ancha':{'head-round':0.6,**LR('cheek-volume-incr',0.5),'chin-width-incr':0.3,'nose-scale-horiz-incr':0.6,'nose-width1-incr':0.4,'nose-scale-vert-decr':0.2,'mouth-scale-horiz-incr':0.35},
+}
+TG.update(CARAS[os.environ.get('CARA','actual')])
 for k,w in TG.items():
     for l in open(f'/tmp/claude-0/mh/t/{k}.target'):
         if l[0]=='#' or not l.strip(): continue

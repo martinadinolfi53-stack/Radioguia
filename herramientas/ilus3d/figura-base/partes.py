@@ -100,7 +100,7 @@ elif ESTILO=='degrade':
     TB=[0,45,60,90,130,180]; YB=[0.0,0.0,0.040,0.042,0.030,0.020]
     lb=lambda P: ey+np.interp(th(P),TB,YB)
     ft=np.clip((PEL[:,1]-(lb(PEL)-0.035))/0.035,0,1)
-    grosor=0.0005+0.0022*ft; verts['pelo']=PEL+n*grosor[:,None]
+    grosor=0.0004+0.0018*ft*np.clip(alto*4,0.1,1); verts['pelo']=PEL+n*grosor[:,None]
     import json; json.dump({'ey':float(ey),'c0':[float(x) for x in c0],'TB':TB,'YB':YB},open('/tmp/claude-0/mh/degrade.json','w'))
 elif ESTILO=='militar':
     # dos zonas: arriba (pelo) y costados/nuca (pelo2) más cortos; degradé = costados casi al ras

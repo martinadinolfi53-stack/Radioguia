@@ -64,6 +64,24 @@ for nombre,(az,el) in VIEWS.items():
             mp=nt.nodes.new('ShaderNodeMapRange'); mp.inputs['From Min'].default_value=-1; mp.inputs['From Max'].default_value=1
             nt.links.new(dp.outputs['Value'],mp.inputs['Value']); nt.links.new(mp.outputs['Result'],cr.inputs['Fac']); nt.links.new(cr.outputs['Color'],e.inputs['Color'])
         else: e.inputs['Color'].default_value=(*c,1)
+        EST=os.environ.get('ESTILO','plano')
+        if EST=='suave':
+            for nd in nt.nodes:
+                if nd.bl_idname=='ShaderNodeValToRGB':
+                    nd.color_ramp.interpolation='EASE'; els=nd.color_ramp.elements
+                    els[0].color=tuple(x*0.80 if i<3 else 1 for i,x in enumerate(els[0].color))
+        if EST=='real':
+            bs=nt.nodes.new('ShaderNodeBsdfPrincipled'); bs.inputs['Roughness'].default_value=(0.55 if k2 in('piel','labios','ombligo','pezon') else 0.8)
+            mxs=[nd for nd in nt.nodes if nd.bl_idname=='ShaderNodeMix' and nd.blend_type=='MIX' and nd.data_type=='RGBA']
+            if mxs: nt.links.new(mxs[0].outputs['Result'],bs.inputs['Base Color'])
+            else: bs.inputs['Base Color'].default_value=(*([min(1,x*1.08) for x in lin('eab496')] if k2=='piel' else c),1)
+            if k2 in('piel','labios','pelo'):
+                bs.inputs['Subsurface Weight'].default_value=0.25; bs.inputs['Subsurface Radius'].default_value=(0.004,0.0015,0.001); bs.inputs['Subsurface Scale'].default_value=1.0
+            if k2 in('ojo','iris'): bs.inputs['Roughness'].default_value=0.15
+            e=bs
+        if EST=='linea':
+            for l_ in list(e.inputs['Color'].links): nt.links.remove(l_)
+            e.inputs['Color'].default_value=(*(lin('3d2b20') if k2=='iris' else (1,1,1)),1) if k2!='iris' else (*lin('3d2b20'),1)
         nt.links.new(e.outputs[0],nt.nodes['Material Output'].inputs['Surface']); o.data.materials.append(m)
         o.data.polygons.foreach_set('use_smooth',[True]*len(o.data.polygons)); o.data.update()
         md=o.modifiers.new('s','SUBSURF'); md.levels=md.render_levels=(2 if k2 in('pelo','pelo2','ojo','iris','piel','ropa') else 1)
@@ -81,11 +99,27 @@ for nombre,(az,el) in VIEWS.items():
     sc.render.engine='CYCLES'; sc.cycles.samples=16; sc.cycles.device='CPU'; sc.render.film_transparent=True
     sc.view_settings.view_transform='Standard'; sc.render.resolution_x=(500 if nombre.startswith('cab') else (1000 if el==90 else 560)); sc.render.resolution_y=(500 if nombre.startswith('cab') else 1000)
     sc.world=bpy.data.worlds.new('w'); sc.render.use_freestyle=True
+    EST=os.environ.get('ESTILO','plano')
+    if EST=='real':
+        sc.render.use_freestyle=(os.environ.get('CONTORNO')=='1'); sc.cycles.samples=96; sc.view_settings.view_transform='AgX'; sc.view_settings.look='AgX - Medium High Contrast'
+        sc.world.use_nodes=True; sc.world.node_tree.nodes['Background'].inputs[0].default_value=(0.75,0.77,0.8,1); sc.world.node_tree.nodes['Background'].inputs[1].default_value=0.35
+        import mathutils as mu
+        def luz(tipo,dirv,en,size=None):
+            L=bpy.data.lights.new(tipo,tipo); L.energy=en
+            if size: L.size=size
+            ob=bpy.data.objects.new(tipo,L); sc.collection.objects.link(ob)
+            d=mu.Vector(dirv).normalized(); ob.location=d*6+mu.Vector((0,0,0.8)); ob.rotation_euler=(-d).to_track_quat('-Z','Y').to_euler()
+        luz('SUN',tuple(-fw*0.7+upv*0.6-rt*0.5),4.0); L2=luz('SUN',tuple(-fw*0.6+rt*0.8),0.9)
+        luz('SUN',tuple(fw*0.8+upv*0.4),1.2)
     fs=sc.view_layers[0].freestyle_settings; ls=fs.linesets[0] if fs.linesets else fs.linesets.new('l')
     ls.select_by_visibility=True; ls.select_by_edge_types=True
     for t in ('silhouette','border','crease','ridge_valley','suggestive_contour','material_boundary','contour','external_contour','edge_mark'):
         if hasattr(ls,'select_'+t): setattr(ls,'select_'+t, t in ('silhouette','external_contour','material_boundary','border'))
     ls.linestyle=ls.linestyle or bpy.data.linestyles.new('ls'); ls.linestyle.color=lin('8a6450'); ls.linestyle.thickness=2.0
+    if os.environ.get('ESTILO')=='linea':
+        for t in ('silhouette','border','crease','suggestive_contour','external_contour','material_boundary','contour'):
+            if hasattr(ls,'select_'+t): setattr(ls,'select_'+t, True)
+        ls.linestyle.color=(0.08,0.08,0.08); ls.linestyle.thickness=1.6; fs.crease_angle=math.radians(120)
     if bpy.data.collections.get('pelo'):
         # el pelo en degradé no lleva borde: solo su silueta exterior
         ls.select_by_collection=True; ls.collection=bpy.data.collections['pelo']; ls.collection_negation='EXCLUSIVE'

@@ -177,3 +177,6 @@ F['hombro-axial-lawrence-cenital'] = lambda: fig('hombro-axial-lawrence-cenital'
 if __name__ == '__main__':
     for k in (sys.argv[1:] or F):
         r = F[k](); print(k, {q: v for q, v in r.items() if q in ('res', 'ppc', 'piel', 'huesos')})
+
+# ---------- avatar realista (prueba) ----------
+F['hombro-grashey-av'] = lambda: tubo('hombro-grashey-av', _lado(), rayo('AP', 40), 'cabeza_humero_R', (0.24, 0.18), cortes=SOBRE_CODO, avatar=True)

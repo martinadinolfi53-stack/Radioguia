@@ -29,10 +29,15 @@ def ropa(c, Pp):
 
 def _obj(ruta, partes):
     with open(ruta, 'w') as f:
-        vo = 1
-        for nombre, (P, I) in partes:
+        vo = 1; to = 1
+        for nombre, datos in partes:
+            P, I = datos[:2]; uv = datos[2] if len(datos) > 2 else None
             f.write(f'o {nombre}\n'); f.writelines('v %.5f %.5f %.5f\n' % tuple(v) for v in P)
-            f.writelines('f %d %d %d\n' % tuple(t + vo) for t in I); vo += len(P)
+            if uv is not None:
+                f.writelines('vt %.5f %.5f\n' % tuple(t) for t in uv)
+                f.writelines('f ' + ' '.join(f'{i + vo}/{i + to}' for i in t) + '\n' for t in I); to += len(uv)
+            else: f.writelines('f ' + ' '.join(str(i + vo) for i in t) + '\n' for t in I)
+            vo += len(P)
 
 TAPADO = 0.006      # m: un hueso con más de esto de piel de OTRA parte delante (otro dedo, la palma) se dibuja tenue
 def _grupo(seg):
@@ -44,7 +49,8 @@ def _grupo(seg):
     return seg.rsplit('_', 1)[0] if seg.endswith(('_R', '_L')) else seg
 
 def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, cortes=(), puntos=(), px=800,
-           muestras=16, con_ropa=None, fundido=0.02, horizontal=None, vertical=None, suavizar=0, capas=False, cara=False):
+           muestras=16, con_ropa=None, fundido=0.02, horizontal=None, vertical=None, suavizar=0, capas=False, cara=False,
+           avatar=False):
     """
     pose: posturas.Pose. dir: hacia dónde mira la cámara (= sentido del rayo en una vista desde el tubo), en ejes del cuerpo.
     huesos: segmentos cuyos huesos se dibujan "por transparencia". region: segmentos de piel a dibujar (None = cuerpo entero).
@@ -56,6 +62,7 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     cara: pelo (malla de otro color sobre el cuero cabelludo) y puntos de ojos, cejas y boca del lado que mira a la cámara,
       para que se entienda si el paciente está de frente (se ven los ojos) o de espaldas (se ve la nuca).
     """
+    avatar = avatar or os.environ.get('AVATAR') == '1'     # AVATAR=1: todas las figuras con el avatar realista
     c = cuerpo(); c.posar(pose); pts = Puntos(c)
     huesos = _con_dedos(huesos); region = None if region is None else _con_dedos(region)
     Pp = c.piel_posada(); I = c.piel_I
@@ -91,6 +98,14 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
         I = I[((Pp[I].mean(1) - p) @ n) > -0.002]
     I = _sin_fragmentos(I, len(Pp))
     partes = [('piel', (Pp, I))]
+    if avatar:
+        # avatar realista: reemplaza la piel del modelo (que sigue sirviendo para el encuadre y los puntos); mismos cortes
+        import avatar as _av
+        partes = []
+        for nombre, V, F, uv in _av.posado(c):
+            for p, n in planos: F = F[((V[F].mean(1) - p) @ n) > -0.002]
+            if len(F): partes.append((nombre, (V, F, uv)))
+        con_ropa = False; cara = False
     if capas:     # copia de la piel separada por partes, solo para la pasada de profundidad (cada parte con su número)
         G = {}; gid = lambda seg: G.setdefault(_grupo(seg), len(G) + 1)
         gf = np.array([gid(x) for x in dom[I[:, 0]]])
@@ -116,7 +131,9 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     # (radio, cm[, lados]) cambia esa distancia y elige la axila ('R', 'L')
     for s_ in 'RL': proy['_axila' + s_] = pts.posado('cabeza_humero_' + s_).tolist()
     for i, (p, n) in enumerate(planos): proy[f'_corte{i}'] = p.tolist(); proy[f'_corte{i}n'] = (p + n * 0.05).tolist()
-    spec = dict(obj=obj, salida=os.path.join(CACHE, id), dir=list(map(float, dir)), arriba=list(map(float, arriba)),
+    if avatar:
+        usados = np.concatenate([d[0][np.unique(d[1])] for n_, d in partes if n_.startswith('av_')])
+    spec = dict(obj=obj, salida=os.path.join(CACHE, id), dir=list(map(float, dir)), arriba=list(map(float, arriba)), realista=avatar,
                 encuadre=[usados.min(0).tolist(), usados.max(0).tolist()] + usados[::40].tolist() + _extremos(usados, dir, arriba), px=px, muestras=muestras, puntos=proy, capas=capas)
     sp = os.path.join(CACHE, id + '-spec.json'); json.dump(spec, open(sp, 'w'))
     r = subprocess.run([sys.executable, os.path.join(AQUI, 'render_obj.py'), sp], capture_output=True, text=True)
@@ -136,6 +153,7 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
         gp, gh = np.rint(zp[..., 1] * 63), np.rint(zh[..., 1] * 63)
         tapado = ((zh[..., 0] - zp[..., 0]) * 4 > TAPADO) & (gp != gh) & (gp > 0) & (gh > 0)
         a_ = np.asarray(al, float); a_[tapado] *= 0.35; al = Image.fromarray(a_.astype(np.uint8))
+    if avatar: al = Image.fromarray((np.asarray(al, float) * 0.85).astype(np.uint8))     # huesos apenas translúcidos sobre la piel realista
     out = Image.new('RGBA', p.size, (0, 0, 0, 0)); out.alpha_composite(p); hh = h.copy(); hh.putalpha(al); out.alpha_composite(hh)
     if capas:
         ln = Image.open(spec['salida'] + '-lineas.png').convert('RGBA')

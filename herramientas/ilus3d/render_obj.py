@@ -16,6 +16,49 @@ cam_pts = np.array([[Mc.col[0].dot(mathutils.Vector(p)), Mc.col[1].dot(mathutils
 lo, hi = cam_pts.min(0), cam_pts.max(0); mid = (lo + hi) / 2; ew, eh = hi - lo
 escala = max(ew, eh) * 1.04
 RES = (int(S['px'] * ew / eh), S['px']) if eh > ew else (S['px'], int(S['px'] * eh / ew))
+AV = {'piel': 'eab496', 'ojo': 'ffffff', 'iris': '3d2b20', 'cejas': '6e4e3a', 'labios': 'c98f7f', 'ropa': 'c9d6e3', 'ombligo': 'c79a84', 'pezon': 'c99383'}
+PELO = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'figura-base', 'pelo_degrade.json')))
+def _realista(sc, objs, mats):
+    """materiales del avatar (render con luz, como figura-base/rend.py ESTILO=real): piel con pelo rapado en degradé pintado
+    desde las coordenadas de reposo guardadas en la uv"""
+    import math
+    for o in objs:
+        if not o.name.startswith('av_'): continue
+        k = o.name[3:].split('.')[0].split('_')[0]
+        m = bpy.data.materials.new(o.name); m.use_nodes = True; nt = m.node_tree; N = nt.nodes; L = nt.links.new
+        bs = N.new('ShaderNodeBsdfPrincipled'); c = lin(AV.get(k, 'ff00ff'))
+        bs.inputs['Base Color'].default_value = (*([min(1, v * 1.08) for v in c] if k == 'piel' else c), 1)
+        bs.inputs['Roughness'].default_value = 0.55 if k in ('piel', 'labios', 'ombligo', 'pezon') else (0.15 if k in ('ojo', 'iris') else 0.8)
+        if k in ('piel', 'labios'):
+            bs.inputs['Subsurface Weight'].default_value = 0.25; bs.inputs['Subsurface Radius'].default_value = (0.004, 0.0015, 0.001)
+        if k == 'piel':
+            bs.inputs['Specular IOR Level'].default_value = 0.25
+            def op(o_, a_, b_=None):
+                q = N.new('ShaderNodeMath'); q.operation = o_
+                for j, v_ in enumerate((a_, b_)):
+                    if v_ is None: continue
+                    if isinstance(v_, (int, float)): q.inputs[j].default_value = v_
+                    else: L(v_, q.inputs[j])
+                return q.outputs[0]
+            tc = N.new('ShaderNodeTexCoord'); sp = N.new('ShaderNodeSeparateXYZ'); L(tc.outputs['UV'], sp.inputs[0])
+            U, Vv = sp.outputs[0], sp.outputs[1]; th = op('MINIMUM', U, 1.0); yr = op('SUBTRACT', Vv, 0.5)
+            def curva(TB, YB):
+                fc = N.new('ShaderNodeFloatCurve'); cu = fc.mapping.curves[0]; lo, hi = min(YB), max(YB); sc_ = hi - lo or 1
+                while len(cu.points) < len(TB): cu.points.new(0.5, 0.5)
+                for p_, (t_, y_) in zip(cu.points, zip(TB, YB)): p_.location = (t_ / 180, (y_ - lo) / sc_); p_.handle_type = 'VECTOR'
+                fc.mapping.update(); L(th, fc.inputs['Value']); return op('ADD', op('MULTIPLY', fc.outputs[0], sc_), lo)
+            HL = curva(PELO['TH'], PELO['HH']); LB = curva(PELO['TB'], PELO['YB'])
+            borde = op('MINIMUM', op('MAXIMUM', op('DIVIDE', op('SUBTRACT', yr, HL), 0.004), 0), 1)
+            ft = op('POWER', op('MINIMUM', op('MAXIMUM', op('DIVIDE', op('SUBTRACT', yr, op('SUBTRACT', LB, 0.035)), 0.035), 0), 1), 1.3)
+            fac = op('MULTIPLY', op('MULTIPLY', borde, ft), op('SUBTRACT', 1, op('GREATER_THAN', U, 1.5)))
+            mx = N.new('ShaderNodeMix'); mx.data_type = 'RGBA'
+            mx.inputs['A'].default_value = bs.inputs['Base Color'].default_value[:]; mx.inputs['B'].default_value = (*lin('5e4434'), 1)
+            L(fac, mx.inputs['Factor']); L(mx.outputs['Result'], bs.inputs['Base Color'])
+            L(op('ADD', op('MULTIPLY', fac, 0.35), 0.55), bs.inputs['Roughness']); L(op('SUBTRACT', 0.25, op('MULTIPLY', fac, 0.2)), bs.inputs['Specular IOR Level'])
+        L(bs.outputs[0], N['Material Output'].inputs['Surface'])
+        o.data.materials.clear(); o.data.materials.append(m)
+        o.data.polygons.foreach_set('use_smooth', [True] * len(o.data.polygons)); o.data.update()
+        md = o.modifiers.new('s', 'SUBSURF'); md.levels = md.render_levels = 2 if k in ('piel', 'ropa', 'ojo', 'iris') else 1
 def render(modo):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.wm.obj_import(filepath=S['obj'], forward_axis='NEGATIVE_Z', up_axis='Y')
@@ -41,7 +84,11 @@ def render(modo):
         e = nt.nodes.new('ShaderNodeEmission'); nt.links.new(cd.outputs['View Z Depth'], mr.inputs['Value'])
         nt.links.new(mr.outputs['Result'], cc.inputs[0]); nt.links.new(cc.outputs[0], e.inputs['Color'])
         nt.links.new(e.outputs[0], nt.nodes['Material Output'].inputs['Surface']); return m
+    if S.get('realista') and modo == 'piel': _realista(sc, objs, mats)
     for o in objs:
+        if o.name.startswith('av_'):
+            o.hide_render = modo != 'piel'
+            if modo == 'piel': continue
         tipo = 'hueso' if o.name.startswith('hueso') else 'ropa' if o.name.startswith('ropa') else 'pelo' if o.name.startswith('pelo') else 'zp' if o.name.startswith('zp_') else 'piel'
         gid = int(o.name.split('__')[1].split('.')[0]) if '__' in o.name else 0
         o.data.materials.clear(); o.data.materials.append(zmat(gid) if modo in ('zpiel', 'zhueso') else mats[tipo if tipo != 'zp' else 'piel'])
@@ -62,6 +109,14 @@ def render(modo):
     if modo in ('zpiel', 'zhueso'):
         sc.cycles.samples = 1; sc.cycles.pixel_filter_type = 'BOX'; sc.view_settings.view_transform = 'Raw'
         sc.render.image_settings.color_depth = '16'; sc.render.dither_intensity = 0
+    if S.get('realista') and modo == 'piel':
+        sc.cycles.samples = max(S.get('muestras', 16), 48); sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Medium High Contrast'
+        sc.world.use_nodes = True; bg = sc.world.node_tree.nodes['Background']; bg.inputs[0].default_value = (0.75, 0.77, 0.8, 1); bg.inputs[1].default_value = 0.35
+        def luz(d, en):
+            L = bpy.data.lights.new('sol', 'SUN'); L.energy = en; L.angle = np.radians(35)
+            ob = bpy.data.objects.new('sol', L); sc.collection.objects.link(ob); d = d.normalized()
+            ob.rotation_euler = (-d).to_track_quat('-Z', 'Y').to_euler()
+        luz(-f * 0.7 + up * 0.6 - x * 0.5, 4.0); luz(-f * 0.6 + x * 0.8, 0.9); luz(f * 0.8 + up * 0.4, 1.2)
     sc.render.use_freestyle = modo in ('piel', 'hueso', 'lineas'); fs = sc.view_layers[0].freestyle_settings
     ls = fs.linesets[0] if fs.linesets else fs.linesets.new('l')
     ls.select_by_visibility = True; ls.select_by_edge_types = True

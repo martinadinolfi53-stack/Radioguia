@@ -64,6 +64,7 @@ c0=np.array([0,ey,ez-0.09])
 def th(P): return np.degrees(np.arctan2(np.abs(P[:,0]-c0[0]), P[:,2]-c0[2]))
 TH=[0,25,45,62,70,78,84,100,112,125,150,180]
 HH=[0.064,0.060,0.052,0.040,0.030,-0.004,0.046,0.046,0.030,0.000,-0.035,-0.042]
+if os.environ.get('PELO')=='flequillo': HH=[0.038,0.041,0.047]+HH[3:]
 hl=lambda P: np.interp(th(P),TH,HH)
 cab=(np.linalg.norm(V-c0,axis=1)<0.155)&(V[:,1]>ey-0.10)
 den=cab&((V[:,1]-ey)>hl(V))
@@ -71,8 +72,24 @@ pf=body[den[body].any(1)]; partes['pelo']=pf
 PEL=V.copy(); idx=np.unique(pf); fuera=idx[~den[idx]]
 PEL[fuera,1]=ey+hl(V[fuera])
 n=PEL-c0; n/=np.maximum(np.linalg.norm(n,axis=1,keepdims=True),1e-6)
-grosor=0.002+0.013*np.clip((PEL[:,1]-ey-hl(PEL))/0.05,0,1)
-verts['pelo']=PEL+n*grosor[:,None]
+ESTILO=os.environ.get('PELO','actual')
+alto=np.clip((PEL[:,1]-ey-hl(PEL))/0.05,0,1); fr=(PEL[:,2]-c0[2])/0.09; lado=np.abs(PEL[:,0])
+if ESTILO=='volumen':
+    # laterales cortos, volumen arriba que crece hacia la frente (copete suave peinado hacia atrás)
+    arriba_=np.clip((PEL[:,1]-ey-0.045)/0.05,0,1)*np.clip(1-(lado-0.045)/0.04,0,1)
+    grosor=0.002+0.005*alto+0.030*arriba_*np.clip(0.45+0.55*fr,0.2,1.0)
+    PELd=PEL+n*grosor[:,None]; PELd[:,2]+=0.012*arriba_*np.clip(fr,0,1)**1.5
+    verts['pelo']=PELd
+elif ESTILO=='flequillo':
+    # flequillo corto que cae sobre la frente, peinado hacia adelante; laterales y nuca prolijos
+    frente=np.clip(fr,0,1)**2*np.clip(1-(lado-0.02)/0.05,0,1)
+    grosor=0.002+0.012*alto+0.006*frente
+    PELd=PEL+n*grosor[:,None]; PELd[:,2]+=0.007*frente*alto; PELd[:,1]-=0.004*frente
+    verts['pelo']=PELd
+elif ESTILO=='rapado':
+    grosor=0.0012+0.0008*alto; verts['pelo']=PEL+n*grosor[:,None]
+else:
+    grosor=0.002+0.013*alto; verts['pelo']=PEL+n*grosor[:,None]
 # short de paciente
 # short: la piel de la pelvis y los muslos (sin manos), separada 3 mm hacia afuera, con bordes rectos
 nrm=np.zeros_like(V)
@@ -84,6 +101,7 @@ partes['ropa']=body[sv[body].all(1)|(sv[body].sum(1)>=2)]
 R=V+nrm*0.003; R[:,1]=np.clip(R[:,1],-0.27,0.07); verts['ropa']=R
 print({k:len(v) for k,v in partes.items()}, file=sys.stderr)
 with open('/tmp/claude-0/mh/mh.obj','w') as f:
+    # las partes con vértices propios (verts) pueden tener otra cantidad de vértices
     vo=1
     for k,ff in partes.items():
         VV=verts.get(k,V); f.write(f'o {k}\n')

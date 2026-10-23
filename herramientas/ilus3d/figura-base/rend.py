@@ -1,12 +1,14 @@
 import sys; sys.path.insert(0,'/tmp/claude-0/sp/bpyenv')
 import bpy, mathutils, math
 out=sys.argv[-1]
-COL={'piel':'f3cfb8','pelo':'5b4130','ojo':'ffffff','iris':'3d2b20','cejas':'6e4e3a','labios':'dba596','ropa':'c9d6e3','ombligo':'c79a84','pezon':'dcab98'}
+import os
+COL={'piel':'f3cfb8','pelo':'5b4130','ojo':'ffffff','iris':'3d2b20','cejas':'6e4e3a','labios':'dba596','ropa':'c9d6e3','pelo2':'553b2b','raya':'3a2a20','ombligo':'c79a84','pezon':'dcab98'}
 def lin(h):
     c=[int(h[i:i+2],16)/255 for i in (0,2,4)]; return tuple(x/12.92 if x<=0.04045 else ((x+0.055)/1.055)**2.4 for x in c)
 VIEWS={} if 'solo_cuerpo' in sys.argv else {'cab_0':(0,0),'cab_45':(45,0),'cab_90':(90,0),'cab_180':(180,0)}
 for a in ([] if 'solo_cab' in sys.argv else ([0,90,180,45] if 'solo_cuerpo' in sys.argv else range(0,360,45))): VIEWS[f'v{a:03d}']=(a,0)
 VIEWS.update({} if 'solo_cab' in sys.argv else {'arriba':(0,90)})
+if os.environ.get('PELO')=='rapado': COL['pelo']='7d624f'
 for nombre,(az,el) in VIEWS.items():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.wm.obj_import(filepath='/tmp/claude-0/mh/mh.obj', forward_axis='NEGATIVE_Z', up_axis='Y')
@@ -21,7 +23,7 @@ for nombre,(az,el) in VIEWS.items():
         m=bpy.data.materials.new(k); m.use_nodes=True; nt=m.node_tree
         base=COL.get(k2,COL.get(k,'ff00ff')); c=lin(base)
         e=nt.nodes.new('ShaderNodeEmission')
-        if k2 in ('piel','ropa','pelo'):
+        if k2 in ('piel','ropa','pelo','pelo2'):
             # sombreado plano de 3 tonos (luz desde arriba, adelante y a la izquierda de la cámara): da volumen sin líneas
             geo=nt.nodes.new('ShaderNodeNewGeometry'); dp=nt.nodes.new('ShaderNodeVectorMath'); dp.operation='DOT_PRODUCT'
             dp.inputs[1].default_value=LUZ; nt.links.new(geo.outputs['Normal'],dp.inputs[0])
@@ -34,7 +36,7 @@ for nombre,(az,el) in VIEWS.items():
         else: e.inputs['Color'].default_value=(*c,1)
         nt.links.new(e.outputs[0],nt.nodes['Material Output'].inputs['Surface']); o.data.materials.append(m)
         o.data.polygons.foreach_set('use_smooth',[True]*len(o.data.polygons)); o.data.update()
-        md=o.modifiers.new('s','SUBSURF'); md.levels=md.render_levels=(2 if k2 in('pelo','ojo','iris','piel','ropa') else 1)
+        md=o.modifiers.new('s','SUBSURF'); md.levels=md.render_levels=(2 if k2 in('pelo','pelo2','ojo','iris','piel','ropa') else 1)
         bpy.ops.object.select_all(action='DESELECT')
     cam=bpy.data.cameras.new('c'); cam.type='ORTHO'; cam.ortho_scale=(0.32 if nombre.startswith('cab') else 2.12)
     co=bpy.data.objects.new('c',cam); sc.collection.objects.link(co); sc.camera=co

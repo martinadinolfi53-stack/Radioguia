@@ -1,10 +1,12 @@
 import sys; sys.path.insert(0,'/tmp/claude-0/sp/bpyenv')
 import bpy, mathutils, math
 out=sys.argv[-1]
-COL={'piel':'f3cfb8','pelo':'5b4130','ojo':'ffffff','iris':'3d2b20','cejas':'5b4130','labios':'d99a8a','ropa':'c9d6e3'}
+COL={'piel':'f3cfb8','pelo':'5b4130','ojo':'ffffff','iris':'3d2b20','cejas':'5b4130','labios':'d99a8a','ropa':'c9d6e3','ombligo':'c79a84','pezon':'d4a08c'}
 def lin(h):
     c=[int(h[i:i+2],16)/255 for i in (0,2,4)]; return tuple(x/12.92 if x<=0.04045 else ((x+0.055)/1.055)**2.4 for x in c)
-VIEWS={'cabeza':(20,0),'frente':(0,0),'tres_cuartos':(35,0),'costado':(90,0),'espalda':(180,0)}
+VIEWS={'cab_0':(0,0),'cab_45':(45,0),'cab_90':(90,0),'cab_180':(180,0)}
+for a in ([] if 'solo_cab' in sys.argv else range(0,360,45)): VIEWS[f'v{a:03d}']=(a,0)
+VIEWS.update({} if 'solo_cab' in sys.argv else {'arriba':(0,90)})
 for nombre,(az,el) in VIEWS.items():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.wm.obj_import(filepath='/tmp/claude-0/mh/mh.obj', forward_axis='NEGATIVE_Z', up_axis='Y')
@@ -16,14 +18,15 @@ for nombre,(az,el) in VIEWS.items():
         nt.links.new(e.outputs[0],nt.nodes['Material Output'].inputs['Surface']); o.data.materials.append(m)
         md=o.modifiers.new('s','SUBSURF'); md.levels=md.render_levels=(2 if k2 in('pelo','ojo','iris') else 1)
         bpy.ops.object.select_all(action='DESELECT')
-    cam=bpy.data.cameras.new('c'); cam.type='ORTHO'; cam.ortho_scale=(0.32 if nombre=='cabeza' else 1.85)
+    cam=bpy.data.cameras.new('c'); cam.type='ORTHO'; cam.ortho_scale=(0.30 if nombre.startswith('cab') else 1.85)
     co=bpy.data.objects.new('c',cam); sc.collection.objects.link(co); sc.camera=co
     a=math.radians(az); r=6
     # modelo: frente hacia -Y de blender (obj +Z)
-    co.location=(r*math.sin(a), -r*math.cos(a), (0.73 if nombre=='cabeza' else 0.0))
+    co.location=(r*math.sin(a), -r*math.cos(a)-(0.03 if nombre.startswith('cab') else 0.0), (0.73 if nombre.startswith('cab') else 0.0))
     co.rotation_euler=(math.radians(90),0,a)
+    if el==90: co.location=(0,0,6); co.rotation_euler=(0,0,math.pi)
     sc.render.engine='CYCLES'; sc.cycles.samples=16; sc.cycles.device='CPU'; sc.render.film_transparent=True
-    sc.view_settings.view_transform='Standard'; sc.render.resolution_x=(600 if nombre=='cabeza' else 520); sc.render.resolution_y=(600 if nombre=='cabeza' else 1000)
+    sc.view_settings.view_transform='Standard'; sc.render.resolution_x=(500 if nombre.startswith('cab') else (1000 if el==90 else 560)); sc.render.resolution_y=(500 if nombre.startswith('cab') else 1000)
     sc.world=bpy.data.worlds.new('w'); sc.render.use_freestyle=True
     fs=sc.view_layers[0].freestyle_settings; ls=fs.linesets[0] if fs.linesets else fs.linesets.new('l')
     ls.select_by_visibility=True; ls.select_by_edge_types=True

@@ -7,7 +7,7 @@ S = json.load(open(sys.argv[-1]))
 bl = lambda v: mathutils.Vector((v[0], -v[2], v[1]))      # obj (Y arriba) -> blender (Z arriba)
 def lin(h):
     c = [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]; return tuple(x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in c)
-COL = {'piel': S.get('color_piel', 'f3cfb8'), 'hueso': 'f1e7cc', 'ropa': S.get('color_ropa', 'c9d6e3')}
+COL = {'piel': S.get('color_piel', 'f3cfb8'), 'hueso': 'f1e7cc', 'ropa': S.get('color_ropa', 'c9d6e3'), 'pelo': '6b5141'}
 f = bl(S['dir']).normalized(); up = bl(S['arriba']); up = (up - f * up.dot(f)).normalized(); x = up.cross(-f)
 Mc = mathutils.Matrix((x, up, -f)).transposed()
 # encuadre: proyectar los puntos de encuadre sobre el plano de la cámara
@@ -42,7 +42,7 @@ def render(modo):
         nt.links.new(mr.outputs['Result'], cc.inputs[0]); nt.links.new(cc.outputs[0], e.inputs['Color'])
         nt.links.new(e.outputs[0], nt.nodes['Material Output'].inputs['Surface']); return m
     for o in objs:
-        tipo = 'hueso' if o.name.startswith('hueso') else 'ropa' if o.name.startswith('ropa') else 'zp' if o.name.startswith('zp_') else 'piel'
+        tipo = 'hueso' if o.name.startswith('hueso') else 'ropa' if o.name.startswith('ropa') else 'pelo' if o.name.startswith('pelo') else 'zp' if o.name.startswith('zp_') else 'piel'
         gid = int(o.name.split('__')[1].split('.')[0]) if '__' in o.name else 0
         o.data.materials.clear(); o.data.materials.append(zmat(gid) if modo in ('zpiel', 'zhueso') else mats[tipo if tipo != 'zp' else 'piel'])
         if modo == 'zpiel': o.hide_render = tipo != 'zp'

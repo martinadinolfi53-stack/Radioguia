@@ -34,6 +34,9 @@ def fig(id, pose, d, cortes=SOBRE_XIFOIDES, huesos=HOMBRO, arriba=(0, 1, 0), ext
 def perspectiva(id, pose, d, centro='cabeza_humero_R', az=35, el=25, ri=(0.45, 0.6), huesos=BRAZO, **kw):
     return fig(id, pose, camara(d, az, el), cortes=CINTURA, huesos=huesos,
                extra=ri_detras(pose, d, centro, *ri, debajo_de='xifoides') + [('rc_ini', _antes(pose, centro, d))], **kw)
+# Vista desde el tubo con la cara o la nuca (cara=True) y el RI real detrás (ancho x alto en m, centrado en el punto)
+def tubo(id, pose, d, centro, ri, cortes=SOBRE_XIFOIDES, huesos=BRAZO, **kw):
+    return fig(id, pose, d, cortes=cortes, huesos=huesos, cara=True, extra=ri_detras(pose, d, centro, *ri, debajo_de='xifoides'), **kw)
 def _antes(pose, centro, d):
     from escena import cuerpo; from puntos import Puntos
     c = cuerpo(); c.posar(pose); return Puntos(c).posado(centro) - 0.45 * np.asarray(d) / np.linalg.norm(d)
@@ -153,6 +156,23 @@ F['escapula-lateral--v2'] = lambda: perspectiva('escapula-lateral--v2', _esc2(),
 F['escapula-lateral--v2-tubo'] = lambda: fig('escapula-lateral--v2-tubo', _esc2(), rayo('PA', 52), huesos=BRAZO)
 F['ac-pearson'] = lambda: fig('ac-pearson', Pose().hombro_rot_ext('R', R0 - 45).prono('R', 45).hombro_rot_ext('L', R0 - 45).prono('L', 45),
     rayo('AP'), huesos=AMBOS + ['cubito_R', 'radio_R', 'mano_R', 'cubito_L', 'radio_L', 'mano_L'], cortes=SOBRE_CADERA)
+
+# ---------- vistas desde el tubo con cara/nuca y RI (reemplazan a "cómo se ubica el paciente") ----------
+F['hombro-grashey-tubo2'] = lambda: tubo('hombro-grashey-tubo2', _lado(), rayo('AP', 40), 'cabeza_humero_R', (0.24, 0.18), cortes=SOBRE_CODO)
+F['hombro-garth-tubo2'] = lambda: tubo('hombro-garth-tubo2', _garth(), rayo('AP', 45), 'cabeza_humero_R', (0.24, 0.30))
+F['hombro-y-escapula-neer-tubo2'] = lambda: tubo('hombro-y-escapula-neer-tubo2', _neer(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))
+F['escapula-lateral--v1-tubo2'] = lambda: tubo('escapula-lateral--v1-tubo2', _garth(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))
+F['escapula-lateral--v2-tubo2'] = lambda: tubo('escapula-lateral--v2-tubo2', _esc2(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))
+F['humero-lateral-rotacion--v1-tubo2'] = lambda: tubo('humero-lateral-rotacion--v1-tubo2', _latrot(), rayo('PA', 17.5), 'centro:Right humerus', (0.35, 0.43), cortes=SOBRE_CADERA, suavizar=AX)
+# Lawrence: vista cenital (el paciente acostado visto desde el techo: es la AP del modelo de pie), con la camilla, el RI de canto
+# sobre el hombro y el RC horizontal que entra por la axila con 25-30° hacia medial; y vista desde el tubo (en el sentido del RC)
+def _mesa_borde(pose, ancho=0.62):
+    # camilla con el borde derecho a la altura del hombro (el brazo queda afuera, sobre un apoyo)
+    m = mesa(pose, ancho); from escena import cuerpo; from puntos import Puntos
+    c = cuerpo(); c.posar(pose); x0 = Puntos(c).posado('cabeza_humero_R')[0] - 0.03
+    dx = x0 - min(v[0] for _, v in m); return [(n, v + np.array([dx, 0, 0])) for n, v in m]
+_ext_lawr = lambda: ri_detras(_lawr(), _dlawr, 'cabeza_humero_R', 0.24, 0.18, radio=0.14, arriba=(0, 0, 1)) + _mesa_borde(_lawr()) + [('rc_ini', _antes(_lawr(), 'cabeza_humero_R', _dlawr))]
+F['hombro-axial-lawrence-cenital'] = lambda: fig('hombro-axial-lawrence-cenital', _lawr(), (0, 0, -1), cortes=CINTURA, huesos=BRAZO, suavizar=AX, cara=True, extra=_ext_lawr())
 
 if __name__ == '__main__':
     for k in (sys.argv[1:] or F):

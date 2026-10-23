@@ -176,7 +176,21 @@ function figura(id, opts = {}) {
   const rango = (x0, x1) => { const cs = (info.columnas || []).filter(([xx]) => x + xx * k >= x0 && x + xx * k <= x1);
     return [r(Math.min(...cs.map((c) => y + c[1] * k))), r(Math.max(...cs.map((c) => y + c[2] * k)))]; };
   const abajo = (x0, x1) => r(Math.max(...(info.columnas || []).filter(([xx]) => x + xx * k >= x0 && x + xx * k <= x1).map((c) => y + c[2] * k)));
-  return { svg: `<image x="${r(x)}" y="${r(y)}" width="${r(rw * k)}" height="${r(rh * k)}" href="data:image/webp;base64,${b64}"/>`,
+  // rasgos de la cara (figura(..., cara=True)): ojos, cejas y boca del lado que mira al observador
+  const tiene = (n) => !!info.puntos[n], ppc = info.ppc * k;
+  let cara = "";
+  for (const s of ["R", "L"]) {
+    if (!tiene(`cara_ojo${s}`)) continue;
+    const a = p(`cara_ojo${s}0`), b = p(`cara_ojo${s}1`), c = p(`cara_ojo${s}`);
+    const ang = (Math.atan2(b[1] - a[1], b[0] - a[0]) * 180) / Math.PI, rx = Math.max(Math.hypot(b[0] - a[0], b[1] - a[1]) / 2, 0.25 * ppc);
+    cara += `<ellipse cx="${c[0]}" cy="${c[1]}" rx="${r(rx)}" ry="${r(Math.min(rx * 0.55, 0.32 * ppc))}" transform="rotate(${r(ang)} ${c[0]} ${c[1]})" fill="#fff" stroke="#6b4a3a" stroke-width="${r(Math.max(0.8, 0.09 * ppc))}"/>` +
+      `<circle cx="${c[0]}" cy="${c[1]}" r="${r(Math.min(rx * 0.5, 0.28 * ppc))}" fill="#4a3428"/>`;
+    const q = [0, 1, 2].map((i) => p(`cara_ceja${s}${i}`));
+    cara += `<path d="M${q[0]} Q${q[1]} ${q[2]}" fill="none" stroke="#6b5141" stroke-width="${r(Math.max(1.2, 0.22 * ppc))}" stroke-linecap="round"/>`;
+  }
+  if (tiene("cara_boca0")) { const q = [0, 1, 2].map((i) => p(`cara_boca${i}`));
+    cara += `<path d="M${q[0]} Q${q[1]} ${q[2]}" fill="none" stroke="#a0604f" stroke-width="${r(Math.max(1, 0.16 * ppc))}" stroke-linecap="round"/>`; }
+  return { svg: `<image x="${r(x)}" y="${r(y)}" width="${r(rw * k)}" height="${r(rh * k)}" href="data:image/webp;base64,${b64}"/>` + cara,
     p, borde, filas, abajo, rango, ppc: info.ppc * k, x: r(x), y: r(y), w: r(rw * k), h: r(rh * k) };
 }
 

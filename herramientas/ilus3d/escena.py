@@ -44,7 +44,7 @@ def _grupo(seg):
     return seg.rsplit('_', 1)[0] if seg.endswith(('_R', '_L')) else seg
 
 def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, cortes=(), puntos=(), px=800,
-           muestras=16, con_ropa=None, fundido=0.02, horizontal=None, vertical=None, suavizar=0, capas=False):
+           muestras=16, con_ropa=None, fundido=0.02, horizontal=None, vertical=None, suavizar=0, capas=False, cara=False):
     """
     pose: posturas.Pose. dir: hacia dónde mira la cámara (= sentido del rayo en una vista desde el tubo), en ejes del cuerpo.
     huesos: segmentos cuyos huesos se dibujan "por transparencia". region: segmentos de piel a dibujar (None = cuerpo entero).
@@ -53,6 +53,8 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     puntos: nombres de puntos de referencia (puntos.py) que se proyectan en la imagen.
     horizontal: (A, B) gira la vista para que la línea del punto A al B quede horizontal, de izquierda a derecha (reemplaza arriba).
     vertical: (A, B) idem, con B arriba de A.
+    cara: pelo (malla de otro color sobre el cuero cabelludo) y puntos de ojos, cejas y boca del lado que mira a la cámara,
+      para que se entienda si el paciente está de frente (se ven los ojos) o de espaldas (se ve la nuca).
     """
     c = cuerpo(); c.posar(pose); pts = Puntos(c)
     huesos = _con_dedos(huesos); region = None if region is None else _con_dedos(region)
@@ -93,6 +95,11 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
         G = {}; gid = lambda seg: G.setdefault(_grupo(seg), len(G) + 1)
         gf = np.array([gid(x) for x in dom[I[:, 0]]])
         for g_ in np.unique(gf): partes.append((f'zp_{g_}__{g_}', (Pp, I[gf == g_])))
+    if cara:
+        V, F, rp = _rasgos(c, pts, Pp, I, dir)
+        for p, n in planos: F = F[((V[F].mean(1) - p) @ n) > 0]
+        if len(F): partes.append(('pelo', (V, F)))
+        puntos = list(puntos) + list(rp.items())
     if con_ropa is None: con_ropa = region is None or bool(set(region) & {'pelvis', 'muslo_R', 'muslo_L'})
     if con_ropa:
         V, F = ropa(c, Pp)
@@ -170,6 +177,35 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     json.dump(info, open(os.path.join(SALIDA, id + '.json'), 'w'), indent=0)
     out.save(os.path.join(CACHE, id + '.png'))
     return info
+
+def _rasgos(c, pts, Pp, I, dir):
+    """pelo y rasgos de la cara. Ejes de la cabeza a partir de los puntos óseos (acompañan cualquier giro de la cabeza)."""
+    hc = (pts.posado('meato_auditivo_R') + pts.posado('meato_auditivo_L')) / 2
+    up = pts.posado('vertex') - hc; up /= np.linalg.norm(up)
+    an = pts.posado('nasion') - hc; an -= up * (an @ up); an /= np.linalg.norm(an)
+    lt = np.cross(up, an)                       # hacia la izquierda del paciente
+    Q = Pp - hc; u, f, l = Q @ up, Q @ an, Q @ lt
+    cab = np.linalg.norm(Q, axis=1) < 0.15
+    # cuero cabelludo: por encima de una línea que va de la frente (6 cm sobre el meato) a la nuca (5 cm por debajo)
+    pelo = cab & (u > 0.012 + 0.62 * f) & (u > -0.055) & ~((np.abs(l) > 0.055) & (u < 0.035) & (f > -0.035))
+    F = I[pelo[I].all(1)]
+    n = Q / np.maximum(np.linalg.norm(Q, axis=1, keepdims=True), 1e-6)
+    V = Pp + n * 0.004
+    # ojos, cejas y boca: el vértice de piel más cercano a cada posición; solo si esa zona mira hacia la cámara
+    d = -np.asarray(dir, float) / np.linalg.norm(dir); ref = pts.posado('nasion')
+    def piel(q): return Pp[cab][np.argmin(np.linalg.norm(Pp[cab] - q, axis=1))]
+    rp = {}
+    for nom, lado in (('R', -1), ('L', 1)):
+        nrm = np.cos(np.radians(25)) * an + np.sin(np.radians(25)) * lado * lt
+        if nrm @ d < 0.2: continue
+        oc = ref + lado * 0.032 * lt - 0.012 * up
+        rp[f'cara_ojo{nom}0'] = piel(oc - 0.012 * lt); rp[f'cara_ojo{nom}1'] = piel(oc + 0.012 * lt)
+        rp[f'cara_ojo{nom}'] = piel(oc)
+        for i, k in enumerate((0.012, 0.03, 0.048)): rp[f'cara_ceja{nom}{i}'] = piel(ref + lado * k * lt + (0.008 - 0.004 * i * (i - 1)) * up)
+    if an @ d > 0.2:
+        bc = (pts.posado('acantion') * 0.45 + pts.posado('menton') * 0.55)
+        for i, k in enumerate((-0.022, 0.0, 0.022)): rp[f'cara_boca{i}'] = piel(bc + k * lt + (0.003 if i == 1 else 0) * up)
+    return V, F, {k: v.tolist() for k, v in rp.items()}
 
 def _color_piel(rgb):
     """color más frecuente del dibujo (la piel; con short, la mediana de los claros podía dar el celeste de la ropa)"""

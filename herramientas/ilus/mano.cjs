@@ -2,7 +2,7 @@
 // Estilo aprobado (contorno continuo color piel + huesos "por transparencia"). Helpers de codo/antebrazo copiados de
 // referencia-tecnicas1-superior.cjs; mano esquelética, cortes desde los dedos y vistas laterales nuevos.
 const E = require("./estilo.cjs");
-const { SK, SKO, RED, BLUE, AMB, INK, MUTE, BONEO, riTop, beam, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, mk, cabezaFrente } = E;
+const { SK, SKO, RED, BLUE, AMB, INK, MUTE, BONEO, riTop, beam, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, mk, cabezaFrente, titulo, separador, poli, encajar } = E;
 
 // ---------- helpers copiados de referencia-tecnicas1-superior.cjs ----------
 const f1 = (n) => +n.toFixed(1);
@@ -51,24 +51,6 @@ function mano(cx, cy, ang, s, tipo, espejo = false, invertir = false) {
 }
 const panelSep = (title, x = 388) => `<line x1="${x}" y1="14" x2="${x}" y2="322" stroke="#e2e4ea"/>` +
   `<text x="${x + 14}" y="20" font-size="12" font-weight="700" fill="${MUTE}" letter-spacing=".06em">${title.toUpperCase()}</text>`;
-// títulos: el enfoque en negrita y la vista en una etiqueta de color (violeta = desde el tubo; verde azulado = la otra vista)
-const VISTA = { tubo: "#6b3fb3", otra: "#0b7a6a" };
-function titulo(x, enfoque, vista, tipo = "tubo") {
-  const xe = enfoque ? x + enfoque.length * 6.7 + 12 : x, V = vista.toUpperCase(), w = V.length * 7.4 + 16;
-  return (enfoque ? txt(x, 22, enfoque, 13.5, INK, "start", 700) : "") +
-    `<rect x="${f1(xe)}" y="9" width="${f1(w)}" height="18" rx="9" fill="${VISTA[tipo]}"/>` +
-    `<text x="${f1(xe + 8)}" y="22" font-size="10.5" font-weight="700" fill="#fff" letter-spacing=".05em">${V}</text>`;
-}
-const separador = (x = 388) => `<line x1="${x}" y1="14" x2="${x}" y2="322" stroke="#e2e4ea"/>`;
-// figura escalada y ubicada para que los puntos ns (p. ej. las esquinas del RI en perspectiva) llenen la caja [x, y, w, h]
-function encajar(id, ns, [bx, by, bw, bh]) {
-  const g0 = E.figura(id, { en: [ns[0], 0, 0], ppc: 10 }), q = ns.map((n) => g0.p(n)).concat([[g0.x, g0.y], [g0.x + g0.w, g0.y + g0.h]]);
-  const xs = q.map((p) => p[0]), ys = q.map((p) => p[1]), w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
-  const k = Math.min(bw / w, bh / h);
-  return E.figura(id, { en: [ns[0], bx + (bw - w * k) / 2 - Math.min(...xs) * k, by + (bh - h * k) / 2 - Math.min(...ys) * k], ppc: 10 * k });
-}
-// polígono de puntos de una figura (p. ej. el RI o una cuña en una vista en perspectiva)
-const poli = (f, ns, fill, stroke = "#9aa0ac", w = 1.4) => `<path d="M${P(ns.map((n) => f.p(n)))} Z" fill="${fill}" stroke="${stroke}" stroke-width="${w}" stroke-linejoin="round"/>`;
 // curva suave por los puntos (de referencia-tecnicas1-pie.cjs)
 function cr(pts, closed = false) {
   const n = pts.length, g = (i) => (closed ? pts[(i + n) % n] : pts[Math.max(0, Math.min(n - 1, i))]);

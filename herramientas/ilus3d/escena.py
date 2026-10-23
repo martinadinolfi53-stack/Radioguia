@@ -413,3 +413,33 @@ def apoyo_cuna(pose, s='R', grados=45, ancho=0.09, lado=None):
     for nom, (u, w) in (('ri0', (-0.15, -0.12)), ('ri1', (0.15, -0.12)), ('ri2', (0.15, 0.12)), ('ri3', (-0.15, 0.12))):
         out.append((nom, cen + u * a + w * r))
     return out
+
+def rect3d(nombre, centro, u, v, ancho, alto):
+    """4 puntos libres (nombre0..3) de un rectángulo centrado en centro, con lados a lo largo de u (ancho) y v (alto)."""
+    c = np.asarray(centro, float); u = np.asarray(u, float) / np.linalg.norm(u); v = np.asarray(v, float) / np.linalg.norm(v)
+    return [(f'{nombre}{i}', c + su * ancho / 2 * u + sv * alto / 2 * v) for i, (su, sv) in enumerate(((-1, -1), (1, -1), (1, 1), (-1, 1)))]
+
+def ri_detras(pose, d, centro, ancho=0.45, alto=0.55, nombre='b', margen=0.005, debajo_de=None, arriba=(0, 1, 0), radio=None):
+    """RI (o bucky) perpendicular al rayo d, apoyado contra el paciente del lado de salida del rayo, centrado en el punto
+    centro (proyectado sobre el plano). debajo_de: punto del cuerpo; solo se tiene en cuenta la piel por encima de él."""
+    c = cuerpo(); c.posar(pose); pts = Puntos(c); Pp = c.piel_posada()
+    d = np.asarray(d, float); d /= np.linalg.norm(d)
+    if debajo_de: Pp = Pp[Pp[:, 1] > pts.posado(debajo_de)[1]]
+    if radio: Pp = Pp[np.linalg.norm(Pp - pts.posado(centro), axis=1) < radio]     # solo la piel cerca del punto (p. ej. el hombro)
+    cen = pts.posado(centro); prof = (Pp @ d).max() + margen; cen = cen + (prof - cen @ d) * d
+    v = np.asarray(arriba, float); v = v - d * (v @ d); u = np.cross(v, d)
+    return rect3d(nombre, cen, u, v, ancho, alto) + [(nombre + 'c', cen), (nombre + 'n', cen - 0.25 * d)]
+
+def camara(d, az=35, el=30, arriba=(0, 1, 0)):
+    """dirección de una cámara en perspectiva de la escena: mira hacia donde va el rayo d, girada az° hacia un costado y
+    bajando el° desde arriba (como una foto del libro tomada desde adelante y arriba)."""
+    Y = np.asarray(arriba, float); d = np.asarray(d, float); d = d - Y * (d @ Y); d /= np.linalg.norm(d)
+    s = np.cross(d, Y); a, e = np.radians(az), np.radians(el)
+    return tuple(np.cos(e) * (np.cos(a) * d + np.sin(a) * s) - np.sin(e) * Y)
+
+def mesa(pose, ancho=0.62, largo=1.1, nombre='m'):
+    """camilla bajo un paciente en decúbito supino (el modelo está de pie: la camilla es el plano frontal detrás de la espalda)"""
+    c = cuerpo(); c.posar(pose); pts = Puntos(c); Pp = c.piel_posada()
+    z = Pp[Pp[:, 1] > pts.posado('grande_R')[1], 2].min() - 0.01
+    cen = (pts.posado('cabeza_humero_R') + pts.posado('cabeza_humero_L')) / 2; cen = np.array([cen[0], cen[1] - 0.3, z])
+    return rect3d(nombre, cen, (1, 0, 0), (0, 1, 0), ancho, largo)

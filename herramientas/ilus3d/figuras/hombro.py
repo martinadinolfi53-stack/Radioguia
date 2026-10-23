@@ -4,7 +4,7 @@
 # el corte "desde arriba" es un plano horizontal visto desde la cabeza, con el tubo arriba del dibujo (arriba = -d) y el RI abajo.
 import os, sys; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import numpy as np
-from escena import figura, corte
+from escena import figura, corte, ri_detras, camara, rect3d, mesa
 from posturas import Pose
 
 R0 = -7                        # rotación del húmero que deja los epicóndilos paralelos al plano frontal (ver codo.py)
@@ -25,10 +25,18 @@ SOBRE_XIFOIDES = [('xifoides', (0, 1, 0), 0.02)]
 SOBRE_CODO = [('codo_R', (0, 1, 0), 0.12)]
 F = {}
 
-def fig(id, pose, d, cortes=SOBRE_XIFOIDES, huesos=HOMBRO, arriba=(0, 1, 0), **kw):
+def fig(id, pose, d, cortes=SOBRE_XIFOIDES, huesos=HOMBRO, arriba=(0, 1, 0), extra=(), **kw):
     # con los brazos colgando la figura llega hasta las manos: se le pone el short de paciente
     ropa = any(c[0] == 'grande_R' for c in cortes)
-    return figura(id, pose, dir=d, arriba=arriba, huesos=huesos, region=None, cortes=cortes, puntos=_PH, con_ropa=ropa, **kw)
+    return figura(id, pose, dir=d, arriba=arriba, huesos=huesos, region=None, cortes=cortes, puntos=_PH + list(extra), con_ropa=ropa, **kw)
+# Vista en perspectiva (como las fotos del libro): el paciente entero de la cintura para arriba, con el bucky o el RI detrás,
+# visto desde adelante y arriba del lado del tubo. Reemplaza a los cortes horizontales.
+def perspectiva(id, pose, d, centro='cabeza_humero_R', az=35, el=25, ri=(0.45, 0.6), huesos=BRAZO, **kw):
+    return fig(id, pose, camara(d, az, el), cortes=CINTURA, huesos=huesos,
+               extra=ri_detras(pose, d, centro, *ri, debajo_de='xifoides') + [('rc_ini', _antes(pose, centro, d))], **kw)
+def _antes(pose, centro, d):
+    from escena import cuerpo; from puntos import Puntos
+    c = cuerpo(); c.posar(pose); return Puntos(c).posado(centro) - 0.45 * np.asarray(d) / np.linalg.norm(d)
 # Para la escápula (Y, laterales) el corte pasa por la mitad de su cuerpo. Si un antebrazo o el brazo sano cruzan el plano del
 # corte (mano en el otro hombro, brazo sano levantado), la malla da contornos rotos: el corte se hace con ese segmento fuera del
 # plano (codo extendido, brazo sano abajo) y la posición completa se ve en la vista desde el tubo y se cuenta en el texto.
@@ -44,6 +52,7 @@ AX = (24, 24, 'R')                                   # suavizado de la axila der
 AMBOS = HOMBRO + ['cintura_L', 'brazo_L']
 SOBRE_CADERA = [('grande_R', (0, 1, 0), 0.08)]          # brazo colgando: hasta las manos
 SOBRE_CINTURA = [('xifoides', (0, 1, 0), 0.25)]
+CINTURA = [('xifoides', (0, 1, 0), 0.22)]       # vistas en perspectiva: hasta la cintura, sin importar dónde estén las manos
 
 # ---------- AP de húmero y de hombro ----------
 # Brazo un poco separado; rotación externa = epicóndilos paralelos al RI (mano en supinación); interna = perpendiculares
@@ -60,7 +69,8 @@ F['hombro-ap-neutra'] = lambda: fig('hombro-ap-neutra', _neu(), rayo('AP'), cort
 # v1: de pie en PA, rotado 15-20° (OAD) hasta apoyar húmero y hombro; codo a 90° con el antebrazo por delante del abdomen
 # (rotación interna: epicóndilos perpendiculares al RI). Corte horizontal visto desde arriba.
 _latrot = lambda: Pose().hombro_abd('R', 10).hombro_rot_ext('R', R0 - 80).codo_flex('R', FLEX(90)).prono('R', 90)
-F['humero-lateral-rotacion--v1'] = lambda: desde_arriba('humero-lateral-rotacion--v1', _latrot(), rayo('PA', 17.5))
+F['humero-lateral-rotacion--v1'] = lambda: perspectiva('humero-lateral-rotacion--v1', _latrot(), rayo('PA', 17.5), centro='centro:Right humerus', az=-35, el=30, ri=(0.4, 0.6), suavizar=AX)
+F['humero-lateral-rotacion--v1-tubo'] = lambda: fig('humero-lateral-rotacion--v1-tubo', _latrot(), rayo('PA', 17.5), huesos=BRAZO, cortes=SOBRE_CADERA, suavizar=AX)
 # v2: AP, codo un poco flexionado, brazo y muñeca rotados hasta la lateral (palma hacia atrás)
 F['humero-lateral-rotacion--v2'] = lambda: fig('humero-lateral-rotacion--v2',
     Pose().hombro_abd('R', 20).hombro_rot_ext('R', R0 - 90).codo_flex('R', 10).prono('R', 180), rayo('AP'),
@@ -87,17 +97,27 @@ F['hombro-ap-axial-apical'] = lambda: fig('hombro-ap-axial-apical', _lado(), ray
 F['hombro-ap-axial-apical-costado'] = lambda: fig('hombro-ap-axial-apical-costado', _lado(), costado(rayo('AP')), huesos=BRAZO, cortes=SOBRE_CODO)
 # Grashey: oblicua posterior 35-45° hacia el lado afectado, brazo en rotación neutra
 F['hombro-grashey'] = lambda: desde_arriba('hombro-grashey', _lado(), rayo('AP', 40))
+F['hombro-grashey-persp'] = lambda: perspectiva('hombro-grashey-persp', _lado(), rayo('AP', 40), az=15, el=40, suavizar=AX)
 F['hombro-grashey-tubo'] = lambda: fig('hombro-grashey-tubo', _lado(), rayo('AP', 40), huesos=BRAZO, cortes=SOBRE_CODO)
 # Garth: oblicua posterior 45°, codo flexionado y mano sobre el otro hombro; RC 45° caudal
 _garth = lambda: Pose().hombro_flex('R', 50).mov('brazo_R', (0, 0, 1), 20).hombro_rot_ext('R', -100).codo_flex('R', 100)
 _garth_corte = lambda: Pose().hombro_flex('R', 50).mov('brazo_R', (0, 0, 1), 20).hombro_rot_ext('R', -100)   # ídem, codo extendido
 F['hombro-garth'] = lambda: desde_arriba('hombro-garth', _garth_corte(), rayo('AP', 45))
+F['hombro-garth-persp'] = lambda: perspectiva('hombro-garth-persp', _garth(), rayo('AP', 45), az=15, el=40, suavizar=AX)
 F['hombro-garth-tubo'] = lambda: fig('hombro-garth-tubo', _garth(), rayo('AP', 45), huesos=BRAZO)
 # Y de escápula y Neer: desde la PA, oblicua anterior 45-60° (52°), brazo sano adelante y arriba, afectado abajo
 _neer = lambda: _lado().hombro_flex('L', 100)
 F['hombro-y-escapula-neer'] = lambda: desde_arriba('hombro-y-escapula-neer', _lado(), rayo('PA', 52), punto='centro:Right scapula')
+F['hombro-y-escapula-neer-persp'] = lambda: perspectiva('hombro-y-escapula-neer-persp', _neer(), rayo('PA', 52), centro='centro:Right scapula', az=-20, el=35, huesos=BRAZO + ['cintura_L', 'brazo_L', 'cubito_L', 'radio_L', 'mano_L'], suavizar=AX)
 F['hombro-y-escapula-neer-tubo'] = lambda: fig('hombro-y-escapula-neer-tubo', _neer(), rayo('PA', 52), huesos=BRAZO)
 # Lawrence axial: decúbito supino, brazo a 90° en rotación externa (mano en supinación), cabeza girada al otro lado; desde arriba
+# en perspectiva: paciente acostado visto desde los pies y arriba, RI vertical sobre el hombro, RC desde abajo 25-30° a medial
+_lawr = lambda: Pose().hombro_abd('R', 90).hombro_rot_ext('R', R0).cabeza_rot('L', 40)
+_dlawr = (np.sin(np.radians(27.5)), np.cos(np.radians(27.5)), 0.0)
+F['hombro-axial-lawrence-persp'] = lambda: fig('hombro-axial-lawrence-persp', _lawr(), camara((0, 1, 0), -40, 40, arriba=(0, 0, 1)),
+    cortes=CINTURA, huesos=BRAZO, suavizar=AX, arriba=(0, 0, 1),
+    extra=ri_detras(_lawr(), _dlawr, 'cabeza_humero_R', 0.30, 0.24, radio=0.14, arriba=(0, 0, 1)) + mesa(_lawr())
+        + [('rc_ini', _antes(_lawr(), 'cabeza_humero_R', _dlawr))])
 F['hombro-axial-lawrence'] = lambda: fig('hombro-axial-lawrence', Pose().hombro_abd('R', 90).hombro_rot_ext('R', R0).cabeza_rot('L', 40),
     rayo('AP'), huesos=BRAZO, suavizar=AX)
 # Hobbs: PA, brazo afectado elevado en extensión completa, cabeza girada al otro lado
@@ -111,6 +131,12 @@ F['hombro-axial-clements'] = lambda: fig('hombro-axial-clements', Pose().hombro_
 # inclinado 40°, flexión de hombro de 52° deja el húmero 12° por delante de la vertical)
 F['hombro-fisk--v1'] = lambda: fig('hombro-fisk--v1', Pose().hombro_abd('R', 10).hombro_rot_ext('R', R0), (1, 0, 0), arriba=(0, 0, 1),
     huesos=BRAZO, cortes=SOBRE_CADERA)
+_fisk = lambda: Pose().hombro_abd('R', 10).hombro_rot_ext('R', R0)
+_dfisk = (0.0, np.cos(np.radians(12.5)), -np.sin(np.radians(12.5)))
+F['hombro-fisk--v1-persp'] = lambda: fig('hombro-fisk--v1-persp', _fisk(), camara((0, 1, 0), -50, 35, arriba=(0, 0, 1)),
+    cortes=CINTURA, huesos=BRAZO, arriba=(0, 0, 1),
+    extra=ri_detras(_fisk(), _dfisk, 'troquiter_R', 0.30, 0.24, radio=0.12, arriba=(0, 0, 1)) + mesa(_fisk())
+        + [('rc_ini', _antes(_fisk(), 'troquiter_R', _dfisk))])
 F['hombro-fisk--v2'] = lambda: fig('hombro-fisk--v2', Pose().lumbar_flex(40).hombro_flex('R', 52).hombro_rot_ext('R', R0).codo_flex('R', FLEX(78)).prono('R', 180),
     (1, 0, 0), huesos=BRAZO, cortes=SOBRE_CADERA)
 
@@ -120,9 +146,11 @@ F['clavicula-costado'] = lambda: fig('clavicula-costado', _lado(), costado(rayo(
 F['escapula-ap'] = lambda: fig('escapula-ap', Pose().hombro_abd('R', 90).hombro_rot_ext('R', R0), rayo('AP'), huesos=BRAZO,
     cortes=[('xifoides', (0, 1, 0), 0.06)], suavizar=AX)
 _cruzado = _garth
-F['escapula-lateral--v1'] = lambda: desde_arriba('escapula-lateral--v1', _garth_corte(), rayo('PA', 52), punto='centro:Right scapula')
-F['escapula-lateral--v2'] = lambda: desde_arriba('escapula-lateral--v2',
-    Pose().hombro_flex('R', -15).hombro_rot_ext('R', R0 - 70).codo_flex('R', FLEX(90)), rayo('PA', 52), punto='centro:Right scapula')
+F['escapula-lateral--v1'] = lambda: perspectiva('escapula-lateral--v1', _garth(), rayo('PA', 52), centro='centro:Right scapula', az=-20, el=35, suavizar=AX)
+F['escapula-lateral--v1-tubo'] = lambda: fig('escapula-lateral--v1-tubo', _garth(), rayo('PA', 52), huesos=BRAZO)
+_esc2 = lambda: Pose().hombro_flex('R', -15).hombro_rot_ext('R', R0 - 70).codo_flex('R', FLEX(90))
+F['escapula-lateral--v2'] = lambda: perspectiva('escapula-lateral--v2', _esc2(), rayo('PA', 52), centro='centro:Right scapula', az=-20, el=35, suavizar=AX)
+F['escapula-lateral--v2-tubo'] = lambda: fig('escapula-lateral--v2-tubo', _esc2(), rayo('PA', 52), huesos=BRAZO)
 F['ac-pearson'] = lambda: fig('ac-pearson', Pose().hombro_rot_ext('R', R0 - 45).prono('R', 45).hombro_rot_ext('L', R0 - 45).prono('L', 45),
     rayo('AP'), huesos=AMBOS + ['cubito_R', 'radio_R', 'mano_R', 'cubito_L', 'radio_L', 'mano_L'], cortes=SOBRE_CADERA)
 

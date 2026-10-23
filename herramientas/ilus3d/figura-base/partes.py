@@ -9,6 +9,8 @@ V=np.array(V)
 # forma del cuerpo: targets macro de MakeHuman (CC0): hombre joven, mezcla de rasgos, musculatura media-alta, algo magro
 import os
 TG={'caucasian-male-young':1/3,'african-male-young':1/3,'asian-male-young':1/3,'universal-male-young-maxmuscle-averageweight':float(os.environ.get('MUSC','0.6')),'universal-male-young-averagemuscle-minweight':float(os.environ.get('MAGRO','0.25'))}
+for s_ in 'lr':
+    TG[f'{s_}-eye-height2-incr']=float(os.environ.get('OJO2','0.7')); TG[f'{s_}-eye-height1-incr']=float(os.environ.get('OJO1','0.3')); TG[f'{s_}-eye-scale-incr']=float(os.environ.get('OJOS','0.2'))
 for k,w in TG.items():
     for l in open(f'/tmp/claude-0/mh/t/{k}.target'):
         if l[0]=='#' or not l.strip(): continue
@@ -27,21 +29,21 @@ eyes=np.array(eyes); ex=np.abs(eyes[:,0]).mean(); ey=eyes[:,1].mean(); ez=eyes[:
 # cejas: arco fino sobre cada ojo
 xr=np.abs(cb[:,0])-ex; dy=cb[:,1]-ey
 arc=0.0215-0.006*(xr/0.024)**2
-ceja=(xr>-0.019)&(xr<0.026)&(np.abs(dy-arc)<0.003)&(cb[:,2]>ez-0.005)
+ceja=(xr>-0.019)&(xr<0.026)&(np.abs(dy-arc)<0.0024)&(cb[:,2]>ez-0.005)
 # labios (superior e inferior), forma de lente
 my=ey-0.0695
 lab=(np.abs(cb[:,0])<0.023)&(np.abs(cb[:,1]-my)<0.0065*np.clip(1-(cb[:,0]/0.024)**2,0,1))&(cb[:,2]>ez-0.012)
 def zona(dentro, borde):
     f_=body[dentro[body].any(1)]; P=V.copy(); i_=np.unique(f_); o_=i_[~dentro[i_]]; P[o_]=borde(V[o_]); return f_, P
 xv=np.abs(V[:,0])-ex; dyv=V[:,1]-ey; av=0.0215-0.006*(xv/0.024)**2
-cv=(xv>-0.019)&(xv<0.026)&(np.abs(dyv-av)<0.003)&(V[:,2]>ez-0.005)
+cv=(xv>-0.019)&(xv<0.026)&(np.abs(dyv-av)<0.0024)&(V[:,2]>ez-0.005)
 def bc(P):
-    x_=np.abs(P[:,0])-ex; a_=0.0215-0.006*(x_/0.024)**2; Q=P.copy(); d_=Q[:,1]-ey-a_; Q[:,1]=ey+a_+np.clip(d_,-0.003,0.003); return Q
+    x_=np.abs(P[:,0])-ex; a_=0.0215-0.006*(x_/0.024)**2; Q=P.copy(); d_=Q[:,1]-ey-a_; Q[:,1]=ey+a_+np.clip(d_,-0.0024,0.0024); return Q
 partes['cejas'], verts['cejas'] = zona(cv, bc)
-hw=lambda x: 0.0052*np.clip(1-(x/0.024)**2,0,1)
-lv=(np.abs(V[:,0])<0.023)&(np.abs(V[:,1]-my)<hw(V[:,0]))&(V[:,2]>ez-0.012)
+hw=lambda x: 0.0045*np.clip(1-(x/0.021)**2,0,1)
+lv=(np.abs(V[:,0])<0.02)&(np.abs(V[:,1]-my)<hw(V[:,0]))&(V[:,2]>ez-0.012)
 def bl(P):
-    Q=P.copy(); Q[:,0]=np.clip(Q[:,0],-0.023,0.023); h_=hw(Q[:,0]); Q[:,1]=my+np.clip(Q[:,1]-my,-h_,h_); return Q
+    Q=P.copy(); Q[:,0]=np.clip(Q[:,0],-0.02,0.02); h_=hw(Q[:,0]); Q[:,1]=my+np.clip(Q[:,1]-my,-h_,h_); return Q
 partes['labios'], verts['labios'] = zona(lv, bl)
 for k in ('cejas','labios'): verts[k]=verts[k]+np.array([0,0,0.0008])
 bv0=np.unique(body); BV0=V[bv0]; m_=(np.abs(BV0[:,0])<0.006)&(BV0[:,1]>0.08)&(BV0[:,1]<0.30)&(BV0[:,2]>0.05)
@@ -53,7 +55,7 @@ def _nip(sx):
 nips=[_nip(1),_nip(-1)]
 om=np.linalg.norm(cb-nav,axis=1)<0.0075
 pv=np.zeros(len(V),bool)
-for q in nips: pv|=np.linalg.norm(V-q,axis=1)<0.009
+for q in nips: pv|=np.linalg.norm(V-q,axis=1)<0.0075
 pz=pv[body].sum(1)>=2
 partes['ombligo']=body[om]; partes['pezon']=body[pz]
 partes['piel']=body[~om&~pz]
@@ -61,7 +63,7 @@ partes['piel']=body[~om&~pz]
 c0=np.array([0,ey,ez-0.09])
 def th(P): return np.degrees(np.arctan2(np.abs(P[:,0]-c0[0]), P[:,2]-c0[2]))
 TH=[0,25,45,62,70,78,84,100,112,125,150,180]
-HH=[0.064,0.060,0.052,0.040,0.030,-0.004,0.030,0.034,0.012,-0.030,-0.042,-0.046]
+HH=[0.064,0.060,0.052,0.040,0.030,-0.004,0.046,0.046,0.030,0.000,-0.035,-0.042]
 hl=lambda P: np.interp(th(P),TH,HH)
 cab=(np.linalg.norm(V-c0,axis=1)<0.155)&(V[:,1]>ey-0.10)
 den=cab&((V[:,1]-ey)>hl(V))
@@ -69,7 +71,7 @@ pf=body[den[body].any(1)]; partes['pelo']=pf
 PEL=V.copy(); idx=np.unique(pf); fuera=idx[~den[idx]]
 PEL[fuera,1]=ey+hl(V[fuera])
 n=PEL-c0; n/=np.maximum(np.linalg.norm(n,axis=1,keepdims=True),1e-6)
-grosor=0.002+0.010*np.clip((PEL[:,1]-ey-hl(PEL))/0.05,0,1)
+grosor=0.002+0.013*np.clip((PEL[:,1]-ey-hl(PEL))/0.05,0,1)
 verts['pelo']=PEL+n*grosor[:,None]
 # short de paciente
 # short: la piel de la pelvis y los muslos (sin manos), separada 3 mm hacia afuera, con bordes rectos

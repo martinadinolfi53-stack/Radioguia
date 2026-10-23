@@ -1,7 +1,7 @@
 import sys; sys.path.insert(0,'/tmp/claude-0/sp/bpyenv')
 import bpy, mathutils, math
 out=sys.argv[-1]
-COL={'piel':'f3cfb8','pelo':'5b4130','ojo':'ffffff','iris':'3d2b20','cejas':'5b4130','labios':'d99a8a','ropa':'c9d6e3','ombligo':'c79a84','pezon':'d4a08c'}
+COL={'piel':'f3cfb8','pelo':'5b4130','ojo':'ffffff','iris':'3d2b20','cejas':'6e4e3a','labios':'dba596','ropa':'c9d6e3','ombligo':'c79a84','pezon':'dcab98'}
 def lin(h):
     c=[int(h[i:i+2],16)/255 for i in (0,2,4)]; return tuple(x/12.92 if x<=0.04045 else ((x+0.055)/1.055)**2.4 for x in c)
 VIEWS={} if 'solo_cuerpo' in sys.argv else {'cab_0':(0,0),'cab_45':(45,0),'cab_90':(90,0),'cab_180':(180,0)}
@@ -26,19 +26,21 @@ for nombre,(az,el) in VIEWS.items():
             geo=nt.nodes.new('ShaderNodeNewGeometry'); dp=nt.nodes.new('ShaderNodeVectorMath'); dp.operation='DOT_PRODUCT'
             dp.inputs[1].default_value=LUZ; nt.links.new(geo.outputs['Normal'],dp.inputs[0])
             cr=nt.nodes.new('ShaderNodeValToRGB'); cr.color_ramp.interpolation='CONSTANT'
-            el_=cr.color_ramp.elements; el_[0].position=0.0; el_[0].color=(*[x*0.80 for x in c],1); el_[1].position=0.33; el_[1].color=(*c,1)
-            hi=el_.new(0.90); hi.color=(*[min(1,x*1.08+0.02) for x in c],1)
+            el_=cr.color_ramp.elements; el_[0].position=0.0; el_[0].color=(*[x*0.84 for x in c],1); el_[1].position=0.36; el_[1].color=(*c,1)
+            hi=el_.new(0.86); hi.color=(*[min(1,x*1.06+0.015) for x in c],1)
+            
             mp=nt.nodes.new('ShaderNodeMapRange'); mp.inputs['From Min'].default_value=-1; mp.inputs['From Max'].default_value=1
             nt.links.new(dp.outputs['Value'],mp.inputs['Value']); nt.links.new(mp.outputs['Result'],cr.inputs['Fac']); nt.links.new(cr.outputs['Color'],e.inputs['Color'])
         else: e.inputs['Color'].default_value=(*c,1)
         nt.links.new(e.outputs[0],nt.nodes['Material Output'].inputs['Surface']); o.data.materials.append(m)
+        o.data.polygons.foreach_set('use_smooth',[True]*len(o.data.polygons)); o.data.update()
         md=o.modifiers.new('s','SUBSURF'); md.levels=md.render_levels=(2 if k2 in('pelo','ojo','iris','piel','ropa') else 1)
         bpy.ops.object.select_all(action='DESELECT')
-    cam=bpy.data.cameras.new('c'); cam.type='ORTHO'; cam.ortho_scale=(0.30 if nombre.startswith('cab') else 2.12)
+    cam=bpy.data.cameras.new('c'); cam.type='ORTHO'; cam.ortho_scale=(0.32 if nombre.startswith('cab') else 2.12)
     co=bpy.data.objects.new('c',cam); sc.collection.objects.link(co); sc.camera=co
     a=math.radians(az); r=6
     # modelo: frente hacia -Y de blender (obj +Z)
-    co.location=(r*math.sin(a), -r*math.cos(a)-(0.03 if nombre.startswith('cab') else 0.0), (0.77 if nombre.startswith('cab') else 0.03))
+    co.location=(r*math.sin(a), -r*math.cos(a)-(0.03 if nombre.startswith('cab') else 0.0), (0.785 if nombre.startswith('cab') else 0.03))
     co.rotation_euler=(math.radians(90),0,a)
     if el==90: co.location=(0,0,6); co.rotation_euler=(0,0,math.pi)
     elif not nombre.startswith('cab'):

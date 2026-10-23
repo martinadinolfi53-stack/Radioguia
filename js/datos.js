@@ -37,6 +37,9 @@ export const terminoPorId = Object.fromEntries(GLOSARIO.map((t) => [t.id, t]));
 
 export const proyeccionesDe = (regionId) => proyecciones.filter((p) => p.region === regionId);
 
+// nombre con el epónimo (método de Grashey, Neer, Lawrence…): muchos lugares conocen la proyección por ese nombre
+for (const p of proyecciones) if (p.metodo && !p.nombre.includes(p.metodo)) p.nombre = `${p.nombre} · ${p.metodo}`;
+
 // texto indexado para el buscador: región, nombre, método y categoría pesan más que el resto
 for (const p of proyecciones) {
   const r = regionPorId[p.region];

@@ -1,4 +1,4 @@
-import sys; sys.path.insert(0,'/tmp/claude-0/sp/bpyenv')
+import sys, json; sys.path.insert(0,'/tmp/claude-0/sp/bpyenv')
 import bpy, mathutils, math
 out=sys.argv[-1]
 import os
@@ -20,8 +20,21 @@ for nombre,(az,el) in VIEWS.items():
     fw=mu.Vector((-math.sin(a), math.cos(a), 0)) if el!=90 else mu.Vector((0,0,-1))
     upv=mu.Vector((0,0,1)) if el!=90 else mu.Vector((0,-1,0)); rt=fw.cross(upv)
     LUZ=tuple((-fw*0.55 + upv*0.65 - rt*0.5).normalized())
+    PINTADO=os.environ.get('ESTILO')=='real' and os.environ.get('PELO')=='degrade'
+    if PINTADO:
+        # rapado pintado sobre la piel: sin malla de pelo, sin bordes, degradé continuo
+        for o in [o for o in sc.objects if o.name.split('.')[0]=='pelo']: bpy.data.objects.remove(o)
+        import numpy as np; from mathutils.kdtree import KDTree
+        Z=np.load('/tmp/claude-0/mh/pelo_fac.npz'); kd=KDTree(len(Z['P']))
+        for i,p in enumerate(Z['P']): kd.insert(p,i)
+        kd.balance()
     for o in [o for o in sc.objects if o.type=='MESH']:
         k=o.name.split('.')[0]; k2=k.split('_')[0]
+        if PINTADO and k2=='piel':
+            att=o.data.attributes.new('fade','FLOAT','POINT'); vals=[]
+            for v in o.data.vertices:
+                co,i,d=kd.find(v.co); vals.append(float(Z['f'][i]) if d<1e-5 else 0.0)
+            att.data.foreach_set('value',vals)
         m=bpy.data.materials.new(k); m.use_nodes=True; nt=m.node_tree
         base=COL.get(k2,COL.get(k,'ff00ff')); c=lin(base)
         e=nt.nodes.new('ShaderNodeEmission')
@@ -75,6 +88,38 @@ for nombre,(az,el) in VIEWS.items():
             mxs=[nd for nd in nt.nodes if nd.bl_idname=='ShaderNodeMix' and nd.blend_type=='MIX' and nd.data_type=='RGBA']
             if mxs: nt.links.new(mxs[0].outputs['Result'],bs.inputs['Base Color'])
             else: bs.inputs['Base Color'].default_value=(*([min(1,x*1.08) for x in lin('eab496')] if k2=='piel' else c),1)
+            if k2=='piel': bs.inputs['Specular IOR Level'].default_value=0.25
+            if PINTADO and k2=='piel':
+                # factor del pelo calculado por píxel desde la posición (liso, sin escalones de la malla)
+                D=json.load(open('/tmp/claude-0/mh/degrade.json')); c0=D['c0']; ey=D['ey']
+                N=nt.nodes; L=nt.links.new
+                def op(o_,a_,b_=None):
+                    m_=N.new('ShaderNodeMath'); m_.operation=o_
+                    for j,v_ in enumerate((a_,b_)):
+                        if v_ is None: continue
+                        if isinstance(v_,(int,float)): m_.inputs[j].default_value=v_
+                        else: L(v_,m_.inputs[j])
+                    return m_.outputs[0]
+                tc=N.new('ShaderNodeTexCoord'); sp=N.new('ShaderNodeSeparateXYZ'); L(tc.outputs['Object'],sp.inputs[0])
+                X,Y,Zc=sp.outputs[0],sp.outputs[1],sp.outputs[2]
+                ax=op('ABSOLUTE',op('SUBTRACT',X,c0[0])); th=op('DIVIDE',op('ARCTAN2',ax,op('SUBTRACT',Zc,c0[2])),math.pi)
+                def curva(TB,YB):
+                    fc=N.new('ShaderNodeFloatCurve'); cu=fc.mapping.curves[0]
+                    lo,hi=min(YB),max(YB); sc_=hi-lo or 1
+                    while len(cu.points)<len(TB): cu.points.new(0.5,0.5)
+                    for p_,(t_,y_) in zip(cu.points,zip(TB,YB)): p_.location=(t_/180,(y_-lo)/sc_); p_.handle_type='VECTOR'
+                    fc.mapping.clip_min_y=0; fc.mapping.clip_max_y=1; fc.mapping.update(); L(th,fc.inputs['Value'])
+                    return op('ADD',op('MULTIPLY',fc.outputs[0],sc_),lo)
+                HL=curva(D['TH'],D['HH']); LB=curva(D['TB'],D['YB'])
+                yr=op('SUBTRACT',Y,ey)
+                borde=op('MINIMUM',op('MAXIMUM',op('DIVIDE',op('SUBTRACT',yr,HL),0.004),0),1)
+                ft=op('POWER',op('MINIMUM',op('MAXIMUM',op('DIVIDE',op('SUBTRACT',yr,op('SUBTRACT',LB,0.035)),0.035),0),1),1.3)
+                oreja=op('MULTIPLY',op('GREATER_THAN',ax,0.0755),op('LESS_THAN',yr,0.040))
+                fac=op('MULTIPLY',op('MULTIPLY',borde,ft),op('SUBTRACT',1,oreja))
+                mx2=N.new('ShaderNodeMix'); mx2.data_type='RGBA'
+                mx2.inputs['A'].default_value=(*[min(1,x*1.08) for x in lin('eab496')],1); mx2.inputs['B'].default_value=(*lin('5e4434'),1)
+                L(fac,mx2.inputs['Factor']); L(mx2.outputs['Result'],bs.inputs['Base Color'])
+                L(op('ADD',op('MULTIPLY',fac,0.35),0.55),bs.inputs['Roughness']); L(op('SUBTRACT',0.25,op('MULTIPLY',fac,0.2)),bs.inputs['Specular IOR Level'])
             if k2 in('piel','labios','pelo'):
                 bs.inputs['Subsurface Weight'].default_value=0.25; bs.inputs['Subsurface Radius'].default_value=(0.004,0.0015,0.001); bs.inputs['Subsurface Scale'].default_value=1.0
             if k2 in('ojo','iris'): bs.inputs['Roughness'].default_value=0.15
@@ -101,11 +146,12 @@ for nombre,(az,el) in VIEWS.items():
     sc.world=bpy.data.worlds.new('w'); sc.render.use_freestyle=True
     EST=os.environ.get('ESTILO','plano')
     if EST=='real':
-        sc.render.use_freestyle=(os.environ.get('CONTORNO')=='1'); sc.cycles.samples=96; sc.view_settings.view_transform='AgX'; sc.view_settings.look='AgX - Medium High Contrast'
+        sc.render.use_freestyle=(os.environ.get('CONTORNO')=='1'); sc.cycles.samples=64; sc.view_settings.view_transform='AgX'; sc.view_settings.look='AgX - Medium High Contrast'
         sc.world.use_nodes=True; sc.world.node_tree.nodes['Background'].inputs[0].default_value=(0.75,0.77,0.8,1); sc.world.node_tree.nodes['Background'].inputs[1].default_value=0.35
         import mathutils as mu
         def luz(tipo,dirv,en,size=None):
             L=bpy.data.lights.new(tipo,tipo); L.energy=en
+            if tipo=='SUN': L.angle=math.radians(35)   # sombras suaves, sin manchas duras sobre el cuerpo
             if size: L.size=size
             ob=bpy.data.objects.new(tipo,L); sc.collection.objects.link(ob)
             d=mu.Vector(dirv).normalized(); ob.location=d*6+mu.Vector((0,0,0.8)); ob.rotation_euler=(-d).to_track_quat('-Z','Y').to_euler()

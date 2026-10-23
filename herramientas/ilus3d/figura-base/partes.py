@@ -8,13 +8,15 @@ for l in open('/tmp/claude-0/mh/base.obj'):
 V=np.array(V)
 # forma del cuerpo: targets macro de MakeHuman (CC0): hombre joven, mezcla de rasgos, musculatura media-alta, algo magro
 import os
-TG={'caucasian-male-young':1/3,'african-male-young':1/3,'asian-male-young':1/3,'universal-male-young-maxmuscle-averageweight':float(os.environ.get('MUSC','0.6')),'universal-male-young-averagemuscle-minweight':float(os.environ.get('MAGRO','0.25'))}
+_R={'mezcla':(1/3,1/3,1/3),'norte':(0.8,0.1,0.1)}[os.environ.get('RAZA','mezcla')]
+TG={'caucasian-male-young':_R[0],'african-male-young':_R[1],'asian-male-young':_R[2],'universal-male-young-maxmuscle-averageweight':float(os.environ.get('MUSC','0.6')),'universal-male-young-averagemuscle-minweight':float(os.environ.get('MAGRO','0.25'))}
 for s_ in 'lr':
     TG[f'{s_}-eye-height2-incr']=float(os.environ.get('OJO2','0.7')); TG[f'{s_}-eye-height1-incr']=float(os.environ.get('OJO1','0.3')); TG[f'{s_}-eye-scale-incr']=float(os.environ.get('OJOS','0.2'))
 # variantes de cara (targets de MakeHuman, CC0), elegidas con CARA=
 LR=lambda n,w: {f'l-{n}':w, f'r-{n}':w}
 CARAS={
  'actual':{},
+ 'mandibula2':{'head-square':0.3,'chin-width-incr':0.2,'chin-bones-incr':0.3,'chin-prominent-incr':0.25,**LR('cheek-bones-incr',0.3),**LR('cheek-volume-decr',0.2),'eyebrows-trans-down':0.2,'neck-scale-horiz-incr':0.15},
  'mandibula':{'head-square':0.6,'chin-width-incr':0.5,'chin-bones-incr':0.6,'chin-prominent-incr':0.3,**LR('cheek-bones-incr',0.4),**LR('cheek-volume-decr',0.3),'eyebrows-trans-down':0.4,'nose-width1-incr':0.3,'neck-scale-horiz-incr':0.3},
  'ovalada':{'head-oval':0.4,'chin-width-decr':0.7,'chin-height-decr':0.2,**LR('cheek-volume-decr',0.5),'nose-scale-horiz-decr':0.35,'nose-point-width-decr':0.3,'eyebrows-angle-up':0.3,'neck-scale-horiz-incr':-0.0},
  'ancha':{'head-round':0.6,**LR('cheek-volume-incr',0.5),'chin-width-incr':0.3,'nose-scale-horiz-incr':0.6,'nose-width1-incr':0.4,'nose-scale-vert-decr':0.2,'mouth-scale-horiz-incr':0.35},
@@ -101,7 +103,13 @@ elif ESTILO=='degrade':
     lb=lambda P: ey+np.interp(th(P),TB,YB)
     ft=np.clip((PEL[:,1]-(lb(PEL)-0.035))/0.035,0,1)
     grosor=0.0004+0.0018*ft*np.clip(alto*4,0.1,1); verts['pelo']=PEL+n*grosor[:,None]
-    import json; json.dump({'ey':float(ey),'c0':[float(x) for x in c0],'TB':TB,'YB':YB},open('/tmp/claude-0/mh/degrade.json','w'))
+    # pelo pintado sobre la piel (para el render realista): factor por vértice, sin orejas
+    sinoreja=~((np.abs(V[:,0])>0.068)&(V[:,1]<ey+0.045))
+    borde=np.clip((V[:,1]-ey-hl(V))/0.006,0,1)
+    ftv=np.clip((V[:,1]-(lb(V)-0.035))/0.035,0,1)**1.3
+    fac=np.where(cab&sinoreja,borde*ftv,0.0); mk=cab
+    np.savez('/tmp/claude-0/mh/pelo_fac.npz',P=V[mk],f=fac[mk])
+    import json; json.dump({'ey':float(ey),'c0':[float(x) for x in c0],'TB':TB,'YB':YB,'TH':TH,'HH':HH},open('/tmp/claude-0/mh/degrade.json','w'))
 elif ESTILO=='militar':
     # dos zonas: arriba (pelo) y costados/nuca (pelo2) más cortos; degradé = costados casi al ras
     # línea de corte lisa: horizontal a los costados, baja hacia la nuca; nada adelante

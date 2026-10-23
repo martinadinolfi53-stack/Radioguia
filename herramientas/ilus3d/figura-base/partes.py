@@ -86,6 +86,20 @@ elif ESTILO=='flequillo':
     grosor=0.002+0.012*alto+0.006*frente
     PELd=PEL+n*grosor[:,None]; PELd[:,2]+=0.007*frente*alto; PELd[:,1]-=0.004*frente
     verts['pelo']=PELd
+elif ESTILO in ('degrade','militar'):
+    # dos zonas: arriba (pelo) y costados/nuca (pelo2) más cortos; degradé = costados casi al ras
+    # línea de corte lisa: horizontal a los costados, baja hacia la nuca; nada adelante
+    TB=[0,45,60,90,130,180]; YB=([-1,-1,0.042,0.046,0.034,0.024] if ESTILO=='degrade' else [-1,-1,0.050,0.054,0.044,0.034])
+    lb=lambda P: ey+np.interp(th(P),TB,YB)
+    # pelo2 = casco completo al ras; pelo = capa de arriba encima (sin huecos entre zonas)
+    sup=(PEL[pf][:,:,1]>lb(PEL[pf].reshape(-1,3)).reshape(pf.shape)).any(1)
+    partes['pelo']=pf[sup]; partes['pelo2']=pf
+    arr=np.clip((PEL[:,1]-lb(PEL))/0.015,0,1)
+    if ESTILO=='degrade': g1=0.0024+0.0006*alto; g2=0.0004+0.0006*alto
+    else: g1=0.0012+0.0058*arr*np.clip(0.6+0.4*fr,0.3,1)+0.0012; g2=0.0012+0.0004*alto
+    A=PEL.copy(); B=PEL.copy(); yl=lb(PEL); m=yl>ey-0.5
+    A[m,1]=np.maximum(A[m,1],yl[m])
+    verts['pelo']=A+n*g1[:,None]; verts['pelo2']=B+n*g2[:,None]
 elif ESTILO=='rapado':
     grosor=0.0012+0.0008*alto; verts['pelo']=PEL+n*grosor[:,None]
 else:

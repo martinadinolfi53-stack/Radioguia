@@ -9,6 +9,8 @@ VIEWS={} if 'solo_cuerpo' in sys.argv else {'cab_0':(0,0),'cab_45':(45,0),'cab_9
 for a in ([] if 'solo_cab' in sys.argv else ([0,90,180,45] if 'solo_cuerpo' in sys.argv else range(0,360,45))): VIEWS[f'v{a:03d}']=(a,0)
 VIEWS.update({} if 'solo_cab' in sys.argv else {'arriba':(0,90)})
 if os.environ.get('PELO')=='rapado': COL['pelo']='7d624f'
+if os.environ.get('PELO')=='degrade': COL['pelo']='6e5442'; COL['pelo2']='c2a690'
+if os.environ.get('PELO')=='militar': COL['pelo']='5f4635'; COL['pelo2']='8a6f5b'
 for nombre,(az,el) in VIEWS.items():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.wm.obj_import(filepath='/tmp/claude-0/mh/mh.obj', forward_axis='NEGATIVE_Z', up_axis='Y')

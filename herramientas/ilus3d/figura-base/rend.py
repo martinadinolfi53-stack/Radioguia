@@ -25,7 +25,35 @@ for nombre,(az,el) in VIEWS.items():
         m=bpy.data.materials.new(k); m.use_nodes=True; nt=m.node_tree
         base=COL.get(k2,COL.get(k,'ff00ff')); c=lin(base)
         e=nt.nodes.new('ShaderNodeEmission')
-        if k2 in ('piel','ropa','pelo','pelo2'):
+        if k2=='pelo' and os.environ.get('PELO')=='degrade':
+            # degradé real: color de piel abajo a pelo arriba, según altura sobre una línea que baja hacia la nuca
+            import json, numpy as np
+            D=json.load(open('/tmp/claude-0/mh/degrade.json')); c0=D['c0']
+            att=o.data.attributes.new('fade','FLOAT','POINT'); vals=[]
+            for v in o.data.vertices:
+                x,y,z=v.co   # el import deja la malla en coordenadas del modelo (rotación en el objeto)
+                th=math.degrees(math.atan2(abs(x-c0[0]), z-c0[2]))
+                lb=D['ey']+float(np.interp(th,D['TB'],D['YB']))
+                vals.append(float(np.clip((y-(lb-0.035))/0.035,0,1))**1.3)
+            att.data.foreach_set('value',vals)
+            at=nt.nodes.new('ShaderNodeAttribute'); at.attribute_name='fade'
+            mx=nt.nodes.new('ShaderNodeMix'); mx.data_type='RGBA'
+            mx.inputs['A'].default_value=(*lin('ecc6ae'),1); mx.inputs['B'].default_value=(*c,1)
+            nt.links.new(at.outputs['Fac'],mx.inputs['Factor'])
+            geo=nt.nodes.new('ShaderNodeNewGeometry'); dp=nt.nodes.new('ShaderNodeVectorMath'); dp.operation='DOT_PRODUCT'
+            dp.inputs[1].default_value=LUZ; nt.links.new(geo.outputs['Normal'],dp.inputs[0])
+            cr=nt.nodes.new('ShaderNodeValToRGB'); cr.color_ramp.interpolation='CONSTANT'
+            el_=cr.color_ramp.elements; el_[0].position=0.0; el_[0].color=(0.84,0.84,0.84,1); el_[1].position=0.36; el_[1].color=(1,1,1,1)
+            hi=el_.new(0.86); hi.color=(1.06,1.06,1.06,1)
+            mp=nt.nodes.new('ShaderNodeMapRange'); mp.inputs['From Min'].default_value=-1; mp.inputs['From Max'].default_value=1
+            nt.links.new(dp.outputs['Value'],mp.inputs['Value']); nt.links.new(mp.outputs['Result'],cr.inputs['Fac'])
+            mu_=nt.nodes.new('ShaderNodeMix'); mu_.data_type='RGBA'; mu_.blend_type='MULTIPLY'; mu_.inputs['Factor'].default_value=1
+            nt.links.new(mx.outputs['Result'],mu_.inputs['A']); nt.links.new(cr.outputs['Color'],mu_.inputs['B']); nt.links.new(mu_.outputs['Result'],e.inputs['Color'])
+            cpel=bpy.data.collections.get('pelo') or bpy.data.collections.new('pelo')
+            if cpel.name not in sc.collection.children: sc.collection.children.link(cpel)
+            for cc in list(o.users_collection): cc.objects.unlink(o)
+            cpel.objects.link(o)
+        elif k2 in ('piel','ropa','pelo','pelo2'):
             # sombreado plano de 3 tonos (luz desde arriba, adelante y a la izquierda de la cámara): da volumen sin líneas
             geo=nt.nodes.new('ShaderNodeNewGeometry'); dp=nt.nodes.new('ShaderNodeVectorMath'); dp.operation='DOT_PRODUCT'
             dp.inputs[1].default_value=LUZ; nt.links.new(geo.outputs['Normal'],dp.inputs[0])
@@ -58,4 +86,11 @@ for nombre,(az,el) in VIEWS.items():
     for t in ('silhouette','border','crease','ridge_valley','suggestive_contour','material_boundary','contour','external_contour','edge_mark'):
         if hasattr(ls,'select_'+t): setattr(ls,'select_'+t, t in ('silhouette','external_contour','material_boundary','border'))
     ls.linestyle=ls.linestyle or bpy.data.linestyles.new('ls'); ls.linestyle.color=lin('8a6450'); ls.linestyle.thickness=2.0
+    if bpy.data.collections.get('pelo'):
+        # el pelo en degradé no lleva borde: solo su silueta exterior
+        ls.select_by_collection=True; ls.collection=bpy.data.collections['pelo']; ls.collection_negation='EXCLUSIVE'
+        l2=fs.linesets.new('pelo'); l2.select_by_visibility=True; l2.select_by_edge_types=True; l2.select_by_collection=True; l2.collection=bpy.data.collections['pelo']
+        for t in ('silhouette','border','crease','ridge_valley','suggestive_contour','material_boundary','contour','external_contour','edge_mark'):
+            if hasattr(l2,'select_'+t): setattr(l2,'select_'+t, t=='external_contour')
+        l2.linestyle=ls.linestyle
     sc.render.filepath=f'{out}/{nombre}.png'; bpy.ops.render.render(write_still=True)

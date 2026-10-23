@@ -63,7 +63,7 @@ partes['piel']=body[~om&~pz]
 c0=np.array([0,ey,ez-0.09])
 def th(P): return np.degrees(np.arctan2(np.abs(P[:,0]-c0[0]), P[:,2]-c0[2]))
 TH=[0,25,45,62,70,78,84,100,112,125,150,180]
-HH=[0.064,0.060,0.052,0.040,0.030,-0.004,0.046,0.046,0.030,0.000,-0.035,-0.042]
+HH=[0.064,0.060,0.052,0.040,0.030,-0.004,0.022,0.022,0.012,-0.010,-0.035,-0.042]
 if os.environ.get('PELO')=='flequillo': HH=[0.038,0.041,0.047]+HH[3:]
 hl=lambda P: np.interp(th(P),TH,HH)
 cab=(np.linalg.norm(V-c0,axis=1)<0.155)&(V[:,1]>ey-0.10)
@@ -86,10 +86,17 @@ elif ESTILO=='flequillo':
     grosor=0.002+0.012*alto+0.006*frente
     PELd=PEL+n*grosor[:,None]; PELd[:,2]+=0.007*frente*alto; PELd[:,1]-=0.004*frente
     verts['pelo']=PELd
-elif ESTILO in ('degrade','militar'):
+elif ESTILO=='degrade':
+    # degradé real: un solo casco; el color pasa de piel a pelo en rend.py según la altura (ver degrade.json)
+    TB=[0,45,60,90,130,180]; YB=[0.0,0.0,0.040,0.042,0.030,0.020]
+    lb=lambda P: ey+np.interp(th(P),TB,YB)
+    ft=np.clip((PEL[:,1]-(lb(PEL)-0.035))/0.035,0,1)
+    grosor=0.0005+0.0022*ft; verts['pelo']=PEL+n*grosor[:,None]
+    import json; json.dump({'ey':float(ey),'c0':[float(x) for x in c0],'TB':TB,'YB':YB},open('/tmp/claude-0/mh/degrade.json','w'))
+elif ESTILO=='militar':
     # dos zonas: arriba (pelo) y costados/nuca (pelo2) más cortos; degradé = costados casi al ras
     # línea de corte lisa: horizontal a los costados, baja hacia la nuca; nada adelante
-    TB=[0,45,60,90,130,180]; YB=([-1,-1,0.042,0.046,0.034,0.024] if ESTILO=='degrade' else [-1,-1,0.050,0.054,0.044,0.034])
+    TB=[0,45,60,90,130,180]; YB=[-1,-1,0.050,0.054,0.044,0.034]
     lb=lambda P: ey+np.interp(th(P),TB,YB)
     # pelo2 = casco completo al ras; pelo = capa de arriba encima (sin huecos entre zonas)
     sup=(PEL[pf][:,:,1]>lb(PEL[pf].reshape(-1,3)).reshape(pf.shape)).any(1)

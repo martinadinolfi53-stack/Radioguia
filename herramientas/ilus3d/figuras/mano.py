@@ -1,6 +1,6 @@
 # Figuras de mano, dedos, pulgar y muñeca. Uso (desde herramientas/ilus3d):  python3 figuras/mano.py [id…]
 import os, sys; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from escena import figura, corte
+from escena import figura, corte, apoyo_cuna
 from posturas import Pose
 
 MANO = ['cubito_R', 'radio_R', 'mano_R']
@@ -22,8 +22,12 @@ F['mano-pa'] = lambda: figura(
 # paralelos al RI. Vista desde el tubo y vista desde la punta de los dedos.
 _obl = lambda: plana(Pose().codo_flex('R', 90).prono('R', 135).dedos_separar('R', 4))
 F['mano-pa-oblicua'] = lambda: figura(
-    'mano-pa-oblicua', _obl(), dir=(0, -1, 0), horizontal=('grande_R', 'mcf3_R'), huesos=MANO, region=MANO,
-    cortes=[('estiloides_radio_R', 'distal', 0.10)], puntos=['mcf3_R', 'grande_R', 'punta_dedo3_R', 'estiloides_radio_R'])
+    'mano-pa-oblicua', _obl(), dir=(0, -1, 0), vertical=('mcf3_R', 'grande_R'), huesos=MANO, region=MANO,
+    cortes=[('estiloides_radio_R', 'distal', 0.12)], puntos=['mcf3_R', 'grande_R', 'punta_dedo3_R', 'estiloides_radio_R'])
+# vista en perspectiva desde adelante y arriba (como la fig. 2.18), con el RI y la cuña de 45°
+F['mano-pa-oblicua-perspectiva'] = lambda: figura(
+    'mano-pa-oblicua-perspectiva', _obl(), dir=(0.2, -0.6, -0.78), arriba=(0, 1, 0), huesos=MANO, region=MANO,
+    cortes=[('estiloides_radio_R', 'distal', 0.12)], puntos=['mcf3_R', 'grande_R', 'punta_dedo3_R'] + apoyo_cuna(_obl()))
 F['mano-pa-oblicua-corte'] = lambda: corte(
     'mano-pa-oblicua-corte', _obl(), ('grande_R', 'mcf3_R', 0.75), arriba=(0, 1, 0), huesos=MANO, region=MANO)
 
@@ -46,8 +50,9 @@ F['mano-lateral--v2'] = lambda: figura(
 # v1: dedos en extensión completa; v2 («receptor de pelota»): dedos en flexión parcial.
 def _norg(s, flex):
     # dedos juntos y mano alineada con el antebrazo (en reposo el modelo tiene algo de desviación cubital): bordes cubitales paralelos
-    p = Pose().codo_flex(s, 90).prono(s, 45).dedos_separar(s, -6).muneca_desv_cubital(s, -10)
-    if flex: p.dedos_flex(s, 0, 20, 15).pulgar(s, abd_palmar=10)
+    # pulgar en el plano de la palma y separado de los dedos, como en la fig. 2.23 (en reposo el modelo lo tiene cruzado sobre la palma)
+    p = Pose().codo_flex(s, 90).prono(s, 45).dedos_separar(s, -6).muneca_desv_cubital(s, -10).pulgar(s, abd_palmar=-15, abd_radial=10)
+    if flex: p.dedos_flex(s, 0, 20, 15).dedos_flex(s, 10, 15, d=1)
     return p
 for _v, _fx in (('v1', False), ('v2', True)):
     for _s in 'RL':
@@ -93,16 +98,20 @@ F['dedos-lateral--v2-corte'] = lambda: corte(
 # mirando arriba). Pulgar extendido. Vista desde el tubo con el pulgar vertical; corte desde la punta de los dedos; para
 # Roberts, vista de costado (desde lateral) con el pulgar sobre el RI.
 # (+16° de desviación cubital: así el eje del pulgar queda paralelo al RI y el pulgar apoya en toda su cara posterior)
-_pap = lambda: Pose().hombro_flex('R', 90).prono('R', 180).hombro_rot_ext('R', -90).muneca_desv_cubital('R', 16)
+# Fig. 2.7 del Bontrager: los demás dedos extendidos quedan hacia un costado, no encima del 1.er metacarpiano: pulgar algo
+# separado de la palma (abducción palmar 30°) y muñeca en desviación cubital de 30° para que su eje quede paralelo al RI.
+_pap = lambda: Pose().hombro_flex('R', 90).prono('R', 180).hombro_rot_ext('R', -90).muneca_desv_cubital('R', 30).pulgar('R', abd_palmar=30, rot=20)
+BRAZO = ['brazo_R'] + MANO
+_CODO = [('olecranon_R', 'distal', 0.10)]     # el húmero se corta 10 cm por encima del codo
 _PULG = ['cmc1_R', 'mcf1_R', 'if1_R', 'punta_dedo1_R', 'centro:Right trapezium', 'centro:Right first metacarpal bone']
 F['pulgar-ap'] = lambda: figura(
-    'pulgar-ap', _pap(), dir=(0, -1, 0), vertical=('cmc1_R', 'punta_dedo1_R'), huesos=MANO, region=MANO,
-    cortes=[('estiloides_radio_R', 'distal', 0.07)], puntos=_PULG)
+    'pulgar-ap', _pap(), dir=(0, -1, 0), vertical=('punta_dedo1_R', 'cmc1_R'), huesos=MANO, region=MANO,
+    cortes=[('estiloides_radio_R', 'distal', 0.14)], puntos=_PULG)     # como en la fig. 2.7: antebrazo arriba, pulgar hacia abajo
 F['pulgar-ap-corte'] = lambda: corte(
     'pulgar-ap-corte', _pap(), ('grande_R', 'mcf3_R', 0.3), arriba=(0, 1, 0), huesos=MANO, region=MANO)
 F['pulgar-ap-costado'] = lambda: figura(
-    'pulgar-ap-costado', _pap(), dir=(1, 0, 0), arriba=(0, 1, 0), huesos=MANO, region=MANO,
-    cortes=[('estiloides_radio_R', 'distal', 0.07)], puntos=_PULG)
+    'pulgar-ap-costado', _pap(), dir=(1, 0, 0), arriba=(0, 1, 0), huesos=BRAZO, region=BRAZO,
+    cortes=_CODO, puntos=_PULG + ['codo_R'])
 # PA oblicua: PA de mano (pulgar apoyado de costado, oblicuo) con el pulgar en leve abducción.
 F['pulgar-pa-oblicua'] = lambda: figura(
     'pulgar-pa-oblicua', plana(Pose().codo_flex('R', 90).prono('R', 180)).pulgar('R', abd_radial=15), dir=(0, -1, 0),

@@ -26,10 +26,28 @@ def render(modo):
         m = bpy.data.materials.new(k); m.use_nodes = True; nt = m.node_tree
         e = nt.nodes.new('ShaderNodeEmission'); e.inputs['Color'].default_value = (*lin(h), 1)
         nt.links.new(e.outputs[0], nt.nodes['Material Output'].inputs['Surface']); mats[k] = m
+    # pasadas extra: 'lineas' (solo los contornos de la piel, incluidos los internos: un dedo sobre otro) y 'zpiel'/'zhueso'
+    # (profundidad desde la cámara codificada en el color, para saber qué hueso queda tapado por otra parte de la piel)
+    if modo == 'lineas':
+        bpy.context.scene.cycles.transparent_max_bounces = 128
+        m = bpy.data.materials.new('nada'); m.use_nodes = True; nt = m.node_tree
+        t = nt.nodes.new('ShaderNodeBsdfTransparent'); nt.links.new(t.outputs[0], nt.nodes['Material Output'].inputs['Surface'])
+        for k in mats: mats[k] = m
+    def zmat(gid):     # R = profundidad (3-7 m desde la cámara), G = número de la parte del cuerpo / 63
+        m = bpy.data.materials.new(f'z{gid}'); m.use_nodes = True; nt = m.node_tree
+        cd = nt.nodes.new('ShaderNodeCameraData'); mr = nt.nodes.new('ShaderNodeMapRange')
+        mr.inputs['From Min'].default_value = 3.0; mr.inputs['From Max'].default_value = 7.0
+        cc = nt.nodes.new('ShaderNodeCombineColor'); cc.inputs[1].default_value = gid / 63
+        e = nt.nodes.new('ShaderNodeEmission'); nt.links.new(cd.outputs['View Z Depth'], mr.inputs['Value'])
+        nt.links.new(mr.outputs['Result'], cc.inputs[0]); nt.links.new(cc.outputs[0], e.inputs['Color'])
+        nt.links.new(e.outputs[0], nt.nodes['Material Output'].inputs['Surface']); return m
     for o in objs:
-        tipo = 'hueso' if o.name.startswith('hueso') else 'ropa' if o.name.startswith('ropa') else 'piel'
-        o.data.materials.clear(); o.data.materials.append(mats[tipo])
-        o.hide_render = (tipo == 'hueso') != (modo == 'hueso')
+        tipo = 'hueso' if o.name.startswith('hueso') else 'ropa' if o.name.startswith('ropa') else 'zp' if o.name.startswith('zp_') else 'piel'
+        gid = int(o.name.split('__')[1].split('.')[0]) if '__' in o.name else 0
+        o.data.materials.clear(); o.data.materials.append(zmat(gid) if modo in ('zpiel', 'zhueso') else mats[tipo if tipo != 'zp' else 'piel'])
+        if modo == 'zpiel': o.hide_render = tipo != 'zp'
+        elif modo == 'zhueso': o.hide_render = tipo != 'hueso'
+        else: o.hide_render = tipo == 'zp' or ((tipo == 'hueso') != (modo == 'hueso'))
         if tipo == 'piel' and S.get('suavizar', 1):     # malla de piel de pocos polígonos: subdividir para que no queden facetas ni pliegues falsos
             md = o.modifiers.new('sub', 'SUBSURF'); md.levels = md.render_levels = S.get('suavizar', 1)
     cam = bpy.data.cameras.new('cam'); cam.type = 'ORTHO'; cam.ortho_scale = escala
@@ -41,15 +59,21 @@ def render(modo):
     sc.render.engine = 'CYCLES'; sc.cycles.samples = S.get('muestras', 16); sc.cycles.device = 'CPU'
     sc.render.film_transparent = True; sc.view_settings.view_transform = 'Standard'
     sc.render.resolution_x, sc.render.resolution_y = RES
-    sc.render.use_freestyle = True; fs = sc.view_layers[0].freestyle_settings
+    if modo in ('zpiel', 'zhueso'):
+        sc.cycles.samples = 1; sc.cycles.pixel_filter_type = 'BOX'; sc.view_settings.view_transform = 'Raw'
+        sc.render.image_settings.color_depth = '16'; sc.render.dither_intensity = 0
+    sc.render.use_freestyle = modo in ('piel', 'hueso', 'lineas'); fs = sc.view_layers[0].freestyle_settings
     ls = fs.linesets[0] if fs.linesets else fs.linesets.new('l')
     ls.select_by_visibility = True; ls.select_by_edge_types = True
     for t in ('silhouette', 'border', 'crease', 'ridge_valley', 'suggestive_contour', 'material_boundary', 'contour', 'external_contour', 'edge_mark'):
         if hasattr(ls, 'select_' + t): setattr(ls, 'select_' + t, t in ('silhouette', 'external_contour', 'material_boundary'))
     ls.linestyle = ls.linestyle or bpy.data.linestyles.new('ls'); ls.linestyle.color = lin('8a6450'); ls.linestyle.thickness = S.get('grosor', 2.4)
     sc.render.filepath = S['salida'] + f'-{modo}.png'; bpy.ops.render.render(write_still=True)
+    if modo in ('zpiel', 'zhueso'):     # PIL no lee PNG de 16 bits con color: se guarda como matriz (R, G) en coma flotante
+        im = bpy.data.images.load(sc.render.filepath); im.colorspace_settings.name = 'Non-Color'; w_, h_ = im.size
+        np.save(S['salida'] + f'-{modo}.npy', np.array(im.pixels[:], np.float32).reshape(h_, w_, 4)[::-1, :, :2])
     return sc, co
-for modo in ('piel', 'hueso'): sc, co = render(modo)
+for modo in ('piel', 'hueso') + (('lineas', 'zpiel', 'zhueso') if S.get('capas') else ()): sc, co = render(modo)
 from bpy_extras.object_utils import world_to_camera_view
 info = {'res': RES, 'pxm': max(RES) / escala, 'puntos': {}}
 for k, v in S.get('puntos', {}).items():

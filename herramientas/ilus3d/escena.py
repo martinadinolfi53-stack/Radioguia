@@ -1,12 +1,12 @@
 # Renderiza una figura (cuerpo posado, estilo dibujo plano) y guarda render/<id>.webp + render/<id>.json
 # (puntos de referencia proyectados en píxeles de la imagen, y píxeles por centímetro).
-import os, sys, json, subprocess, pickle, numpy as np
+import os, re, sys, json, subprocess, pickle, numpy as np
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
 import rig
 from puntos import Puntos
 from scipy.spatial import ConvexHull
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageFilter
 
 CACHE = os.path.join(AQUI, '.cache'); os.makedirs(CACHE, exist_ok=True)
 SALIDA = os.path.join(AQUI, 'render'); os.makedirs(SALIDA, exist_ok=True)
@@ -34,8 +34,17 @@ def _obj(ruta, partes):
             f.write(f'o {nombre}\n'); f.writelines('v %.5f %.5f %.5f\n' % tuple(v) for v in P)
             f.writelines('f %d %d %d\n' % tuple(t + vo) for t in I); vo += len(P)
 
+TAPADO = 0.006      # m: un hueso con más de esto de piel de OTRA parte delante (otro dedo, la palma) se dibuja tenue
+def _grupo(seg):
+    """parte del cuerpo para decidir si una piel tapa a un hueso: cada dedo es una parte (f1m, f1a… -> dedo1), la palma otra"""
+    seg = str(seg)
+    if re.match(r'f\d', seg): return 'dedo' + seg[1]
+    if seg.startswith('dedos_pie'): return 'dedospie'
+    if re.match(r'(cubito|radio|antebrazo)_[RL]$', seg): return 'antebrazo' + seg[-2:]
+    return seg.rsplit('_', 1)[0] if seg.endswith(('_R', '_L')) else seg
+
 def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, cortes=(), puntos=(), px=800,
-           muestras=16, con_ropa=None, fundido=0.02, horizontal=None, vertical=None, suavizar=0):
+           muestras=16, con_ropa=None, fundido=0.02, horizontal=None, vertical=None, suavizar=0, capas=False):
     """
     pose: posturas.Pose. dir: hacia dónde mira la cámara (= sentido del rayo en una vista desde el tubo), en ejes del cuerpo.
     huesos: segmentos cuyos huesos se dibujan "por transparencia". region: segmentos de piel a dibujar (None = cuerpo entero).
@@ -80,6 +89,10 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
         I = I[((Pp[I].mean(1) - p) @ n) > -0.002]
     I = _sin_fragmentos(I, len(Pp))
     partes = [('piel', (Pp, I))]
+    if capas:     # copia de la piel separada por partes, solo para la pasada de profundidad (cada parte con su número)
+        G = {}; gid = lambda seg: G.setdefault(_grupo(seg), len(G) + 1)
+        gf = np.array([gid(x) for x in dom[I[:, 0]]])
+        for g_ in np.unique(gf): partes.append((f'zp_{g_}__{g_}', (Pp, I[gf == g_])))
     if con_ropa is None: con_ropa = region is None or bool(set(region) & {'pelvis', 'muslo_R', 'muslo_L'})
     if con_ropa:
         V, F = ropa(c, Pp)
@@ -88,16 +101,16 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     for k, (P, Ih) in c.huesos_posados().items():
         if c.huesos[k]['seg'] not in huesos: continue
         for p, n in planos: Ih = Ih[((P[Ih].mean(1) - p) @ n) > -0.002]
-        if len(Ih): partes.append(('hueso_' + k, (P, Ih)))
+        if len(Ih): partes.append(('hueso_' + k + (f'__{gid(c.huesos[k]["seg"])}' if capas else ''), (P, Ih)))
     obj = os.path.join(CACHE, id + '.obj'); _obj(obj, partes)
     usados = Pp[np.unique(I)]
-    proy = {k: pts.posado(k).tolist() for k in puntos}
+    proy = {(k[0] if isinstance(k, tuple) else k): list(map(float, k[1])) if isinstance(k, tuple) else pts.posado(k).tolist() for k in puntos}     # (nombre, xyz): punto libre
     # suavizar: radio en px del suavizado de la silueta, solo cerca de las axilas (a menos de 15 cm de la cabeza humeral);
     # (radio, cm[, lados]) cambia esa distancia y elige la axila ('R', 'L')
     for s_ in 'RL': proy['_axila' + s_] = pts.posado('cabeza_humero_' + s_).tolist()
     for i, (p, n) in enumerate(planos): proy[f'_corte{i}'] = p.tolist(); proy[f'_corte{i}n'] = (p + n * 0.05).tolist()
     spec = dict(obj=obj, salida=os.path.join(CACHE, id), dir=list(map(float, dir)), arriba=list(map(float, arriba)),
-                encuadre=[usados.min(0).tolist(), usados.max(0).tolist()] + usados[::40].tolist(), px=px, muestras=muestras, puntos=proy)
+                encuadre=[usados.min(0).tolist(), usados.max(0).tolist()] + usados[::40].tolist() + _extremos(usados, dir, arriba), px=px, muestras=muestras, puntos=proy, capas=capas)
     sp = os.path.join(CACHE, id + '-spec.json'); json.dump(spec, open(sp, 'w'))
     r = subprocess.run([sys.executable, os.path.join(AQUI, 'render_obj.py'), sp], capture_output=True, text=True)
     if r.returncode or 'Traceback' in r.stderr: raise RuntimeError(r.stderr[-3000:])
@@ -109,7 +122,22 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
         r_, zc, ld = (tuple(suavizar) + ('RL',))[:3] if isinstance(suavizar, tuple) else (suavizar, 15, 'RL')
         p = _suavizar_silueta(p, r_, [(q, zc * info['pxm'] / 100) for q, s_ in zip(ax_, 'RL') if s_ in ld])
     al = ImageChops.multiply(h.getchannel('A'), p.getchannel('A'))
+    if capas:
+        # capas: los huesos que quedan detrás de otra parte de la piel (p. ej. el pulgar bajo la palma) se dibujan tenues, y los
+        # contornos de la piel (también los internos, dedo sobre dedo) van por encima de los huesos
+        zp, zh = (np.load(spec['salida'] + f'-{n}.npy') for n in ('zpiel', 'zhueso'))
+        gp, gh = np.rint(zp[..., 1] * 63), np.rint(zh[..., 1] * 63)
+        tapado = ((zh[..., 0] - zp[..., 0]) * 4 > TAPADO) & (gp != gh) & (gp > 0) & (gh > 0)
+        a_ = np.asarray(al, float); a_[tapado] *= 0.35; al = Image.fromarray(a_.astype(np.uint8))
     out = Image.new('RGBA', p.size, (0, 0, 0, 0)); out.alpha_composite(p); hh = h.copy(); hh.putalpha(al); out.alpha_composite(hh)
+    if capas:
+        ln = Image.open(spec['salida'] + '-lineas.png').convert('RGBA')
+        la = np.asarray(ln.getchannel('A'), float) * (np.asarray(p.getchannel('A')) > 0)
+        # contornos internos solo en mano y dedos (en antebrazo y brazo serían pliegues sueltos de la malla)
+        ids = [v for k, v in G.items() if k.startswith(('dedo', 'mano'))]
+        m_ = Image.fromarray((np.isin(gp, ids) * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(7))
+        la *= np.maximum(np.asarray(m_) > 0, np.asarray(p.getchannel('A')) < 250)
+        ln.putalpha(Image.fromarray(la.astype(np.uint8))); out.alpha_composite(ln)
     # desvanecer los bordes cortados
     W_, H_ = out.size; yy, xx = np.mgrid[0:H_, 0:W_]; A = np.asarray(out.getchannel('A'), float)
     ppc = info['pxm'] / 100
@@ -250,6 +278,12 @@ def _borde(A):
         out.append(p)
     return np.array(out) - 1
 
+def _extremos(P, dir, arriba):
+    """los puntos de P más a la izquierda, derecha, arriba y abajo en la imagen (para que el encuadre no corte una punta)"""
+    f = np.asarray(dir, float); f /= np.linalg.norm(f); u = np.asarray(arriba, float); u = u - f * (u @ f); u /= np.linalg.norm(u)
+    x = np.cross(u, -f); px_, py_ = P @ x, P @ u
+    return [P[i].tolist() for i in (px_.argmin(), px_.argmax(), py_.argmin(), py_.argmax())]
+
 def _dir(c, pts, d, ref):
     """dirección de corte: vector, o 'distal'/'proximal' a lo largo del segmento del punto de referencia."""
     if not isinstance(d, str): v = np.asarray(d, float); return v / np.linalg.norm(v)
@@ -353,3 +387,29 @@ def _dentro(p, q):
     x, y = p; a = q; b = np.roll(q, -1, 0)
     c = ((a[:, 1] > y) != (b[:, 1] > y)) & (x < (b[:, 0] - a[:, 0]) * (y - a[:, 1]) / (b[:, 1] - a[:, 1] + 1e-12) + a[:, 0])
     return c.sum() % 2 == 1
+
+def apoyo_cuna(pose, s='R', grados=45, ancho=0.09, lado=None):
+    """Puntos 3D (nombre, xyz) del RI y de una cuña bajo la mano posada, para dibujarlos en una vista en perspectiva.
+    El RI es horizontal, a la altura del punto más bajo de la mano. La cuña sube 'grados' desde una arista sobre el RI,
+    paralela al eje de la mano, hacia el lado del pulgar (lado=+1) o del meñique (-1), tangente a la piel de la palma."""
+    c = cuerpo(); c.posar(pose); pts = Puntos(c); Pp = c.piel_posada()
+    dom = np.array(c.nombres_w)[c.W.argmax(1)].astype(str)
+    m = np.char.startswith(dom, 'mano_' + s) | (np.char.startswith(dom, 'f') & np.char.endswith(dom, '_' + s))
+    H = Pp[m]; Y = np.array([0, 1.0, 0]); ib = np.argsort(H[:, 1])[len(H) // 100]; yri = H[ib, 1]     # percentil 1: sin piel suelta del modelo
+    a = pts.posado(f'mcf3_{s}') - pts.posado(f'grande_{s}'); a[1] = 0; a /= np.linalg.norm(a)
+    r = np.cross(Y, a); r *= np.sign(r @ (pts.posado(f'mcf2_{s}') - pts.posado(f'mcf5_{s}')))     # horizontal, hacia el pulgar
+    if lado is not None: r *= lado
+    g = np.radians(grados); n = -np.sin(g) * r + np.cos(g) * Y                                       # normal de la cara inclinada
+    base = H[ib].copy()
+    Hp = Pp[np.char.startswith(dom, 'mano_' + s)]     # la cuña apoya en la palma (los dedos siguen hasta el RI)
+    k = max(0.0, (-((Hp - base) @ n)).max() / np.sin(g)); h0 = base + k * r      # arista de la cuña
+    s_ = (H - h0) @ a; a0, a1 = s_.min() - 0.01, s_.max() + 0.01
+    sube = np.cos(g) * r + np.sin(g) * Y
+    out = [(nom, v) for nom, v in (('cA0', h0 + a0 * a), ('cA1', h0 + a1 * a), ('cT0', h0 + a0 * a + ancho * sube), ('cT1', h0 + a1 * a + ancho * sube),
+                   ('cB0', h0 + a0 * a + ancho * np.cos(g) * r), ('cB1', h0 + a1 * a + ancho * np.cos(g) * r))]
+    m3 = pts.posado(f'mcf3_{s}'); out += [('rc0', m3), ('rc1', m3 + 0.25 * Y)]     # vertical por la 3.ª MCF (dirección del RC)
+    # RI: rectángulo alrededor de la mano (24 x 30 con el lado largo a lo largo de la mano)
+    cen = H.mean(0); cen[1] = yri     # centrado bajo la mano
+    for nom, (u, w) in (('ri0', (-0.15, -0.12)), ('ri1', (0.15, -0.12)), ('ri2', (0.15, 0.12)), ('ri3', (-0.15, 0.12))):
+        out.append((nom, cen + u * a + w * r))
+    return out

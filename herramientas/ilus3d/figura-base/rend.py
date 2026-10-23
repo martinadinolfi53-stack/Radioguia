@@ -100,9 +100,10 @@ for nombre,(az,el) in VIEWS.items():
                         if isinstance(v_,(int,float)): m_.inputs[j].default_value=v_
                         else: L(v_,m_.inputs[j])
                     return m_.outputs[0]
-                tc=N.new('ShaderNodeTexCoord'); sp=N.new('ShaderNodeSeparateXYZ'); L(tc.outputs['Object'],sp.inputs[0])
-                X,Y,Zc=sp.outputs[0],sp.outputs[1],sp.outputs[2]
-                ax=op('ABSOLUTE',op('SUBTRACT',X,c0[0])); th=op('DIVIDE',op('ARCTAN2',ax,op('SUBTRACT',Zc,c0[2])),math.pi)
+                # coordenadas de reposo guardadas en la UV (sirven con el avatar posado)
+                tc=N.new('ShaderNodeTexCoord'); sp=N.new('ShaderNodeSeparateXYZ'); L(tc.outputs['UV'],sp.inputs[0])
+                U,Vv=sp.outputs[0],sp.outputs[1]
+                th=op('MINIMUM',U,1.0); Y=op('ADD',op('SUBTRACT',Vv,0.5),ey)
                 def curva(TB,YB):
                     fc=N.new('ShaderNodeFloatCurve'); cu=fc.mapping.curves[0]
                     lo,hi=min(YB),max(YB); sc_=hi-lo or 1
@@ -114,7 +115,7 @@ for nombre,(az,el) in VIEWS.items():
                 yr=op('SUBTRACT',Y,ey)
                 borde=op('MINIMUM',op('MAXIMUM',op('DIVIDE',op('SUBTRACT',yr,HL),0.004),0),1)
                 ft=op('POWER',op('MINIMUM',op('MAXIMUM',op('DIVIDE',op('SUBTRACT',yr,op('SUBTRACT',LB,0.035)),0.035),0),1),1.3)
-                oreja=op('MULTIPLY',op('GREATER_THAN',ax,0.0755),op('LESS_THAN',yr,0.040))
+                oreja=op('GREATER_THAN',U,1.5)
                 fac=op('MULTIPLY',op('MULTIPLY',borde,ft),op('SUBTRACT',1,oreja))
                 mx2=N.new('ShaderNodeMix'); mx2.data_type='RGBA'
                 mx2.inputs['A'].default_value=(*[min(1,x*1.08) for x in lin('eab496')],1); mx2.inputs['B'].default_value=(*lin('5e4434'),1)

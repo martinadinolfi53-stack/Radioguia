@@ -138,11 +138,28 @@ sv=(V[:,1]>-0.27)&(V[:,1]<0.07)&(np.abs(V[:,0])<0.24)
 partes['ropa']=body[sv[body].all(1)|(sv[body].sum(1)>=2)]
 R=V+nrm*0.003; R[:,1]=np.clip(R[:,1],-0.27,0.07); verts['ropa']=R
 print({k:len(v) for k,v in partes.items()}, file=sys.stderr)
+# coordenadas de reposo para pintar el pelo (u = ángulo alrededor de la cabeza/180, 2 = oreja; v = altura sobre los ojos + 0.5)
+_ax=np.abs(V[:,0]-c0[0]); _yr=V[:,1]-ey
+UVr=np.stack([np.where((_ax>0.0755)&(_yr<0.040),2.0,th(V)/180), _yr+0.5],1)
+# pose (opcional): POSE=archivo.py que define POSE={hueso:[(eje,grados),...]} y opcionalmente GIRO=[(eje,grados),...] del cuerpo entero
+if os.environ.get('POSE'):
+    import pose as _p, runpy
+    _p.V_REPOSO=V
+    _d=runpy.run_path(os.environ['POSE']); posar=_p.aplicar(V,_d['POSE'])[0]
+    Rg=np.eye(3)
+    for e_,g_ in _d.get('GIRO',[]): Rg=_p.rot(e_,g_)@Rg
+    f_=lambda P: posar(P)@Rg.T
+    verts={k:f_(v) for k,v in verts.items()}; V=f_(V)
 with open('/tmp/claude-0/mh/mh.obj','w') as f:
     # las partes con vértices propios (verts) pueden tener otra cantidad de vértices
-    vo=1
+    vo=1; vt0=1
     for k,ff in partes.items():
         VV=verts.get(k,V); f.write(f'o {k}\n')
         for p in VV: f.write('v %.5f %.5f %.5f\n'%tuple(p))
-        for q in ff: f.write('f '+' '.join(str(i+vo) for i in q)+'\n')
+        if k=='piel':
+            for p in UVr: f.write('vt %.5f %.5f\n'%tuple(p))
+            for q in ff: f.write('f '+' '.join(f'{i+vo}/{i+vt0}' for i in q)+'\n')
+            vt0+=len(UVr)
+        else:
+            for q in ff: f.write('f '+' '.join(str(i+vo) for i in q)+'\n')
         vo+=len(VV)

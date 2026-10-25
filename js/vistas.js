@@ -199,11 +199,42 @@ export function vistaFavoritos() {
     `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>`;
 }
 
+// Ajustes > Apariencia: diseño (clásico o Pompa de jabón); en Pompa, la paleta de colores y los detalles jugados; en clásico, el tema
+const PALETAS = [
+  ["original", "Original", "#0b0d1f", "#ff7ad9, #ffd36e, #7dffb0, #6ee7ff, #8a7bff, #ff7ad9"],
+  ["perla", "Perla", "#f5f1ea", "#f7b6d9, #ffe1a8, #c9f5df, #bfe3ff, #d9c8ff, #f7b6d9"],
+  ["oro", "Oro negro", "#030303", "#f6d27a, #8a5a1c, #fff1c1, #c08a2e, #f9e5a6, #f6d27a"],
+  ["lima", "Lima", "#04130b", "#c6f432, #2bd66b, #4fe3c1, #f7f36a, #9bff7a, #c6f432"],
+  ["rubi", "Rubí", "#160307", "#ff4d6d, #ffb3c1, #ffd27a, #ff7a45, #c9184a, #ff4d6d"],
+  ["oceano", "Océano", "#021624", "#6ee7ff, #4f8bff, #9b8cff, #6effd0, #c4fff1, #6ee7ff"],
+  ["atardecer", "Atardecer", "#170a20", "#ff8fb1, #ffcf7a, #fff1a8, #ff9a6b, #d48bff, #ff8fb1"],
+];
+const DETALLES = [
+  ["subir", "Burbujitas que suben", "Pompas que flotan por el fondo y tarjetas que se mecen"],
+  ["rebote", "Rebote al tocar", "Los botones se aplastan y vuelven como gelatina"],
+  ["pompitas", "Pompitas en las esquinas", "Dos burbujas chiquitas en cada tarjeta"],
+];
+function apariencia(op) {
+  const p = (k) => preferencias.get(k);
+  const elegir = (k, v, muestra, txt) => `<button class="ap-op${p(k) === v ? " on" : ""}" data-pref="${k}" data-val="${v}" aria-pressed="${p(k) === v}">${muestra}<span>${txt}</span></button>`;
+  const disenos = `<div class="ap-disenos">${elegir("diseno", "clasico", `<span class="ap-muestra clasico"></span>`, "Clásico")}${elegir("diseno", "pompa", `<span class="ap-muestra pompa"></span>`, "Pompa de jabón")}</div>`;
+  if (p("diseno") !== "pompa") return `<section class="panel"><h2>Apariencia</h2><h3>Diseño</h3>${disenos}
+      <h3>Tema</h3><div class="opciones">${op("tema", "oscuro", "Oscuro")}${op("tema", "claro", "Claro")}${op("tema", "sistema", "Como el teléfono")}</div></section>`;
+  const paletas = PALETAS.map(([v, txt, bg, iris]) => elegir("paleta", v, `<span class="ap-muestra" style="--mbg: linear-gradient(${bg}, ${bg}); --miris: conic-gradient(${iris})"></span>`, txt)).join("");
+  const detalles = DETALLES.map(([k, txt, sub]) => {
+    const si = p(k) === "si";
+    return `<button class="ap-detalle" role="switch" aria-checked="${si}" data-pref="${k}" data-val="${si ? "no" : "si"}"><span>${txt}<small>${sub}</small></span><span class="interruptor"></span></button>`;
+  }).join("");
+  return `<section class="panel"><h2>Apariencia</h2><h3>Diseño</h3>${disenos}
+      <h3>Colores</h3><div class="ap-paletas">${paletas}</div>
+      <h3>Detalles jugados</h3>${detalles}</section>`;
+}
+
 export function vistaAjustes() {
   const op = (k, v, txt) => `<button class="opcion${preferencias.get(k) === v ? " on" : ""}" data-pref="${k}" data-val="${v}" aria-pressed="${preferencias.get(k) === v}">${txt}</button>`;
   return cabecera({ titulo: "Ajustes", atras: "#" }) + `
   <main class="wrap">
-    <section class="panel"><h2>Tema</h2><div class="opciones">${op("tema", "oscuro", "Oscuro")}${op("tema", "claro", "Claro")}${op("tema", "sistema", "Como el teléfono")}</div></section>
+    ${apariencia(op)}
     <section class="panel"><h2>Tamaño del texto</h2><div class="opciones">${op("texto", "normal", "Normal")}${op("texto", "grande", "Grande")}</div></section>
     <section class="panel"><h2>Sin conexión</h2><p>${pwa.estadoOffline()}</p></section>
     <section class="panel"><h2>Reportes de preguntas</h2>

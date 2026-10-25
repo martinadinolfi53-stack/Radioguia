@@ -1,0 +1,87 @@
+/* RadioGuía · diseño "Pompa de jabón" (Ajustes > Apariencia). Se activa junto con css/glass.css cuando la persona elige ese diseño
+   (aplicarPreferencias en js/almacen.js habilita las dos hojas). Paletas: :root[data-paleta]. Detalles jugados: :root[data-subir],
+   [data-rebote], [data-pompitas]. La paleta decide si es clara u oscura (Perla es la única clara). */
+:root { --bg: #0b0d1f; --luz-1: #3d7bff; --luz-2: #c04dff; --luz-3: #19d3c5; --r: 34px;
+  --glass: rgb(255 255 255 / .05); --glass-2: rgb(255 255 255 / .08);
+  --vidrio: rgb(14 18 40 / .86); --iris: conic-gradient(from 200deg, #ff7ad9, #ffd36e, #7dffb0, #6ee7ff, #8a7bff, #ff7ad9); }
+.acceso, .grupo, .lista, .sec, .rc, .panel, .ilus, .vacio, .top-row, .search input, .chip, .opcion, .btn-sec, .ico, .btn-calc, .portada-boton {
+  border: 1.5px solid transparent !important; position: relative;
+  background: linear-gradient(var(--vidrio), var(--vidrio)) padding-box, var(--iris) border-box !important;
+  box-shadow: inset 0 0 18px rgb(255 255 255 / .10), inset 6px 8px 14px rgb(255 255 255 / .10), inset -8px -10px 22px rgb(120 80 255 / .18), 0 12px 30px rgb(0 0 0 / .45) !important; }
+.acceso::after, .grupo::after, .sec::after, .panel::after, .rc::after, .ico::after, .chip::after, .lista::after {
+  content: ""; position: absolute; left: 14px; top: 7px; width: 34%; height: 9px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, rgb(255 255 255 / .75), transparent); }
+.ico::after, .chip::after { left: 22%; top: 4px; width: 40%; height: 6px; }
+.grupo::before { display: none; }
+.grupo { min-height: 90px; border-radius: 34px !important; background: radial-gradient(90% 120% at 10% 0%, color-mix(in srgb, var(--c) 35%, transparent), transparent 60%) padding-box, linear-gradient(var(--vidrio), var(--vidrio)) padding-box, var(--iris) border-box !important; }
+.grupo .s::before { content: "●"; color: var(--c); margin-right: 6px; text-shadow: 0 0 8px var(--c); }
+.chip.on, .opcion.on { background: radial-gradient(120% 120% at 30% 20%, #ffffffee, #b9e9ff 25%, #6ec8ff 60%, #7a6bff) padding-box, var(--iris) border-box !important; color: #071226 !important; }
+
+.portada-img { box-shadow: 0 0 0 2px transparent, 0 18px 40px rgb(0 0 0 / .45) !important; outline: 2px solid transparent; background: var(--iris); padding: 2px; }
+.portada-img img { border-radius: inherit; }
+.portada-img::after { background: radial-gradient(30% 14% at 30% 12%, rgb(255 255 255 / .7), transparent 70%) !important;
+  box-shadow: inset 0 0 30px rgb(255 255 255 / .18), inset -14px -18px 40px rgb(140 90 255 / .35) !important; }
+.search .lupa, .search .borrar { z-index: 1; }
+.portada-img { border-radius: 22% !important; }
+
+/* ---------- paletas ---------- */
+:root[data-paleta="perla"] { --bg: #f5f1ea; --luz-1: #ffd6e8; --luz-2: #cfe3ff; --luz-3: #fff0c2; --vidrio: rgb(255 255 255 / .78);
+  --iris: conic-gradient(from 200deg, #f7b6d9, #ffe1a8, #c9f5df, #bfe3ff, #d9c8ff, #f7b6d9); --accent: #3b5bdb; --accent-ink: #fff; --rc-perp: #3b5bdb; }
+:root[data-paleta="perla"] :is(.acceso, .grupo, .lista, .sec, .top-row, .search input, .chip, .opcion, .ico, .rc, .ilus, .panel, .vacio, .btn-sec, .btn-calc, .portada-boton) {
+  box-shadow: inset 0 0 18px rgb(255 255 255 / .9), inset -8px -10px 22px rgb(200 170 255 / .18), 0 10px 26px rgb(120 90 60 / .14) !important; }
+:root[data-paleta="perla"] .grupo { background: radial-gradient(90% 120% at 10% 0%, color-mix(in srgb, var(--c) 22%, transparent), transparent 60%) padding-box, linear-gradient(var(--vidrio), var(--vidrio)) padding-box, var(--iris) border-box !important; }
+:root[data-paleta="perla"] .portada-rx { background: linear-gradient(180deg, #3b5bdb, #b0408f); -webkit-background-clip: text; background-clip: text; }
+:root[data-paleta="oro"] { --bg: #030303; --luz-1: #3a2a08; --luz-2: #1a1206; --luz-3: #2b1e05; --vidrio: rgb(12 10 6 / .88);
+  --iris: conic-gradient(from 200deg, #f6d27a, #8a5a1c, #fff1c1, #c08a2e, #f9e5a6, #f6d27a); --accent: #f2c14e; --accent-ink: #1a1203; --rc-perp: #f2c14e; }
+:root[data-paleta="oro"] :is(.label, .familia h2) { color: #f2c14e !important; letter-spacing: .14em; }
+:root[data-paleta="oro"] .grupo .s::before { color: #f2c14e; text-shadow: 0 0 8px #f2c14e88; }
+:root[data-paleta="oro"] .grupo { background: linear-gradient(var(--vidrio), var(--vidrio)) padding-box, var(--iris) border-box !important; }
+:root[data-paleta="oro"] .portada-rx { background: linear-gradient(180deg, #fff3cf, #c9973a); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 4px 18px rgb(242 193 78 / .4)); }
+:root[data-paleta="lima"] { --bg: #04130b; --luz-1: #2bd66b; --luz-2: #0a7d55; --luz-3: #c6f432; --vidrio: rgb(6 26 16 / .84);
+  --iris: conic-gradient(from 200deg, #c6f432, #2bd66b, #4fe3c1, #f7f36a, #9bff7a, #c6f432); --accent: #b6f55a; --accent-ink: #0b1a02; --rc-perp: #b6f55a; }
+:root[data-paleta="lima"] :is(.label, .familia h2) { color: #c9ff7a !important; }
+:root[data-paleta="rubi"] { --bg: #160307; --luz-1: #d81b4a; --luz-2: #7a0b2c; --luz-3: #ff8a3d; --vidrio: rgb(30 6 12 / .86);
+  --iris: conic-gradient(from 200deg, #ff4d6d, #ffb3c1, #ffd27a, #ff7a45, #c9184a, #ff4d6d); --accent: #ff5c7a; --accent-ink: #2a0309; --rc-perp: #ff5c7a; }
+:root[data-paleta="rubi"] :is(.label, .familia h2) { color: #ffa0b4 !important; }
+:root[data-paleta="oceano"] { --bg: #021624; --luz-1: #00b4d8; --luz-2: #0057a8; --luz-3: #48e5c2; --accent: #4fe3ff; --accent-ink: #01202c;
+  --iris: conic-gradient(from 200deg, #6ee7ff, #4f8bff, #9b8cff, #6effd0, #c4fff1, #6ee7ff); }
+:root[data-paleta="oceano"] :is(.label, .familia h2) { color: #8ff3ff !important; }
+:root[data-paleta="atardecer"] { --bg: #170a20; --luz-1: #ff6b8b; --luz-2: #b03dff; --luz-3: #ffb347; --accent: #ffb27a; --accent-ink: #2a0f05; --rc-perp: #ffb27a;
+  --iris: conic-gradient(from 200deg, #ff8fb1, #ffcf7a, #fff1a8, #ff9a6b, #d48bff, #ff8fb1); }
+:root[data-paleta="atardecer"] :is(.label, .familia h2) { color: #ffc6a3 !important; }
+
+/* ---------- detalles jugados ---------- */
+/* burbujitas que suben por el fondo y tarjetas que se mecen */
+:root[data-subir="si"]::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  --b1: color-mix(in srgb, var(--accent) 60%, white); --b2: color-mix(in srgb, var(--luz-2) 60%, white); --b3: color-mix(in srgb, var(--luz-3) 60%, white);
+  background:
+    radial-gradient(circle at 12% 80%, transparent 9px, var(--b1) 10px, transparent 11.5px),
+    radial-gradient(circle at 82% 65%, transparent 14px, var(--b2) 15px, transparent 16.5px),
+    radial-gradient(circle at 30% 40%, transparent 5px, var(--b3) 6px, transparent 7px),
+    radial-gradient(circle at 70% 20%, transparent 7px, var(--b1) 8px, transparent 9.5px),
+    radial-gradient(circle at 50% 92%, transparent 11px, var(--b2) 12px, transparent 13.5px),
+    radial-gradient(circle at 90% 88%, transparent 4px, var(--b3) 5px, transparent 6px),
+    radial-gradient(circle at 6% 30%, transparent 6px, var(--b1) 7px, transparent 8.5px);
+  opacity: .6; animation: suben 18s linear infinite; }
+@keyframes suben { from { transform: translateY(20vh); } to { transform: translateY(-30vh); } }
+:root[data-subir="si"] :is(.grupo, .acceso) { animation: mecer 5s ease-in-out infinite; }
+:root[data-subir="si"] :is(.grupo, .acceso):nth-child(2n) { animation-delay: -2.5s; }
+@keyframes mecer { 50% { transform: translateY(-3px); } }
+/* rebote al tocar: los botones se aplastan y vuelven como gelatina; Enfoques y Juegos tiemblan apenas */
+:root[data-rebote="si"] :is(.grupo, .acceso, .chip, .opcion, .ico, .btn-sec) { transition: transform .35s cubic-bezier(.3, 1.8, .5, 1) !important; }
+:root[data-rebote="si"] :is(.grupo, .acceso, .chip, .opcion, .ico, .btn-sec):active { transform: scale(1.06, .9) !important; transition-duration: .08s !important; }
+:root[data-rebote="si"] .portada-img { animation: tembleque 3.2s ease-in-out infinite !important; }
+@keyframes tembleque { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.03, .97); } 55% { transform: scale(.97, 1.03); } }
+/* pompitas tornasoladas pegadas en la esquina de cada tarjeta */
+:root[data-pompitas="si"] :is(.sec, .panel, .rc, .lista) { background:
+    radial-gradient(circle at calc(100% - 26px) 16px, rgb(255 255 255 / .95) 0 1.6px, transparent 2.2px) padding-box,
+    radial-gradient(circle at calc(100% - 24px) 20px, transparent 7px, color-mix(in srgb, var(--luz-2) 70%, white) 7.6px, color-mix(in srgb, var(--accent) 70%, white) 8.6px, transparent 9.6px) padding-box,
+    radial-gradient(circle at calc(100% - 42px) 13px, transparent 3px, color-mix(in srgb, var(--luz-3) 70%, white) 3.6px, color-mix(in srgb, var(--luz-1) 60%, white) 4.4px, transparent 5.2px) padding-box,
+    linear-gradient(var(--vidrio), var(--vidrio)) padding-box, var(--iris) border-box !important; }
+:root[data-pompitas="si"] .grupo { background:
+    radial-gradient(circle at calc(100% - 26px) 16px, rgb(255 255 255 / .95) 0 1.6px, transparent 2.2px) padding-box,
+    radial-gradient(circle at calc(100% - 24px) 20px, transparent 7px, color-mix(in srgb, var(--luz-2) 70%, white) 7.6px, color-mix(in srgb, var(--accent) 70%, white) 8.6px, transparent 9.6px) padding-box,
+    radial-gradient(circle at calc(100% - 42px) 13px, transparent 3px, color-mix(in srgb, var(--luz-3) 70%, white) 3.6px, color-mix(in srgb, var(--luz-1) 60%, white) 4.4px, transparent 5.2px) padding-box,
+    radial-gradient(90% 120% at 10% 0%, color-mix(in srgb, var(--c) 35%, transparent), transparent 60%) padding-box,
+    linear-gradient(var(--vidrio), var(--vidrio)) padding-box, var(--iris) border-box !important; }
+@media (prefers-reduced-motion: reduce) { :root::before, .grupo, .acceso, .portada-img { animation: none !important; } }

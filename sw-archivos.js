@@ -1,10 +1,11 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "2cfb1f8fb4";
+self.RG_VERSION = "a36d2667fb";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
  "config/firebase.js",
  "css/app.css",
+ "css/glass.css",
  "css/juegos.css",
  "css/repaso.css",
  "datos/angulacion-rotacion.js",

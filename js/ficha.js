@@ -42,7 +42,7 @@ export function vistaFicha(p, volver) {
       <div class="tags">
         ${(p.categoria || []).map((c) => `<span class="tag">${esc(c)}</span>`).join("")}
         ${p.tipo ? `<span class="tag ${p.tipo === "R" ? "rut" : "esp"}">${p.tipo === "R" ? "Rutina" : "Especial"}</span>` : ""}
-        ${p.metodo ? `<span class="tag">${esc(p.metodo)}</span>` : ""}
+        
         ${p.estado !== "validado" ? `<span class="tag pend">Pendiente de revisión</span>` : ""}
       </div>
     </div>

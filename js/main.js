@@ -115,6 +115,20 @@ function refrescarMain() {
   if (nuevo && actual) actual.replaceWith(nuevo);
 }
 
+// Ajustes → Buscar actualización
+app.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-buscar-act]");
+  if (!b) return;
+  const est = b.nextElementSibling;
+  b.disabled = true; est.textContent = "Buscando…";
+  const r = await pwa.buscarActualizacion().catch(() => "error");
+  est.textContent = r === "nueva" ? "Hay una versión nueva: se está descargando y la app se va a recargar sola."
+    : r === "al-dia" ? "Ya tenés la última versión."
+    : r === "sin-sw" ? "Esta vista no usa el modo sin conexión: recargá la página para ver lo último."
+    : "No se pudo comprobar. Revisá la conexión a internet.";
+  b.disabled = false;
+});
+
 app.addEventListener("click", async (e) => {
   const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir]");
   if (!t) return;

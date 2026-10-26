@@ -188,7 +188,8 @@ F['escapula-lateral--v1-arriba'] = lambda: arriba('escapula-lateral--v1-arriba',
 F['escapula-lateral--v2-arriba'] = lambda: arriba('escapula-lateral--v2-arriba', _esc2(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))
 F['humero-lateral-rotacion--v1-arriba'] = lambda: arriba('humero-lateral-rotacion--v1-arriba', _latrot(), rayo('PA', 17.5), 'centro:Right humerus', (0.35, 0.43), cortes=SOBRE_CADERA)
 F['hombro-grashey-tubo2'] = lambda: tubo('hombro-grashey-tubo2', _lado(), rayo('AP', 40), 'cabeza_humero_R', (0.24, 0.18), cortes=SOBRE_CODO)
-F['hombro-garth-tubo2'] = lambda: tubo('hombro-garth-tubo2', _garth(), caudal(rayo('AP', 45), 45), 'cabeza_humero_R', (0.24, 0.30), normal=rayo('AP', 45))
+F['hombro-garth-tubo2'] = lambda: tubo('hombro-garth-tubo2', _garth(), caudal(rayo('AP', 45), 45), 'cabeza_humero_R', (0.24, 0.30), normal=rayo('AP', 45),
+    cortes=SOBRE_XIFOIDES + [('yugular', (0, -1, 0), 0.07)], ventana=dict(ventana('cabeza_humero_R'), encuadre=0.28))      # visto desde arriba la cara tapaba el hombro: sin la cabeza
 F['hombro-y-escapula-neer-tubo2'] = lambda: tubo('hombro-y-escapula-neer-tubo2', _neer(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))
 F['escapula-lateral--v1-tubo2'] = lambda: tubo('escapula-lateral--v1-tubo2', _garth(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))
 F['escapula-lateral--v2-tubo2'] = lambda: tubo('escapula-lateral--v2-tubo2', _esc2(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))

@@ -213,8 +213,8 @@ I["humero-transtoracica"] = () => transtoracica("humero-transtoracica", (f) => f
 function hombroAP(id, titulo, rc, notas) {
   const f = E.figura(id, { caja: [30, 30, 380, 296] });
   const t = cm(f, f.p("coracoides_R"), 0, rc);
-  return { f, t, svg: view(titulo) + side(24, 52, "D") + riEn(f, t, 30, 24) + txt(f1(t[0] - 15 * f.ppc + 6), f1(t[1] + 12 * f.ppc - 6), "RI 24 x 30 horizontal", 11, INK) +
-    f.svg + crossP(t) + notas(f, t) };
+  return { f, t, svg: view(titulo) + side(24, 52, "D") + riEn(f, t, 30, 24) +
+    f.svg + txt(f1(t[0] - 15 * f.ppc), f1(t[1] - 12 * f.ppc - 6), "RI 24 x 30 horizontal", 11, INK) + crossP(t) + notas(f, t) };
 }
 const epis = (f) => [f.p("epicondilo_lat_R"), f.p("epicondilo_med_R")];
 const hombroRotTxt = () =>

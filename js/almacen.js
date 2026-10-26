@@ -78,7 +78,7 @@ export const preferencias = {
 };
 
 // paletas de Pompa de jabón que van sobre fondo claro (el resto son oscuras)
-export const PALETAS_CLARAS = new Set(["perla", "salvia", "niebla", "durazno"]);
+export const PALETAS_CLARAS = new Set(["perla", "perla-brillante", "salvia", "niebla", "durazno"]);
 
 export function aplicarPreferencias() {
   const root = document.documentElement;

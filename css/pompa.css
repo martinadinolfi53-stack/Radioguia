@@ -25,7 +25,7 @@
 .portada-img { border-radius: 22% !important; }
 
 /* ---------- paletas ---------- */
-/* paletas claras (Perla, Salvia, Niebla, Durazno): almacen.js les pone data-theme="light". Fondo apagado y vidrio teñido,
+/* paletas claras (Perla, Perla brillante, Salvia, Niebla, Durazno): almacen.js les pone data-theme="light". Fondo apagado y vidrio teñido,
    no blanco puro, para que no encandile; el texto es casi negro pero cálido. */
 :root[data-theme="light"] :is(.acceso, .grupo, .lista, .sec, .top-row, .search input, .chip, .opcion, .ico, .rc, .ilus, .panel, .vacio, .btn-sec, .btn-calc, .portada-boton) {
   box-shadow: inset 0 0 16px rgb(255 255 255 / .45), inset -8px -10px 22px color-mix(in srgb, var(--luz-2) 22%, transparent), 0 8px 22px rgb(60 50 40 / .12) !important; }
@@ -36,6 +36,8 @@
 :root[data-paleta="perla"] { --bg: #e6e1d8; --luz-1: #edc9d6; --luz-2: #c7d3e6; --luz-3: #eadbb6; --vidrio: rgb(246 242 235 / .66);
   --fg: #2b2723; --mute: #6e665d; --line: rgb(60 50 40 / .12);
   --iris: conic-gradient(from 200deg, #e4b3c8, #ecd4a4, #bfdccb, #b7cfe6, #cdbfe8, #e4b3c8); --accent: #4a5bb8; --accent-ink: #fff; --rc-perp: #4a5bb8; --rx-2: #9a4a86; }
+:root[data-paleta="perla-brillante"] { --bg: #f5f1ea; --luz-1: #ffd6e8; --luz-2: #cfe3ff; --luz-3: #fff0c2; --vidrio: rgb(255 255 255 / .78);
+  --iris: conic-gradient(from 200deg, #f7b6d9, #ffe1a8, #c9f5df, #bfe3ff, #d9c8ff, #f7b6d9); --accent: #3b5bdb; --accent-ink: #fff; --rc-perp: #3b5bdb; --rx-2: #b0408f; }
 :root[data-paleta="salvia"] { --bg: #dfe4dc; --luz-1: #b7ccb0; --luz-2: #e6cfb2; --luz-3: #c3d6d0; --vidrio: rgb(240 243 236 / .64);
   --fg: #1f2a22; --mute: #5d6a5f; --line: rgb(30 50 35 / .12);
   --iris: conic-gradient(from 200deg, #9fbf98, #e3c49d, #d99a7e, #a9cbc0, #c9d6a8, #9fbf98); --accent: #3e6d52; --accent-ink: #fff; --rc-perp: #3e6d52; --rx-2: #b4623f; }

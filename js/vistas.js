@@ -203,6 +203,7 @@ export function vistaFavoritos() {
 const PALETAS = [
   ["original", "Original", "#0b0d1f", "#ff7ad9, #ffd36e, #7dffb0, #6ee7ff, #8a7bff, #ff7ad9"],
   ["perla", "Perla", "#e6e1d8", "#e4b3c8, #ecd4a4, #bfdccb, #b7cfe6, #cdbfe8, #e4b3c8"],
+  ["perla-brillante", "Perla brillante", "#f5f1ea", "#f7b6d9, #ffe1a8, #c9f5df, #bfe3ff, #d9c8ff, #f7b6d9"],
   ["salvia", "Salvia", "#dfe4dc", "#9fbf98, #e3c49d, #d99a7e, #a9cbc0, #c9d6a8, #9fbf98"],
   ["niebla", "Niebla", "#e2e0ea", "#b9a8f0, #f0b8d4, #a8d0f0, #c8f0e0, #d9c8ff, #b9a8f0"],
   ["durazno", "Durazno", "#ede0d7", "#ffb59a, #f6a6bb, #ffd9a0, #f3c7b4, #e8b0d8, #ffb59a"],

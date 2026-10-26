@@ -199,10 +199,17 @@ export function vistaFavoritos() {
     `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>`;
 }
 
-// Ajustes > Apariencia: diseño (clásico o Pompa de jabón); en Pompa, la paleta de colores y los detalles jugados; en clásico, el tema
+// Ajustes > Apariencia: diseño (Clásico, Pompa de jabón o Liquid Glass); en Pompa, la paleta de colores y los detalles jugados; en los otros, el tema
 const PALETAS = [
   ["original", "Original", "#0b0d1f", "#ff7ad9, #ffd36e, #7dffb0, #6ee7ff, #8a7bff, #ff7ad9"],
-  ["perla", "Perla", "#f5f1ea", "#f7b6d9, #ffe1a8, #c9f5df, #bfe3ff, #d9c8ff, #f7b6d9"],
+  ["perla", "Perla", "#e6e1d8", "#e4b3c8, #ecd4a4, #bfdccb, #b7cfe6, #cdbfe8, #e4b3c8"],
+  ["salvia", "Salvia", "#dfe4dc", "#9fbf98, #e3c49d, #d99a7e, #a9cbc0, #c9d6a8, #9fbf98"],
+  ["niebla", "Niebla", "#e2e0ea", "#b9a8f0, #f0b8d4, #a8d0f0, #c8f0e0, #d9c8ff, #b9a8f0"],
+  ["durazno", "Durazno", "#ede0d7", "#ffb59a, #f6a6bb, #ffd9a0, #f3c7b4, #e8b0d8, #ffb59a"],
+  ["grafito", "Grafito", "#111216", "#9aa4b8, #4b5468, #e6ebf5, #c0c8d8, #7aa2ff, #9aa4b8"],
+  ["coral", "Coral", "#0c1322", "#ff8a7a, #ffc7a1, #6f8fe0, #3a5bbf, #ff9fb0, #ff8a7a"],
+  ["mocha", "Mocha", "#181210", "#c99b80, #f1dcc4, #a47864, #e8b8a8, #7a5242, #c99b80"],
+  ["aurora", "Aurora", "#06121a", "#5ef2c2, #7b6bff, #c6f45a, #3fd0ff, #a98bff, #5ef2c2"],
   ["oro", "Oro negro", "#030303", "#f6d27a, #8a5a1c, #fff1c1, #c08a2e, #f9e5a6, #f6d27a"],
   ["lima", "Lima", "#04130b", "#c6f432, #2bd66b, #4fe3c1, #f7f36a, #9bff7a, #c6f432"],
   ["rubi", "Rubí", "#160307", "#ff4d6d, #ffb3c1, #ffd27a, #ff7a45, #c9184a, #ff4d6d"],
@@ -217,7 +224,7 @@ const DETALLES = [
 function apariencia(op) {
   const p = (k) => preferencias.get(k);
   const elegir = (k, v, muestra, txt) => `<button class="ap-op${p(k) === v ? " on" : ""}" data-pref="${k}" data-val="${v}" aria-pressed="${p(k) === v}">${muestra}<span>${txt}</span></button>`;
-  const disenos = `<div class="ap-disenos">${elegir("diseno", "clasico", `<span class="ap-muestra clasico"></span>`, "Clásico")}${elegir("diseno", "pompa", `<span class="ap-muestra pompa"></span>`, "Pompa de jabón")}</div>`;
+  const disenos = `<div class="ap-disenos">${elegir("diseno", "clasico", `<span class="ap-muestra clasico"></span>`, "Clásico")}${elegir("diseno", "pompa", `<span class="ap-muestra pompa"></span>`, "Pompa de jabón")}${elegir("diseno", "vidrio", `<span class="ap-muestra vidrio"></span>`, "Liquid Glass")}</div>`;
   if (p("diseno") !== "pompa") return `<section class="panel"><h2>Apariencia</h2><h3>Diseño</h3>${disenos}
       <h3>Tema</h3><div class="opciones">${op("tema", "oscuro", "Oscuro")}${op("tema", "claro", "Claro")}${op("tema", "sistema", "Como el teléfono")}</div></section>`;
   const paletas = PALETAS.map(([v, txt, bg, iris]) => elegir("paleta", v, `<span class="ap-muestra" style="--mbg: linear-gradient(${bg}, ${bg}); --miris: conic-gradient(${iris})"></span>`, txt)).join("");

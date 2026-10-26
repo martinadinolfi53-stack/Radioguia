@@ -240,6 +240,8 @@ export function vistaAjustes() {
     <section class="panel"><h2>Reportes de preguntas</h2>
       <p>Las preguntas del repaso que reportaron todos los que usan la app. Solo las ve la cuenta de Martin.</p>
       <div class="opciones"><a class="opcion" href="#repaso-reportes">Ver reportes</a></div></section>
+    <section class="panel"><h2>Versión</h2><p>Versión instalada: <b>${esc(pwa.version() || "sin datos")}</b></p>
+      <button class="opcion" data-buscar-act>Buscar actualización</button><p class="act-estado" aria-live="polite"></p></section>
     <section class="panel"><h2>Fuente</h2><p>${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del manual, pendiente de revisión.</p></section>
     <p class="pie">Listas de favoritos y ajustes se guardan solo en este dispositivo.</p>
   </main>`;

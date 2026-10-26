@@ -72,6 +72,22 @@ function planta(cx, yRI, ang, base, label) {
     txt(cx, f1(yRI + 22), "visto desde arriba", 9.5, MUTE, "middle");
 }
 
+// vista desde arriba por capas (render <id>: el cuerpo desde la cabeza, piel semitransparente, huesos adentro; tubo arriba y RI
+// abajo): RI de canto, RC hacia el blanco y el ángulo entre el plano frontal del paciente y el RI
+const _fs = require("fs"), _path = require("path");
+const hayRender = (id) => _fs.existsSync(_path.join(__dirname, "..", "ilus3d", "render", id + ".webp"));
+function arribaCapas(id, blanco, label, caja = [330, 44, 182, 178]) {
+  const f = encajar(id, ["b0", "b1", blanco], caja), t = f.p(blanco), R = f.p("cabeza_humero_R"), L = f.p("cabeza_humero_L");
+  const b0 = f.p("b0"), b1 = f.p("b1"), y = Math.max(b0[1], b1[1]) + 4;
+  const ini = f.p("rc_ini"), u = [ini[0] - t[0], ini[1] - t[1]], n = Math.hypot(...u), k = Math.min(n, Math.max(40, t[1] - 40)) / n;
+  const a = [t[0] + u[0] * k, t[1] + u[1] * k];
+  const izq = L[0] < R[0], g = angulo(R, L);
+  return f.svg + `<line x1="${f1(Math.min(b0[0], b1[0]))}" y1="${f1(y)}" x2="${f1(Math.max(b0[0], b1[0]))}" y2="${f1(y)}" stroke="${INK}" stroke-width="6"/>` +
+    txt(f1(Math.max(b0[0], b1[0]) + 6), f1(y + 5), "RI", 10.5, INK, "start", 700) +
+    `<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(t[0])}" y2="${f1(t[1] - 7)}" stroke="${RED}" stroke-width="3" marker-end="url(#ar)"/>` + redDot(t, 3.5) +
+    (label ? arco(R, 34, izq ? g : 0, izq ? 180 : g, label, BLUE, 20) : "");
+}
+
 // vista desde el tubo (paciente con cara o nuca, RI real detrás) + vista desde arriba (planta) + textos.
 // o: { id (render <id>-tubo2), blanco (punto del RC), pa (tubo por detrás), ang, base, label (planta), ri (rótulo del RI),
 //      arriba (líneas bajo la planta), rc, pos, pie (columnas de texto), extra(f, t) (agregados sobre la vista desde el tubo) }
@@ -84,7 +100,8 @@ function tuboArriba(o) {
     poli(f, RI, "#e6e8ee", INK, 2.2) + f.svg + dash + txt(f1(top[0] + 4), f1(Math.max(top[1] + 14, 50)), o.ri, 10.5, INK, "start", 700) +
     crossP(t) + (o.extra ? o.extra(f, t) : "") +
     separador(318) + titulo(330, "", "Vista desde arriba", "otra") +
-    `<g transform="translate(420 168) scale(1.25) translate(-420 -168)">${planta(410, 168, o.ang, o.base, o.label)}</g>` +
+    (hayRender(o.id + "-arriba") ? arribaCapas(o.id + "-arriba", o.blanco, o.label)
+      : `<g transform="translate(420 168) scale(1.25) translate(-420 -168)">${planta(410, 168, o.ang, o.base, o.label)}</g>`) +
     col(330, 236, o.arriba.map((l) => [l, INK, 400, 10.5])) +
     separador(522) + col(534, 52, o.rc) + col(534, 52 + o.rc.length * 15 + 16, o.pos) + col(534, 252, o.pie)
   );

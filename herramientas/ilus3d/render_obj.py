@@ -128,7 +128,74 @@ def render(modo):
         im = bpy.data.images.load(sc.render.filepath); im.colorspace_settings.name = 'Non-Color'; w_, h_ = im.size
         np.save(S['salida'] + f'-{modo}.npy', np.array(im.pixels[:], np.float32).reshape(h_, w_, 4)[::-1, :, :2])
     return sc, co
-for modo in ('piel', 'hueso') + (('lineas', 'zpiel', 'zhueso') if S.get('capas') else ()): sc, co = render(modo)
+def ventana():
+    """estilo por capas: un solo render con luz. Avatar realista con una ventana transparente alrededor de la línea del rayo que
+    pasa por el centro; adentro, músculos tenues y huesos en 3D (estructuras destacadas en color). Fondo transparente."""
+    import math
+    V = S['ventana']; R = V['radio']; Cw = bl(V['centro'])
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    bpy.ops.wm.obj_import(filepath=S['obj'], forward_axis='NEGATIVE_Z', up_axis='Y')
+    sc = bpy.context.scene; objs = [o for o in sc.objects if o.type == 'MESH']
+    for o in objs:
+        if o.name.startswith('av_ropa'): o.hide_render = True
+    cam = bpy.data.cameras.new('cam'); cam.type = 'ORTHO'; cam.ortho_scale = escala
+    co = bpy.data.objects.new('cam', cam); sc.collection.objects.link(co); sc.camera = co
+    M = Mc.to_4x4(); M.translation = Mc.col[0] * mid[0] + Mc.col[1] * mid[1] - f * 5.0; co.matrix_world = M; cam.clip_end = 20
+    sc.render.engine = 'CYCLES'; sc.cycles.device = 'CPU'; sc.cycles.samples = V.get('muestras', 24); sc.cycles.use_denoising = True
+    sc.cycles.transparent_max_bounces = 64; sc.cycles.max_bounces = 64
+    sc.render.film_transparent = True; sc.render.resolution_x, sc.render.resolution_y = RES
+    sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Medium High Contrast'
+    w = bpy.data.worlds.new('w'); sc.world = w; w.use_nodes = True; bg = w.node_tree.nodes['Background']; bg.inputs[0].default_value = (0.92, 0.93, 0.95, 1); bg.inputs[1].default_value = 0.4
+    def luz(d, en):
+        L = bpy.data.lights.new('sol', 'SUN'); L.energy = en; L.angle = math.radians(35)
+        ob = bpy.data.objects.new('sol', L); sc.collection.objects.link(ob); ob.rotation_euler = (-d.normalized()).to_track_quat('-Z', 'Y').to_euler()
+    luz(-f * 0.7 + up * 0.6 - x * 0.5, 3.2); luz(-f * 0.6 + x * 0.8, 1.4); luz(f * 0.8 + up * 0.4, 1.0)
+    _realista(sc, objs, {})
+    def mat(nombre, build):
+        m = bpy.data.materials.new(nombre); m.use_nodes = True; nt = m.node_tree; N = nt.nodes
+        N.remove(N['Principled BSDF']); s_ = build(N, nt.links.new); nt.links.new(s_, N['Material Output'].inputs['Surface']); return m
+    def dist_linea(N, L):     # distancia de cada punto a la línea del rayo que pasa por el centro de la ventana
+        g = N.new('ShaderNodeNewGeometry'); a = N.new('ShaderNodeVectorMath'); a.operation = 'SUBTRACT'; a.inputs[1].default_value = Cw
+        b = N.new('ShaderNodeVectorMath'); b.operation = 'CROSS_PRODUCT'; b.inputs[1].default_value = f
+        l = N.new('ShaderNodeVectorMath'); l.operation = 'LENGTH'
+        L(g.outputs['Position'], a.inputs[0]); L(a.outputs[0], b.inputs[0]); L(b.outputs[0], l.inputs[0]); return l.outputs['Value']
+    def rango(N, L, v, a0, a1, b0, b1):
+        mr = N.new('ShaderNodeMapRange'); mr.inputs[1].default_value = a0; mr.inputs[2].default_value = a1; mr.inputs[3].default_value = b0; mr.inputs[4].default_value = b1
+        L(v, mr.inputs[0]); return mr.outputs[0]
+    def mezcla(N, L, fac, sh):
+        t = N.new('ShaderNodeBsdfTransparent'); mx = N.new('ShaderNodeMixShader'); L(fac, mx.inputs[0]); L(t.outputs[0], mx.inputs[1]); L(sh, mx.inputs[2]); return mx.outputs[0]
+    mm = None
+    for o in objs:
+        n = o.name
+        if n.startswith('av_piel'):
+            m = o.data.materials[0]; nt = m.node_tree; N = nt.nodes; L = nt.links.new; bs = [k for k in N if k.type == 'BSDF_PRINCIPLED'][-1]
+            L(mezcla(N, L, rango(N, L, dist_linea(N, L), R, R + 0.03, V.get('piel_dentro', 0.10), V.get('piel', 1.0)), bs.outputs[0]), N['Material Output'].inputs['Surface'])
+        elif n.startswith('av_'): continue
+        elif n.startswith('musculo'):
+            if mm is None:
+                def b(N, L):
+                    p = N.new('ShaderNodeBsdfPrincipled'); p.inputs['Base Color'].default_value = (*lin('b8574e'), 1); p.inputs['Roughness'].default_value = 0.5
+                    return mezcla(N, L, rango(N, L, dist_linea(N, L), R, R + 0.03, V.get('musculo', 0.18), 0), p.outputs[0])
+                mm = mat('mus', b)
+            o.data.materials.clear(); o.data.materials.append(mm)
+        else:
+            col = n.split('_')[1] if n.startswith('destacado_') else 'efe5cc'
+            def b(N, L, col=col):
+                p = N.new('ShaderNodeBsdfPrincipled'); p.inputs['Base Color'].default_value = (*lin(col), 1); p.inputs['Roughness'].default_value = 0.6; return p.outputs[0]
+            o.data.materials.clear(); o.data.materials.append(mat(n, b))
+        o.data.polygons.foreach_set('use_smooth', [True] * len(o.data.polygons)); o.data.update()
+    sc.render.use_freestyle = True; fs = sc.view_layers[0].freestyle_settings; ls = fs.linesets[0] if fs.linesets else fs.linesets.new('l')
+    cl = bpy.data.collections.new('av'); sc.collection.children.link(cl)
+    for o in objs:
+        if o.name.startswith('av_') and not o.hide_render: cl.objects.link(o)
+    ls.select_by_collection = True; ls.collection = cl; ls.select_by_visibility = True
+    ls.select_silhouette = True; ls.select_border = False; ls.select_crease = False; ls.select_external_contour = True
+    ls.linestyle = ls.linestyle or bpy.data.linestyles.new('ls'); ls.linestyle.thickness = 1.4; ls.linestyle.color = (0.18, 0.13, 0.11)
+    sc.render.filepath = S['salida'] + '-ventana.png'; bpy.ops.render.render(write_still=True)
+    return sc, co
+if S.get('ventana'): sc, co = ventana()
+else:
+    for modo in ('piel', 'hueso') + (('lineas', 'zpiel', 'zhueso') if S.get('capas') else ()): sc, co = render(modo)
 from bpy_extras.object_utils import world_to_camera_view
 info = {'res': RES, 'pxm': max(RES) / escala, 'puntos': {}}
 for k, v in S.get('puntos', {}).items():

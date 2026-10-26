@@ -39,6 +39,31 @@ def _obj(ruta, partes):
             else: f.writelines('f ' + ' '.join(str(i + vo) for i in t) + '\n' for t in I)
             vo += len(P)
 
+def _musculos(c, nombres, segs):
+    """músculos del atlas (system muscular) cuyo nombre contiene alguno de nombres; cada vértice sigue a los dos segmentos óseos
+    de segs más cercanos en reposo (el atlas está en reposo; los músculos no tienen pesos propios)"""
+    import gzip
+    from scipy.spatial import cKDTree
+    A = json.load(open(rig.B + 'atlas.json')); cache = {}; out = []
+    def malla(p):
+        if p['chunk'] not in cache: cache[p['chunk']] = gzip.open(rig.B + A['chunks'][p['chunk']]['gzip']).read()
+        b = cache[p['chunk']]; n = p['vertexCount']
+        return (np.frombuffer(b, np.float32, n * 3, p['positions']).reshape(-1, 3).astype(float),
+                np.frombuffer(b, np.uint32, p['indexCount'], p['indices']).reshape(-1, 3).astype(int))
+    kd = {s_: cKDTree(c.segs[s_]) for s_ in segs}
+    for p in A['parts']:
+        n = p['name'].lower()
+        if p['system'] != 'muscular' or not any(m in n for m in nombres): continue
+        P, I = malla(p); D = np.stack([kd[s_].query(P)[0] for s_ in segs], 1)
+        o = np.argsort(D, 1)[:, :2]; dd = np.take_along_axis(D, o, 1); w = 1 / (dd + 0.004) ** 3; w /= w.sum(1, keepdims=True)
+        Q = np.zeros_like(P)
+        for j in range(2):
+            for si, s_ in enumerate(segs):
+                m = o[:, j] == si
+                if m.any(): Q[m] += w[m, j, None] * rig.aplicar(c.T[s_], P[m])
+        out.append(('musculo_' + p['id'], (Q, I)))
+    return out
+
 TAPADO = 0.006      # m: un hueso con más de esto de piel de OTRA parte delante (otro dedo, la palma) se dibuja tenue
 def _grupo(seg):
     """parte del cuerpo para decidir si una piel tapa a un hueso: cada dedo es una parte (f1m, f1a… -> dedo1), la palma otra"""
@@ -50,7 +75,7 @@ def _grupo(seg):
 
 def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, cortes=(), puntos=(), px=800,
            muestras=16, con_ropa=None, fundido=0.02, horizontal=None, vertical=None, suavizar=0, capas=False, cara=False,
-           avatar=False):
+           avatar=False, ventana=None):
     """
     pose: posturas.Pose. dir: hacia dónde mira la cámara (= sentido del rayo en una vista desde el tubo), en ejes del cuerpo.
     huesos: segmentos cuyos huesos se dibujan "por transparencia". region: segmentos de piel a dibujar (None = cuerpo entero).
@@ -61,7 +86,12 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     vertical: (A, B) idem, con B arriba de A.
     cara: pelo (malla de otro color sobre el cuero cabelludo) y puntos de ojos, cejas y boca del lado que mira a la cámara,
       para que se entienda si el paciente está de frente (se ven los ojos) o de espaldas (se ve la nuca).
+    ventana: estilo por capas (render con luz): avatar realista con una ventana transparente alrededor de la línea del rayo que
+      pasa por un punto, y adentro músculos tenues y huesos en 3D con estructuras destacadas en color. dict con punto (nombre),
+      radio (m), musculos ([nombres en inglés], [segmentos que siguen]), destacar ([(nombre del hueso, punto, radio m, color)]),
+      contexto (segmentos de huesos extra, p. ej. el tórax, que se ven por la ventana).
     """
+    if ventana: avatar = True
     avatar = avatar or os.environ.get('AVATAR') == '1'     # AVATAR=1: todas las figuras con el avatar realista
     c = cuerpo(); c.posar(pose); pts = Puntos(c)
     huesos = _con_dedos(huesos); region = None if region is None else _con_dedos(region)
@@ -102,7 +132,7 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
         # avatar realista: reemplaza la piel del modelo (que sigue sirviendo para el encuadre y los puntos); mismos cortes
         import avatar as _av
         partes = []
-        for nombre, V, F, uv in _av.posado(c):
+        for nombre, V, F, uv in _av.posado(c, **({'ajustado': ventana.get('ajustado', True)} if ventana else {})):
             for p, n in planos: F = F[((V[F].mean(1) - p) @ n) > -0.002]
             if len(F): partes.append((nombre, (V, F, uv)))
         con_ropa = False; cara = False
@@ -120,10 +150,20 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
         V, F = ropa(c, Pp)
         for p, n in planos: F = F[((V[F].mean(1) - p) @ n) > 0]
         partes.append(('ropa', (V, F)))
+    segs_h = set(huesos) | set((ventana or {}).get('contexto', ()))
+    dest = {c.id_por_nombre[b]: (pts.posado(q), r_, col) for b, q, r_, col in (ventana or {}).get('destacar', ())}
     for k, (P, Ih) in c.huesos_posados().items():
-        if c.huesos[k]['seg'] not in huesos: continue
+        if c.huesos[k]['seg'] not in segs_h: continue
         for p, n in planos: Ih = Ih[((P[Ih].mean(1) - p) @ n) > -0.002]
+        if k in dest and len(Ih):
+            q, r_, col = dest[k]; fd = (np.linalg.norm(P - q, axis=1) < r_)[Ih].all(1)
+            if fd.any(): partes.append((f'destacado_{col}_{k}', (P, Ih[fd])))
+            Ih = Ih[~fd]
         if len(Ih): partes.append(('hueso_' + k + (f'__{gid(c.huesos[k]["seg"])}' if capas else ''), (P, Ih)))
+    if ventana and ventana.get('musculos'):
+        for nombre, (P, Im) in _musculos(c, *ventana['musculos']):
+            for p, n in planos: Im = Im[((P[Im].mean(1) - p) @ n) > -0.002]
+            if len(Im): partes.append((nombre, (P, Im)))
     obj = os.path.join(CACHE, id + '.obj'); _obj(obj, partes)
     usados = Pp[np.unique(I)]
     proy = {(k[0] if isinstance(k, tuple) else k): list(map(float, k[1])) if isinstance(k, tuple) else pts.posado(k).tolist() for k in puntos}     # (nombre, xyz): punto libre
@@ -133,14 +173,23 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     for i, (p, n) in enumerate(planos): proy[f'_corte{i}'] = p.tolist(); proy[f'_corte{i}n'] = (p + n * 0.05).tolist()
     if avatar:
         usados = np.concatenate([d[0][np.unique(d[1])] for n_, d in partes if n_.startswith('av_')])
+    if ventana and ventana.get('encuadre', 0.20):     # encuadre cerca del centro de la ventana (como en una foto de la región): un cuadrado de lado 2 x encuadre
+        q0 = pts.posado(ventana['punto']); f_ = np.asarray(dir, float) / np.linalg.norm(dir); r_ = usados - q0
+        usados = usados[np.linalg.norm(r_ - np.outer(r_ @ f_, f_), axis=1) < ventana.get('encuadre', 0.20)]
     spec = dict(obj=obj, salida=os.path.join(CACHE, id), dir=list(map(float, dir)), arriba=list(map(float, arriba)), realista=avatar,
                 encuadre=[usados.min(0).tolist(), usados.max(0).tolist()] + usados[::40].tolist() + _extremos(usados, dir, arriba), px=px, muestras=muestras, puntos=proy, capas=capas)
+    if ventana: spec['ventana'] = dict(centro=pts.posado(ventana['punto']).tolist(), radio=ventana.get('radio', 0.10), musculo=ventana.get('opacidad_musculo', 0.18), piel=ventana.get('piel', 1.0), muestras=ventana.get('muestras', 24 if ventana.get('piel', 1.0) >= 1 else 80))
     sp = os.path.join(CACHE, id + '-spec.json'); json.dump(spec, open(sp, 'w'))
     r = subprocess.run([sys.executable, os.path.join(AQUI, 'render_obj.py'), sp], capture_output=True, text=True)
     if r.returncode or 'Traceback' in r.stderr: raise RuntimeError(r.stderr[-3000:])
     info = json.load(open(os.path.join(CACHE, id + '.json')))
-    p = Image.open(spec['salida'] + '-piel.png').convert('RGBA'); h = Image.open(spec['salida'] + '-hueso.png').convert('RGBA')
     ax_ = [info['puntos'].pop('_axila' + s_) for s_ in 'RL']
+    if ventana:     # bordes del encuadre desvanecidos (el cuerpo sigue más allá del recorte)
+        im = Image.open(spec['salida'] + '-ventana.png').convert('RGBA'); W_, H_ = im.size; m_ = 0.07 * max(W_, H_)
+        yy, xx = np.mgrid[0:H_, 0:W_]; k_ = np.clip(np.minimum.reduce([xx, W_ - 1 - xx, yy, H_ - 1 - yy]) / m_, 0, 1)
+        im.putalpha(Image.fromarray((np.asarray(im.getchannel('A'), float) * k_).astype(np.uint8)))
+        return _terminar(id, im, info, planos, fundido)
+    p = Image.open(spec['salida'] + '-piel.png').convert('RGBA'); h = Image.open(spec['salida'] + '-hueso.png').convert('RGBA')
     p = _tapar_agujeros(p, zonas=[(q, 12 * info['pxm'] / 100) for q in ax_])
     if suavizar:
         r_, zc, ld = (tuple(suavizar) + ('RL',))[:3] if isinstance(suavizar, tuple) else (suavizar, 15, 'RL')
@@ -163,6 +212,9 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
         m_ = Image.fromarray((np.isin(gp, ids) * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(7))
         la *= np.maximum(np.asarray(m_) > 0, np.asarray(p.getchannel('A')) < 250)
         ln.putalpha(Image.fromarray(la.astype(np.uint8))); out.alpha_composite(ln)
+    return _terminar(id, out, info, planos, fundido)
+
+def _terminar(id, out, info, planos, fundido):
     # desvanecer los bordes cortados
     W_, H_ = out.size; yy, xx = np.mgrid[0:H_, 0:W_]; A = np.asarray(out.getchannel('A'), float)
     ppc = info['pxm'] / 100
@@ -473,11 +525,12 @@ def rect3d(nombre, centro, u, v, ancho, alto):
     c = np.asarray(centro, float); u = np.asarray(u, float) / np.linalg.norm(u); v = np.asarray(v, float) / np.linalg.norm(v)
     return [(f'{nombre}{i}', c + su * ancho / 2 * u + sv * alto / 2 * v) for i, (su, sv) in enumerate(((-1, -1), (1, -1), (1, 1), (-1, 1)))]
 
-def ri_detras(pose, d, centro, ancho=0.45, alto=0.55, nombre='b', margen=0.005, debajo_de=None, arriba=(0, 1, 0), radio=None):
+def ri_detras(pose, d, centro, ancho=0.45, alto=0.55, nombre='b', margen=0.005, debajo_de=None, arriba=(0, 1, 0), radio=None, normal=None):
     """RI (o bucky) perpendicular al rayo d, apoyado contra el paciente del lado de salida del rayo, centrado en el punto
-    centro (proyectado sobre el plano). debajo_de: punto del cuerpo; solo se tiene en cuenta la piel por encima de él."""
+    centro (proyectado sobre el plano). debajo_de: punto del cuerpo; solo se tiene en cuenta la piel por encima de él.
+    normal: normal del RI cuando no es perpendicular al rayo (rayo angulado: el RI sigue vertical u horizontal)."""
     c = cuerpo(); c.posar(pose); pts = Puntos(c); Pp = c.piel_posada()
-    d = np.asarray(d, float); d /= np.linalg.norm(d)
+    d = np.asarray(normal if normal is not None else d, float); d /= np.linalg.norm(d)
     if debajo_de: Pp = Pp[Pp[:, 1] > pts.posado(debajo_de)[1]]
     if radio: Pp = Pp[np.linalg.norm(Pp - pts.posado(centro), axis=1) < radio]     # solo la piel cerca del punto (p. ej. el hombro)
     cen = pts.posado(centro); prof = (Pp @ d).max() + margen; cen = cen + (prof - cen @ d) * d

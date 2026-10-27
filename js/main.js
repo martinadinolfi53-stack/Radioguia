@@ -130,7 +130,7 @@ app.addEventListener("click", async (e) => {
 });
 
 app.addEventListener("click", async (e) => {
-  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir]");
+  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir],[data-cerrar-sesion]");
   if (!t) return;
   const rehacer = () => { const y = scrollY; render(); scrollTo(0, y); };
   if (t.dataset.fav) { e.preventDefault(); tocarEstrella(t.dataset.fav, rehacer); }
@@ -158,6 +158,16 @@ app.addEventListener("click", async (e) => {
   } else if (t.dataset.pref) { preferencias.set(t.dataset.pref, t.dataset.val); render(); }
   else if ("instalar" in t.dataset) { await pwa.instalar(); render(); }
   else if ("cerrarAviso" in t.dataset) { preferencias.set("avisoInstalar", false); render(); }
+  else if ("cerrarSesion" in t.dataset) {
+    const { usuario, conGoogle } = nube.estado();
+    const aviso = usuario && !conGoogle ? "Estás solo con apodo: si cerrás la sesión, no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Cerrar igual?" : "¿Cerrar la sesión? Tus favoritos quedan guardados en este celular.";
+    if (!confirm(aviso)) return;
+    t.disabled = true;
+    try { if (usuario) await nube.salir(); } catch {}
+    // olvida el nombre y vuelve a empezar, así no quedan datos de la cuenta anterior en pantalla
+    try { localStorage.removeItem("radioguia.nombre"); } catch {}
+    location.hash = ""; location.reload();
+  }
 });
 
 app.addEventListener("input", (e) => {
@@ -179,6 +189,6 @@ iniciarJuegos(app);
 iniciarGrupos(app, render);
 pwa.iniciar(() => { if (["portada", "inicio", "ajustes", "ayuda-app"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
-// cuando llega la cuenta: pedir la foto si falta, o mostrarla en la portada
-nube.alCambiar(() => { const p = nube.estado().perfil; if (identificado() && (ruta().tipo === "portada" || (p && !p.foto))) render(); });
+// cuando llega la cuenta: pedir la foto si falta, o mostrarla en la portada y en Ajustes
+nube.alCambiar(() => { const p = nube.estado().perfil; if (identificado() && (ruta().tipo === "portada" || ruta().tipo === "ajustes" || (p && !p.foto))) render(); });
 render();

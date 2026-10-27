@@ -376,6 +376,12 @@ button.sel-fila { width: 100%; text-align: left; padding: 10px 14px; gap: 12px; 
 .sel-fila.on { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
 .portada-hola .portada-foto { display: block; width: 72px; height: 72px; margin: 0 auto 12px; border: 2px solid rgba(255,255,255,.25); }
 
+/* ---------- Ajustes > Tu cuenta ---------- */
+.aj-cuenta { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
+.aj-cuenta span { display: grid; min-width: 0; }
+.aj-cuenta small { color: var(--mute); overflow-wrap: anywhere; }
+.aj-salir { color: var(--rojo, #ff6b6b); }
+
 /* ---------- Ajustes > Apariencia: muestras para elegir ---------- */
 .ap-disenos, .ap-paletas { display: grid; gap: 10px; }
 .ap-disenos { grid-template-columns: repeat(3, 1fr); }

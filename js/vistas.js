@@ -238,10 +238,20 @@ function apariencia(op) {
       <h3>Detalles jugados</h3>${detalles}</section>`;
 }
 
+// Ajustes > Tu cuenta: quién está usando la app y el botón para cerrar la sesión
+function cuenta() {
+  const { usuario, perfil, conGoogle } = nube.estado(), apodo = perfil?.apodo || nombreUsuario();
+  const detalle = conGoogle ? `Con Google · ${esc(usuario.email || "")}` : usuario ? "Solo con apodo, en este celular" : "Sin cuenta";
+  return `<section class="panel"><h2>Tu cuenta</h2>
+      <div class="aj-cuenta">${avatar(perfil?.foto, apodo)}<span><b>${esc(apodo)}</b><small>${detalle}</small></span></div>
+      <div class="opciones">${usuario ? `<a class="opcion" href="#juegos-cuenta">Editar perfil</a>` : ""}<button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button></div></section>`;
+}
+
 export function vistaAjustes() {
   const op = (k, v, txt) => `<button class="opcion${preferencias.get(k) === v ? " on" : ""}" data-pref="${k}" data-val="${v}" aria-pressed="${preferencias.get(k) === v}">${txt}</button>`;
   return cabecera({ titulo: "Ajustes", atras: "#" }) + `
   <main class="wrap">
+    ${cuenta()}
     ${apariencia(op)}
     <section class="panel"><h2>Tamaño del texto</h2><div class="opciones">${op("texto", "normal", "Normal")}${op("texto", "grande", "Grande")}</div></section>
     <section class="panel"><h2>Sin conexión</h2><p>${pwa.estadoOffline()}</p></section>

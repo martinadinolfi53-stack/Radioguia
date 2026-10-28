@@ -11,7 +11,7 @@ const MESA = "No (sobre la mesa)";
 const RI_18x24 = "18 × 24 cm, longitudinal o transversal (varias imágenes en un RI)";
 const RI_18x24_L = "18 × 24 cm, longitudinal";
 const f = (ri, extra = {}) => ({ ri, dfri: DFRI, respiracion: null, ...extra });
-const crit = (estructuras, evaluacion) => [["Estructuras que se muestran", estructuras], ["Criterios de evaluación", evaluacion]];
+const crit = (estructuras, evaluacion) => [["Estructuras que se muestran", estructuras], ...(evaluacion.length ? [["Criterios de evaluación", evaluacion]] : [])];
 const GONADAS = "Proteger las gónadas.";
 
 export default {

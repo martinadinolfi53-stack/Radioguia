@@ -8,7 +8,7 @@
 const DFRI = "122 cm";
 const BUCKY = "Sí (Bucky, rejilla 16:1)";
 const f = (ri, extra = {}) => ({ ri, dfri: DFRI, respiracion: "Suspendida al final de la espiración", ...extra });
-const crit = (estructuras, evaluacion) => [["Estructuras que se muestran", estructuras], ["Criterios de evaluación", evaluacion]];
+const crit = (estructuras, evaluacion) => [["Estructuras que se muestran", estructuras], ...(evaluacion.length ? [["Criterios de evaluación", evaluacion]] : [])];
 const GONADAS = "Proteger las gónadas.";
 const V2 = (...paginas) => ({ paginas, volumen: 2 });
 const ESCALA = "Escala de contraste muy corta, que muestre claramente el contraste en riñones, uréteres y vejiga.";

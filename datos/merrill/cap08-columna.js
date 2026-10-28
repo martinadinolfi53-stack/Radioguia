@@ -10,7 +10,7 @@ const LARGA = "152 a 183 cm (más DORI; ayuda a ver C7)";
 const BUCKY = "Sí (Bucky, rejilla 16:1)";
 const REJILLA = "Sí (rejilla)";
 const f = (ri, extra = {}) => ({ ri, dfri: DFRI, respiracion: "Suspendida", ...extra });
-const crit = (estructuras, evaluacion) => [["Estructuras que se muestran", estructuras], ["Criterios de evaluación", evaluacion]];
+const crit = (estructuras, evaluacion) => [["Estructuras que se muestran", estructuras], ...(evaluacion.length ? [["Criterios de evaluación", evaluacion]] : [])];
 const GONADAS = "Proteger las gónadas.";
 
 export default {

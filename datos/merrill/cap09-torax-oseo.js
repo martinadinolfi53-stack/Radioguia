@@ -7,7 +7,7 @@
 const DFRI = "122 cm";
 const BUCKY = "Sí (Bucky, rejilla 16:1)";
 const f = (ri, extra = {}) => ({ ri, dfri: DFRI, respiracion: "Suspendida", ...extra });
-const crit = (estructuras, evaluacion) => [["Estructuras que se muestran", estructuras], ["Criterios de evaluación", evaluacion]];
+const crit = (estructuras, evaluacion) => [["Estructuras que se muestran", estructuras], ...(evaluacion.length ? [["Criterios de evaluación", evaluacion]] : [])];
 const GONADAS = "Proteger las gónadas.";
 const RESP_ESTERNON = "Respiración lenta y superficial durante la exposición (difumina la trama pulmonar); con tiempo corto, suspendida al final de la espiración";
 

@@ -18,8 +18,11 @@ def par(id, pose, d, centro, ri, otra='costado', radio=0.15, encuadre=0.27, hues
     if 'arriba_tubo' in kw: kt['arriba'] = kw.pop('arriba_tubo')
     F[id + '-tubo'] = lambda: tubo(id, pose(), d, centro, ri, radio=radio, encuadre=encuadre, huesos=huesos, **kt)
     if otra == 'costado': F[id + '-otra'] = lambda: costado(id, pose(), d, centro, ri, huesos=huesos, encuadre=enc_otra, **kw)
-    elif otra == 'arriba': F[id + '-otra'] = lambda: arriba(id, pose(), d, centro, ri, huesos=huesos, **{k: v for k, v in kw.items() if k not in ('desde', 'arriba_img')})
+    # desde la cabeza: el tronco cortado 4 cm por encima de la cresta, para ver el giro de la pelvis sin el tórax delante
+    elif otra == 'arriba': F[id + '-otra'] = lambda: arriba(id, pose(), d, centro, ri, huesos=huesos, cortes=[('cresta_iliaca_R', (0, -1, 0), 0.04)], region=TRONCO_BAJO,
+                                                          **{k: v for k, v in kw.items() if k not in ('desde', 'arriba_img')})
 
+TRONCO_BAJO = ['pelvis', 'L3', 'L5', 'muslo_R', 'muslo_L', 'pierna_R', 'pierna_L']     # sin brazos ni pies: solo el giro de la pelvis
 _rot = lambda g=17: Pose().cadera_rot_int('R', ROT(g)).cadera_rot_int('L', ROT(g))       # las dos piernas con rotación interna 15-20°
 EIAS = 'eias_R+eias_L'
 # AP de pelvis: RC a mitad de camino entre las EIAS y la sínfisis

@@ -21,8 +21,8 @@ export const icono = {
   libro: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v16H6.5A2.5 2.5 0 004 21.5z"/><path d="M4 5.5v16"/></svg>',
 };
 
-export function cabecera({ titulo, sub, atras, derecha = "" }) {
-  return `<header class="top"><div class="wrap top-row">
+export function cabecera({ titulo, sub, atras, derecha = "", chica = false }) {
+  return `<header class="top${chica ? " chica" : ""}"><div class="wrap top-row">
     ${atras ? `<a class="ico" href="${atras}" data-atras aria-label="Volver">${icono.atras}</a>` : `<img class="logo" src="iconos/icono-192.png" alt="">`}
     <div class="titulo"><h1>${esc(titulo)}</h1>${sub ? `<p>${esc(sub)}</p>` : ""}</div>
     ${derecha}
@@ -62,3 +62,8 @@ export function abrirHoja(titulo, cuerpo, alCerrar) {
   hojaAbierta = { panel: hoja.querySelector(".hoja-panel"), cerrar };
   return hojaAbierta;
 }
+
+// barra de pestañas fija abajo (en Liquid Glass flota como en el iPhone): Enfoques, Favoritos, Juegos y Ajustes
+const PESTANAS = [["enfoques", "#enfoques", "Enfoques", icono.libro], ["favoritos", "#favoritos", "Favoritos", icono.estrella(false)], ["juegos", "#juegos", "Juegos", icono.repaso], ["ajustes", "#ajustes", "Ajustes", icono.ajustes]];
+export const barraPestanas = (activa) => `<nav class="pestanas" aria-label="Secciones">${PESTANAS.map(([id, h, txt, ic]) =>
+  `<a href="${h}"${id === activa ? ' class="on" aria-current="page"' : ""}>${ic}<span>${txt}</span></a>`).join("")}</nav>`;

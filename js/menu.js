@@ -2,7 +2,7 @@
 import { MENU } from "./datos.js";
 
 const C = { torax: "#2a9d8f", superior: "#1f9a6a", inferior: "#6f5fd0", pelvis: "#9a55c0", columna: "#3d7fd0", toraxOseo: "#6a9a2f", craneo: "#c0619a", abdomen: "#c98a1b", contraste: "#c76b3a", portatil: "#7d8796", pediatria: "#d9822b" };
-export const FAMILIAS = {
+const F = {
   torax: { nombre: "Tórax", color: C.torax },
   superior: { nombre: "Miembro superior", color: C.superior },
   inferior: { nombre: "Miembro inferior", color: C.inferior },
@@ -16,7 +16,11 @@ export const FAMILIAS = {
   pediatria: { nombre: "Pediatría", color: C.pediatria },
 };
 
-export const GRUPOS = MENU.map((g) => ({ ...g, familia: FAMILIAS[g.familia] }));
+// cada familia sabe su id (para la ruta #f-<id>)
+for (const [id, f] of Object.entries(F)) f.id = id;
+export const FAMILIAS = Object.values(F);
+
+export const GRUPOS = MENU.map((g) => ({ ...g, familia: F[g.familia] }));
 
 for (const g of GRUPOS) g.color = g.familia.color;
 

@@ -4,13 +4,13 @@ import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { listas, preferencias, aplicarPreferencias } from "./almacen.js";
 import { tocarEstrella, hojaLista, quitarDeLista } from "./listas-ui.js";
 import { vistaImprimir, opcionesImpresion, preguntarEImprimir } from "./imprimir.js";
-import { estado, vistaElegirFuente, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
+import { estado, vistaElegirFuente, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes, vistaFamilia } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
 import { mostrarTermino } from "./glosario.js";
 import { ampliar } from "./imagenes.js";
 import { pwa } from "./pwa.js";
-import { grupoPorId, grupoDeRegion } from "./menu.js";
+import { grupoPorId, grupoDeRegion, FAMILIAS } from "./menu.js";
 import { vistaRepaso, iniciarRepaso } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
 import { iniciarGrupos } from "./grupos.js";
@@ -18,8 +18,10 @@ import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificaci
 import * as nube from "./nube.js";
 import { vistaFoto } from "./foto.js";
 import { elegida, elegirFuente } from "./fuente.js";
+import { iniciarLente } from "./lente.js";
 
 const app = document.getElementById("app");
+iniciarLente(app);
 aplicarPreferencias();
 listas.limpiar(new Set(proyecciones.map((p) => p.id)));
 
@@ -38,6 +40,7 @@ function ruta() {
     const fav = h.endsWith("-fav"), id = h.slice(3, fav ? -4 : undefined);
     if (regionPorId[id]) return { tipo: "region", r: regionPorId[id], fav };
   }
+  if (h.startsWith("#f-")) { const f = FAMILIAS.find((x) => x.id === h.slice(3)); if (f) return { tipo: "familia", f }; }
   if (h === "#favoritos") return { tipo: "favoritos" };
   if (h === "#imprimir") return { tipo: "imprimir" };
   if (h === "#ajustes" || h === "#ajustes-fuente") return { tipo: "ajustes" };
@@ -90,6 +93,7 @@ function render() {
     case "repaso": app.innerHTML = vistaRepaso(r.h); break;
     case "juegos": app.innerHTML = vistaJuegos(r.h); break;
     case "inicio": app.innerHTML = vistaInicio(); break;
+    case "familia": app.innerHTML = vistaFamilia(r.f); break;
     default: app.innerHTML = vistaPortada();
   }
   // el título es el nombre sugerido del PDF
@@ -154,7 +158,7 @@ app.addEventListener("click", async (e) => {
 });
 
 app.addEventListener("click", async (e) => {
-  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir]");
+  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir],[data-cerrar-sesion]");
   if (!t) return;
   const rehacer = () => { const y = scrollY; render(); scrollTo(0, y); };
   if (t.dataset.fav) { e.preventDefault(); tocarEstrella(t.dataset.fav, rehacer); }
@@ -182,6 +186,16 @@ app.addEventListener("click", async (e) => {
   } else if (t.dataset.pref) { preferencias.set(t.dataset.pref, t.dataset.val); render(); }
   else if ("instalar" in t.dataset) { await pwa.instalar(); render(); }
   else if ("cerrarAviso" in t.dataset) { preferencias.set("avisoInstalar", false); render(); }
+  else if ("cerrarSesion" in t.dataset) {
+    const { usuario, conGoogle } = nube.estado();
+    const aviso = usuario && !conGoogle ? "Estás solo con apodo: si cerrás la sesión, no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Cerrar igual?" : "¿Cerrar la sesión? Tus favoritos quedan guardados en este celular.";
+    if (!confirm(aviso)) return;
+    t.disabled = true;
+    try { if (usuario) await nube.salir(); } catch {}
+    // olvida el nombre y vuelve a empezar, así no quedan datos de la cuenta anterior en pantalla
+    try { localStorage.removeItem("radioguia.nombre"); } catch {}
+    location.hash = ""; location.reload();
+  }
 });
 
 app.addEventListener("input", (e) => {
@@ -203,6 +217,6 @@ iniciarJuegos(app);
 iniciarGrupos(app, render);
 pwa.iniciar(() => { if (["portada", "inicio", "ajustes", "ayuda-app"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
-// cuando llega la cuenta: pedir la foto si falta, o mostrarla en la portada
-nube.alCambiar(() => { const p = nube.estado().perfil; if (identificado() && (ruta().tipo === "portada" || (p && !p.foto))) render(); });
+// cuando llega la cuenta: pedir la foto si falta, o mostrarla en la portada y en Ajustes
+nube.alCambiar(() => { const p = nube.estado().perfil; if (identificado() && (ruta().tipo === "portada" || ruta().tipo === "ajustes" || (p && !p.foto))) render(); });
 render();

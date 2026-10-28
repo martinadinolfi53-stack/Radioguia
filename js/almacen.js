@@ -100,11 +100,14 @@ export const preferencias = {
   set(k, v) { prefs = { ...prefs, [k]: v }; escribir(K_PREF, prefs); aplicarPreferencias(); },
 };
 
+// paletas de Pompa de jabón que van sobre fondo claro (el resto son oscuras)
+export const PALETAS_CLARAS = new Set(["perla", "perla-brillante", "salvia", "niebla", "durazno"]);
+
 export function aplicarPreferencias() {
   const root = document.documentElement;
-  const pompa = prefs.diseno === "pompa";
-  // en Pompa de jabón la paleta decide si es clara u oscura (Perla es la única clara); el Tema vale solo para el diseño clásico
-  const tema = pompa ? (prefs.paleta === "perla" ? "claro" : "oscuro")
+  const pompa = prefs.diseno === "pompa", vidrio = prefs.diseno === "vidrio";
+  // en Pompa de jabón la paleta decide si es clara u oscura; en Clásico y Liquid Glass manda el Tema
+  const tema = pompa ? (PALETAS_CLARAS.has(prefs.paleta) ? "claro" : "oscuro")
     : prefs.tema === "sistema" ? (matchMedia("(prefers-color-scheme: light)").matches ? "claro" : "oscuro") : prefs.tema;
   root.dataset.theme = tema === "claro" ? "light" : "dark";
   root.dataset.texto = prefs.texto;
@@ -112,6 +115,7 @@ export function aplicarPreferencias() {
   for (const k of ["paleta", "subir", "rebote", "pompitas"]) {
     if (pompa) root.dataset[k] = prefs[k]; else delete root.dataset[k];
   }
-  for (const id of ["hoja-glass", "hoja-pompa"]) { const l = document.getElementById(id); if (l) l.disabled = !pompa; }
+  const hojas = { "hoja-glass": pompa, "hoja-pompa": pompa, "hoja-vidrio": vidrio };
+  for (const [id, on] of Object.entries(hojas)) { const l = document.getElementById(id); if (l) l.disabled = !on; }
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", tema === "claro" ? "#f3f5f8" : "#0d1117");
 }

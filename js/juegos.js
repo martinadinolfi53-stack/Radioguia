@@ -4,7 +4,7 @@
 // Las estadísticas se acumulan con cada repaso terminado (evento rg:repaso-resultado de js/repaso.js), así no se pierden
 // cuando el repaso descarta resultados viejos (guarda los últimos 50).
 import { proyeccionPorId } from "./datos.js";
-import { esc, icono, cabecera } from "./util.js";
+import { esc, icono, cabecera, barraPestanas } from "./util.js";
 import { GRUPOS, grupoDeRegion } from "./menu.js";
 import { ASPECTOS } from "./repaso-preguntas.js";
 import { resultados, empezarRepaso } from "./repaso.js";
@@ -131,7 +131,7 @@ function vistaMenu() {
     </div>
     <p class="pie" id="jg-aviso" hidden></p>
     <p class="pie">Para jugar en grupo entrás con un apodo o con tu cuenta de Google.</p>
-  </main>`;
+  </main>` + barraPestanas("juegos");
 }
 
 const barra = (x) => `<div class="jg-fila"><span><b>${esc(x.nombre)}</b><small>${x.ok} de ${x.n} correctas</small></span>

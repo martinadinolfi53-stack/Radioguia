@@ -27,7 +27,7 @@ for (const { id: fid, lista: fLista } of FUENTES) {
 
   // cada región del libro tiene que estar en un solo botón del menú principal
   const enMenu = MENU.flatMap((g) => g.regiones);
-  for (const g of MENU) if (!FAMILIAS[g.familia]) problemas.push(`${dir}/menu.js: familia desconocida "${g.familia}" en ${g.id}`);
+  for (const g of MENU) if (!FAMILIAS.some((f) => f.id === g.familia)) problemas.push(`${dir}/menu.js: familia desconocida "${g.familia}" en ${g.id}`);
   for (const r of regiones) if (!enMenu.includes(r.id)) problemas.push(`Región sin botón en el menú (${dir}/menu.js): ${r.id}`);
   enMenu.forEach((id, i) => { if (enMenu.indexOf(id) !== i || !regiones.some((r) => r.id === id)) problemas.push(`Región repetida o inexistente en ${dir}/menu.js: ${id}`); });
 

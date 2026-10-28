@@ -35,7 +35,7 @@ export function vistaFicha(p, volver) {
     ${x.rc ? `<div class="ver-rc rc-${x.rc.direccion === "cefálico" ? "cefalico" : x.rc.direccion || "sin-dato"}"><h4>Rayo central</h4>${RC_ETIQUETA[x.rc.direccion] ? `<p class="rc-dir">${esc(RC_ETIQUETA[x.rc.direccion])}${x.rc.angulo ? ` <b>${esc(x.rc.angulo)}</b>` : ""}</p>` : ""}<p>${m(x.rc.texto)}</p></div>` : ""}
     ${x.ilustracion?.src ? bloqueIlustracion(x.ilustracion, `${p.nombre} · ${x.nombre}`) : ""}</div></details>`;
 
-  return cabecera({ titulo: r?.nombre || "", sub: r?.detalle, atras: volver, derecha: botonFav(p.id, "ico fav") }) + `
+  return cabecera({ titulo: r?.nombre || "", sub: r?.detalle, atras: volver, derecha: botonFav(p.id, "ico fav"), chica: true }) + `
   <main class="wrap ficha">
     <div class="ficha-cab">
       <h2>${esc(p.nombre)}</h2>

@@ -1,9 +1,9 @@
 // Pantallas de navegación: Portada (elegir Enfoques o Juegos), Inicio de enfoques, Región, Favoritos, resultados del buscador y Ajustes.
 import { capitulos, regiones, regionPorId, proyecciones, proyeccionesDe, CATEGORIAS, norm, FUENTE } from "./datos.js";
 import { listas, preferencias } from "./almacen.js";
-import { esc, icono, cabecera, botonFav } from "./util.js";
+import { esc, icono, cabecera, botonFav, barraPestanas } from "./util.js";
 import { pwa } from "./pwa.js";
-import { GRUPOS } from "./menu.js";
+import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { avatar } from "./foto.js";
@@ -35,11 +35,29 @@ function resultados(lista, q) {
 // menú principal: botones por zona agrupados por región, con su color (ver js/menu.js); "filtro" deja solo las proyecciones que cumplen (favoritos)
 function menuRegiones(filtro) {
   const fav = filtro !== todos;
+  if (!fav) {
+    // menú por región: una fila por región grande; adentro se despliegan sus partes con los enfoques
+    const filas = FAMILIAS.map((f) => ({ f, n: GRUPOS.filter((g) => g.familia === f).reduce((a, g) => a + g.regiones.reduce((b, id) => b + proyeccionesDe(id).length, 0), 0) })).filter((x) => x.n);
+    return `<section class="familia"><h2>Regiones</h2><div class="grupos">${filas.map(({ f, n }) =>
+      `<a class="grupo" style="--c:${f.color}" href="#f-${f.id}"><span class="t">${esc(f.nombre)}</span><span class="s">${n}</span></a>`).join("")}</div></section>`;
+  }
   const botones = GRUPOS.map((g) => ({ g, n: g.regiones.reduce((a, id) => a + proyeccionesDe(id).filter(filtro).length, 0) })).filter((x) => x.n);
   const familias = [...new Set(botones.map((x) => x.g.familia))];
   return familias.map((f) => `<section class="familia" style="--c:${f.color}"><h2>${esc(f.nombre)}</h2><div class="grupos">${botones.filter((x) => x.g.familia === f).map(({ g, n }) =>
     `<a class="grupo" href="#g-${g.id}${fav ? "-fav" : ""}"><span class="t">${esc(g.nombre)}</span><span class="s">${n} ${n === 1 ? "proyección" : "proyecciones"}</span></a>`).join("")}</div></section>`).join("");
 }
+
+// una región grande (por ejemplo Miembro superior): cada parte se despliega y muestra sus enfoques
+export function vistaFamilia(f) {
+  const partes = GRUPOS.filter((g) => g.familia === f).map((g) => ({ g, lista: g.regiones.flatMap((id) => proyeccionesDe(id)) })).filter((x) => x.lista.length);
+  const total = partes.reduce((a, x) => a + x.lista.length, 0);
+  return cabecera({ titulo: f.nombre, sub: `${total} enfoques · ${FUENTE.corto}`, atras: "#enfoques" }) + `
+  <main class="wrap" style="--c:${f.color}">
+    ${partes.map(({ g, lista }, i) => `<details class="sec region"${i === 0 ? " open" : ""}><summary><span class="t">${esc(g.nombre)}</span><span class="s">${lista.length}</span>${icono.chev}</summary>
+      <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></details>`).join("")}
+  </main>` + barraPestanas("enfoques");
+}
+
 const todos = () => true;
 
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
@@ -113,7 +131,7 @@ export function vistaInicio() {
       </div>
       ${menuRegiones(todos)}`}
     <p class="pie">${proyecciones.length} proyecciones · ${regiones.length} regiones · Fuente: ${esc(FUENTE.corto)}</p>
-  </main>`;
+  </main>` + barraPestanas("enfoques");
 }
 
 export function vistaRegion(r, soloFav) {
@@ -123,14 +141,14 @@ export function vistaRegion(r, soloFav) {
   const f = estado.filtro[r.id];
   const lista = f ? todas.filter((p) => p.categoria.includes(f)) : todas;
   const chip = (c, txt) => `<button class="chip${(f || "") === c ? " on" : ""}" data-filtro="${esc(r.id)}" data-cat="${esc(c)}">${esc(txt)}</button>`;
-  return cabecera({ titulo: r.nombre, sub: soloFav ? act.nombre : r.detalle, atras: soloFav ? "#favoritos" : "#enfoques" }) + `
+  return cabecera({ titulo: r.nombre, sub: soloFav ? act.nombre : r.detalle, atras: soloFav ? "#favoritos" : `#f-${g.familia.id}` }) + `
   <div class="filtros"><div class="wrap filtros-row">
     <div class="chips" role="group" aria-label="Filtrar por proyección">${cats.length > 1 ? chip("", "Todas") + cats.map((c) => chip(c, c)).join("") : cats.map((c) => `<span class="chip on">${esc(c)}</span>`).join("")}</div>
     <a class="btn-calc" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
   </div></div>
   <main class="wrap">
     ${lista.length ? `<div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div>` : `<div class="vacio">No hay proyecciones en esta categoría.</div>`}
-  </main>`;
+  </main>` + barraPestanas("enfoques");
 }
 
 // índice de una región del menú: sus partes como subtítulos y las proyecciones de cada una
@@ -148,14 +166,14 @@ export function vistaGrupo(g, soloFav) {
     return `<section class="parte"><h2 class="sub"><span>${esc(r.nombre)}</span>${r.detalle ? `<small>${esc(r.detalle)}</small>` : ""}</h2>
       <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></section>`;
   }).join("");
-  return cabecera({ titulo: g.nombre, sub: `${soloFav ? act.nombre + " · " : ""}${todas.length} ${todas.length === 1 ? "proyección" : "proyecciones"}`, atras: soloFav ? "#favoritos" : "#enfoques" }) + `
+  return cabecera({ titulo: g.nombre, sub: `${soloFav ? act.nombre + " · " : ""}${todas.length} ${todas.length === 1 ? "proyección" : "proyecciones"}`, atras: soloFav ? "#favoritos" : `#f-${g.familia.id}` }) + `
   <div class="filtros"><div class="wrap filtros-row">
     ${cats.length > 1 ? `<div class="chips" role="group" aria-label="Filtrar por proyección">${chip("", "Todas") + cats.map((c) => chip(c, c)).join("")}</div>` : ""}
     <a class="btn-calc" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
   </div></div>
   <main class="wrap" style="--c:${g.color}">
     ${partes || `<div class="vacio">No hay proyecciones en esta categoría.</div>`}
-  </main>`;
+  </main>` + barraPestanas("enfoques");
 }
 
 // modo seleccionar de Favoritos: las proyecciones de la lista con casillas, para quitar varias juntas
@@ -196,13 +214,21 @@ export function vistaFavoritos() {
     </div>`;
   return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#enfoques" }) +
     (favs.length && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
-    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>`;
+    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>` + barraPestanas("favoritos");
 }
 
-// Ajustes > Apariencia: diseño (clásico o Pompa de jabón); en Pompa, la paleta de colores y los detalles jugados; en clásico, el tema
+// Ajustes > Apariencia: diseño (Clásico, Pompa de jabón o Liquid Glass); en Pompa, la paleta de colores y los detalles jugados; en los otros, el tema
 const PALETAS = [
   ["original", "Original", "#0b0d1f", "#ff7ad9, #ffd36e, #7dffb0, #6ee7ff, #8a7bff, #ff7ad9"],
-  ["perla", "Perla", "#f5f1ea", "#f7b6d9, #ffe1a8, #c9f5df, #bfe3ff, #d9c8ff, #f7b6d9"],
+  ["perla", "Perla", "#e6e1d8", "#e4b3c8, #ecd4a4, #bfdccb, #b7cfe6, #cdbfe8, #e4b3c8"],
+  ["perla-brillante", "Perla brillante", "#f5f1ea", "#f7b6d9, #ffe1a8, #c9f5df, #bfe3ff, #d9c8ff, #f7b6d9"],
+  ["salvia", "Salvia", "#dfe4dc", "#9fbf98, #e3c49d, #d99a7e, #a9cbc0, #c9d6a8, #9fbf98"],
+  ["niebla", "Niebla", "#e2e0ea", "#b9a8f0, #f0b8d4, #a8d0f0, #c8f0e0, #d9c8ff, #b9a8f0"],
+  ["durazno", "Durazno", "#ede0d7", "#ffb59a, #f6a6bb, #ffd9a0, #f3c7b4, #e8b0d8, #ffb59a"],
+  ["grafito", "Grafito", "#111216", "#9aa4b8, #4b5468, #e6ebf5, #c0c8d8, #7aa2ff, #9aa4b8"],
+  ["coral", "Coral", "#0c1322", "#ff8a7a, #ffc7a1, #6f8fe0, #3a5bbf, #ff9fb0, #ff8a7a"],
+  ["mocha", "Mocha", "#181210", "#c99b80, #f1dcc4, #a47864, #e8b8a8, #7a5242, #c99b80"],
+  ["aurora", "Aurora", "#06121a", "#5ef2c2, #7b6bff, #c6f45a, #3fd0ff, #a98bff, #5ef2c2"],
   ["oro", "Oro negro", "#030303", "#f6d27a, #8a5a1c, #fff1c1, #c08a2e, #f9e5a6, #f6d27a"],
   ["lima", "Lima", "#04130b", "#c6f432, #2bd66b, #4fe3c1, #f7f36a, #9bff7a, #c6f432"],
   ["rubi", "Rubí", "#160307", "#ff4d6d, #ffb3c1, #ffd27a, #ff7a45, #c9184a, #ff4d6d"],
@@ -217,7 +243,7 @@ const DETALLES = [
 function apariencia(op) {
   const p = (k) => preferencias.get(k);
   const elegir = (k, v, muestra, txt) => `<button class="ap-op${p(k) === v ? " on" : ""}" data-pref="${k}" data-val="${v}" aria-pressed="${p(k) === v}">${muestra}<span>${txt}</span></button>`;
-  const disenos = `<div class="ap-disenos">${elegir("diseno", "clasico", `<span class="ap-muestra clasico"></span>`, "Clásico")}${elegir("diseno", "pompa", `<span class="ap-muestra pompa"></span>`, "Pompa de jabón")}</div>`;
+  const disenos = `<div class="ap-disenos">${elegir("diseno", "clasico", `<span class="ap-muestra clasico"></span>`, "Clásico")}${elegir("diseno", "pompa", `<span class="ap-muestra pompa"></span>`, "Pompa de jabón")}${elegir("diseno", "vidrio", `<span class="ap-muestra vidrio"></span>`, "Liquid Glass")}</div>`;
   if (p("diseno") !== "pompa") return `<section class="panel"><h2>Apariencia</h2><h3>Diseño</h3>${disenos}
       <h3>Tema</h3><div class="opciones">${op("tema", "oscuro", "Oscuro")}${op("tema", "claro", "Claro")}${op("tema", "sistema", "Como el teléfono")}</div></section>`;
   const paletas = PALETAS.map(([v, txt, bg, iris]) => elegir("paleta", v, `<span class="ap-muestra" style="--mbg: linear-gradient(${bg}, ${bg}); --miris: conic-gradient(${iris})"></span>`, txt)).join("");
@@ -230,10 +256,20 @@ function apariencia(op) {
       <h3>Detalles jugados</h3>${detalles}</section>`;
 }
 
+// Ajustes > Tu cuenta: quién está usando la app y el botón para cerrar la sesión
+function cuenta() {
+  const { usuario, perfil, conGoogle } = nube.estado(), apodo = perfil?.apodo || nombreUsuario();
+  const detalle = conGoogle ? `Con Google · ${esc(usuario.email || "")}` : usuario ? "Solo con apodo, en este celular" : "Sin cuenta";
+  return `<section class="panel"><h2>Tu cuenta</h2>
+      <div class="aj-cuenta">${avatar(perfil?.foto, apodo)}<span><b>${esc(apodo)}</b><small>${detalle}</small></span></div>
+      <div class="opciones">${usuario ? `<a class="opcion" href="#juegos-cuenta">Editar perfil</a>` : ""}<button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button></div></section>`;
+}
+
 export function vistaAjustes() {
   const op = (k, v, txt) => `<button class="opcion${preferencias.get(k) === v ? " on" : ""}" data-pref="${k}" data-val="${v}" aria-pressed="${preferencias.get(k) === v}">${txt}</button>`;
   return cabecera({ titulo: "Ajustes", atras: "#" }) + `
   <main class="wrap">
+    ${cuenta()}
     ${apariencia(op)}
     <section class="panel"><h2>Tamaño del texto</h2><div class="opciones">${op("texto", "normal", "Normal")}${op("texto", "grande", "Grande")}</div></section>
     <section class="panel"><h2>Sin conexión</h2><p>${pwa.estadoOffline()}</p></section>
@@ -244,5 +280,5 @@ export function vistaAjustes() {
       <button class="opcion" data-buscar-act>Buscar actualización</button><p class="act-estado" aria-live="polite"></p></section>
     <section class="panel"><h2>Fuente</h2><p>${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del manual, pendiente de revisión.</p></section>
     <p class="pie">Listas de favoritos y ajustes se guardan solo en este dispositivo.</p>
-  </main>`;
+  </main>` + barraPestanas("ajustes");
 }

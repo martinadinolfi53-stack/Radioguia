@@ -47,6 +47,7 @@ def costado(id, pose, d, centro, ri, cortes=(), region=None, huesos=(), normal=N
     if desde is None:
         desde = np.cross(dh, (0, 1, 0)); desde /= np.linalg.norm(desde)
         if abs(desde[0]) > 0.5 and desde[0] < 0: desde = -desde          # AP/PA: mirar desde la derecha del paciente (X negativo -> +X)
+        if abs(desde[2]) > 0.5 and desde[2] > 0: desde = -desde          # lateral: mirar al paciente de frente
     v = dict(punto=centro, radio=-1, piel=0.5, encuadre=encuadre, destacar=list(destacar), contexto=list(contexto))
     return figura(id + '-otra', pose, dir=tuple(desde), arriba=tuple(arriba_img if arriba_img is not None else -dh), huesos=huesos, region=region, cortes=cortes, ventana=v,
                   puntos=[centro] + list(puntos) + _extra(pose, d, centro, ri, normal, debajo_de, arriba_ri, kw.pop('ri_radio', None)), **kw)

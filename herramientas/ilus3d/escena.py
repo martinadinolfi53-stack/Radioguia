@@ -207,6 +207,7 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     r = subprocess.run([sys.executable, os.path.join(AQUI, 'render_obj.py'), sp], capture_output=True, text=True)
     if r.returncode or 'Traceback' in r.stderr: raise RuntimeError(r.stderr[-3000:])
     info = json.load(open(os.path.join(CACHE, id + '.json')))
+    info['dir'] = [float(v) for v in dir]             # dirección de la cámara (para el título de la segunda vista)
     ax_ = [info['puntos'].pop('_axila' + s_) for s_ in 'RL']
     if ventana:     # bordes del encuadre desvanecidos (el cuerpo sigue más allá del recorte)
         im = Image.open(spec['salida'] + '-ventana.png').convert('RGBA'); W_, H_ = im.size; m_ = 0.07 * max(W_, H_)

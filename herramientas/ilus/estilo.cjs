@@ -146,6 +146,12 @@ function cabezaFrente(cx, cy, r = 24, rot = 0) {
 // opts: caja [x, y, w, h] (encaja centrado) | en [nombre, X, Y] + ppc (el punto nombre cae en X,Y a esa escala).
 const _fs = require("node:fs"), _path = require("node:path");
 const RENDER = _path.join(__dirname, "..", "ilus3d", "render");
+// título de la segunda vista según la dirección de la cámara guardada en el render (X izquierda del paciente, Z anterior)
+function _vistaDe(d) {
+  if (!d || Math.abs(d[0]) > 0.5) return "Vista de costado";
+  if (Math.abs(d[2]) > 0.5) return d[2] < 0 ? "Vista de frente" : "Vista desde atrás";
+  return "Vista de costado";
+}
 function figura(id, opts = {}) {
   const info = JSON.parse(_fs.readFileSync(_path.join(RENDER, id + ".json"), "utf8"));
   const [rw, rh] = info.res;
@@ -190,7 +196,7 @@ function figura(id, opts = {}) {
   }
   if (tiene("cara_boca0")) { const q = [0, 1, 2].map((i) => p(`cara_boca${i}`));
     cara += `<path d="M${q[0]} Q${q[1]} ${q[2]}" fill="none" stroke="#a0604f" stroke-width="${r(Math.max(1, 0.16 * ppc))}" stroke-linecap="round"/>`; }
-  return { svg: `<image x="${r(x)}" y="${r(y)}" width="${r(rw * k)}" height="${r(rh * k)}" href="data:image/webp;base64,${b64}"/>` + cara,
+  return { info, svg: `<image x="${r(x)}" y="${r(y)}" width="${r(rw * k)}" height="${r(rh * k)}" href="data:image/webp;base64,${b64}"/>` + cara,
     p, borde, filas, abajo, rango, ppc: info.ppc * k, x: r(x), y: r(y), w: r(rw * k), h: r(rh * k) };
 }
 
@@ -284,7 +290,7 @@ function modelo(o) {
     let nv = [-(b[1] - a[1]), b[0] - a[0]]; const nn = Math.hypot(...nv); nv = [nv[0] / nn, nv[1] / nn];
     if (nv[0] * u[0] + nv[1] * u[1] < 0) nv = [-nv[0], -nv[1]];
     const L = Math.min(n * k, 80), pe = [q[0] + nv[0] * L, q[1] + nv[1] * L];
-    s += separador(318) + titulo(330, "", o.otraTitulo || (o.otra === "arriba" ? "Vista desde arriba" : "Vista de costado"), "otra") + g.svg + (o.extraOtra ? o.extraOtra(g, q) : "") +
+    s += separador(318) + titulo(330, "", o.otraTitulo || (o.otra === "arriba" ? "Vista desde arriba" : _vistaDe(g.info.dir)), "otra") + g.svg + (o.extraOtra ? o.extraOtra(g, q) : "") +
       `<line x1="${_r1(a[0])}" y1="${_r1(a[1])}" x2="${_r1(b[0])}" y2="${_r1(b[1])}" stroke="${INK}" stroke-width="6" stroke-linecap="butt"/>` +
       txt(_r1(Math.max(a[0], b[0]) + 6), _r1(Math.max(a[1], b[1]) + 4), "RI", 10.5, INK, "start", 700) +
       (o.ang ? `<line x1="${_r1(q[0])}" y1="${_r1(q[1])}" x2="${_r1(pe[0])}" y2="${_r1(pe[1])}" stroke="${RED}" stroke-width="1.3" stroke-dasharray="3 4"/>` +

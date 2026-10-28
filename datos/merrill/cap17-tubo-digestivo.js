@@ -133,7 +133,7 @@ export default {
       posicion: [
         "Desde la PA: cabeza sobre la mejilla derecha y brazo derecho junto al cuerpo; elevar el lado izquierdo apoyándose en el antebrazo y la rodilla izquierdos.",
         "Centrar en la rejilla el plano sagital a mitad de camino entre la columna y el borde lateral del lado elevado.",
-        "RI unos 2,55 cm por encima del reborde costal inferior, a la altura de L1-L2 (con el paciente en prono).",
+        "RI unos 2,5-5 cm por encima del reborde costal inferior, a la altura de L1-L2 (con el paciente en prono).",
         "Rotación final de 40 a 70° según el tamaño, forma y posición del estómago.",
         GONADAS,
       ],

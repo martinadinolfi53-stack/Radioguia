@@ -47,4 +47,5 @@ export default [
   { id: "huesos-faciales", nombre: "Huesos de la cara", familia: "craneo", regiones: ["huesos-faciales", "huesos-nasales"] },
   { id: "arcos-cigomaticos", nombre: "Arcos cigomáticos", familia: "craneo", regiones: ["arcos-cigomaticos"] },
   { id: "mandibula", nombre: "Mandíbula y ATM", familia: "craneo", regiones: ["mandibula", "atm"] },
+  { id: "senos", nombre: "Senos paranasales", familia: "craneo", regiones: ["senos"] },
 ];

@@ -35,4 +35,8 @@ export default [
   { id: "pleura", nombre: "Decúbitos (pulmones y pleura)", familia: "torax", regiones: ["pleura"] },
   { id: "traquea", nombre: "Tráquea y mediastino superior", familia: "torax", regiones: ["traquea"] },
   { id: "abdomen", nombre: "Abdomen", familia: "abdomen", regiones: ["abdomen"] },
+  { id: "esofago", nombre: "Esófago", familia: "contraste", regiones: ["esofago"] },
+  { id: "estomago", nombre: "Estómago y duodeno", familia: "contraste", regiones: ["estomago"] },
+  { id: "intestino-delgado", nombre: "Intestino delgado", familia: "contraste", regiones: ["intestino-delgado"] },
+  { id: "intestino-grueso", nombre: "Intestino grueso", familia: "contraste", regiones: ["intestino-grueso"] },
 ];

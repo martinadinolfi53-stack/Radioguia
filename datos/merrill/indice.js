@@ -14,6 +14,7 @@ import cap20 from "./cap20-craneo.js";
 import cap21 from "./cap21-huesos-cara.js";
 import cap22 from "./cap22-senos.js";
 import cap27 from "./cap27-pediatria.js";
+import cap29 from "./cap29-radiologia-movil.js";
 export { default as MENU } from "./menu.js";
 export { default as ANG_ROT } from "./angulacion-rotacion.js";
 export { default as VERSIONES } from "./versiones.js";
@@ -28,4 +29,4 @@ export const FUENTE = {
   ilustraciones: "ilustraciones/merrill/",
 };
 
-export const CAPITULOS = [cap04, cap05, cap06, cap07, cap08, cap09, cap10, cap16, cap17, cap18, cap20, cap21, cap22, cap27];
+export const CAPITULOS = [cap04, cap05, cap06, cap07, cap08, cap09, cap10, cap16, cap17, cap18, cap20, cap21, cap22, cap27, cap29];

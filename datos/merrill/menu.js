@@ -55,4 +55,9 @@ export default [
   { id: "ped-abdomen", nombre: "Abdomen", familia: "pediatria", regiones: ["ped-abdomen"] },
   { id: "ped-escoliosis", nombre: "Escoliosis", familia: "pediatria", regiones: ["ped-escoliosis"] },
   { id: "ped-especiales", nombre: "Edad ósea y cuerpos extraños", familia: "pediatria", regiones: ["ped-especiales"] },
+  { id: "port-torax", nombre: "Tórax portátil", familia: "portatil", regiones: ["port-torax"] },
+  { id: "port-abdomen", nombre: "Abdomen portátil", familia: "portatil", regiones: ["port-abdomen"] },
+  { id: "port-pelvis-femur", nombre: "Pelvis y fémur portátiles", familia: "portatil", regiones: ["port-pelvis", "port-femur"] },
+  { id: "port-cervical", nombre: "Columna cervical portátil", familia: "portatil", regiones: ["port-cervical"] },
+  { id: "port-neonato", nombre: "Recién nacido (UCIN)", familia: "portatil", regiones: ["port-neonato"] },
 ];

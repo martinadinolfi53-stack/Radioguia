@@ -13,9 +13,11 @@ const r1 = (n) => Math.round(n * 10) / 10;
 const giro = (label) => (g) => {
   const a = g.p("cabeza_humero_R"), b = g.p("cabeza_humero_L"), u = [b[0] - a[0], b[1] - a[1]], n = Math.hypot(...u);
   const p0 = [a[0] - u[0] / n * 20, a[1] - u[1] / n * 20], p1 = [b[0] + u[0] / n * 20, b[1] + u[1] / n * 20];
-  const ref = `<line x1="${r1(p0[0])}" y1="${r1(p0[1])}" x2="${r1(p0[0] + Math.sign(u[0] || 1) * (n + 40))}" y2="${r1(p0[1])}" stroke="${MUTE}" stroke-width="1.3" stroke-dasharray="3 4"/>`;
+  const ref = `<line x1="${r1(p0[0])}" y1="${r1(p0[1])}" x2="${r1(Math.min(505, p0[0] + Math.sign(u[0] || 1) * (n + 40)))}" y2="${r1(p0[1])}" stroke="${MUTE}" stroke-width="1.3" stroke-dasharray="3 4"/>`;
   return ref + `<line x1="${r1(p0[0])}" y1="${r1(p0[1])}" x2="${r1(p1[0])}" y2="${r1(p1[1])}" stroke="${BLUE}" stroke-width="2" stroke-dasharray="6 5"/>` +
-    E.txt(r1(p1[0] + 4), r1(p1[1] + (u[1] > 0 ? 14 : -4)), label, 11.5, BLUE, "start", 700);
+    (p1[0] + 4 + label.length * 6.5 > 452       // si no entra antes de la columna del texto, el rótulo va del otro lado
+      ? E.txt(r1(p1[0] - 4), r1(p1[1] + (u[1] > 0 ? 14 : -4)), label, 11.5, BLUE, "end", 700)
+      : E.txt(r1(p1[0] + 4), r1(p1[1] + (u[1] > 0 ? 14 : -4)), label, 11.5, BLUE, "start", 700));
 };
 const CRESTAS = "medio:cresta_iliaca_R+cresta_iliaca_L|cresta_iliaca_R+cresta_iliaca_L", SOBRE_CRESTA = "medio:cresta_iliaca_R+cresta_iliaca_L|xifoides|0.25";
 const L1 = "centro:First lumbar vertebra", L1_IZQ = `medio:${L1}|centro:Left eleventh rib|0.25`, L1_MITAD_IZQ = `medio:${L1}|centro:Left eleventh rib|0.5`;

@@ -15,7 +15,9 @@ const giro = (label) => (g) => {
   const p0 = [a[0] - u[0] / n * 20, a[1] - u[1] / n * 20], p1 = [b[0] + u[0] / n * 20, b[1] + u[1] / n * 20];
   const ref = `<line x1="${r1(a[0])}" y1="${r1(a[1])}" x2="${r1(a[0] + Math.sign(u[0] || 1) * 90)}" y2="${r1(a[1])}" stroke="${MUTE}" stroke-width="1.3" stroke-dasharray="3 4"/>`;
   return ref + `<line x1="${r1(p0[0])}" y1="${r1(p0[1])}" x2="${r1(p1[0])}" y2="${r1(p1[1])}" stroke="${BLUE}" stroke-width="2" stroke-dasharray="6 5"/>` +
-    E.txt(r1(p1[0] + 4), r1(p1[1] + (u[1] > 0 ? 14 : -4)), label, 11.5, BLUE, "start", 700);
+    (p1[0] + 4 + label.length * 6.5 > 452       // si no entra antes de la columna del texto, el rótulo va del otro lado
+      ? E.txt(r1(p1[0] - 4), r1(p1[1] + (u[1] > 0 ? 14 : -4)), label, 11.5, BLUE, "end", 700)
+      : E.txt(r1(p1[0] + 4), r1(p1[1] + (u[1] > 0 ? 14 : -4)), label, 11.5, BLUE, "start", 700));
 };
 
 def({ id: "hombro-garth", blanco: "cabeza_humero_R", ri: "24 × 30", otra: "costado", ang: "45°",

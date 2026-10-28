@@ -34,4 +34,5 @@ export default [
   { id: "torax", nombre: "Tórax (pulmones y corazón)", familia: "torax", regiones: ["torax", "vertices"] },
   { id: "pleura", nombre: "Decúbitos (pulmones y pleura)", familia: "torax", regiones: ["pleura"] },
   { id: "traquea", nombre: "Tráquea y mediastino superior", familia: "torax", regiones: ["traquea"] },
+  { id: "abdomen", nombre: "Abdomen", familia: "abdomen", regiones: ["abdomen"] },
 ];

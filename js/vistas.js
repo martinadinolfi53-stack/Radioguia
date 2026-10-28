@@ -3,14 +3,14 @@ import { capitulos, regiones, regionPorId, proyecciones, proyeccionesDe, CATEGOR
 import { listas, preferencias } from "./almacen.js";
 import { esc, icono, cabecera, botonFav } from "./util.js";
 import { pwa } from "./pwa.js";
-import { GRUPOS } from "./menu.js";
+import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { avatar } from "./foto.js";
 import { FUENTES, fuenteId, elegida } from "./fuente.js";
 import { nombresDe } from "./otras-fuentes.js";
 
-export const estado = { q: "", qFav: "", filtro: {}, sel: null }; // búsqueda, filtro de categoría por región y selección en Favoritos (Set o null)
+export const estado = { q: "", qFav: "", filtro: {}, sel: null, favFuente: "" }; // búsqueda, filtro de categoría por región, selección en Favoritos (Set o null) y filtro por libro en Favoritos ("" = todos)
 
 const filaProyeccion = (p, conRegion) => `<div class="row">
   <a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span>
@@ -196,15 +196,32 @@ function seleccionLista(favs) {
         <span class="sel-txt"><span class="t">${esc(p.nombre)}</span><span class="s">${esc([...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "))}</span></span></button>`).join("")}</div></section>`).join("")}`;
 }
 
-// enfoques de la lista que se guardaron desde otro libro: con el nombre del libro; al tocarlos se cambia de fuente y se abre la ficha
-function favoritosDeOtros(otras) {
-  const porFuente = FUENTES.filter((f) => f.id !== fuenteId).map((f) => [f, otras.filter((x) => x.fuente === f.id)]).filter(([, l]) => l.length);
-  return porFuente.map(([f, l]) => {
+// Favoritos por región (las familias del menú), con los dos libros juntos: los del libro abierto como botones de zona
+// y los de otro libro como filas con su etiqueta; al tocar una de esas filas se cambia de libro y se abre la ficha
+function menuFavoritos(filtro, otras) {
+  const fav = (p) => filtro(p);
+  const botones = GRUPOS.map((g) => ({ g, n: g.regiones.reduce((a, id) => a + proyeccionesDe(id).filter(fav).length, 0) })).filter((x) => x.n);
+  const extra = {};
+  let cargando = false;
+  for (const f of FUENTES.filter((x) => x.id !== fuenteId)) {
+    const suyas = otras.filter((x) => x.fuente === f.id);
+    if (!suyas.length) continue;
     const nombres = nombresDe(f.id, () => { if (location.hash === "#favoritos") document.dispatchEvent(new Event("rx-rehacer")); });
-    const filas = nombres ? l.filter((x) => nombres[x.id]).map((x) => `<button class="row fav-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(x.id)}">
-        <span class="sel-txt"><span class="t">${esc(nombres[x.id].nombre)}</span><span class="s">${esc(nombres[x.id].region)}</span></span><span class="fuente-tag">${esc(f.nombre)}</span></button>`).join("") : `<div class="vacio">Cargando…</div>`;
-    return `<h2 class="fav-fuente">${esc(f.nombre)}</h2><p class="fav-fuente-nota">Al abrir uno, la app cambia al ${esc(f.nombre)}.</p><div class="lista">${filas}</div>`;
+    if (!nombres) { cargando = true; continue; }
+    for (const x of suyas) if (nombres[x.id]) (extra[FAMILIAS[nombres[x.id].familia] ? nombres[x.id].familia : ""] ||= []).push({ f, x, info: nombres[x.id] });
+  }
+  const secciones = [...Object.keys(FAMILIAS), ""].map((k) => {
+    const fam = FAMILIAS[k] || { nombre: "Otras", color: "var(--mute)" };
+    const locales = botones.filter((b) => b.g.familia === fam), deOtros = extra[k] || [];
+    if (!locales.length && !deOtros.length) return "";
+    return `<section class="familia" style="--c:${fam.color}"><h2>${esc(fam.nombre)}</h2>
+      ${locales.length ? `<div class="grupos">${locales.map(({ g, n }) => `<a class="grupo" href="#g-${g.id}-fav"><span class="t">${esc(g.nombre)}</span><span class="s">${n} ${n === 1 ? "proyección" : "proyecciones"} · ${esc(FUENTE.corto)}</span></a>`).join("")}</div>` : ""}
+      ${deOtros.length ? `<div class="lista fav-otras">${deOtros.map(({ f, x, info }) => `<button class="row fav-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(x.id)}">
+        <span class="sel-txt"><span class="t">${esc(info.nombre)}</span><span class="s">${esc(info.region)}</span></span><span class="fuente-tag">${esc(f.nombre)}</span></button>`).join("")}</div>` : ""}
+    </section>`;
   }).join("");
+  const nota = otras.length ? `<p class="fav-fuente-nota">Los enfoques de otro libro llevan su etiqueta; al abrir uno, la app cambia a ese libro.</p>` : "";
+  return nota + secciones + (cargando ? `<div class="vacio">Cargando…</div>` : "");
 }
 
 // lista activa de favoritos: selector de listas arriba, acciones (editar, nueva, seleccionar, imprimir) y el menú filtrado
@@ -214,13 +231,21 @@ export function vistaFavoritos() {
   if (estado.sel) for (const id of estado.sel) if (!act.ids.includes(id)) estado.sel.delete(id);
   if (estado.sel && !favs.length) estado.sel = null;
   const q = estado.qFav.trim();
-  const otras = estado.sel ? "" : favoritosDeOtros(act.otras);
+  // filtro por libro: "" muestra todos; si no, solo los enfoques de ese libro
+  const ff = estado.favFuente;
+  const otrasVer = act.otras.filter((x) => !ff || x.fuente === ff), localVer = !ff || ff === fuenteId ? favs : [];
+  const nDe = (id) => (id === fuenteId ? favs.length : act.otras.filter((x) => x.fuente === id).length);
+  const filtroFuente = estado.sel || !act.total ? "" : `<div class="chips fav-filtro" role="group" aria-label="Filtrar por libro">${[{ id: "", nombre: "Todos" }, ...FUENTES.filter((f) => f.lista)].map((f) => {
+      const on = ff === f.id, n = f.id ? nDe(f.id) : act.total;
+      return `<button class="chip${on ? " on" : ""}" data-fav-fuente="${esc(f.id)}" aria-pressed="${on}">${esc(f.nombre)} · ${n}</button>`;
+    }).join("")}</div>`;
   let cuerpo;
-  if (!favs.length && act.otras.length) cuerpo = estado.sel ? "" : otras;
-  else if (!favs.length) cuerpo = `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
-  else if (estado.sel) cuerpo = seleccionLista(favs);
-  else if (q) cuerpo = resultados(favs, q);
-  else cuerpo = (act.otras.length ? `<h2 class="fav-fuente">${esc(FUENTE.corto)}</h2>` : "") + menuRegiones((p) => act.ids.includes(p.id)) + otras;
+  if (estado.sel) cuerpo = seleccionLista(favs);
+  else if (!localVer.length && !otrasVer.length) cuerpo = act.total
+    ? `<div class="vacio">No hay enfoques del ${esc(FUENTES.find((f) => f.id === ff)?.nombre || "")} en esta lista.</div>`
+    : `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
+  else if (q && localVer.length) cuerpo = resultados(localVer, q);
+  else cuerpo = menuFavoritos((p) => localVer.includes(p), otrasVer);
   const selector = estado.sel ? "" : `<div class="lst-selector" role="group" aria-label="Listas de favoritos">${todas.map((l) =>
       `<button class="lst-chip${l.id === act.id ? " on" : ""}" data-lista="${esc(l.id)}" aria-pressed="${l.id === act.id}" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}<span>${esc(l.nombre)}</span><b>${l.total}</b></button>`).join("")}
     <button class="lst-chip nueva" data-lista-nueva>${icono.mas}<span>Nueva lista</span></button></div>
@@ -232,7 +257,7 @@ export function vistaFavoritos() {
     </div>`;
   return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${act.total} ${act.total === 1 ? "proyección" : "proyecciones"}`, atras: "#enfoques" }) +
     (favs.length && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
-    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>`;
+    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${filtroFuente}${cuerpo}</main>`;
 }
 
 // Ajustes > Apariencia: diseño (clásico o Pompa de jabón); en Pompa, la paleta de colores y los detalles jugados; en clásico, el tema

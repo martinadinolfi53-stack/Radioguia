@@ -133,6 +133,8 @@ app.addEventListener("click", (e) => {
 app.addEventListener("click", (e) => {
   const b = e.target.closest("[data-ir-fuente]");
   if (b) elegirFuente(b.dataset.irFuente, `#p-${b.dataset.irFicha}`);
+  const f = e.target.closest("[data-fav-fuente]");
+  if (f) { estado.favFuente = f.dataset.favFuente; const y = scrollY; render(); scrollTo(0, y); }
 });
 // una vista avisa que terminó de cargar algo (por ejemplo, los nombres de otro libro en Favoritos)
 document.addEventListener("rx-rehacer", () => { const y = scrollY; render(); scrollTo(0, y); });

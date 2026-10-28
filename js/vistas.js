@@ -1,7 +1,7 @@
 // Pantallas de navegación: Portada (elegir Enfoques o Juegos), Inicio de enfoques, Región, Favoritos, resultados del buscador y Ajustes.
 import { capitulos, regiones, regionPorId, proyecciones, proyeccionesDe, CATEGORIAS, norm, FUENTE } from "./datos.js";
 import { listas, preferencias } from "./almacen.js";
-import { esc, icono, cabecera, botonFav } from "./util.js";
+import { esc, icono, cabecera, botonFav, barraPestanas } from "./util.js";
 import { pwa } from "./pwa.js";
 import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
@@ -58,9 +58,6 @@ export function vistaFamilia(f) {
   </main>` + barraPestanas("enfoques");
 }
 
-// barra de pestañas flotante de abajo, como en el iPhone
-const PESTANAS = [["enfoques", "#enfoques", "Enfoques", icono.libro], ["favoritos", "#favoritos", "Favoritos", icono.estrella(false)], ["juegos", "#juegos", "Juegos", icono.repaso], ["ajustes", "#ajustes", "Ajustes", icono.ajustes]];
-export const barraPestanas = (activa) => `<nav class="pestanas" aria-label="Secciones">${PESTANAS.map(([id, h, txt, ic]) => `<a href="${h}" class="${id === activa ? "on" : ""}">${ic}<span>${txt}</span></a>`).join("")}</nav>`;
 const todos = () => true;
 
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
@@ -144,14 +141,14 @@ export function vistaRegion(r, soloFav) {
   const f = estado.filtro[r.id];
   const lista = f ? todas.filter((p) => p.categoria.includes(f)) : todas;
   const chip = (c, txt) => `<button class="chip${(f || "") === c ? " on" : ""}" data-filtro="${esc(r.id)}" data-cat="${esc(c)}">${esc(txt)}</button>`;
-  return cabecera({ titulo: r.nombre, sub: soloFav ? act.nombre : r.detalle, atras: soloFav ? "#favoritos" : "#enfoques" }) + `
+  return cabecera({ titulo: r.nombre, sub: soloFav ? act.nombre : r.detalle, atras: soloFav ? "#favoritos" : `#f-${g.familia.id}` }) + `
   <div class="filtros"><div class="wrap filtros-row">
     <div class="chips" role="group" aria-label="Filtrar por proyección">${cats.length > 1 ? chip("", "Todas") + cats.map((c) => chip(c, c)).join("") : cats.map((c) => `<span class="chip on">${esc(c)}</span>`).join("")}</div>
     <a class="btn-calc" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
   </div></div>
   <main class="wrap">
     ${lista.length ? `<div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div>` : `<div class="vacio">No hay proyecciones en esta categoría.</div>`}
-  </main>`;
+  </main>` + barraPestanas("enfoques");
 }
 
 // índice de una región del menú: sus partes como subtítulos y las proyecciones de cada una
@@ -169,14 +166,14 @@ export function vistaGrupo(g, soloFav) {
     return `<section class="parte"><h2 class="sub"><span>${esc(r.nombre)}</span>${r.detalle ? `<small>${esc(r.detalle)}</small>` : ""}</h2>
       <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></section>`;
   }).join("");
-  return cabecera({ titulo: g.nombre, sub: `${soloFav ? act.nombre + " · " : ""}${todas.length} ${todas.length === 1 ? "proyección" : "proyecciones"}`, atras: soloFav ? "#favoritos" : "#enfoques" }) + `
+  return cabecera({ titulo: g.nombre, sub: `${soloFav ? act.nombre + " · " : ""}${todas.length} ${todas.length === 1 ? "proyección" : "proyecciones"}`, atras: soloFav ? "#favoritos" : `#f-${g.familia.id}` }) + `
   <div class="filtros"><div class="wrap filtros-row">
     ${cats.length > 1 ? `<div class="chips" role="group" aria-label="Filtrar por proyección">${chip("", "Todas") + cats.map((c) => chip(c, c)).join("")}</div>` : ""}
     <a class="btn-calc" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
   </div></div>
   <main class="wrap" style="--c:${g.color}">
     ${partes || `<div class="vacio">No hay proyecciones en esta categoría.</div>`}
-  </main>`;
+  </main>` + barraPestanas("enfoques");
 }
 
 // modo seleccionar de Favoritos: las proyecciones de la lista con casillas, para quitar varias juntas
@@ -217,7 +214,7 @@ export function vistaFavoritos() {
     </div>`;
   return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#enfoques" }) +
     (favs.length && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
-    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>`;
+    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>` + barraPestanas("favoritos");
 }
 
 // Ajustes > Apariencia: diseño (Clásico, Pompa de jabón o Liquid Glass); en Pompa, la paleta de colores y los detalles jugados; en los otros, el tema
@@ -283,5 +280,5 @@ export function vistaAjustes() {
       <button class="opcion" data-buscar-act>Buscar actualización</button><p class="act-estado" aria-live="polite"></p></section>
     <section class="panel"><h2>Fuente</h2><p>${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del manual, pendiente de revisión.</p></section>
     <p class="pie">Listas de favoritos y ajustes se guardan solo en este dispositivo.</p>
-  </main>`;
+  </main>` + barraPestanas("ajustes");
 }

@@ -376,6 +376,16 @@ button.sel-fila { width: 100%; text-align: left; padding: 10px 14px; gap: 12px; 
 .sel-fila.on { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
 .portada-hola .portada-foto { display: block; width: 72px; height: 72px; margin: 0 auto 12px; border: 2px solid rgba(255,255,255,.25); }
 
+/* ---------- barra de pestañas de abajo (Enfoques, Favoritos, Juegos, Ajustes) ---------- */
+main.wrap:has(+ .pestanas) { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 110px); }
+.pestanas { position: fixed; z-index: 20; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  display: flex; gap: 2px; padding: 5px; width: min(calc(100% - 32px), 420px); border-radius: 22px;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: 0 10px 30px rgb(0 0 0 / .3); }
+.pestanas a { flex: 1; display: grid; justify-items: center; gap: 1px; padding: 6px 0 5px; border-radius: 16px; color: var(--mute); font-size: 11px; font-weight: 600; }
+.pestanas a svg { width: 24px; height: 24px; }
+.pestanas a.on { color: var(--accent); background: var(--surface-2); }
+@media print { .pestanas { display: none; } }
+
 /* ---------- Ajustes > Tu cuenta ---------- */
 .aj-cuenta { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
 .aj-cuenta span { display: grid; min-width: 0; }

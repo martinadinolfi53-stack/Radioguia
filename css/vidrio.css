@@ -138,11 +138,13 @@ a.opcion, .opciones .aj-salir { flex: 0 1 auto; }
 .sec.region .row:first-child { background: linear-gradient(var(--line), var(--line)) 16px 0 / calc(100% - 16px) .5px no-repeat; }
 
 /* ---------- barra de pestañas flotante, de vidrio ---------- */
-main.wrap:has(+ .pestanas) { padding-bottom: 120px; }
-.pestanas { position: fixed; z-index: 20; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
-  display: flex; gap: 2px; padding: 5px; border-radius: 999px; width: min(calc(100% - 32px), 420px);
+.pestanas { border: 0; border-radius: 999px;
   background: var(--material); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
   box-shadow: inset 0 0 0 .5px var(--material-borde), inset 1px 1px 0 -.5px var(--canto), 0 10px 30px rgb(0 0 0 / .3); }
-.pestanas a { flex: 1; display: grid; justify-items: center; gap: 1px; padding: 6px 0 5px; border-radius: 999px; color: var(--fg); font-size: 10px; font-weight: 500; }
-.pestanas a svg { width: 24px; height: 24px; }
+.pestanas a { border-radius: 999px; color: var(--fg); font-size: 10px; font-weight: 500; }
 .pestanas a.on { color: var(--accent); background: var(--relleno); }
+
+/* ficha: título chico al lado de la flecha (el nombre grande es el de la proyección) */
+.top.chica .titulo { order: 0; flex-basis: auto; flex: 1; text-align: center; }
+.top.chica h1 { font-size: 17px; font-weight: 600; }
+.top.chica p { font-size: 13px; }

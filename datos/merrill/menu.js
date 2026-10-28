@@ -31,4 +31,7 @@ export default [
   { id: "esternon", nombre: "Esternón", familia: "toraxOseo", regiones: ["esternon"] },
   { id: "esternoclaviculares", nombre: "Articulaciones esternoclaviculares", familia: "toraxOseo", regiones: ["esternoclaviculares"] },
   { id: "costillas", nombre: "Costillas", familia: "toraxOseo", regiones: ["costillas", "costales"] },
+  { id: "torax", nombre: "Tórax (pulmones y corazón)", familia: "torax", regiones: ["torax", "vertices"] },
+  { id: "pleura", nombre: "Decúbitos (pulmones y pleura)", familia: "torax", regiones: ["pleura"] },
+  { id: "traquea", nombre: "Tráquea y mediastino superior", familia: "torax", regiones: ["traquea"] },
 ];

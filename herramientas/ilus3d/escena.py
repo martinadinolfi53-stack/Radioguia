@@ -77,9 +77,9 @@ def _grupo(seg):
 # ficha según el prefijo del id, con la piel del modelo anatómico (ESTILO_CAPAS=0 vuelve al dibujo plano). Lo específico va antes.
 ESTILO_CAPAS = os.environ.get('ESTILO_CAPAS', '1') == '1'
 VENTANAS = [('dedos-pie', 'centro:Right second metatarsal bone', 0.11), ('pierna', 'centro:Right tibia', 0.24), ('pie', 'centro:Right cuboid bone', 0.13),
-            ('calcaneo', 'centro:Right calcaneus', 0.08), ('tobillo', 'centro:Right talus', 0.09), ('rodilla', 'centro:Right patella', 0.10),
-            ('fosa-rotula', 'centro:Right patella', 0.09), ('femur', 'centro:Right femur', 0.27), ('muneca', 'centro:Right capitate', 0.08),
-            ('antebrazo', 'centro:Right radius', 0.17), ('codo', 'codo_R', 0.09), ('norgaard', 'centro:Right capitate', 0.15),
+            ('calcaneo', 'centro:Right calcaneus', 0.08), ('tobillo', 'centro:Right talus', 0.09), ('rodilla', 'centro:Right patella', 0.15),
+            ('fosa-rotula', 'centro:Right patella', 0.14), ('femur', 'centro:Right femur', 0.27), ('muneca', 'centro:Right capitate', 0.08),
+            ('antebrazo', 'centro:Right radius', 0.17), ('codo', 'codo_R', 0.15), ('norgaard', 'centro:Right capitate', 0.15),
             ('manos', 'centro:Right capitate', 0.15), ('mano', 'centro:Right capitate', 0.15), ('dedos', 'centro:Right third metacarpal bone', 0.14),
             ('pulgar', 'centro:Right capitate', 0.12)]
 def _ventana_auto(id):
@@ -87,7 +87,8 @@ def _ventana_auto(id):
         if id.startswith(k):
             if id.endswith('-L') and q.startswith('centro:Right'): q = q.replace('Right', 'Left')
             elif id.endswith('-L') and q.endswith('_R'): q = q[:-2] + '_L'
-            return dict(punto=q, radio=r, encuadre=0, piel_dentro=0.2, borde=0.06, piel_modelo=True, muestras=64)
+            return dict(punto=q, radio=r, encuadre=0, piel_dentro=0.12 if k in ('codo', 'rodilla', 'fosa-rotula') else 0.2,   # codo y rodilla son gruesos: más transparentes
+                        borde=0.06, piel_modelo=True, muestras=64)
     return None
 
 def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, cortes=(), puntos=(), px=800,

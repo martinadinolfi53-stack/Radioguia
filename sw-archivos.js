@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "aedeedc342";
+self.RG_VERSION = "876b5b3360";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -40,6 +40,7 @@ self.RG_ARCHIVOS = [
  "datos/merrill/cap20-craneo.js",
  "datos/merrill/cap21-huesos-cara.js",
  "datos/merrill/cap22-senos.js",
+ "datos/merrill/cap27-pediatria.js",
  "datos/merrill/ilustraciones.js",
  "datos/merrill/indice.js",
  "datos/merrill/menu.js",

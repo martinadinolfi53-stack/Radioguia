@@ -48,4 +48,11 @@ export default [
   { id: "arcos-cigomaticos", nombre: "Arcos cigomáticos", familia: "craneo", regiones: ["arcos-cigomaticos"] },
   { id: "mandibula", nombre: "Mandíbula y ATM", familia: "craneo", regiones: ["mandibula", "atm"] },
   { id: "senos", nombre: "Senos paranasales", familia: "craneo", regiones: ["senos"] },
+  { id: "ped-torax", nombre: "Tórax", familia: "pediatria", regiones: ["ped-torax"] },
+  { id: "ped-cadera", nombre: "Caderas y pelvis", familia: "pediatria", regiones: ["ped-cadera"] },
+  { id: "ped-craneo", nombre: "Cráneo", familia: "pediatria", regiones: ["ped-craneo"] },
+  { id: "ped-extremidades", nombre: "Extremidades", familia: "pediatria", regiones: ["ped-extremidades"] },
+  { id: "ped-abdomen", nombre: "Abdomen", familia: "pediatria", regiones: ["ped-abdomen"] },
+  { id: "ped-escoliosis", nombre: "Escoliosis", familia: "pediatria", regiones: ["ped-escoliosis"] },
+  { id: "ped-especiales", nombre: "Edad ósea y cuerpos extraños", familia: "pediatria", regiones: ["ped-especiales"] },
 ];

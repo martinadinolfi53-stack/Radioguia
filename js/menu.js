@@ -1,7 +1,7 @@
 // Menú principal por zona: los botones salen de la fuente elegida (datos/<fuente>/menu.js) y cada familia tiene su color.
 import { MENU } from "./datos.js";
 
-const C = { torax: "#2a9d8f", superior: "#1f9a6a", inferior: "#6f5fd0", pelvis: "#9a55c0", columna: "#3d7fd0", toraxOseo: "#6a9a2f", craneo: "#c0619a", abdomen: "#c98a1b", contraste: "#c76b3a", portatil: "#7d8796" };
+const C = { torax: "#2a9d8f", superior: "#1f9a6a", inferior: "#6f5fd0", pelvis: "#9a55c0", columna: "#3d7fd0", toraxOseo: "#6a9a2f", craneo: "#c0619a", abdomen: "#c98a1b", contraste: "#c76b3a", portatil: "#7d8796", pediatria: "#d9822b" };
 export const FAMILIAS = {
   torax: { nombre: "Tórax", color: C.torax },
   superior: { nombre: "Miembro superior", color: C.superior },
@@ -13,6 +13,7 @@ export const FAMILIAS = {
   abdomen: { nombre: "Abdomen", color: C.abdomen },
   contraste: { nombre: "Estudios con contraste", color: C.contraste },
   portatil: { nombre: "Portátiles e intraoperatorias", color: C.portatil },
+  pediatria: { nombre: "Pediatría", color: C.pediatria },
 };
 
 export const GRUPOS = MENU.map((g) => ({ ...g, familia: FAMILIAS[g.familia] }));

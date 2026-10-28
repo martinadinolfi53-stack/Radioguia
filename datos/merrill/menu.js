@@ -21,4 +21,11 @@ export default [
   { id: "pelvis", nombre: "Pelvis", familia: "pelvis", regiones: ["pelvis", "pelvis-anterior", "ilion"] },
   { id: "cadera", nombre: "Cadera y cuellos femorales", familia: "pelvis", regiones: ["cadera", "cuellos-femorales"] },
   { id: "acetabulo", nombre: "Acetábulo", familia: "pelvis", regiones: ["acetabulo"] },
+  { id: "cervical-superior", nombre: "Cervical superior (C1-C2)", familia: "columna", regiones: ["cervical-superior"] },
+  { id: "cervical", nombre: "Columna cervical", familia: "columna", regiones: ["cervical"] },
+  { id: "toracica", nombre: "Columna torácica", familia: "columna", regiones: ["toracica"] },
+  { id: "lumbar", nombre: "Columna lumbar", familia: "columna", regiones: ["lumbar"] },
+  { id: "sacroiliacas", nombre: "Sacroilíacas", familia: "columna", regiones: ["sacroiliacas"] },
+  { id: "sacro-coccix", nombre: "Sacro y cóccix", familia: "columna", regiones: ["sacro-coccix"] },
+  { id: "escoliosis", nombre: "Escoliosis y funcionales", familia: "columna", regiones: ["escoliosis"] },
 ];

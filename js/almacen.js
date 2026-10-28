@@ -1,9 +1,11 @@
 // Listas de favoritos y preferencias, guardados en este dispositivo (localStorage). Todo envuelto en try/catch:
 // en modo privado o con datos bloqueados la app funciona igual, solo que sin recordar.
+import { clave } from "./fuente.js";
 const leer = (k, def) => { try { const v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); } catch { return def; } };
 const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
-const K_LISTAS = "radioguia.listas", K_FAV_VIEJO = "radioguia.favoritos", K_PREF = "radioguia.preferencias";
+// favoritos separados por fuente (js/fuente.js); las preferencias de apariencia valen para todas
+const K_LISTAS = clave("radioguia.listas"), K_FAV_VIEJO = clave("radioguia.favoritos"), K_PREF = "radioguia.preferencias";
 
 // Listas de favoritos. Formato guardado en localStorage["radioguia.listas"] (v: 1):
 //   { v: 1, activa: "<id>", listas: [{ id, nombre, color, ids: ["<id de proyección>", ...] }] }

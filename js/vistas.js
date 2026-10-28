@@ -7,6 +7,7 @@ import { GRUPOS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { avatar } from "./foto.js";
+import { FUENTES, fuenteId, fuenteInfo, elegida } from "./fuente.js";
 
 export const estado = { q: "", qFav: "", filtro: {}, sel: null }; // búsqueda, filtro de categoría por región y selección en Favoritos (Set o null)
 
@@ -55,10 +56,28 @@ export function vistaPortada() {
       <a class="portada-boton" href="#ajustes" aria-label="Ajustes">${icono.ajustes}<span>Ajustes</span></a>
     </div>
     <p class="portada-hola">${fotoPortada()}Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
+    <a class="portada-fuente" href="#ajustes-fuente">${icono.libro}<span>Consultando el <b>${esc(fuenteInfo.nombre)}</b></span><small>Cambiar</small></a>
     <div class="portada-ops">
       <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
       <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
     </div>
+  </main>`;
+}
+
+// botones para elegir la fuente (al entrar y en Ajustes); las que todavía no tienen fichas aparecen "en preparación"
+const botonesFuente = () => FUENTES.map((f) => {
+  const on = elegida() && f.id === fuenteId;
+  return `<button class="fuente-op${on ? " on" : ""}" data-fuente="${f.id}" ${f.lista ? "" : "disabled"} aria-pressed="${on}">
+    <b>${esc(f.nombre)}</b><small>${esc(f.detalle)}</small>${f.lista ? "" : "<em>En preparación</em>"}</button>`;
+}).join("");
+
+// después de identificarse: de qué libro salen las fichas, el repaso y los juegos (js/fuente.js)
+export function vistaElegirFuente() {
+  return `<main class="portada">
+    <p class="portada-rx">RX</p>
+    <p class="portada-hola">¿Qué libro querés consultar?</p>
+    <div class="fuente-ops">${botonesFuente()}</div>
+    <small class="ident-nota">Cada libro tiene sus propias fichas, favoritos y juegos. Lo podés cambiar cuando quieras en Ajustes.</small>
   </main>`;
 }
 
@@ -103,7 +122,7 @@ export function vistaAyudaApp() {
 export function vistaInicio() {
   const q = estado.q.trim();
   const act = listas.activa();
-  return cabecera({ titulo: "Enfoques", sub: "Técnicas y proyecciones radiológicas", atras: "#" }) + `
+  return cabecera({ titulo: "Enfoques", sub: `Técnicas y proyecciones · ${FUENTE.corto}`, atras: "#" }) + `
   <div class="buscar-barra"><div class="wrap">${buscador("q-inicio", estado.q, "Región, proyección o método")}</div></div>
   <main class="wrap">
     ${q ? resultados(proyecciones, q) : `
@@ -234,6 +253,9 @@ export function vistaAjustes() {
   const op = (k, v, txt) => `<button class="opcion${preferencias.get(k) === v ? " on" : ""}" data-pref="${k}" data-val="${v}" aria-pressed="${preferencias.get(k) === v}">${txt}</button>`;
   return cabecera({ titulo: "Ajustes", atras: "#" }) + `
   <main class="wrap">
+    <section class="panel" id="fuente"><h2>Fuente</h2><p>El libro del que salen las fichas, el repaso y los juegos. Cada uno guarda sus propios favoritos.</p>
+      <div class="fuente-ops">${botonesFuente()}</div>
+      <p>Ahora: ${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del libro, pendiente de revisión.</p></section>
     ${apariencia(op)}
     <section class="panel"><h2>Tamaño del texto</h2><div class="opciones">${op("texto", "normal", "Normal")}${op("texto", "grande", "Grande")}</div></section>
     <section class="panel"><h2>Sin conexión</h2><p>${pwa.estadoOffline()}</p></section>
@@ -242,7 +264,7 @@ export function vistaAjustes() {
       <div class="opciones"><a class="opcion" href="#repaso-reportes">Ver reportes</a></div></section>
     <section class="panel"><h2>Versión</h2><p>Versión instalada: <b>${esc(pwa.version() || "sin datos")}</b></p>
       <button class="opcion" data-buscar-act>Buscar actualización</button><p class="act-estado" aria-live="polite"></p></section>
-    <section class="panel"><h2>Fuente</h2><p>${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del manual, pendiente de revisión.</p></section>
+
     <p class="pie">Listas de favoritos y ajustes se guardan solo en este dispositivo.</p>
   </main>`;
 }

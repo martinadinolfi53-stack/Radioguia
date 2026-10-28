@@ -10,6 +10,13 @@ import { ASPECTOS, CAMPOS, generarPreguntas } from "./repaso-preguntas.js";
 import * as nube from "./nube.js";
 import { registrarDesafio } from "./juegos.js";
 import { vistaFoto, avatar, iniciarFoto } from "./foto.js";
+import { clave, fuenteId, FUENTES } from "./fuente.js";
+
+// cada grupo juega con las fichas de una fuente; los grupos de antes de que hubiera varias son del Bontrager
+const fuenteDe = (g) => g.fuente || "bontrager";
+const nombreFuente = (id) => FUENTES.find((f) => f.id === id)?.nombre || id;
+const avisoOtraFuente = (g) => `<div class="jg-hecho"><b>Este grupo usa el ${esc(nombreFuente(fuenteDe(g)))}</b><small>Ahora estás consultando el ${esc(nombreFuente(fuenteId))}. Para jugar, cambiá de fuente.</small></div>
+  <button class="rp-empezar jg-centro" data-fuente="${esc(fuenteDe(g))}">Cambiar al ${esc(nombreFuente(fuenteDe(g)))}</button>`;
 
 let rerender = () => {};
 const local = (() => { try { return localStorage; } catch { return null; } })();
@@ -134,7 +141,7 @@ function vistaCuenta() {
 function vistaListaGrupos() {
   const c = dato("grupos", () => nube.misGrupos());
   const cuerpo = c.error ? `<div class="vacio">${esc(c.error)}</div>` : !c.ok ? `<div class="vacio">Cargando…</div>`
-    : c.datos.length ? `<div class="jg-lista">${c.datos.map((g) => `<a class="jg-tarjeta" href="#juegos-grupo-${esc(g.id)}"><span><b>${esc(g.nombre)}</b><small>${g.fichas.length} enfoques · código ${esc(g.codigo)}</small></span>${icono.chev}</a>`).join("")}</div>`
+    : c.datos.length ? `<div class="jg-lista">${c.datos.map((g) => `<a class="jg-tarjeta" href="#juegos-grupo-${esc(g.id)}"><span><b>${esc(g.nombre)}</b><small>${g.fichas.length} enfoques · ${esc(nombreFuente(fuenteDe(g)))} · código ${esc(g.codigo)}</small></span>${icono.chev}</a>`).join("")}</div>`
     : `<div class="vacio"><b>Todavía no estás en ningún grupo.</b> Creá uno e invitá a tus compañeros, o unite con el código que te pasaron.</div>`;
   return cabecera({ titulo: "Grupos", sub: nube.estado().perfil?.apodo, atras: "#juegos", derecha: `<a class="ico" href="#juegos-cuenta" aria-label="Tu cuenta">${icono.ajustes}</a>` }) + `
   <main class="wrap juegos">
@@ -236,7 +243,7 @@ function vistaGrupo(gid, hist) {
       : `<div class="vacio">${hist ? "Todavía nadie jugó." : "Esta semana todavía nadie jugó el desafío. ¡Sé el primero!"}</div>`;
   }
   const jugado = hoyP.ok && hoyP.datos;
-  const boton = !hoyP.ok ? "" : jugado?.terminada
+  const boton = fuenteDe(g) !== fuenteId ? avisoOtraFuente(g) : !hoyP.ok ? "" : jugado?.terminada
     ? `<div class="jg-hecho"><b>Desafío de hoy: ${jugado.puntos} puntos</b><small>${jugado.correctas} correctas${jugado.sinVidas ? " · te quedaste sin vidas" : ""}. Mañana hay uno nuevo.</small></div>`
     : jugado ? `<div class="jg-hecho"><b>Ya empezaste el desafío de hoy</b><small>Si se cortó, seguí desde donde quedaste.</small></div><a class="rp-empezar jg-centro" href="#juegos-desafio-${esc(gid)}">Seguir</a>`
     : `<a class="rp-empezar jg-centro" href="#juegos-desafio-${esc(gid)}">Jugar el desafío del día</a>`;
@@ -288,7 +295,7 @@ function panelCreador(gid, g) {
 }
 
 // ---------- desafío del día ----------
-const K_JUEGO = "radioguia.juegos.desafio";
+const K_JUEGO = clave("radioguia.juegos.desafio");
 let juego = leer(K_JUEGO, null); // { gid, fecha, nombre, preguntas, respuestas, actual, vidas, vidasIni, inicio, fin, resultado }
 const guardarJuego = () => escribir(K_JUEGO, juego);
 
@@ -307,6 +314,7 @@ function vistaDesafio(gid) {
   const err = cg.error || cc.error || ch.error;
   if (err) return fallo("Desafío del día", atras, err);
   if (!cg.ok || !cc.ok || !ch.ok) return cargando("Desafío del día", atras);
+  if (fuenteDe(cg.datos) !== fuenteId) return cabecera({ titulo: "Desafío del día", atras }) + `<main class="wrap juegos">${avisoOtraFuente(cg.datos)}</main>`;
   if (ch.datos) {
     history.replaceState(null, "", atras);
     return vistaGrupo(gid, false);
@@ -427,7 +435,7 @@ export function iniciarGrupos(app, render) {
       case "guardar-grupo": return hacer(t, "errForm", async () => {
         const fichas = fichasDelForm(), origen = nombreOrigen();
         if (form.gid) { await nube.editarGrupo(form.gid, { nombre: form.nombre, fichas, ...(origen ? { origen } : {}) }); olvidar(`grupo:${form.gid}`, "grupos"); location.hash = `#juegos-grupo-${form.gid}`; }
-        else { const nuevo = await nube.crearGrupo({ nombre: form.nombre, fichas, aspectos: ASPECTOS.map((a) => a.id), origen }); olvidar("grupos"); location.hash = `#juegos-grupo-${nuevo}`; }
+        else { const nuevo = await nube.crearGrupo({ nombre: form.nombre, fichas, aspectos: ASPECTOS.map((a) => a.id), origen, fuente: fuenteId }); olvidar("grupos"); location.hash = `#juegos-grupo-${nuevo}`; }
         form = null;
       });
       case "unirse": return hacer(t, "errUnirse", async () => { await nube.unirse(gid); olvidar("grupos"); location.hash = `#juegos-grupo-${gid}`; });

@@ -1,6 +1,6 @@
 // Genera docs/para-revisar.md con todos los avisos "para revisar" de las fichas, por capítulo.
 import { writeFileSync } from "node:fs";
-const { CAPITULOS } = await import("../datos/indice.js");
+const { CAPITULOS } = await import("../datos/bontrager/indice.js");
 let md = "# RadioGuía · datos para revisar\n\nDudas o contradicciones encontradas en el Bontrager 9ª ed. Cada una figura también en su ficha, en el recuadro «Para revisar».\n";
 let n = 0;
 for (const c of CAPITULOS) {

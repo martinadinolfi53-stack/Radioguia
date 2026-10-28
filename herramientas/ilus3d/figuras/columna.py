@@ -40,9 +40,9 @@ par('columna-cervical-odontoides-judd', _menton, PA, 'centro:Axis', (0.24, 0.18)
 par('columna-cervical-ap-axial', lambda: Pose().cabeza_flex(-10), angulado(AP, 17, 'cefalico'), C5, (0.18, 0.24), normal=AP, **DE_PIE)
 OPD, OAD = oblicuo('AP', 45, 'R'), oblicuo('PA', 45, 'R')
 par('columna-cervical-oblicuas--v1', lambda: Pose().cabeza_flex(-10), angulado(OPD, 17, 'cefalico'), C4, (0.24, 0.30), normal=OPD, otra='arriba',
-    puntos=['cabeza_humero_L'])
+    puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 par('columna-cervical-oblicuas--v2', lambda: Pose().cabeza_flex(-10), angulado(OAD, 17, 'caudal'), C4, (0.24, 0.30), normal=OAD, otra='arriba',
-    puntos=['cabeza_humero_L'])
+    puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 par('columna-cervical-lateral-erguida', lambda: _hombros_abajo().cabeza_flex(-10), LAT, C4, (0.24, 0.30), **DE_PIE)
 _nadador = lambda: _brazo_arriba(Pose(), 'L').hombro_elevar('R', -15)
 par('columna-cervical-nadador', _nadador, LAT, T1, (0.24, 0.30), **DE_PIE)
@@ -52,7 +52,7 @@ par('columna-cervical-lateral-flexion-extension--v2', lambda: _hombros_abajo().c
 par('columna-cervical-trauma-lateral-horizontal', _hombros_abajo, LAT, C4, (0.24, 0.30), **SUP_H)
 par('columna-cervical-trauma-ap', _hombros_abajo, angulado(AP, 17, 'cefalico'), C4, (0.24, 0.30), normal=AP)
 par('columna-cervical-trauma-ap-axial-oblicua', _hombros_abajo, angulado(OPD, 15, 'cefalico'), C4, (0.24, 0.30), normal=AP, otra='arriba',
-    puntos=['cabeza_humero_L'])
+    puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 par('columna-cervical-trauma-cervicotoracica', _nadador, LAT, T1, (0.24, 0.30), **SUP_H)
 
 # ---------- torácica ----------
@@ -61,7 +61,7 @@ par('columna-toracica-lateral', _lateral, LAT, T7, (0.35, 0.43), radio=0.20, enc
 # oblicua: OPD a 70° (20° de rotación posterior desde la lateral); brazo alejado del RI detrás de la espalda, el cercano arriba
 _obl_t = lambda: _brazo_arriba(Pose(), 'R').hombro_flex('L', -30).codo_flex('L', 90)
 par('columna-toracica-oblicua', _obl_t, oblicuo('AP', 70, 'R'), T7, (0.35, 0.43), radio=0.20, encuadre=0.36, huesos=TORAC, cortes=TORSO,
-    otra='arriba', puntos=['cabeza_humero_L'])
+    otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 
 # ---------- lumbar ----------
 par('columna-lumbar-ap', _rodillas, AP, L3, (0.30, 0.35), radio=0.16, encuadre=0.30, huesos=LUMB, cortes=TORSO)
@@ -69,9 +69,9 @@ par('columna-lumbar-lateral', _rodillas, LAT, L3, (0.30, 0.35), radio=0.16, encu
 par('columna-lumbar-lateral-l5-s1', _rodillas, LAT, 'medio:centro:Fifth lumbar vertebra|centro:Sacrum|0.3', (0.18, 0.24), radio=0.10, encuadre=0.22,
     huesos=LUMB, cortes=TORSO)
 par('columna-lumbar-oblicua--v1', Pose, oblicuo('AP', 45, 'R'), L3, (0.30, 0.35), radio=0.16, encuadre=0.30, huesos=LUMB, cortes=TORSO,
-    otra='arriba', puntos=['cabeza_humero_L'])
+    otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 par('columna-lumbar-oblicua--v2', Pose, oblicuo('PA', 45, 'R'), L3, (0.30, 0.35), radio=0.16, encuadre=0.30, huesos=LUMB, cortes=TORSO,
-    otra='arriba', puntos=['cabeza_humero_L'])
+    otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 par('columna-lumbar-ap-flexion-lateral--v1', lambda: Pose().lumbar_lat('R', 25), AP, L3, (0.35, 0.43), radio=0.20, encuadre=0.36, huesos=LUMB + ['torax'],
     cortes=TORSO, **DE_PIE)
 par('columna-lumbar-ap-flexion-lateral--v2', lambda: Pose().lumbar_lat('L', 25), AP, L3, (0.35, 0.43), radio=0.20, encuadre=0.36, huesos=LUMB,
@@ -95,7 +95,7 @@ par('columna-sacroiliacas-ap-axial', Pose, angulado(AP, 32, 'cefalico'), 'medio:
     encuadre=0.24, huesos=LUMB, cortes=TORSO)
 # oblicua posterior 25-30° con el lado a estudiar levantado: acá la SI derecha (OPI, lado izquierdo contra la mesa)
 par('columna-sacroiliacas-oblicua-posterior', Pose, oblicuo('AP', 27, 'L'), 'medio:eias_R|eias_L|0.12', (0.24, 0.30), radio=0.12, encuadre=0.24,
-    huesos=LUMB, cortes=TORSO, otra='arriba', puntos=['cabeza_humero_L'])
+    huesos=LUMB, cortes=TORSO, otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 
 if __name__ == '__main__':
     for k in (sys.argv[1:] or F):

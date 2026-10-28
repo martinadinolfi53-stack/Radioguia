@@ -52,28 +52,28 @@ LORD = 20                                                  # inclinación del pa
 _vert_lord = (0, np.cos(np.radians(LORD)), np.sin(np.radians(LORD)))     # vertical de la sala en ejes del cuerpo
 par('torax-ap-lordotica', _pa, angulado(AP, LORD, 'cefalico'), 'esternon_medio', (0.35, 0.43), arriba_tubo=_vert_lord, arriba_img=_vert_lord)
 # oblicuas anteriores 45°: OAD (v1, hombro derecho contra el RI, brazo izquierdo arriba) y OAI (v2)
-par('torax-oblicua-anterior--v1', _obl('L'), oblicuo('PA', 45, 'R'), T7, (0.35, 0.43), otra='arriba', puntos=['cabeza_humero_L'])
-par('torax-oblicua-anterior--v2', _obl('R'), oblicuo('PA', 45, 'L'), T7, (0.35, 0.43), otra='arriba', puntos=['cabeza_humero_L'])
+par('torax-oblicua-anterior--v1', _obl('L'), oblicuo('PA', 45, 'R'), T7, (0.35, 0.43), otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
+par('torax-oblicua-anterior--v2', _obl('R'), oblicuo('PA', 45, 'L'), T7, (0.35, 0.43), otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 # vía aérea superior: AP (v1) y lateral (v2, hombros abajo y atrás); RC a la altura de C6-C7
 VA = 'centro:Sixth cervical vertebra'
 par('via-aerea-ap-lateral--v1', Pose, AP, VA, (0.24, 0.30), radio=0.09, encuadre=0.22, huesos=CUELLO, cortes=[('xifoides', (0, 1, 0), 0.0)], **DE_PIE)
 par('via-aerea-ap-lateral--v2', lambda: Pose().hombro_flex('R', -15).hombro_flex('L', -15), LAT, f'medio:{VA}|yugular', (0.24, 0.30), radio=0.09,
     encuadre=0.22, huesos=CUELLO, cortes=[('xifoides', (0, 1, 0), 0.0)], **DE_PIE)
 # esternón: OAD 15-20°; lateral con los hombros hacia atrás
-par('esternon-oad', _obl('L'), oblicuo('PA', 17, 'R'), 'esternon_medio', (0.24, 0.30), radio=0.13, encuadre=0.26, otra='arriba', puntos=['cabeza_humero_L'])
+par('esternon-oad', _obl('L'), oblicuo('PA', 17, 'R'), 'esternon_medio', (0.24, 0.30), radio=0.13, encuadre=0.26, otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 par('esternon-lateral', lambda: Pose().hombro_flex('R', -25).hombro_flex('L', -25), LAT, 'esternon_medio', (0.24, 0.30), radio=0.13, encuadre=0.26, **DE_PIE)
 # esternoclaviculares: PA a T2-T3 (unos 3 cm por debajo de la escotadura yugular), cabeza girada; oblicua anterior 10-15°
 EC = 'medio:yugular|esternon_medio|0.35'
 par('esternoclaviculares-pa', lambda: Pose().cabeza_rot('L', 60), PA, EC, (0.24, 0.18), radio=0.09, encuadre=0.20, **DE_PIE)
 par('esternoclaviculares-oblicua', lambda: Pose().cabeza_rot('L', 60), oblicuo('PA', 12, 'R'), EC, (0.24, 0.18), radio=0.09, encuadre=0.20,
-    otra='arriba', puntos=['cabeza_humero_L'])
+    otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 # costillas: AP por encima del diafragma (T7) y por debajo (entre el xifoides y el borde costal inferior);
 # axilares superiores en OAD 45° y axilares inferiores en OPI 45° (brazo del lado del RI arriba, la otra mano en la cintura)
 par('costillas-ap-encima-diafragma', Pose, AP, T7, (0.43, 0.35), **DE_PIE)
 DEB = 'medio:xifoides|centro:Second lumbar vertebra'
 par('costillas-ap-debajo-diafragma', Pose, AP, DEB, (0.43, 0.35), **DE_PIE)
-par('costillas-axilares-oad-superiores', _obl('L'), oblicuo('PA', 45, 'R'), T7, (0.35, 0.43), otra='arriba', puntos=['cabeza_humero_L'])
-par('costillas-axilares-opi-inferiores', _obl('L'), oblicuo('AP', 45, 'L'), DEB, (0.35, 0.43), otra='arriba', puntos=['cabeza_humero_L'])
+par('costillas-axilares-oad-superiores', _obl('L'), oblicuo('PA', 45, 'R'), T7, (0.35, 0.43), otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
+par('costillas-axilares-opi-inferiores', _obl('L'), oblicuo('AP', 45, 'L'), DEB, (0.35, 0.43), otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 
 if __name__ == '__main__':
     for k in (sys.argv[1:] or F):

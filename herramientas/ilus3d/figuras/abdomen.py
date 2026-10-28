@@ -37,7 +37,7 @@ _brazos = lambda: _arriba(_arriba(Pose(), 'R'), 'L')
 _rod = lambda p, g=30: p.cadera_flex('R', g).cadera_flex('L', g).rodilla_flex('R', g * 1.5).rodilla_flex('L', g * 1.5)
 _dec = lambda: _rod(_brazos(), 20)                       # decúbito lateral: brazos arriba, rodillas algo flexionadas
 _un_brazo = lambda s: lambda: _arriba(Pose(), s)        # el brazo s arriba, el otro abajo
-OBL = dict(otra='arriba', puntos=['cabeza_humero_L'])
+OBL = dict(otra='arriba', puntos=['cabeza_humero_R', 'cabeza_humero_L'])
 R35, R3043, R2430 = (0.35, 0.43), (0.30, 0.35), (0.24, 0.30)
 
 # ---------- abdomen ----------

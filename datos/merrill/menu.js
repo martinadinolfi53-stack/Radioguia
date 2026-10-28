@@ -41,4 +41,7 @@ export default [
   { id: "intestino-grueso", nombre: "Intestino grueso", familia: "contraste", regiones: ["intestino-grueso"] },
   { id: "urinario", nombre: "Aparato urinario", familia: "contraste", regiones: ["urinario"] },
   { id: "vejiga", nombre: "Vejiga y uretra", familia: "contraste", regiones: ["vejiga"] },
+  { id: "craneo", nombre: "Cráneo y base", familia: "craneo", regiones: ["craneo", "base-craneo"] },
+  { id: "petromastoidea", nombre: "Peñasco y mastoides", familia: "craneo", regiones: ["petromastoidea"] },
+  { id: "orbitas", nombre: "Conducto óptico y ojo", familia: "craneo", regiones: ["optico", "ojo"] },
 ];

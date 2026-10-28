@@ -28,4 +28,7 @@ export default [
   { id: "sacroiliacas", nombre: "Sacroilíacas", familia: "columna", regiones: ["sacroiliacas"] },
   { id: "sacro-coccix", nombre: "Sacro y cóccix", familia: "columna", regiones: ["sacro-coccix"] },
   { id: "escoliosis", nombre: "Escoliosis y funcionales", familia: "columna", regiones: ["escoliosis"] },
+  { id: "esternon", nombre: "Esternón", familia: "toraxOseo", regiones: ["esternon"] },
+  { id: "esternoclaviculares", nombre: "Articulaciones esternoclaviculares", familia: "toraxOseo", regiones: ["esternoclaviculares"] },
+  { id: "costillas", nombre: "Costillas", familia: "toraxOseo", regiones: ["costillas", "costales"] },
 ];

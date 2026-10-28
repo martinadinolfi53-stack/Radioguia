@@ -85,6 +85,7 @@ class Puntos:
             'cresta_iliaca': ('pelvis', lambda: self.extremo(f'{L} hip bone', Y + 0.2 * lat, 0.003)),
             # tronco
             'sinfisis': ('pelvis', lambda: (self.extremo('Right hip bone', Z - 0.6 * Y + 0.4 * X, 0.003) + self.extremo('Left hip bone', Z - 0.6 * Y - 0.4 * X, 0.003)) / 2),
+            'coxis': ('pelvis', lambda: self.extremo('Sacrum', -Y - 0.3 * Z, 0.003)),     # punta del sacro (el modelo no trae el cóccix)
             'yugular': ('torax', lambda: self.extremo('Manubrium', Y, 0.02)),
             'xifoides': ('torax', lambda: self.extremo('Xiphoid process', -Y)),
             'esternon_medio': ('torax', lambda: self.centro('Body of sternum')),

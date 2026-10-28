@@ -169,13 +169,13 @@ def ventana():
         n = o.name
         if n.startswith('av_piel'):
             m = o.data.materials[0]; nt = m.node_tree; N = nt.nodes; L = nt.links.new; bs = [k for k in N if k.type == 'BSDF_PRINCIPLED'][-1]
-            L(mezcla(N, L, rango(N, L, dist_linea(N, L), R, R + 0.03, V.get('piel_dentro', 0.10), V.get('piel', 1.0)), bs.outputs[0]), N['Material Output'].inputs['Surface'])
+            L(mezcla(N, L, rango(N, L, dist_linea(N, L), R, R + V.get('borde', 0.03), V.get('piel_dentro', 0.10), V.get('piel', 1.0)), bs.outputs[0]), N['Material Output'].inputs['Surface'])
         elif n.startswith('av_'): continue
         elif n.startswith('musculo'):
             if mm is None:
                 def b(N, L):
                     p = N.new('ShaderNodeBsdfPrincipled'); p.inputs['Base Color'].default_value = (*lin('b8574e'), 1); p.inputs['Roughness'].default_value = 0.5
-                    return mezcla(N, L, rango(N, L, dist_linea(N, L), R, R + 0.03, V.get('musculo', 0.18), 0), p.outputs[0])
+                    return mezcla(N, L, rango(N, L, dist_linea(N, L), R, R + V.get('borde', 0.03), V.get('musculo', 0.18), 0), p.outputs[0])
                 mm = mat('mus', b)
             o.data.materials.clear(); o.data.materials.append(mm)
         else:

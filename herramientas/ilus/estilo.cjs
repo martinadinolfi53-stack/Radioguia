@@ -255,4 +255,46 @@ function encajar(id, ns, [bx, by, bw, bh]) {
   return figura(id, { en: [ns[0], bx + (bw - w * k) / 2 - Math.min(...xs) * k, by + (bh - h * k) / 2 - Math.min(...ys) * k], ppc: 10 * k });
 }
 
-module.exports = { titulo, separador, poli, encajar, SK, SKO, RED, BLUE, AMB, INK, MUTE, W, H, BONE, BONEO, body, table, wall, ri, riTop, beam, tube, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, mk, cabezaPerfil, cabezaFrente, figura, corte, hueco };
+// Ficha genérica con las vistas por capas del modelo 3D (herramientas/ilus3d/vistas.py): a la izquierda la vista desde el tubo
+// (<id>-tubo) con el RI y el punto del RC; al medio, si existe, la segunda vista (<id>-otra, de costado o desde arriba) con el RI
+// de canto, el RC y su ángulo; a la derecha el texto. o: id, blanco (punto del RC), ri, pa, otra ('costado'|'arriba'), otraTitulo,
+// tubo (título), ang, rc/pos/pie (filas de texto: "texto" o [texto, color, peso, tamaño]), extra(f, t), extraOtra(g, q).
+const _r1 = (n) => Math.round(n * 10) / 10;
+const _col = (x, y, filas) => filas.map((f, i) => { const [t, c = INK, w = 400, z = 11.5] = Array.isArray(f) ? f : [f]; return txt(x, y + i * 15, t, z, c, "start", w); }).join("");
+function modelo(o) {
+  const fs_ = require("fs"), path_ = require("path");
+  const hay = (id) => fs_.existsSync(path_.join(RENDER, id + ".webp"));
+  const otra = o.otra && hay(o.id + "-otra");
+  const RI = ["b0", "b1", "b2", "b3"], caja = otra ? [14, 40, 290, 272] : [14, 40, 390, 272];
+  const f = encajar(o.id + "-tubo", RI, caja), t = f.p(o.blanco);
+  const top = RI.map((n) => f.p(n)).sort((p, q) => p[1] - q[1] || p[0] - q[0])[0];
+  const dash = `<path d="M${RI.map((n) => f.p(n).map(_r1).join(",")).join(" L")} Z" fill="none" stroke="${INK}" stroke-width="1.6" stroke-dasharray="6 4"/>`;
+  let s = titulo(12, "", o.tubo || (o.pa ? "Desde el tubo (por detrás)" : "Desde el tubo")) +
+    poli(f, RI, "#e6e8ee", INK, 2.2) + f.svg + dash + txt(_r1(top[0] + 4), _r1(Math.max(top[1] + 14, 50)), o.ri, 10.5, INK, "start", 700) +
+    cross(_r1(t[0]), _r1(t[1])) + (o.extra ? o.extra(f, t) : "");
+  let xt = 420;
+  if (otra) {
+    const bx = [330, 44, 182, 236], g = encajar(o.id + "-otra", ["b0", "b1", "b2", "b3", o.blanco], bx), q = g.p(o.blanco);
+    // el RI se ve de canto: segmento entre las dos esquinas proyectadas más alejadas
+    const P = RI.map((n) => g.p(n)); let a = P[0], b = P[1], dmax = -1;
+    for (const p of P) for (const r of P) { const dd = Math.hypot(p[0] - r[0], p[1] - r[1]); if (dd > dmax) { dmax = dd; a = p; b = r; } }
+    const ini = g.p("rc_ini"), u = [ini[0] - q[0], ini[1] - q[1]], n = Math.hypot(...u), k = Math.min(n, Math.max(40, q[1] - 46)) / n;
+    const s0 = [q[0] + u[0] * k, q[1] + u[1] * k];
+    // perpendicular al RI hacia el lado del tubo, para mostrar el ángulo del RC
+    let nv = [-(b[1] - a[1]), b[0] - a[0]]; const nn = Math.hypot(...nv); nv = [nv[0] / nn, nv[1] / nn];
+    if (nv[0] * u[0] + nv[1] * u[1] < 0) nv = [-nv[0], -nv[1]];
+    const L = Math.min(n * k, 80), pe = [q[0] + nv[0] * L, q[1] + nv[1] * L];
+    s += separador(318) + titulo(330, "", o.otraTitulo || (o.otra === "arriba" ? "Vista desde arriba" : "Vista de costado"), "otra") + g.svg + (o.extraOtra ? o.extraOtra(g, q) : "") +
+      `<line x1="${_r1(a[0])}" y1="${_r1(a[1])}" x2="${_r1(b[0])}" y2="${_r1(b[1])}" stroke="${INK}" stroke-width="6" stroke-linecap="butt"/>` +
+      txt(_r1(Math.max(a[0], b[0]) + 6), _r1(Math.max(a[1], b[1]) + 4), "RI", 10.5, INK, "start", 700) +
+      (o.ang ? `<line x1="${_r1(q[0])}" y1="${_r1(q[1])}" x2="${_r1(pe[0])}" y2="${_r1(pe[1])}" stroke="${RED}" stroke-width="1.3" stroke-dasharray="3 4"/>` +
+        txt(_r1(s0[0] + (s0[0] >= pe[0] ? 8 : -8)), _r1(s0[1] + 10), o.ang, 11.5, RED, s0[0] >= pe[0] ? "start" : "end", 700) : "") +
+      `<line x1="${_r1(s0[0])}" y1="${_r1(s0[1])}" x2="${_r1(q[0])}" y2="${_r1(q[1])}" stroke="${RED}" stroke-width="3" marker-end="url(#ar)"/>` +
+      `<circle cx="${_r1(q[0])}" cy="${_r1(q[1])}" r="3.5" fill="${RED}"/>`;
+    xt = 534;
+  }
+  s += separador(xt - 12) + _col(xt, 52, o.rc || []) + _col(xt, 52 + (o.rc || []).length * 15 + 16, o.pos || []) + _col(xt, 268, o.pie || []);
+  return svg(s);
+}
+
+module.exports = { modelo, titulo, separador, poli, encajar, SK, SKO, RED, BLUE, AMB, INK, MUTE, W, H, BONE, BONEO, body, table, wall, ri, riTop, beam, tube, cross, coll, refline, note, view, txt, svg, dot, side, piel, linea, hueso, etiquetaHueso, mk, cabezaPerfil, cabezaFrente, figura, corte, hueco };

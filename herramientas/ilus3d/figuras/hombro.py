@@ -130,12 +130,10 @@ _garth = lambda: Pose().hombro_flex('R', 50).mov('brazo_R', (0, 0, 1), 20).hombr
 _garth_corte = lambda: Pose().hombro_flex('R', 50).mov('brazo_R', (0, 0, 1), 20).hombro_rot_ext('R', -100)   # ídem, codo extendido
 F['hombro-garth'] = lambda: desde_arriba('hombro-garth', _garth_corte(), rayo('AP', 45))
 F['hombro-garth-persp'] = lambda: perspectiva('hombro-garth-persp', _garth(), rayo('AP', 45), az=15, el=40, suavizar=AX)
-F['hombro-garth-tubo'] = lambda: fig('hombro-garth-tubo', _garth(), rayo('AP', 45), huesos=BRAZO)
 # Y de escápula y Neer: desde la PA, oblicua anterior 45-60° (52°), brazo sano adelante y arriba, afectado abajo
 _neer = lambda: _lado().hombro_flex('L', 100)
 F['hombro-y-escapula-neer'] = lambda: desde_arriba('hombro-y-escapula-neer', _lado(), rayo('PA', 52), punto='centro:Right scapula')
 F['hombro-y-escapula-neer-persp'] = lambda: perspectiva('hombro-y-escapula-neer-persp', _neer(), rayo('PA', 52), centro='centro:Right scapula', az=-20, el=35, huesos=BRAZO + ['cintura_L', 'brazo_L', 'cubito_L', 'radio_L', 'mano_L'], suavizar=AX)
-F['hombro-y-escapula-neer-tubo'] = lambda: fig('hombro-y-escapula-neer-tubo', _neer(), rayo('PA', 52), huesos=BRAZO)
 # Lawrence axial: decúbito supino, brazo a 90° en rotación externa (mano en supinación), cabeza girada al otro lado; desde arriba
 # en perspectiva: paciente acostado visto desde los pies y arriba, RI vertical sobre el hombro, RC desde abajo 25-30° a medial
 _lawr = lambda: Pose().hombro_abd('R', ABD90).hombro_rot_ext('R', R0).cabeza_rot('L', 40)

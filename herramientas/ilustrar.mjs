@@ -27,7 +27,9 @@ function claveInvalida(clave) {
 }
 const zonas = process.argv.slice(2);
 const archivos = readdirSync(join(raiz, "herramientas/ilus")).filter((f) => f.endsWith(".cjs") && f !== "estilo.cjs" && !f.startsWith("referencia-"))
-  .filter((f) => !zonas.length || zonas.includes(f.replace(/\.cjs$/, "")));
+  .filter((f) => !zonas.length || zonas.includes(f.replace(/\.cjs$/, "")) || zonas.includes(f.replace(/^modelo-|\.cjs$/g, "")))
+  // modelo-<zona>.cjs (figuras por capas del modelo 3D) va al final: sus esquemas reemplazan a los dibujados a mano de la zona
+  .sort((a, b) => a.startsWith("modelo-") - b.startsWith("modelo-") || a.localeCompare(b));
 mkdirSync(join(raiz, "ilustraciones"), { recursive: true });
 const problemas = [];
 let n = 0;

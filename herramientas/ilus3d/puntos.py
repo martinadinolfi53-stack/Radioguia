@@ -32,6 +32,10 @@ class Puntos:
             d, s_ = m.groups(); L_ = _lado(s_).lower(); nm = 'thumb' if d == '1' else {'2': 'index', '3': 'middle', '4': 'ring', '5': 'little'}[d] + ' finger'
             seg = f'f{d}c_{s_}'
             return seg, lambda: self.extremo(f'Distal phalanx of {L_} {nm}', self._dir_dedo(d, s_))
+        if nombre.startswith('medio:'):       # 'medio:A|B|t': punto a fracción t (0,5 si falta) de A a B; 'A+B' promedia puntos
+            pr = nombre[6:].split('|'); t = float(pr[2]) if len(pr) > 2 else 0.5
+            prom = lambda x: np.mean([self.definir(n)[1]() for n in x.split('+')], 0)
+            return self.definir(pr[0].split('+')[0])[0], lambda: prom(pr[0]) + t * (prom(pr[1]) - prom(pr[0]))
         if nombre.startswith('centro:'):      # centro de cualquier hueso por su nombre en el modelo, p. ej. 'centro:Right capitate'
             hb = nombre[7:]; return self.c.huesos[self.c.id_por_nombre[hb]]['seg'], lambda: self.centro(hb)
         k, _, s = nombre.rpartition('_') if nombre[-2:] in ('_R', '_L') else (nombre, '', '')

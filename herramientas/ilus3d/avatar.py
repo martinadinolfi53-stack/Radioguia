@@ -171,6 +171,14 @@ def ajuste(c):
     delta = Vd - V
     pickle.dump(delta, open(ruta, 'wb')); return delta
 
+def segmentos(c):
+    """segmento dominante de cada vértice de la piel del avatar (el hueso con más peso), para recortar por región"""
+    n = len(_datos(c)['R']['V']); w0 = np.zeros(n); seg = np.full(n, 'cabeza', dtype=object)
+    for b, lst in P.WT.items():
+        for i, w in lst:
+            if i < n and w > w0[i]: w0[i] = w; seg[i] = _seg(b)
+    return seg.astype(str)
+
 def posado(c, ajustado=None):
     """partes del avatar posadas como el cuerpo c (después de c.posar): lista de (nombre, P, caras, uv o None).
     ajustado: piel llevada a la forma del cuerpo de BodyParts3D (AVATAR_AJUSTE=1)"""

@@ -73,6 +73,23 @@ def _grupo(seg):
     if re.match(r'(cubito|radio|antebrazo)_[RL]$', seg): return 'antebrazo' + seg[-2:]
     return seg.rsplit('_', 1)[0] if seg.endswith(('_R', '_L')) else seg
 
+# Estilo por capas automático para las figuras de los miembros (mano, codo, pie, rodilla): ventana sobre la estructura de la
+# ficha según el prefijo del id, con la piel del modelo anatómico (ESTILO_CAPAS=0 vuelve al dibujo plano). Lo específico va antes.
+ESTILO_CAPAS = os.environ.get('ESTILO_CAPAS', '1') == '1'
+VENTANAS = [('dedos-pie', 'centro:Right second metatarsal bone', 0.11), ('pierna', 'centro:Right tibia', 0.24), ('pie', 'centro:Right cuboid bone', 0.13),
+            ('calcaneo', 'centro:Right calcaneus', 0.08), ('tobillo', 'centro:Right talus', 0.09), ('rodilla', 'centro:Right patella', 0.10),
+            ('fosa-rotula', 'centro:Right patella', 0.09), ('femur', 'centro:Right femur', 0.27), ('muneca', 'centro:Right capitate', 0.08),
+            ('antebrazo', 'centro:Right radius', 0.17), ('codo', 'codo_R', 0.09), ('norgaard', 'centro:Right capitate', 0.15),
+            ('manos', 'centro:Right capitate', 0.15), ('mano', 'centro:Right capitate', 0.15), ('dedos', 'centro:Right third metacarpal bone', 0.14),
+            ('pulgar', 'centro:Right capitate', 0.12)]
+def _ventana_auto(id):
+    for k, q, r in VENTANAS:
+        if id.startswith(k):
+            if id.endswith('-L') and q.startswith('centro:Right'): q = q.replace('Right', 'Left')
+            elif id.endswith('-L') and q.endswith('_R'): q = q[:-2] + '_L'
+            return dict(punto=q, radio=r, encuadre=0, piel_dentro=0.2, borde=0.06, piel_modelo=True, muestras=64)
+    return None
+
 def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, cortes=(), puntos=(), px=800,
            muestras=16, con_ropa=None, fundido=0.02, horizontal=None, vertical=None, suavizar=0, capas=False, cara=False,
            avatar=False, ventana=None):
@@ -91,6 +108,7 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
       radio (m), musculos ([nombres en inglés], [segmentos que siguen]), destacar ([(nombre del hueso, punto, radio m, color)]),
       contexto (segmentos de huesos extra, p. ej. el tórax, que se ven por la ventana).
     """
+    if ventana is None and ESTILO_CAPAS: ventana = _ventana_auto(id)
     if ventana: avatar = True
     avatar = avatar or os.environ.get('AVATAR') == '1'     # AVATAR=1: todas las figuras con el avatar realista
     c = cuerpo(); c.posar(pose); pts = Puntos(c)
@@ -132,10 +150,15 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
         # avatar realista: reemplaza la piel del modelo (que sigue sirviendo para el encuadre y los puntos); mismos cortes
         import avatar as _av
         partes = []
+        sg = _av.segmentos(c) if region is not None else None
         for nombre, V, F, uv in _av.posado(c, **({'ajustado': ventana.get('ajustado', True)} if ventana else {})):
+            if sg is not None and len(V) == len(sg): F = F[np.isin(sg[F], list(region)).any(1)]
             for p, n in planos: F = F[((V[F].mean(1) - p) @ n) > -0.002]
             if len(F): partes.append((nombre, (V, F, uv)))
         con_ropa = False; cara = False
+    if ventana and ventana.get('piel_modelo'):
+        # piel del modelo anatómico en lugar del avatar (miembros distales: los dedos del avatar no coinciden con los huesos)
+        partes = [('av_piel', (Pp, I, np.tile([2.0, 0.0], (len(Pp), 1))))]; avatar = False; con_ropa = False; cara = False
     if capas:     # copia de la piel separada por partes, solo para la pasada de profundidad (cada parte con su número)
         G = {}; gid = lambda seg: G.setdefault(_grupo(seg), len(G) + 1)
         gf = np.array([gid(x) for x in dom[I[:, 0]]])
@@ -171,14 +194,15 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     # (radio, cm[, lados]) cambia esa distancia y elige la axila ('R', 'L')
     for s_ in 'RL': proy['_axila' + s_] = pts.posado('cabeza_humero_' + s_).tolist()
     for i, (p, n) in enumerate(planos): proy[f'_corte{i}'] = p.tolist(); proy[f'_corte{i}n'] = (p + n * 0.05).tolist()
-    if avatar:
+    if avatar or ventana:
         usados = np.concatenate([d[0][np.unique(d[1])] for n_, d in partes if n_.startswith('av_')])
     if ventana and ventana.get('encuadre', 0.20):     # encuadre cerca del centro de la ventana (como en una foto de la región): un cuadrado de lado 2 x encuadre
         q0 = pts.posado(ventana['punto']); f_ = np.asarray(dir, float) / np.linalg.norm(dir); r_ = usados - q0
         usados = usados[np.linalg.norm(r_ - np.outer(r_ @ f_, f_), axis=1) < ventana.get('encuadre', 0.20)]
-    spec = dict(obj=obj, salida=os.path.join(CACHE, id), dir=list(map(float, dir)), arriba=list(map(float, arriba)), realista=avatar,
+    spec = dict(obj=obj, salida=os.path.join(CACHE, id), dir=list(map(float, dir)), arriba=list(map(float, arriba)), realista=avatar or bool(ventana),
                 encuadre=[usados.min(0).tolist(), usados.max(0).tolist()] + usados[::40].tolist() + _extremos(usados, dir, arriba), px=px, muestras=muestras, puntos=proy, capas=capas)
-    if ventana: spec['ventana'] = dict(centro=pts.posado(ventana['punto']).tolist(), radio=ventana.get('radio', 0.10), musculo=ventana.get('opacidad_musculo', 0.18), piel=ventana.get('piel', 1.0), muestras=ventana.get('muestras', 24 if ventana.get('piel', 1.0) >= 1 else 80))
+    if ventana: spec['ventana'] = dict(centro=pts.posado(ventana['punto']).tolist(), radio=ventana.get('radio', 0.10), musculo=ventana.get('opacidad_musculo', 0.18), piel=ventana.get('piel', 1.0), piel_dentro=ventana.get('piel_dentro', 0.10), borde=ventana.get('borde', 0.03),
+                              muestras=ventana.get('muestras', 24 if ventana.get('piel', 1.0) >= 1 else 80))
     sp = os.path.join(CACHE, id + '-spec.json'); json.dump(spec, open(sp, 'w'))
     r = subprocess.run([sys.executable, os.path.join(AQUI, 'render_obj.py'), sp], capture_output=True, text=True)
     if r.returncode or 'Traceback' in r.stderr: raise RuntimeError(r.stderr[-3000:])
@@ -186,8 +210,9 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     ax_ = [info['puntos'].pop('_axila' + s_) for s_ in 'RL']
     if ventana:     # bordes del encuadre desvanecidos (el cuerpo sigue más allá del recorte)
         im = Image.open(spec['salida'] + '-ventana.png').convert('RGBA'); W_, H_ = im.size; m_ = 0.07 * max(W_, H_)
-        yy, xx = np.mgrid[0:H_, 0:W_]; k_ = np.clip(np.minimum.reduce([xx, W_ - 1 - xx, yy, H_ - 1 - yy]) / m_, 0, 1)
-        im.putalpha(Image.fromarray((np.asarray(im.getchannel('A'), float) * k_).astype(np.uint8)))
+        if ventana.get('encuadre', 0.20):     # solo con recorte: sin él, el desvanecido borraba las puntas de los dedos
+            yy, xx = np.mgrid[0:H_, 0:W_]; k_ = np.clip(np.minimum.reduce([xx, W_ - 1 - xx, yy, H_ - 1 - yy]) / m_, 0, 1)
+            im.putalpha(Image.fromarray((np.asarray(im.getchannel('A'), float) * k_).astype(np.uint8)))
         return _terminar(id, im, info, planos, fundido)
     p = Image.open(spec['salida'] + '-piel.png').convert('RGBA'); h = Image.open(spec['salida'] + '-hueso.png').convert('RGBA')
     p = _tapar_agujeros(p, zonas=[(q, 12 * info['pxm'] / 100) for q in ax_])
@@ -525,15 +550,17 @@ def rect3d(nombre, centro, u, v, ancho, alto):
     c = np.asarray(centro, float); u = np.asarray(u, float) / np.linalg.norm(u); v = np.asarray(v, float) / np.linalg.norm(v)
     return [(f'{nombre}{i}', c + su * ancho / 2 * u + sv * alto / 2 * v) for i, (su, sv) in enumerate(((-1, -1), (1, -1), (1, 1), (-1, 1)))]
 
-def ri_detras(pose, d, centro, ancho=0.45, alto=0.55, nombre='b', margen=0.005, debajo_de=None, arriba=(0, 1, 0), radio=None, normal=None):
+def ri_detras(pose, d, centro, ancho=0.45, alto=0.55, nombre='b', margen=0.005, debajo_de=None, arriba=(0, 1, 0), radio=None, normal=None, al_rc=False):
     """RI (o bucky) perpendicular al rayo d, apoyado contra el paciente del lado de salida del rayo, centrado en el punto
     centro (proyectado sobre el plano). debajo_de: punto del cuerpo; solo se tiene en cuenta la piel por encima de él.
     normal: normal del RI cuando no es perpendicular al rayo (rayo angulado: el RI sigue vertical u horizontal)."""
     c = cuerpo(); c.posar(pose); pts = Puntos(c); Pp = c.piel_posada()
+    r = np.asarray(d, float); r /= np.linalg.norm(r)     # al_rc: con rayo angulado, centrar el RI donde sale el RC (el "RC proyectado")
     d = np.asarray(normal if normal is not None else d, float); d /= np.linalg.norm(d)
     if debajo_de: Pp = Pp[Pp[:, 1] > pts.posado(debajo_de)[1]]
     if radio: Pp = Pp[np.linalg.norm(Pp - pts.posado(centro), axis=1) < radio]     # solo la piel cerca del punto (p. ej. el hombro)
-    cen = pts.posado(centro); prof = (Pp @ d).max() + margen; cen = cen + (prof - cen @ d) * d
+    cen = pts.posado(centro); prof = (Pp @ d).max() + margen
+    cen = cen + (prof - cen @ d) / (r @ d) * r if al_rc and normal is not None else cen + (prof - cen @ d) * d
     v = np.asarray(arriba, float); v = v - d * (v @ d); u = np.cross(v, d)
     return rect3d(nombre, cen, u, v, ancho, alto) + [(nombre + 'c', cen), (nombre + 'n', cen - 0.25 * d)]
 

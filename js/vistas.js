@@ -7,7 +7,7 @@ import { GRUPOS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { avatar } from "./foto.js";
-import { FUENTES, fuenteId, fuenteInfo, elegida } from "./fuente.js";
+import { FUENTES, fuenteId, elegida } from "./fuente.js";
 
 export const estado = { q: "", qFav: "", filtro: {}, sel: null }; // búsqueda, filtro de categoría por región y selección en Favoritos (Set o null)
 
@@ -56,11 +56,14 @@ export function vistaPortada() {
       <a class="portada-boton" href="#ajustes" aria-label="Ajustes">${icono.ajustes}<span>Ajustes</span></a>
     </div>
     <p class="portada-hola">${fotoPortada()}Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
-    <a class="portada-fuente" href="#ajustes-fuente">${icono.libro}<span>Consultando el <b>${esc(fuenteInfo.nombre)}</b></span><small>Cambiar</small></a>
     <div class="portada-ops">
       <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
       <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
     </div>
+    <div class="portada-fuente" role="group" aria-label="Libro que estás consultando">${FUENTES.filter((f) => f.lista).map((f) => {
+      const on = f.id === fuenteId;
+      return `<button type="button" data-fuente="${f.id}" class="${on ? "on" : ""}" aria-pressed="${on}">${esc(f.nombre)}</button>`;
+    }).join("")}</div>
   </main>`;
 }
 

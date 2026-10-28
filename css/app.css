@@ -406,6 +406,8 @@ button.sel-fila { width: 100%; text-align: left; padding: 10px 14px; gap: 12px; 
 .panel .fuente-op { background: var(--surface-2); border-color: var(--line); color: var(--fg); }
 .panel .fuente-op small { color: var(--mute); }
 .panel .fuente-op.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
-.portada-fuente { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; margin: -8px 0 16px; padding: 0 14px; border: 1px solid #263142; border-radius: 999px; color: #c9d3df; font-size: .9em; }
-.portada-fuente small { color: #5cc8ff; }
+/* interruptor de libro debajo de Enfoques y Juegos: el libro activo queda resaltado; tocar el otro cambia de fuente */
+.portada-fuente { display: inline-flex; gap: 4px; margin-top: 36px; padding: 4px; border: 1px solid rgb(127 140 160 / .35); border-radius: 999px; }
+.portada-fuente button { min-height: 40px; min-width: 112px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; color: inherit; opacity: .7; font: inherit; font-size: .95em; font-weight: 600; cursor: pointer; }
+.portada-fuente button.on { background: #5cc8ff; color: #04121f; opacity: 1; cursor: default; }
 #fuente { scroll-margin-top: calc(var(--top-h, 64px) + 12px); }

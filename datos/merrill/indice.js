@@ -9,6 +9,7 @@ import cap09 from "./cap09-torax-oseo.js";
 import cap10 from "./cap10-visceras-toracicas.js";
 import cap16 from "./cap16-abdomen.js";
 import cap17 from "./cap17-tubo-digestivo.js";
+import cap18 from "./cap18-urinario.js";
 export { default as MENU } from "./menu.js";
 export { default as ANG_ROT } from "./angulacion-rotacion.js";
 export { default as VERSIONES } from "./versiones.js";
@@ -23,4 +24,4 @@ export const FUENTE = {
   ilustraciones: "ilustraciones/merrill/",
 };
 
-export const CAPITULOS = [cap04, cap05, cap06, cap07, cap08, cap09, cap10, cap16, cap17];
+export const CAPITULOS = [cap04, cap05, cap06, cap07, cap08, cap09, cap10, cap16, cap17, cap18];

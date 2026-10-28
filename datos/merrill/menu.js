@@ -39,4 +39,6 @@ export default [
   { id: "estomago", nombre: "Estómago y duodeno", familia: "contraste", regiones: ["estomago"] },
   { id: "intestino-delgado", nombre: "Intestino delgado", familia: "contraste", regiones: ["intestino-delgado"] },
   { id: "intestino-grueso", nombre: "Intestino grueso", familia: "contraste", regiones: ["intestino-grueso"] },
+  { id: "urinario", nombre: "Aparato urinario", familia: "contraste", regiones: ["urinario"] },
+  { id: "vejiga", nombre: "Vejiga y uretra", familia: "contraste", regiones: ["vejiga"] },
 ];

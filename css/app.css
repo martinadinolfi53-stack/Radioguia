@@ -390,6 +390,7 @@ main.wrap:has(+ .pestanas) { padding-bottom: calc(env(safe-area-inset-bottom, 0p
 .aj-cuenta { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
 .aj-cuenta span { display: grid; min-width: 0; }
 .aj-cuenta small { color: var(--mute); overflow-wrap: anywhere; }
+.aj-nota { color: var(--mute); font-size: .9em; margin: 0 0 12px; }
 .aj-salir { color: var(--rojo, #ff6b6b); }
 
 /* ---------- Ajustes > Apariencia: muestras para elegir ---------- */

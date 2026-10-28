@@ -82,7 +82,7 @@ export function vistaIdentificacion() {
     </form>
     <p class="ident-o">o</p>
     <button class="ident-google" data-id-google ${ocupado ? "disabled" : ""}>Entrar con Google</button>
-    <small class="ident-nota">Con Google no perdés tus grupos ni tus puntos si cambiás de celular.</small>
+    <small class="ident-nota">Con Google no perdés tus grupos, tus puntos ni tus favoritos si cambiás de celular.</small>
     ${ocupado ? `<p class="ident-estado">Entrando…</p>` : ""}
     ${error ? `<p class="ident-error" role="alert">${esc(error)}</p>` : ""}
   </main>`;

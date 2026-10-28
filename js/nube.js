@@ -5,6 +5,8 @@
 // Firestore (reglas en herramientas/firestore.rules):
 //   config/desafio                         { preguntas, vidas }  lo cambia Martin desde la consola para ajustar la dificultad
 //   usuarios/{uid}                         { apodo, foto, grupos: [gid] }   foto: JPEG cuadrado chico como data URL
+//   usuarios/{uid}/privado/favoritos       { datos, actualizado }  listas de favoritos (JSON de js/almacen.js), solo cuentas con Google;
+//                                          solo las lee y escribe el dueño (ver js/sync-favoritos.js)
 //   codigos/{CODIGO}                       { gid, creador }  para unirse escribiendo el código del grupo
 //   grupos/{gid}                           { nombre, codigo, creador, creado, fichas, aspectos, excluir, origen }
 //   grupos/{gid}/miembros/{uid}            { uid, apodo, foto, puntos, partidas, racha, ultimaFecha }  acumulado para el ranking histórico
@@ -85,6 +87,21 @@ export async function guardarFoto(foto) {
   perfil = { ...(perfil || {}), foto };
   await Promise.all((perfil.grupos || []).map((g) => fb.updateDoc(fb.doc(db, "grupos", g, "miembros", uid), { foto }).catch(() => {})));
   avisar();
+}
+
+// ---------- favoritos en la cuenta ----------
+const refFavoritos = () => fb.doc(db, "usuarios", auth.currentUser.uid, "privado", "favoritos");
+// devuelve { datos, actualizado } o null si la cuenta todavía no guardó nada
+export async function leerFavoritos() {
+  await iniciar();
+  const d = await fb.getDoc(refFavoritos());
+  if (!d.exists()) return null;
+  const { datos, actualizado } = d.data();
+  try { return { datos: JSON.parse(datos), actualizado }; } catch { return null; }
+}
+export async function guardarFavoritos(datos, actualizado) {
+  await iniciar();
+  await fb.setDoc(refFavoritos(), { datos: JSON.stringify(datos), actualizado });
 }
 
 // ---------- grupos ----------

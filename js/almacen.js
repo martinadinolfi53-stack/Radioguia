@@ -1,4 +1,5 @@
-// Listas de favoritos y preferencias, guardados en este dispositivo (localStorage). Todo envuelto en try/catch:
+// Listas de favoritos y preferencias, guardados en este dispositivo (localStorage); con cuenta de Google los
+// favoritos además viajan a la nube (js/sync-favoritos.js). Todo envuelto en try/catch:
 // en modo privado o con datos bloqueados la app funciona igual, solo que sin recordar.
 const leer = (k, def) => { try { const v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); } catch { return def; } };
 const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
@@ -28,7 +29,9 @@ function cargarListas() {
   return { v: 1, activa: "fav", listas: [{ id: "fav", nombre: "Favoritos", color: "amarillo", ids: [...new Set(leer(K_FAV_VIEJO, []))] }] };
 }
 let datos = cargarListas();
-const guardar = () => escribir(K_LISTAS, datos);
+// js/sync-favoritos.js se entera de cada cambio para subirlo a la cuenta de Google
+let avisarCambio = () => {};
+const guardar = () => { escribir(K_LISTAS, datos); avisarCambio(); };
 const buscarLista = (id) => datos.listas.find((l) => l.id === id);
 const copia = (l) => l && { ...l, ids: [...l.ids] };
 
@@ -68,6 +71,14 @@ export const listas = {
   },
   // saca ids de proyecciones que ya no existen
   limpiar(validos) { for (const l of datos.listas) l.ids = l.ids.filter((pid) => validos.has(pid)); guardar(); },
+};
+
+// para sincronizar con la cuenta: el guardado entero tal cual, reemplazarlo (sin volver a avisar) y enterarse de los cambios
+export const favoritosGuardados = {
+  leer: () => JSON.parse(JSON.stringify(datos)),
+  reemplazar(d) { escribir(K_LISTAS, d); datos = cargarListas(); },
+  borrar() { try { localStorage.removeItem(K_LISTAS); localStorage.removeItem(K_FAV_VIEJO); } catch {} datos = cargarListas(); },
+  alCambiar(f) { avisarCambio = f; },
 };
 
 const PREF_DEF = { tema: "oscuro", texto: "normal", avisoInstalar: true, diseno: "clasico", paleta: "original", subir: "no", rebote: "no", pompitas: "no" };

@@ -18,6 +18,7 @@ import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificaci
 import * as nube from "./nube.js";
 import { vistaFoto } from "./foto.js";
 import { iniciarLente } from "./lente.js";
+import { iniciarSyncFavoritos, cerrarSesion } from "./sync-favoritos.js";
 
 const app = document.getElementById("app");
 iniciarLente(app);
@@ -164,10 +165,12 @@ app.addEventListener("click", async (e) => {
   else if ("cerrarAviso" in t.dataset) { preferencias.set("avisoInstalar", false); render(); }
   else if ("cerrarSesion" in t.dataset) {
     const { usuario, conGoogle } = nube.estado();
-    const aviso = usuario && !conGoogle ? "Estás solo con apodo: si cerrás la sesión, no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Cerrar igual?" : "¿Cerrar la sesión? Tus favoritos quedan guardados en este celular.";
+    const aviso = conGoogle ? "¿Cerrar la sesión? Tus favoritos quedan guardados en tu cuenta de Google y vuelven cuando entres de nuevo."
+      : usuario ? "Estás solo con apodo: si cerrás la sesión se borran tus favoritos de este celular y no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Cerrar igual?"
+      : "Si cerrás la sesión se borran tus favoritos de este celular. ¿Cerrar igual?";
     if (!confirm(aviso)) return;
     t.disabled = true;
-    try { if (usuario) await nube.salir(); } catch {}
+    await cerrarSesion();
     // olvida el nombre y vuelve a empezar, así no quedan datos de la cuenta anterior en pantalla
     try { localStorage.removeItem("radioguia.nombre"); } catch {}
     location.hash = ""; location.reload();
@@ -191,6 +194,8 @@ iniciarIdentificacion(app, render);
 iniciarRepaso(app, render);
 iniciarJuegos(app);
 iniciarGrupos(app, render);
+// con cuenta de Google, cuando llegan favoritos de otro dispositivo se redibuja (salvo que esté escribiendo)
+iniciarSyncFavoritos(() => { if (!document.activeElement?.matches("input, textarea")) render(); });
 pwa.iniciar(() => { if (["portada", "inicio", "ajustes", "ayuda-app"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
 // cuando llega la cuenta: pedir la foto si falta, o mostrarla en la portada y en Ajustes

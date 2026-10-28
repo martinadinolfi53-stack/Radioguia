@@ -8,6 +8,7 @@ import { esc, icono, cabecera } from "./util.js";
 import { GRUPOS, grupoDeRegion } from "./menu.js";
 import { ASPECTOS, CAMPOS, generarPreguntas } from "./repaso-preguntas.js";
 import * as nube from "./nube.js";
+import { cerrarSesion } from "./sync-favoritos.js";
 import { registrarDesafio } from "./juegos.js";
 import { vistaFoto, avatar, iniciarFoto } from "./foto.js";
 
@@ -106,7 +107,7 @@ function vistaCuenta() {
         <button class="rp-empezar" type="submit">Entrar</button></form>
     </section>
     <section class="panel"><h2>O con tu cuenta de Google</h2>
-      <p class="jg-nota">Así no perdés tus grupos ni tus puntos si cambiás de celular o borrás el navegador.</p>
+      <p class="jg-nota">Así no perdés tus grupos, tus puntos ni tus favoritos si cambiás de celular o borrás el navegador.</p>
       <button class="btn jg-google" data-gr="google">Entrar con Google</button>
     </section>
     ${err}
@@ -122,8 +123,8 @@ function vistaCuenta() {
         <button class="btn" type="submit">Guardar</button></form>
     </section>
     <section class="panel"><h2>Cuenta</h2>
-      ${conGoogle ? `<p class="jg-nota">Conectada con Google (${esc(usuario.email || "")}): tus grupos y puntos te siguen en cualquier dispositivo.</p>`
-        : `<p class="jg-nota">Estás jugando solo con apodo, en este dispositivo. Si lo vinculás con Google, no perdés tus grupos ni tus puntos si cambiás de celular.</p>
+      ${conGoogle ? `<p class="jg-nota">Conectada con Google (${esc(usuario.email || "")}): tus grupos, puntos y favoritos te siguen en cualquier dispositivo.</p>`
+        : `<p class="jg-nota">Estás jugando solo con apodo, en este dispositivo. Si lo vinculás con Google, no perdés tus grupos, tus puntos ni tus favoritos si cambiás de celular.</p>
           <button class="btn jg-google" data-gr="google">Vincular con Google</button>`}
       <button class="btn jg-salir" data-gr="salir">Salir</button>
     </section>
@@ -421,8 +422,8 @@ export function iniciarGrupos(app, render) {
       case "reintentar": Object.keys(cache).forEach((k) => cache[k]?.error && delete cache[k]); return rerender();
       case "google": return hacer(t, "errCuenta", async () => { await nube.entrarGoogle(); olvidar("grupos"); despues(); });
       case "salir":
-        if (!nube.estado().conGoogle && !confirm("Estás jugando solo con apodo: si salís, no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Salir igual?")) return;
-        return hacer(t, "errCuenta", async () => { await nube.salir(); Object.keys(cache).forEach((k) => k !== "sesion" && delete cache[k]); juego = null; guardarJuego(); });
+        if (!nube.estado().conGoogle && !confirm("Estás jugando solo con apodo: si salís se borran tus favoritos de este celular y no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Salir igual?")) return;
+        return hacer(t, "errCuenta", async () => { await cerrarSesion(); Object.keys(cache).forEach((k) => k !== "sesion" && delete cache[k]); juego = null; guardarJuego(); });
       case "origen": form.origen = t.dataset.val; return rerender();
       case "guardar-grupo": return hacer(t, "errForm", async () => {
         const fichas = fichasDelForm(), origen = nombreOrigen();

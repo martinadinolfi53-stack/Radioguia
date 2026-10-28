@@ -7,7 +7,8 @@ from posturas import Pose
 from vistas import tubo, costado, arriba, angulado, oblicuo
 
 AP, PA, LAT = (0, 0, -1), (0, 0, 1), (1, 0, 0)        # LAT: lateral izquierda (costado izquierdo contra el RI o la mesa)
-CERV = ['cabeza', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'torax', 'cintura_R', 'cintura_L']
+CERV_CRANEO = ['cabeza', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'torax', 'cintura_R', 'cintura_L']
+CERV = CERV_CRANEO[1:]          # sin el cráneo (que tapaba la cara); solo lo llevan las de C1-C2
 TORAC = ['C7', 'torax', 'cintura_R', 'cintura_L', 'L1', 'L2']
 LUMB = ['torax', 'L1', 'L2', 'L3', 'L4', 'L5', 'pelvis', 'muslo_R', 'muslo_L']
 V = lambda n: 'centro:' + n + ' vertebra'
@@ -33,10 +34,10 @@ _hombros_abajo = lambda: Pose().hombro_elevar('R', -10).hombro_elevar('L', -10)
 SUP_H = dict(arriba_tubo=(0, 0, 1), desde=(0, 0, -1), arriba_img=(0, 1, 0))
 
 # ---------- cervical ----------
-par('columna-cervical-ap-boca-abierta', Pose, AP, 'medio:centro:Atlas|centro:Axis', (0.18, 0.24), radio=0.08, encuadre=0.18, **DE_PIE)
+par('columna-cervical-ap-boca-abierta', Pose, AP, 'medio:centro:Atlas|centro:Axis', (0.18, 0.24), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO, **DE_PIE)
 _menton = lambda: Pose().cabeza_flex(-30)
-par('columna-cervical-odontoides-fuchs', _menton, AP, 'centro:Axis', (0.24, 0.18), radio=0.08, encuadre=0.18)
-par('columna-cervical-odontoides-judd', _menton, PA, 'centro:Axis', (0.24, 0.18), radio=0.08, encuadre=0.18)
+par('columna-cervical-odontoides-fuchs', _menton, AP, 'centro:Axis', (0.24, 0.18), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO)
+par('columna-cervical-odontoides-judd', _menton, PA, 'centro:Axis', (0.24, 0.18), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO)
 par('columna-cervical-ap-axial', lambda: Pose().cabeza_flex(-10), angulado(AP, 17, 'cefalico'), C5, (0.18, 0.24), normal=AP, **DE_PIE)
 OPD, OAD = oblicuo('AP', 45, 'R'), oblicuo('PA', 45, 'R')
 par('columna-cervical-oblicuas--v1', lambda: Pose().cabeza_flex(-10), angulado(OPD, 17, 'cefalico'), C4, (0.24, 0.30), normal=OPD, otra='arriba',

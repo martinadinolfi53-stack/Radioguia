@@ -217,28 +217,31 @@ function seleccionLista(favs) {
 // Favoritos por región (las familias del menú), con los dos libros juntos: los del libro abierto como botones de zona
 // y los de otro libro como filas con su etiqueta; al tocar una de esas filas se cambia de libro y se abre la ficha
 function menuFavoritos(filtro, otras) {
-  const fav = (p) => filtro(p);
-  const botones = GRUPOS.map((g) => ({ g, n: g.regiones.reduce((a, id) => a + proyeccionesDe(id).filter(fav).length, 0) })).filter((x) => x.n);
-  const extra = {};
+  // cada enfoque es una fila con la etiqueta de su libro (un color por libro); los del libro abierto abren la ficha directo
+  const etiqueta = (f) => `<span class="fuente-tag f-${esc(f.id)}">${esc(f.nombre)}</span>`;
+  const fila = ({ f, id, nombre, region }) => f.id === fuenteId
+    ? `<a class="row fav-otra" href="#p-${esc(id)}"><span class="sel-txt"><span class="t">${esc(nombre)}</span><span class="s">${esc(region)}</span></span>${etiqueta(f)}</a>`
+    : `<button class="row fav-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(id)}"><span class="sel-txt"><span class="t">${esc(nombre)}</span><span class="s">${esc(region)}</span></span>${etiqueta(f)}</button>`;
+  const porFamilia = {};
+  const agregar = (k, item) => (porFamilia[FAMILIAS.some((x) => x.id === k) ? k : ""] ||= []).push(item);
+  const abierta = FUENTES.find((f) => f.id === fuenteId);
+  for (const g of GRUPOS) for (const rid of g.regiones) for (const p of proyeccionesDe(rid).filter(filtro))
+    agregar(g.familia.id, { f: abierta, id: p.id, nombre: p.nombre, region: regionPorId[rid]?.nombre || "" });
   let cargando = false;
   for (const f of FUENTES.filter((x) => x.id !== fuenteId)) {
     const suyas = otras.filter((x) => x.fuente === f.id);
     if (!suyas.length) continue;
     const nombres = nombresDe(f.id, () => { if (location.hash === "#favoritos") document.dispatchEvent(new Event("rx-rehacer")); });
     if (!nombres) { cargando = true; continue; }
-    for (const x of suyas) if (nombres[x.id]) (extra[FAMILIAS.some((f) => f.id === nombres[x.id].familia) ? nombres[x.id].familia : ""] ||= []).push({ f, x, info: nombres[x.id] });
+    for (const x of suyas) if (nombres[x.id]) agregar(nombres[x.id].familia, { f, id: x.id, ...nombres[x.id] });
   }
   const secciones = [...FAMILIAS.map((f) => f.id), ""].map((k) => {
     const fam = FAMILIAS.find((f) => f.id === k) || { nombre: "Otras", color: "var(--mute)" };
-    const locales = botones.filter((b) => b.g.familia === fam), deOtros = extra[k] || [];
-    if (!locales.length && !deOtros.length) return "";
-    return `<section class="familia" style="--c:${fam.color}"><h2>${esc(fam.nombre)}</h2>
-      ${locales.length ? `<div class="grupos">${locales.map(({ g, n }) => `<a class="grupo" href="#g-${g.id}-fav"><span class="t">${esc(g.nombre)}</span><span class="s">${n} ${n === 1 ? "proyección" : "proyecciones"} · ${esc(FUENTE.corto)}</span></a>`).join("")}</div>` : ""}
-      ${deOtros.length ? `<div class="lista fav-otras">${deOtros.map(({ f, x, info }) => `<button class="row fav-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(x.id)}">
-        <span class="sel-txt"><span class="t">${esc(info.nombre)}</span><span class="s">${esc(info.region)}</span></span><span class="fuente-tag">${esc(f.nombre)}</span></button>`).join("")}</div>` : ""}
-    </section>`;
+    const items = porFamilia[k];
+    if (!items?.length) return "";
+    return `<section class="familia" style="--c:${fam.color}"><h2>${esc(fam.nombre)}</h2><div class="lista fav-otras">${items.map(fila).join("")}</div></section>`;
   }).join("");
-  const nota = otras.length ? `<p class="fav-fuente-nota">Los enfoques de otro libro llevan su etiqueta; al abrir uno, la app cambia a ese libro.</p>` : "";
+  const nota = otras.length ? `<p class="fav-fuente-nota">Cada enfoque lleva la etiqueta de su libro; al abrir uno de otro libro, la app cambia a ese libro.</p>` : "";
   return nota + secciones + (cargando ? `<div class="vacio">Cargando…</div>` : "");
 }
 

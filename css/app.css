@@ -434,5 +434,11 @@ main.wrap:has(+ .pestanas) { padding-bottom: calc(env(safe-area-inset-bottom, 0p
 .fav-otra { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 0; background: transparent; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
 .fav-otra .sel-txt { flex: 1; display: grid; gap: 2px; min-width: 0; }
 .fav-otra .s { font-size: .85em; color: var(--mute); }
-.fuente-tag { flex: none; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: .78em; color: var(--mute); }
+/* etiqueta del libro: un color por fuente para distinguirlas de un vistazo */
+.fuente-tag { --fc: var(--mute); flex: none; padding: 3px 10px; border: 1px solid var(--fc); border-radius: 999px; background: color-mix(in srgb, var(--fc) 16%, transparent); font-size: .78em; font-weight: 700; color: var(--fc); }
+.fuente-tag.f-bontrager { --fc: #4fa3ff; }
+.fuente-tag.f-merrill { --fc: #f0a23a; }
+:root[data-theme="light"] .fuente-tag.f-bontrager { --fc: #1565c0; }
+:root[data-theme="light"] .fuente-tag.f-merrill { --fc: #b25d00; }
+a.row.fav-otra { display: flex; padding: 12px 16px; text-decoration: none; }
 #fuente { scroll-margin-top: calc(var(--top-h, 64px) + 12px); }

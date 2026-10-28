@@ -29,7 +29,7 @@ function hoja(p, nombreLista) {
     <section><h3>Posición del paciente</h3>${posicion}</section>
     ${o.criterios && p.criterios?.length ? `<section><h3>Criterios de evaluación</h3>${p.criterios.map(([t, it]) => `<h4>${esc(t)}</h4>${lista(it)}`).join("")}</section>` : ""}
     ${o.ilustraciones && !ilusPorVersion ? figura(p.ilustracion, p.nombre) : ""}
-    <footer class="imp-pie">${esc(FUENTE.corto)}, pág${p.fuente.paginas.length > 1 ? "s" : ""}. ${p.fuente.paginas.join(", ")} · ${esc(nombreLista)} · RadioGuía</footer>
+    <footer class="imp-pie">${esc(FUENTE.corto)}${p.fuente.volumen ? `, vol. ${p.fuente.volumen}` : ""}, pág${p.fuente.paginas.length > 1 ? "s" : ""}. ${p.fuente.paginas.join(", ")} · ${esc(nombreLista)} · RadioGuía</footer>
   </article>`;
 }
 

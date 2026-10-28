@@ -33,11 +33,13 @@ for (const { id: fid, lista: fLista } of FUENTES) {
 
   // angulación y rotación: una entrada por ficha, con «Sí…», «No…» o null
   const ANG = (await import(pathToFileURL(join(raiz, dir, "angulacion-rotacion.js")))).default;
-  for (const p of proyecciones) if (!ANG[p.id]) problemas.push(`[${p.id}] falta en ${dir}/angulacion-rotacion.js`);
+  // (o, como en el Merrill, directamente en los factores de la ficha)
+  for (const p of proyecciones) if (!ANG[p.id] && !(p.factores && "angulacion" in p.factores && "rotacion" in p.factores)) problemas.push(`[${p.id}] falta en ${dir}/angulacion-rotacion.js (o angulacion y rotacion en sus factores)`);
   for (const [id, v] of Object.entries(ANG)) {
     if (!proyecciones.some((p) => p.id === id)) problemas.push(`${dir}/angulacion-rotacion.js: "${id}" no es una proyección`);
     for (const k of ["angulacion", "rotacion"]) if (v[k] !== null && !/^(Sí|No)(\s|;|$)/.test(v[k] ?? "")) problemas.push(`[${id}] ${k} tiene que empezar con Sí o No`);
   }
+  for (const p of proyecciones) for (const k of ["angulacion", "rotacion"]) if (p.factores?.[k] && !/^(Sí|No)(\s|;|$)/.test(p.factores[k])) problemas.push(`[${p.id}] ${k} tiene que empezar con Sí o No`);
 
   // archivos de datos que existen pero no están en el índice
   const enIndice = readFileSync(join(raiz, dir, "indice.js"), "utf8");

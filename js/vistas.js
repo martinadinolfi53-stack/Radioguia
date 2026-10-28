@@ -8,6 +8,7 @@ import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { avatar } from "./foto.js";
 import { FUENTES, fuenteId, elegida } from "./fuente.js";
+import { nombresDe } from "./otras-fuentes.js";
 
 export const estado = { q: "", qFav: "", filtro: {}, sel: null }; // búsqueda, filtro de categoría por región y selección en Favoritos (Set o null)
 
@@ -130,7 +131,7 @@ export function vistaInicio() {
   <main class="wrap">
     ${q ? resultados(proyecciones, q) : `
       <div class="accesos">
-        <a class="acceso fav" href="#favoritos" style="--lc: var(--lc-${act.color})">${icono.estrella(true)}<span>${listas.todas().length > 1 ? esc(act.nombre) : "Favoritos"}</span><b>${act.ids.length}</b></a>
+        <a class="acceso fav" href="#favoritos" style="--lc: var(--lc-${act.color})">${icono.estrella(true)}<span>${listas.todas().length > 1 ? esc(act.nombre) : "Favoritos"}</span><b>${act.total}</b></a>
         <a class="acceso" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
       </div>
       ${menuRegiones(todos)}`}
@@ -195,6 +196,17 @@ function seleccionLista(favs) {
         <span class="sel-txt"><span class="t">${esc(p.nombre)}</span><span class="s">${esc([...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "))}</span></span></button>`).join("")}</div></section>`).join("")}`;
 }
 
+// enfoques de la lista que se guardaron desde otro libro: con el nombre del libro; al tocarlos se cambia de fuente y se abre la ficha
+function favoritosDeOtros(otras) {
+  const porFuente = FUENTES.filter((f) => f.id !== fuenteId).map((f) => [f, otras.filter((x) => x.fuente === f.id)]).filter(([, l]) => l.length);
+  return porFuente.map(([f, l]) => {
+    const nombres = nombresDe(f.id, () => { if (location.hash === "#favoritos") document.dispatchEvent(new Event("rx-rehacer")); });
+    const filas = nombres ? l.filter((x) => nombres[x.id]).map((x) => `<button class="row fav-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(x.id)}">
+        <span class="sel-txt"><span class="t">${esc(nombres[x.id].nombre)}</span><span class="s">${esc(nombres[x.id].region)}</span></span><span class="fuente-tag">${esc(f.nombre)}</span></button>`).join("") : `<div class="vacio">Cargando…</div>`;
+    return `<h2 class="fav-fuente">${esc(f.nombre)}</h2><p class="fav-fuente-nota">Al abrir uno, la app cambia al ${esc(f.nombre)}.</p><div class="lista">${filas}</div>`;
+  }).join("");
+}
+
 // lista activa de favoritos: selector de listas arriba, acciones (editar, nueva, seleccionar, imprimir) y el menú filtrado
 export function vistaFavoritos() {
   const act = listas.activa(), todas = listas.todas();
@@ -202,13 +214,15 @@ export function vistaFavoritos() {
   if (estado.sel) for (const id of estado.sel) if (!act.ids.includes(id)) estado.sel.delete(id);
   if (estado.sel && !favs.length) estado.sel = null;
   const q = estado.qFav.trim();
+  const otras = estado.sel ? "" : favoritosDeOtros(act.otras);
   let cuerpo;
-  if (!favs.length) cuerpo = `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
+  if (!favs.length && act.otras.length) cuerpo = estado.sel ? "" : otras;
+  else if (!favs.length) cuerpo = `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
   else if (estado.sel) cuerpo = seleccionLista(favs);
   else if (q) cuerpo = resultados(favs, q);
-  else cuerpo = menuRegiones((p) => act.ids.includes(p.id));
+  else cuerpo = (act.otras.length ? `<h2 class="fav-fuente">${esc(FUENTE.corto)}</h2>` : "") + menuRegiones((p) => act.ids.includes(p.id)) + otras;
   const selector = estado.sel ? "" : `<div class="lst-selector" role="group" aria-label="Listas de favoritos">${todas.map((l) =>
-      `<button class="lst-chip${l.id === act.id ? " on" : ""}" data-lista="${esc(l.id)}" aria-pressed="${l.id === act.id}" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}<span>${esc(l.nombre)}</span><b>${l.ids.length}</b></button>`).join("")}
+      `<button class="lst-chip${l.id === act.id ? " on" : ""}" data-lista="${esc(l.id)}" aria-pressed="${l.id === act.id}" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}<span>${esc(l.nombre)}</span><b>${l.total}</b></button>`).join("")}
     <button class="lst-chip nueva" data-lista-nueva>${icono.mas}<span>Nueva lista</span></button></div>
     <div class="lst-acciones">
       <button class="btn-sec" data-lista-editar="${esc(act.id)}">${icono.lapiz}<span>Nombre y color</span></button>
@@ -216,7 +230,7 @@ export function vistaFavoritos() {
       <a class="btn-sec" href="#imprimir">${icono.imprimir}<span>Imprimir o PDF</span></a>
       <a class="btn-sec" href="#repaso-l-${esc(act.id)}">${icono.repaso}<span>Repasar</span></a>` : ""}
     </div>`;
-  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#enfoques" }) +
+  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${act.total} ${act.total === 1 ? "proyección" : "proyecciones"}`, atras: "#enfoques" }) +
     (favs.length && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
     `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>`;
 }

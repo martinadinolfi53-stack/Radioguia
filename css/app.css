@@ -410,4 +410,11 @@ button.sel-fila { width: 100%; text-align: left; padding: 10px 14px; gap: 12px; 
 .portada-fuente { display: inline-flex; gap: 4px; margin-top: 36px; padding: 4px; border: 1px solid rgb(127 140 160 / .35); border-radius: 999px; }
 .portada-fuente button { min-height: 40px; min-width: 112px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; color: inherit; opacity: .7; font: inherit; font-size: .95em; font-weight: 600; cursor: pointer; }
 .portada-fuente button.on { background: #5cc8ff; color: #04121f; opacity: 1; cursor: default; }
+/* Favoritos compartidos: título con el libro de cada bloque y etiqueta en los enfoques de otro libro */
+.fav-fuente { margin: 22px 0 6px; font-size: .8em; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.fav-fuente-nota { margin: 0 0 8px; font-size: .85em; color: var(--mute); }
+.fav-otra { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 0; background: transparent; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.fav-otra .sel-txt { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.fav-otra .s { font-size: .85em; color: var(--mute); }
+.fuente-tag { flex: none; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: .78em; color: var(--mute); }
 #fuente { scroll-margin-top: calc(var(--top-h, 64px) + 12px); }

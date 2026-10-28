@@ -13,11 +13,12 @@ export const fuenteId = elegida() ? leer() : "bontrager";
 export const fuenteInfo = FUENTES.find((f) => f.id === fuenteId);
 
 // los datos de la fuente se cargan una sola vez al abrir: cambiar de fuente recarga la app
-export function elegirFuente(id) {
+// destino: a dónde ir después de recargar (por ejemplo, la ficha de un favorito del otro libro)
+export function elegirFuente(id, destino = "#") {
   if (!valida(id)) return;
   try { localStorage.setItem(K, id); } catch {}
   if (id === fuenteId) return false;
-  location.hash = "#";
+  location.hash = destino;
   location.reload();
   return true;
 }

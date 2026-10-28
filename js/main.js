@@ -129,6 +129,14 @@ app.addEventListener("click", (e) => {
   if (b && elegirFuente(b.dataset.fuente) === false) render();
 });
 
+// favorito de otro libro: cambia a ese libro y abre la ficha
+app.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-ir-fuente]");
+  if (b) elegirFuente(b.dataset.irFuente, `#p-${b.dataset.irFicha}`);
+});
+// una vista avisa que terminó de cargar algo (por ejemplo, los nombres de otro libro en Favoritos)
+document.addEventListener("rx-rehacer", () => { const y = scrollY; render(); scrollTo(0, y); });
+
 // Ajustes → Buscar actualización
 app.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-buscar-act]");

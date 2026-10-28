@@ -3,6 +3,7 @@
 import cap04 from "./cap04-extremidad-superior.js";
 import cap05 from "./cap05-cintura-escapular.js";
 import cap06 from "./cap06-miembro-inferior.js";
+import cap07 from "./cap07-pelvis.js";
 export { default as MENU } from "./menu.js";
 export { default as ANG_ROT } from "./angulacion-rotacion.js";
 export { default as VERSIONES } from "./versiones.js";
@@ -17,4 +18,4 @@ export const FUENTE = {
   ilustraciones: "ilustraciones/merrill/",
 };
 
-export const CAPITULOS = [cap04, cap05, cap06];
+export const CAPITULOS = [cap04, cap05, cap06, cap07];

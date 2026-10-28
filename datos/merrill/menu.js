@@ -18,4 +18,7 @@ export default [
   { id: "rodilla", nombre: "Rodilla", familia: "inferior", regiones: ["rodilla"] },
   { id: "rotula", nombre: "Rótula", familia: "inferior", regiones: ["rotula"] },
   { id: "femur", nombre: "Fémur", familia: "inferior", regiones: ["femur"] },
+  { id: "pelvis", nombre: "Pelvis", familia: "pelvis", regiones: ["pelvis", "pelvis-anterior", "ilion"] },
+  { id: "cadera", nombre: "Cadera y cuellos femorales", familia: "pelvis", regiones: ["cadera", "cuellos-femorales"] },
+  { id: "acetabulo", nombre: "Acetábulo", familia: "pelvis", regiones: ["acetabulo"] },
 ];

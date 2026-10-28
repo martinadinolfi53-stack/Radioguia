@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "cecaaf2150";
+self.RG_VERSION = "ec5e07fde1";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -292,6 +292,7 @@ self.RG_ARCHIVOS = [
  "js/pwa.js",
  "js/repaso-preguntas.js",
  "js/repaso.js",
+ "js/sync-favoritos.js",
  "js/util.js",
  "js/validacion.js",
  "js/vendor/firebase.js",

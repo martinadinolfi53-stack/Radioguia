@@ -36,6 +36,14 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // favoritos de cada cuenta de Google (js/sync-favoritos.js): solo los ve y los cambia el dueño
+    match /usuarios/{uid}/privado/{doc} {
+      allow read, delete: if yo(uid);
+      allow create, update: if yo(uid) && request.resource.data.keys().hasOnly(['datos', 'actualizado'])
+        && request.resource.data.datos is string && request.resource.data.datos.size() <= 300000
+        && request.resource.data.actualizado is int;
+    }
+
     match /codigos/{codigo} {
       allow read: if logueado();
       allow create: if logueado() && request.resource.data.creador == request.auth.uid && request.resource.data.gid is string;

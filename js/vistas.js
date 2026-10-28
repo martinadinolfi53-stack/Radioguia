@@ -262,7 +262,9 @@ function cuenta() {
   const detalle = conGoogle ? `Con Google · ${esc(usuario.email || "")}` : usuario ? "Solo con apodo, en este celular" : "Sin cuenta";
   return `<section class="panel"><h2>Tu cuenta</h2>
       <div class="aj-cuenta">${avatar(perfil?.foto, apodo)}<span><b>${esc(apodo)}</b><small>${detalle}</small></span></div>
-      <div class="opciones">${usuario ? `<a class="opcion" href="#juegos-cuenta">Editar perfil</a>` : ""}<button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button></div></section>`;
+      <p class="aj-nota">${conGoogle ? "Tus favoritos se guardan en tu cuenta de Google: los ves en cualquier dispositivo donde entres con ella."
+        : "Tus favoritos se guardan solo en este dispositivo y se borran al cerrar sesión. Entrá con Google para tenerlos en todos lados."}</p>
+      <div class="opciones">${usuario ? `<a class="opcion" href="#juegos-cuenta">${conGoogle ? "Editar perfil" : "Perfil y Google"}</a>` : `<a class="opcion" href="#juegos-cuenta">Entrar con Google</a>`}<button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button></div></section>`;
 }
 
 export function vistaAjustes() {
@@ -279,6 +281,6 @@ export function vistaAjustes() {
     <section class="panel"><h2>Versión</h2><p>Versión instalada: <b>${esc(pwa.version() || "sin datos")}</b></p>
       <button class="opcion" data-buscar-act>Buscar actualización</button><p class="act-estado" aria-live="polite"></p></section>
     <section class="panel"><h2>Fuente</h2><p>${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del manual, pendiente de revisión.</p></section>
-    <p class="pie">Listas de favoritos y ajustes se guardan solo en este dispositivo.</p>
+    <p class="pie">Los ajustes se guardan solo en este dispositivo.</p>
   </main>` + barraPestanas("ajustes");
 }

@@ -44,4 +44,7 @@ export default [
   { id: "craneo", nombre: "Cráneo y base", familia: "craneo", regiones: ["craneo", "base-craneo"] },
   { id: "petromastoidea", nombre: "Peñasco y mastoides", familia: "craneo", regiones: ["petromastoidea"] },
   { id: "orbitas", nombre: "Conducto óptico y ojo", familia: "craneo", regiones: ["optico", "ojo"] },
+  { id: "huesos-faciales", nombre: "Huesos de la cara", familia: "craneo", regiones: ["huesos-faciales", "huesos-nasales"] },
+  { id: "arcos-cigomaticos", nombre: "Arcos cigomáticos", familia: "craneo", regiones: ["arcos-cigomaticos"] },
+  { id: "mandibula", nombre: "Mandíbula y ATM", familia: "craneo", regiones: ["mandibula", "atm"] },
 ];

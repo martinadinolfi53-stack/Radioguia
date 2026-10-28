@@ -67,7 +67,8 @@ par('nasales-lateral', Pose, LAT_I, 'medio:nasion|acantion|0.2', (0.24, 0.18), r
 def _lga():
     from escena import cuerpo; from puntos import Puntos
     c = cuerpo(); c.posar(cabeza(-30)); P_ = Puntos(c); v = P_.posado('acantion') - P_.posado('glabela'); return tuple(v / np.linalg.norm(v))
-par('nasales-superoinferior', lambda: cabeza(-30), _lga(), 'medio:nasion|acantion|0.2', (0.24, 0.18), radio=0.06, encuadre=0.15, **DE_PIE)
+par('nasales-superoinferior', lambda: cabeza(-30), _lga(), 'medio:nasion|acantion|0.2', (0.24, 0.18), radio=0.06, encuadre=0.15, ri_radio=0.12,
+    **DE_PIE)      # ri_radio: el RI bajo el mentón, no debajo del tronco
 
 # ---------- mandíbula ----------
 par('mandibula-pa', LOM_PERP, PA, 'medio:acantion|menton|0.5', (0.18, 0.24), **DE_PIE)

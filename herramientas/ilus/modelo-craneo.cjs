@@ -109,7 +109,7 @@ def({ id: "senos-lateral", blanco: MALAR, ri: "18 × 24", otra: "costado",
 def({ id: "senos-pa-caldwell--v1", blanco: "nasion", ri: "18 × 24", otra: "costado", ang: "15°", pa: true,
   rc: [R("RC horizontal"), "saliendo por el nasión"],
   pos: ["Sentado, mirando al RI", "RI inclinado 15° hacia", "el paciente", "LOM ⊥ al RI"] });
-def({ id: "senos-pa-caldwell--v2", blanco: "nasion", ri: "18 × 24", otra: "costado", ang: "15°", pa: true,
+def({ id: "senos-pa-caldwell--v2", blanco: "nasion", ri: "18 × 24", otra: "costado", pa: true,
   rc: [R("RC horizontal"), "saliendo por el nasión"],
   pos: ["Modificada (soporte fijo):", "cabeza inclinada hacia atrás", "hasta que la LOM quede a 15°", "de la horizontal"] });
 def({ id: "senos-parietoacantial-waters", blanco: "acantion", ri: "18 × 24", otra: "costado", pa: true,

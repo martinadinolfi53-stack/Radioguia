@@ -1,7 +1,7 @@
-// Efecto lente del diseño Liquid Glass (css/vidrio.css): el borde de cada botón de vidrio desvía lo que hay atrás,
+// Efecto lente del diseño Liquid Glass (css/vidrio.css): el borde de los botones redondos de vidrio desvía lo que hay atrás,
 // como una gota. Usa un filtro SVG (feDisplacementMap) hecho a la medida de cada botón, con un mapa dibujado en un canvas.
 // Solo Chrome (y Android) aplica filtros SVG en backdrop-filter; en Safari queda el desenfoque de la hoja de estilos.
-const SELECTOR = ".ico, .chip, .opcion, .btn-sec, .lst-chip, .btn-calc, .portada-boton, .btn, .search input, .ap-op";
+const SELECTOR = ".ico, .portada-boton";
 const SVG = "http://www.w3.org/2000/svg";
 const soporta = /Chrome\//.test(navigator.userAgent) && !/Edg\//.test(navigator.userAgent);
 let svg = null, pendiente = false;

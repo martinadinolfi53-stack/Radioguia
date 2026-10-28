@@ -17,8 +17,10 @@ import { iniciarGrupos } from "./grupos.js";
 import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificacion } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { vistaFoto } from "./foto.js";
+import { iniciarLente } from "./lente.js";
 
 const app = document.getElementById("app");
+iniciarLente(app);
 aplicarPreferencias();
 listas.limpiar(new Set(proyecciones.map((p) => p.id)));
 

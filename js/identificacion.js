@@ -8,7 +8,7 @@ const DESTINO = "radioguia.destino";
 const leer = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 const escribir = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
 
-let error = "", ocupado = false;
+let error = "", ocupado = false, intento = 0;
 
 export const nombre = () => leer(CLAVE) || "";
 export const identificado = () => !!nombre();
@@ -31,8 +31,10 @@ export function iniciarIdentificacion(app, render) {
   const entrar = async (fn) => {
     if (ocupado) return;
     ocupado = true; error = ""; render();
+    const este = ++intento; // si la persona cancela, la respuesta tardía de este intento se ignora
     try {
       await fn();
+      if (este !== intento) return;
       const { perfil } = nube.estado();
       if (perfil?.apodo) escribir(CLAVE, perfil.apodo);
       const destino = leer(DESTINO) || "#";
@@ -40,6 +42,7 @@ export function iniciarIdentificacion(app, render) {
       ocupado = false;
       if (location.hash === destino || (destino === "#" && !location.hash)) render(); else location.hash = destino;
     } catch (e) {
+      if (este !== intento) return;
       ocupado = false; error = mensaje(e); render();
     }
   };
@@ -51,6 +54,7 @@ export function iniciarIdentificacion(app, render) {
   });
   app.addEventListener("click", (e) => {
     if (e.target.closest("[data-id-google]")) entrar(() => nube.entrarGoogle());
+    if (e.target.closest("[data-id-cancelar]")) { intento++; ocupado = false; error = ""; render(); }
     const c = e.target.closest("[data-copiar-link]");
     if (c) {
       const listo = () => { c.textContent = "Copiado"; setTimeout(() => (c.textContent = "Copiar"), 1800); };
@@ -66,11 +70,17 @@ function mensaje(e) {
   if (c.includes("popup-blocked")) return "El navegador bloqueó la ventana de Google. Permití las ventanas emergentes e intentá otra vez.";
   if (c.includes("credential-already-in-use")) return "Esa cuenta de Google ya está usada por otro jugador. Recargá la app y entrá directamente con Google.";
   if (c.includes("unauthorized-domain")) return "Falta autorizar esta página en Firebase.";
+  if (c === "rg/ios-instalada") return nube.IOS_INSTALADA;
+  if (c === "rg/google-sin-respuesta") return "Google no respondió. Si ya confirmaste en la ventana de Google, cerrala y probá otra vez.";
+  if (c === "rg/sin-respuesta") return "El servidor no respondió. Revisá la conexión y probá otra vez.";
   if (/Failed to fetch|import/i.test(e?.message || "")) return "No hay conexión. La primera vez hace falta internet para identificarte.";
   return e?.message || "Algo salió mal.";
 }
 
 export function vistaIdentificacion() {
+  // el SDK se va cargando mientras la persona lee: así la ventana de Google se abre enseguida al tocar el botón
+  // (Safari bloquea la ventana si se abre mucho después del toque)
+  if (navigator.onLine) nube.iniciar().catch(() => {});
   return `<main class="portada ident">
     <p class="portada-rx">RX</p>
     <p class="portada-ayuda">Para empezar, identificate. Se pide una sola vez en este dispositivo.</p>
@@ -81,9 +91,10 @@ export function vistaIdentificacion() {
       <small>Es lo que ven tus compañeros en los juegos.</small>
     </form>
     <p class="ident-o">o</p>
-    <button class="ident-google" data-id-google ${ocupado ? "disabled" : ""}>Entrar con Google</button>
-    <small class="ident-nota">Con Google no perdés tus grupos ni tus puntos si cambiás de celular.</small>
-    ${ocupado ? `<p class="ident-estado">Entrando…</p>` : ""}
+    ${nube.iosInstalada() ? `<small class="ident-nota">${esc(nube.IOS_INSTALADA)}</small>` : `<button class="ident-google" data-id-google ${ocupado ? "disabled" : ""}>Entrar con Google</button>
+    <small class="ident-nota">Con Google no perdés tus grupos ni tus puntos si cambiás de celular. RadioGuía solo recibe tu nombre, email y foto; nunca tu contraseña.</small>`}
+    <a class="ident-nota" href="#privacidad">Qué datos guarda RadioGuía</a>
+    ${ocupado ? `<p class="ident-estado">Entrando… <button class="ident-cancelar" data-id-cancelar>Cancelar</button></p>` : ""}
     ${error ? `<p class="ident-error" role="alert">${esc(error)}</p>` : ""}
   </main>`;
 }

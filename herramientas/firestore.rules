@@ -1,13 +1,23 @@
 rules_version = '2';
 // Reglas de Firestore para cuentas, grupos y ranking de RadioGuía (ver js/nube.js).
 // Se publican pegándolas en la consola de Firebase: Firestore Database > Reglas > Publicar.
+// Antes de publicar un cambio, correr las pruebas: ver herramientas/probar-reglas.mjs.
 service cloud.firestore {
   match /databases/{base}/documents {
     function logueado() { return request.auth != null; }
     function yo(uid) { return logueado() && request.auth.uid == uid; }
     function texto(s, max) { return s is string && s.size() > 0 && s.size() <= max; }
+    function nuevo() { return request.resource.data; }
+    // solo cambian estos campos (los demás quedan igual)
+    function soloCambia(campos) { return nuevo().diff(resource.data).affectedKeys().hasOnly(campos); }
     // foto de perfil: JPEG chico como data URL (la app la guarda de 160 px, unos 10 KB)
     function fotoOk(d) { return !('foto' in d) || d.foto == '' || (d.foto is string && d.foto.size() <= 60000 && d.foto.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+')); }
+    // fecha "AAAA-MM-DD" del día de hoy en el celular: se acepta de ayer a mañana según el reloj del servidor (por las zonas horarias)
+    function fechaDeHoy(f) {
+      return f is string && f.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        && timestamp.date(int(f[0:4]), int(f[5:7]), int(f[8:10])) > request.time - duration.value(2, 'd')
+        && timestamp.date(int(f[0:4]), int(f[5:7]), int(f[8:10])) < request.time + duration.value(1, 'd');
+    }
 
     // dificultad del desafío del día: solo se cambia desde la consola
     match /config/{doc} {
@@ -17,43 +27,58 @@ service cloud.firestore {
 
     // preguntas reportadas en el repaso: cualquiera con cuenta reporta; solo los ADMINS las leen y las borran.
     // Para sumar a alguien, se agrega su código de usuario (Ajustes > Ver reportes) a esta lista.
-    function admin() { return logueado() && request.auth.uid in []; }
+    function admin() { return logueado() && request.auth.uid in ['igedxRAEYVWLCPaXRNe18Wsj5JE3']; }
     match /reportes/{rid} {
-      allow create: if logueado() && request.resource.data.uid == request.auth.uid
-        && texto(request.resource.data.enunciado, 600) && texto(request.resource.data.motivo, 60)
-        && request.resource.data.comentario is string && request.resource.data.comentario.size() <= 500
-        && request.resource.data.opciones is list && request.resource.data.opciones.size() <= 6
-        && request.resource.data.keys().size() <= 13;
+      allow create: if logueado() && nuevo().uid == request.auth.uid
+        && texto(nuevo().enunciado, 600) && texto(nuevo().motivo, 60)
+        && nuevo().comentario is string && nuevo().comentario.size() <= 500
+        && nuevo().opciones is list && nuevo().opciones.size() <= 6
+        && nuevo().keys().size() <= 13;
       allow read, delete: if admin();
       allow update: if false;
     }
 
+    // perfil: solo lo ve y lo cambia su dueño (los compañeros ven apodo y foto en los miembros de cada grupo)
     match /usuarios/{uid} {
-      allow read: if logueado();
-      allow create, update: if yo(uid)
-        && (!('apodo' in request.resource.data) || texto(request.resource.data.apodo, 24)) && fotoOk(request.resource.data)
-        && (!('grupos' in request.resource.data) || (request.resource.data.grupos is list && request.resource.data.grupos.size() <= 30));
-      allow delete: if false;
+      allow read: if yo(uid);
+      allow create, update: if yo(uid) && nuevo().keys().hasOnly(['apodo', 'foto', 'grupos'])
+        && (!('apodo' in nuevo()) || texto(nuevo().apodo, 24)) && fotoOk(nuevo())
+        && (!('grupos' in nuevo()) || (nuevo().grupos is list && nuevo().grupos.size() <= 30));
+      // "Borrar mi cuenta"
+      allow delete: if yo(uid);
     }
 
+    // código de invitación → grupo. Se consulta uno por uno (nunca la lista entera) y lo crea quien crea el grupo.
     match /codigos/{codigo} {
-      allow read: if logueado();
-      allow create: if logueado() && request.resource.data.creador == request.auth.uid && request.resource.data.gid is string;
-      allow update, delete: if false;
+      function grupoNuevo() { return getAfter(/databases/$(base)/documents/grupos/$(nuevo().gid)).data; }
+      allow get: if logueado();
+      allow list: if false;
+      allow create: if logueado() && codigo.matches('[A-Z0-9]{6}')
+        && nuevo().keys().hasOnly(['gid', 'creador', 'nombre', 'enfoques'])
+        && nuevo().creador == request.auth.uid && nuevo().gid is string
+        && texto(nuevo().nombre, 40) && nuevo().enfoques is int
+        && grupoNuevo().creador == request.auth.uid && grupoNuevo().codigo == codigo;
+      // nombre y cantidad de enfoques que muestra la invitación, cuando el creador edita el grupo
+      allow update: if logueado() && resource.data.creador == request.auth.uid && soloCambia(['nombre', 'enfoques'])
+        && texto(nuevo().nombre, 40) && nuevo().enfoques is int;
+      allow delete: if false;
     }
 
     match /grupos/{gid} {
       function grupo() { return get(/databases/$(base)/documents/grupos/$(gid)).data; }
       function miembro() { return logueado() && exists(/databases/$(base)/documents/grupos/$(gid)/miembros/$(request.auth.uid)); }
 
-      // quien tiene el link o el código puede ver el grupo para unirse
-      allow get: if logueado();
+      // el grupo lo ven sus miembros; para unirse, la invitación muestra lo que hay en codigos/{CODIGO}
+      allow get: if miembro() || (logueado() && resource.data.creador == request.auth.uid);
       allow list: if false;
-      allow create: if logueado() && request.resource.data.creador == request.auth.uid
-        && texto(request.resource.data.nombre, 40) && request.resource.data.fichas is list && request.resource.data.fichas.size() <= 400;
+      allow create: if logueado() && nuevo().creador == request.auth.uid
+        && nuevo().keys().hasOnly(['nombre', 'codigo', 'creador', 'creado', 'fichas', 'aspectos', 'excluir', 'origen'])
+        && texto(nuevo().nombre, 40) && nuevo().fichas is list && nuevo().fichas.size() <= 400
+        && nuevo().codigo is string
+        && getAfter(/databases/$(base)/documents/codigos/$(nuevo().codigo)).data.gid == gid;
       allow update: if logueado() && resource.data.creador == request.auth.uid
-        && request.resource.data.creador == resource.data.creador && request.resource.data.codigo == resource.data.codigo
-        && texto(request.resource.data.nombre, 40) && request.resource.data.fichas.size() <= 400;
+        && soloCambia(['nombre', 'fichas', 'aspectos', 'excluir', 'origen'])
+        && texto(nuevo().nombre, 40) && nuevo().fichas is list && nuevo().fichas.size() <= 400;
       allow delete: if false;
 
       function cierraPartida(uid, fecha) {
@@ -62,27 +87,42 @@ service cloud.firestore {
       }
 
       match /miembros/{uid} {
+        function camposMiembro() { return nuevo().keys().hasOnly(['uid', 'apodo', 'foto', 'puntos', 'partidas', 'racha', 'ultimaFecha', 'codigo']); }
         allow read: if miembro() || yo(uid);
-        allow create: if yo(uid) && request.resource.data.uid == uid && request.resource.data.puntos == 0 && request.resource.data.partidas == 0 && fotoOk(request.resource.data);
-        // los puntos solo suben de a una partida por vez (10 por acierto, hasta 100 preguntas, más el bonus de racha)
+        // para unirse hay que tener el código del grupo (lo trae el link de invitación o se escribe a mano)
+        allow create: if yo(uid) && camposMiembro() && nuevo().uid == uid && texto(nuevo().apodo, 24) && fotoOk(nuevo())
+          && nuevo().puntos == 0 && nuevo().partidas == 0 && nuevo().racha == 0 && nuevo().ultimaFecha == ''
+          && nuevo().codigo == grupo().codigo;
         // cambiar el apodo o la foto, o sumar exactamente los puntos de la partida de hoy en el mismo momento en que se cierra
-        allow update: if yo(uid) && request.resource.data.uid == uid && texto(request.resource.data.apodo, 24) && fotoOk(request.resource.data)
-          && ((request.resource.data.puntos == resource.data.puntos && request.resource.data.partidas == resource.data.partidas)
-            || (request.resource.data.partidas == resource.data.partidas + 1 && cierraPartida(uid, request.resource.data.ultimaFecha)
-              && request.resource.data.puntos == resource.data.puntos + getAfter(/databases/$(base)/documents/grupos/$(gid)/partidas/$(request.resource.data.ultimaFecha + '_' + uid)).data.puntos));
+        allow update: if yo(uid) && camposMiembro() && nuevo().uid == uid && texto(nuevo().apodo, 24) && fotoOk(nuevo())
+          && (soloCambia(['apodo', 'foto'])
+            || (nuevo().partidas == resource.data.partidas + 1 && cierraPartida(uid, nuevo().ultimaFecha)
+              && nuevo().racha is int && (nuevo().racha == 1 || nuevo().racha == resource.data.racha || nuevo().racha == resource.data.racha + 1)
+              && nuevo().puntos == resource.data.puntos + getAfter(/databases/$(base)/documents/grupos/$(gid)/partidas/$(nuevo().ultimaFecha + '_' + uid)).data.puntos));
         allow delete: if yo(uid) || (logueado() && grupo().creador == request.auth.uid);
       }
 
       // una partida por persona por día (el id es fecha_uid); se anota al empezar y se cierra una sola vez al terminar
       match /partidas/{pid} {
+        function maxPreguntas() {
+          let cfg = /databases/$(base)/documents/config/desafio;
+          return exists(cfg) ? get(cfg).data.get('preguntas', 15) : 15;
+        }
         allow read: if miembro();
-        allow create: if miembro() && request.resource.data.uid == request.auth.uid
-          && pid == request.resource.data.fecha + '_' + request.auth.uid
-          && request.resource.data.terminada == false && request.resource.data.puntos == 0;
-        allow update: if miembro() && resource.data.uid == request.auth.uid && resource.data.terminada == false
-          && request.resource.data.uid == resource.data.uid && request.resource.data.fecha == resource.data.fecha
-          && request.resource.data.correctas is int && request.resource.data.correctas <= 50
-          && request.resource.data.puntos <= request.resource.data.correctas * 10 + 10;
+        allow create: if miembro() && nuevo().uid == request.auth.uid
+          && pid == nuevo().fecha + '_' + request.auth.uid && fechaDeHoy(nuevo().fecha)
+          && nuevo().keys().hasOnly(['uid', 'apodo', 'fecha', 'semana', 'correctas', 'respondidas', 'vidas', 'sinVidas', 'puntos', 'bonus', 'duracionMs', 'terminada', 'detalle', 'creado'])
+          && nuevo().creado == request.time && nuevo().terminada == false && nuevo().puntos == 0;
+        // al cerrar: no más aciertos que respuestas ni que preguntas, y al menos 2 segundos por respuesta desde que empezó
+        // (las partidas empezadas antes de estas reglas no tienen "creado" y se cierran sin ese control)
+        allow update: if miembro() && resource.data.uid == request.auth.uid && resource.data.terminada == false && nuevo().terminada == true
+          && soloCambia(['correctas', 'respondidas', 'vidas', 'sinVidas', 'duracionMs', 'puntos', 'bonus', 'detalle', 'terminada'])
+          && nuevo().correctas is int && nuevo().respondidas is int && nuevo().puntos is int
+          && nuevo().correctas >= 0 && nuevo().correctas <= nuevo().respondidas && nuevo().respondidas <= maxPreguntas()
+          && nuevo().puntos <= nuevo().correctas * 10 + 10
+          && request.time >= resource.data.get('creado', timestamp.value(0)) + duration.value(nuevo().respondidas * 2, 's');
+        // "Borrar mi cuenta": las partidas quedan para el ranking del grupo, pero sin el apodo
+        allow update: if resource.data.uid == request.auth.uid && soloCambia(['apodo']) && nuevo().apodo == 'Cuenta borrada';
         allow delete: if false;
       }
     }

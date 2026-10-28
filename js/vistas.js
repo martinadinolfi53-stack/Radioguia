@@ -262,7 +262,8 @@ function cuenta() {
   const detalle = conGoogle ? `Con Google · ${esc(usuario.email || "")}` : usuario ? "Solo con apodo, en este celular" : "Sin cuenta";
   return `<section class="panel"><h2>Tu cuenta</h2>
       <div class="aj-cuenta">${avatar(perfil?.foto, apodo)}<span><b>${esc(apodo)}</b><small>${detalle}</small></span></div>
-      <div class="opciones">${usuario ? `<a class="opcion" href="#juegos-cuenta">Editar perfil</a>` : ""}<button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button></div></section>`;
+      <div class="opciones">${usuario ? `<a class="opcion" href="#juegos-cuenta">Editar perfil</a>` : ""}<button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button></div>
+      <div class="opciones"><a class="opcion" href="#privacidad">Qué datos guarda RadioGuía</a>${usuario ? `<button class="opcion aj-salir" data-borrar-cuenta>Borrar mi cuenta y mis datos</button>` : ""}</div></section>`;
 }
 
 export function vistaAjustes() {

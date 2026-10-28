@@ -10,4 +10,12 @@ export default [
   { id: "muneca", nombre: "Muñeca", familia: "superior", regiones: ["muneca"] },
   { id: "mano", nombre: "Mano", familia: "superior", regiones: ["mano"] },
   { id: "dedos-mano", nombre: "Dedos y pulgar", familia: "superior", regiones: ["dedos-mano", "pulgar"] },
+  { id: "dedos-pie", nombre: "Dedos del pie", familia: "inferior", regiones: ["dedos-pie"] },
+  { id: "pie", nombre: "Pie", familia: "inferior", regiones: ["pie"] },
+  { id: "calcaneo", nombre: "Calcáneo y subastragalina", familia: "inferior", regiones: ["calcaneo"] },
+  { id: "tobillo", nombre: "Tobillo", familia: "inferior", regiones: ["tobillo"] },
+  { id: "pierna", nombre: "Pierna", familia: "inferior", regiones: ["pierna"] },
+  { id: "rodilla", nombre: "Rodilla", familia: "inferior", regiones: ["rodilla"] },
+  { id: "rotula", nombre: "Rótula", familia: "inferior", regiones: ["rotula"] },
+  { id: "femur", nombre: "Fémur", familia: "inferior", regiones: ["femur"] },
 ];

@@ -129,3 +129,20 @@ a.opcion, .opciones .aj-salir { flex: 0 1 auto; }
 .pie { color: var(--mute); }
 
 @media (prefers-reduced-transparency: reduce) { .ico { background: var(--surface-2); } }
+
+/* ---------- menú por región: partes que se despliegan ---------- */
+.sec.region > summary { gap: 12px; }
+.sec.region > summary .t { flex: 1; }
+.sec.region > summary .s { color: var(--mute); }
+.sec.region .lista { background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-radius: 0; margin: 0 0 6px; }
+.sec.region .row:first-child { background: linear-gradient(var(--line), var(--line)) 16px 0 / calc(100% - 16px) .5px no-repeat; }
+
+/* ---------- barra de pestañas flotante, de vidrio ---------- */
+main.wrap:has(+ .pestanas) { padding-bottom: 120px; }
+.pestanas { position: fixed; z-index: 20; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  display: flex; gap: 2px; padding: 5px; border-radius: 999px; width: min(calc(100% - 32px), 420px);
+  background: var(--material); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 0 0 .5px var(--material-borde), inset 1px 1px 0 -.5px var(--canto), 0 10px 30px rgb(0 0 0 / .3); }
+.pestanas a { flex: 1; display: grid; justify-items: center; gap: 1px; padding: 6px 0 5px; border-radius: 999px; color: var(--fg); font-size: 10px; font-weight: 500; }
+.pestanas a svg { width: 24px; height: 24px; }
+.pestanas a.on { color: var(--accent); background: var(--relleno); }

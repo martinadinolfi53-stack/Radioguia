@@ -14,6 +14,10 @@ const F = {
   portatil: { nombre: "Portátiles e intraoperatorias", color: C.portatil },
 };
 
+// cada familia sabe su id (para la ruta #f-<id>)
+for (const [id, f] of Object.entries(F)) f.id = id;
+export const FAMILIAS = Object.values(F);
+
 export const GRUPOS = [
   { id: "torax", nombre: "Tórax", familia: F.torax, regiones: ["torax", "torax-pediatrico"] },
   { id: "via-aerea", nombre: "Vía aérea", familia: F.torax, regiones: ["via-aerea"] },

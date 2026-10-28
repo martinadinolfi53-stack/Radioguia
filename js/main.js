@@ -4,13 +4,13 @@ import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { listas, preferencias, aplicarPreferencias } from "./almacen.js";
 import { tocarEstrella, hojaLista, quitarDeLista } from "./listas-ui.js";
 import { vistaImprimir, opcionesImpresion, preguntarEImprimir } from "./imprimir.js";
-import { estado, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
+import { estado, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes, vistaFamilia } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
 import { mostrarTermino } from "./glosario.js";
 import { ampliar } from "./imagenes.js";
 import { pwa } from "./pwa.js";
-import { grupoPorId, grupoDeRegion } from "./menu.js";
+import { grupoPorId, grupoDeRegion, FAMILIAS } from "./menu.js";
 import { vistaRepaso, iniciarRepaso } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
 import { iniciarGrupos } from "./grupos.js";
@@ -39,6 +39,7 @@ function ruta() {
     const fav = h.endsWith("-fav"), id = h.slice(3, fav ? -4 : undefined);
     if (regionPorId[id]) return { tipo: "region", r: regionPorId[id], fav };
   }
+  if (h.startsWith("#f-")) { const f = FAMILIAS.find((x) => x.id === h.slice(3)); if (f) return { tipo: "familia", f }; }
   if (h === "#favoritos") return { tipo: "favoritos" };
   if (h === "#imprimir") return { tipo: "imprimir" };
   if (h === "#ajustes") return { tipo: "ajustes" };
@@ -85,6 +86,7 @@ function render() {
     case "repaso": app.innerHTML = vistaRepaso(r.h); break;
     case "juegos": app.innerHTML = vistaJuegos(r.h); break;
     case "inicio": app.innerHTML = vistaInicio(); break;
+    case "familia": app.innerHTML = vistaFamilia(r.f); break;
     default: app.innerHTML = vistaPortada();
   }
   // el título es el nombre sugerido del PDF

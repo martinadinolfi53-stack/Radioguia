@@ -3,7 +3,7 @@ import { capitulos, regiones, regionPorId, proyecciones, proyeccionesDe, CATEGOR
 import { listas, preferencias } from "./almacen.js";
 import { esc, icono, cabecera, botonFav } from "./util.js";
 import { pwa } from "./pwa.js";
-import { GRUPOS } from "./menu.js";
+import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { avatar } from "./foto.js";
@@ -35,11 +35,32 @@ function resultados(lista, q) {
 // menú principal: botones por zona agrupados por región, con su color (ver js/menu.js); "filtro" deja solo las proyecciones que cumplen (favoritos)
 function menuRegiones(filtro) {
   const fav = filtro !== todos;
+  if (!fav) {
+    // menú por región: una fila por región grande; adentro se despliegan sus partes con los enfoques
+    const filas = FAMILIAS.map((f) => ({ f, n: GRUPOS.filter((g) => g.familia === f).reduce((a, g) => a + g.regiones.reduce((b, id) => b + proyeccionesDe(id).length, 0), 0) })).filter((x) => x.n);
+    return `<section class="familia"><h2>Regiones</h2><div class="grupos">${filas.map(({ f, n }) =>
+      `<a class="grupo" style="--c:${f.color}" href="#f-${f.id}"><span class="t">${esc(f.nombre)}</span><span class="s">${n}</span></a>`).join("")}</div></section>`;
+  }
   const botones = GRUPOS.map((g) => ({ g, n: g.regiones.reduce((a, id) => a + proyeccionesDe(id).filter(filtro).length, 0) })).filter((x) => x.n);
   const familias = [...new Set(botones.map((x) => x.g.familia))];
   return familias.map((f) => `<section class="familia" style="--c:${f.color}"><h2>${esc(f.nombre)}</h2><div class="grupos">${botones.filter((x) => x.g.familia === f).map(({ g, n }) =>
     `<a class="grupo" href="#g-${g.id}${fav ? "-fav" : ""}"><span class="t">${esc(g.nombre)}</span><span class="s">${n} ${n === 1 ? "proyección" : "proyecciones"}</span></a>`).join("")}</div></section>`).join("");
 }
+
+// una región grande (por ejemplo Miembro superior): cada parte se despliega y muestra sus enfoques
+export function vistaFamilia(f) {
+  const partes = GRUPOS.filter((g) => g.familia === f).map((g) => ({ g, lista: g.regiones.flatMap((id) => proyeccionesDe(id)) })).filter((x) => x.lista.length);
+  const total = partes.reduce((a, x) => a + x.lista.length, 0);
+  return cabecera({ titulo: f.nombre, sub: `${total} enfoques · ${FUENTE.corto}`, atras: "#enfoques" }) + `
+  <main class="wrap" style="--c:${f.color}">
+    ${partes.map(({ g, lista }, i) => `<details class="sec region"${i === 0 ? " open" : ""}><summary><span class="t">${esc(g.nombre)}</span><span class="s">${lista.length}</span>${icono.chev}</summary>
+      <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></details>`).join("")}
+  </main>` + barraPestanas("enfoques");
+}
+
+// barra de pestañas flotante de abajo, como en el iPhone
+const PESTANAS = [["enfoques", "#enfoques", "Enfoques", icono.libro], ["favoritos", "#favoritos", "Favoritos", icono.estrella(false)], ["juegos", "#juegos", "Juegos", icono.repaso], ["ajustes", "#ajustes", "Ajustes", icono.ajustes]];
+export const barraPestanas = (activa) => `<nav class="pestanas" aria-label="Secciones">${PESTANAS.map(([id, h, txt, ic]) => `<a href="${h}" class="${id === activa ? "on" : ""}">${ic}<span>${txt}</span></a>`).join("")}</nav>`;
 const todos = () => true;
 
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
@@ -113,7 +134,7 @@ export function vistaInicio() {
       </div>
       ${menuRegiones(todos)}`}
     <p class="pie">${proyecciones.length} proyecciones · ${regiones.length} regiones · Fuente: ${esc(FUENTE.corto)}</p>
-  </main>`;
+  </main>` + barraPestanas("enfoques");
 }
 
 export function vistaRegion(r, soloFav) {

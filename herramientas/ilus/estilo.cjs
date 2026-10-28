@@ -146,6 +146,8 @@ function cabezaFrente(cx, cy, r = 24, rot = 0) {
 // opts: caja [x, y, w, h] (encaja centrado) | en [nombre, X, Y] + ppc (el punto nombre cae en X,Y a esa escala).
 const _fs = require("node:fs"), _path = require("node:path");
 const RENDER = _path.join(__dirname, "..", "ilus3d", "render");
+// el rótulo del ángulo va del lado de afuera del RC, salvo que se meta en la columna del texto
+const _angDer = (s0, pe, t) => s0[0] >= pe[0] && s0[0] + 8 + t.length * 6.5 <= 452;
 // título de la segunda vista según la dirección de la cámara guardada en el render (X izquierda del paciente, Z anterior)
 function _vistaDe(d) {
   if (!d || Math.abs(d[0]) > 0.5) return "Vista de costado";
@@ -284,7 +286,9 @@ function modelo(o) {
     // el RI se ve de canto: segmento entre las dos esquinas proyectadas más alejadas
     const P = RI.map((n) => g.p(n)); let a = P[0], b = P[1], dmax = -1;
     for (const p of P) for (const r of P) { const dd = Math.hypot(p[0] - r[0], p[1] - r[1]); if (dd > dmax) { dmax = dd; a = p; b = r; } }
-    const ini = g.p("rc_ini"), u = [ini[0] - q[0], ini[1] - q[1]], n = Math.hypot(...u), k = Math.min(n, Math.max(40, q[1] - 46)) / n;
+    const ini = g.p("rc_ini"), u = [ini[0] - q[0], ini[1] - q[1]], n = Math.hypot(...u);
+    let k = Math.min(n, Math.max(40, q[1] - 46)) / n;
+    if (q[0] + u[0] * k > 500) k = Math.max(0, (500 - q[0]) / u[0]);      // que la flecha no entre en la columna del texto
     const s0 = [q[0] + u[0] * k, q[1] + u[1] * k];
     // perpendicular al RI hacia el lado del tubo, para mostrar el ángulo del RC
     let nv = [-(b[1] - a[1]), b[0] - a[0]]; const nn = Math.hypot(...nv); nv = [nv[0] / nn, nv[1] / nn];
@@ -294,7 +298,9 @@ function modelo(o) {
       `<line x1="${_r1(a[0])}" y1="${_r1(a[1])}" x2="${_r1(b[0])}" y2="${_r1(b[1])}" stroke="${INK}" stroke-width="6" stroke-linecap="butt"/>` +
       txt(_r1(Math.max(a[0], b[0]) + 6), _r1(Math.max(a[1], b[1]) + 4), "RI", 10.5, INK, "start", 700) +
       (o.ang ? `<line x1="${_r1(q[0])}" y1="${_r1(q[1])}" x2="${_r1(pe[0])}" y2="${_r1(pe[1])}" stroke="${RED}" stroke-width="1.3" stroke-dasharray="3 4"/>` +
-        txt(_r1(s0[0] + (s0[0] >= pe[0] ? 8 : -8)), _r1(s0[1] + 10), o.ang, 11.5, RED, s0[0] >= pe[0] ? "start" : "end", 700) : "") +
+        (s0[0] >= pe[0] && !_angDer(s0, pe, o.ang)
+          ? txt(_r1(s0[0]), _r1(s0[1] - 8), o.ang, 11.5, RED, "middle", 700)      // no entra a la derecha: arriba del comienzo de la flecha
+          : txt(_r1(s0[0] + (s0[0] >= pe[0] ? 8 : -8)), _r1(s0[1] + 10), o.ang, 11.5, RED, s0[0] >= pe[0] ? "start" : "end", 700)) : "") +
       `<line x1="${_r1(s0[0])}" y1="${_r1(s0[1])}" x2="${_r1(q[0])}" y2="${_r1(q[1])}" stroke="${RED}" stroke-width="3" marker-end="url(#ar)"/>` +
       `<circle cx="${_r1(q[0])}" cy="${_r1(q[1])}" r="3.5" fill="${RED}"/>`;
     xt = 534;

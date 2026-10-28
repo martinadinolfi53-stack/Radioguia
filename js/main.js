@@ -1,10 +1,10 @@
 // Arranque y navegación por #hash:
-// #  portada (Enfoques o Juegos) · #enfoques inicio de enfoques · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #imprimir (lista activa) · #calc · #calc-<proyección> · #ajustes · #ayuda-app (instalar en el celular) · #repaso… (js/repaso.js) · #juegos… (js/juegos.js)
+// #  portada (Enfoques o Juegos) · #ajustes-fuente (Ajustes, en la parte de elegir libro) · #enfoques inicio de enfoques · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #imprimir (lista activa) · #calc · #calc-<proyección> · #ajustes · #ayuda-app (instalar en el celular) · #repaso… (js/repaso.js) · #juegos… (js/juegos.js)
 import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { listas, preferencias, aplicarPreferencias } from "./almacen.js";
 import { tocarEstrella, hojaLista, quitarDeLista } from "./listas-ui.js";
 import { vistaImprimir, opcionesImpresion, preguntarEImprimir } from "./imprimir.js";
-import { estado, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes, vistaFamilia } from "./vistas.js";
+import { estado, vistaElegirFuente, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes, vistaFamilia } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
 import { mostrarTermino } from "./glosario.js";
@@ -18,6 +18,7 @@ import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificaci
 import * as nube from "./nube.js";
 import { vistaFoto } from "./foto.js";
 import { vistaPrivacidad } from "./privacidad.js";
+import { elegida, elegirFuente } from "./fuente.js";
 import { iniciarLente } from "./lente.js";
 
 const app = document.getElementById("app");
@@ -43,7 +44,7 @@ function ruta() {
   if (h.startsWith("#f-")) { const f = FAMILIAS.find((x) => x.id === h.slice(3)); if (f) return { tipo: "familia", f }; }
   if (h === "#favoritos") return { tipo: "favoritos" };
   if (h === "#imprimir") return { tipo: "imprimir" };
-  if (h === "#ajustes") return { tipo: "ajustes" };
+  if (h === "#ajustes" || h === "#ajustes-fuente") return { tipo: "ajustes" };
   if (h === "#ayuda-app") return { tipo: "ayuda-app" };
   if (h === "#privacidad") return { tipo: "privacidad" };
   if (h === "#enfoques") return { tipo: "inicio" };
@@ -60,9 +61,9 @@ function volverA(r) {
 }
 
 function render() {
-  // primero hay que identificarse (una sola vez por dispositivo)
   // qué datos se guardan: se puede leer antes de identificarse
   if (!identificado() && location.hash === "#privacidad") { app.innerHTML = vistaPrivacidad("#"); document.title = "RX"; return; }
+  // primero hay que identificarse (una sola vez por dispositivo)
   if (!identificado()) {
     recordarDestino(location.hash);
     app.innerHTML = vistaIdentificacion();
@@ -73,6 +74,12 @@ function render() {
   const cuenta = nube.estado();
   if (navigator.onLine && cuenta.listo && cuenta.usuario && cuenta.perfil && !cuenta.perfil.foto) {
     app.innerHTML = vistaFoto({ titulo: "Tu foto", sub: cuenta.perfil.apodo, listo: render });
+    document.title = "RX";
+    return;
+  }
+  // y elegir de qué libro consultar (una vez; se cambia en Ajustes)
+  if (!elegida()) {
+    app.innerHTML = vistaElegirFuente();
     document.title = "RX";
     return;
   }
@@ -97,6 +104,7 @@ function render() {
   // el título es el nombre sugerido del PDF
   document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : r.tipo === "imprimir" ? `${listas.activa().nombre} · RadioGuía` : "RadioGuía";
   altoCabecera();
+  if (location.hash === "#ajustes-fuente") document.getElementById("fuente")?.scrollIntoView();
 }
 
 // la barra del buscador y la de filtros se pegan debajo de la cabecera, que puede ocupar dos renglones
@@ -113,7 +121,7 @@ addEventListener("hashchange", (e) => {
   if (!antes.startsWith("#p-")) historial.push(antes); else if (!historial.length) historial.push(antes);
   if (historial.length > 30) historial.shift();
   render();
-  scrollTo(0, 0);
+  if (location.hash !== "#ajustes-fuente") scrollTo(0, 0);
 });
 
 // solo se reemplaza el contenido, así el buscador no pierde el foco ni cierra el teclado
@@ -123,6 +131,22 @@ function refrescarMain() {
   const nuevo = tmp.querySelector("main"), actual = app.querySelector("main");
   if (nuevo && actual) actual.replaceWith(nuevo);
 }
+
+// elegir la fuente (al entrar, en Ajustes o desde un grupo de otro libro): si cambia, la app se recarga con esos datos
+app.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-fuente]");
+  if (b && elegirFuente(b.dataset.fuente) === false) render();
+});
+
+// favorito de otro libro: cambia a ese libro y abre la ficha
+app.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-ir-fuente]");
+  if (b) elegirFuente(b.dataset.irFuente, `#p-${b.dataset.irFicha}`);
+  const f = e.target.closest("[data-fav-fuente]");
+  if (f) { estado.favFuente = f.dataset.favFuente; const y = scrollY; render(); scrollTo(0, y); }
+});
+// una vista avisa que terminó de cargar algo (por ejemplo, los nombres de otro libro en Favoritos)
+document.addEventListener("rx-rehacer", () => { const y = scrollY; render(); scrollTo(0, y); });
 
 // Ajustes → Buscar actualización
 app.addEventListener("click", async (e) => {

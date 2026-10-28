@@ -147,7 +147,7 @@ export async function guardarFoto(foto) {
 const LETRAS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sin O/0 ni I/1, que se confunden
 const nuevoCodigo = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => LETRAS[b % LETRAS.length]).join("");
 
-export async function crearGrupo({ nombre, fichas, aspectos, excluir = [], origen }) {
+export async function crearGrupo({ nombre, fichas, aspectos, excluir = [], origen, fuente }) {
   await iniciar();
   nombre = String(nombre || "").trim().slice(0, 40);
   if (!nombre) throw new Error("Poné un nombre al grupo.");
@@ -162,7 +162,7 @@ export async function crearGrupo({ nombre, fichas, aspectos, excluir = [], orige
       await fb.runTransaction(db, async (t) => {
         if ((await t.get(fb.doc(db, "codigos", codigo))).exists()) throw new Error("repetido");
         t.set(fb.doc(db, "codigos", codigo), { gid: ref.id, creador: uid, nombre, enfoques: fichas.length });
-        t.set(ref, { nombre, codigo, creador: uid, creado: fb.serverTimestamp(), fichas, aspectos, excluir, origen: origen || "" });
+        t.set(ref, { nombre, codigo, creador: uid, creado: fb.serverTimestamp(), fichas, aspectos, excluir, origen: origen || "", fuente });
       });
       break;
     } catch (e) { if (e.message !== "repetido" || i === 4) throw e; }

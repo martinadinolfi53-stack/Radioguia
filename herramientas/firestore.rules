@@ -72,12 +72,12 @@ service cloud.firestore {
       allow get: if miembro() || (logueado() && resource.data.creador == request.auth.uid);
       allow list: if false;
       allow create: if logueado() && nuevo().creador == request.auth.uid
-        && nuevo().keys().hasOnly(['nombre', 'codigo', 'creador', 'creado', 'fichas', 'aspectos', 'excluir', 'origen'])
+        && nuevo().keys().hasOnly(['nombre', 'codigo', 'creador', 'creado', 'fichas', 'aspectos', 'excluir', 'origen', 'fuente'])
         && texto(nuevo().nombre, 40) && nuevo().fichas is list && nuevo().fichas.size() <= 400
         && nuevo().codigo is string
         && getAfter(/databases/$(base)/documents/codigos/$(nuevo().codigo)).data.gid == gid;
       allow update: if logueado() && resource.data.creador == request.auth.uid
-        && soloCambia(['nombre', 'fichas', 'aspectos', 'excluir', 'origen'])
+        && soloCambia(['nombre', 'fichas', 'aspectos', 'excluir', 'origen', 'fuente'])
         && texto(nuevo().nombre, 40) && nuevo().fichas is list && nuevo().fichas.size() <= 400;
       allow delete: if false;
 

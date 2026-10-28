@@ -98,7 +98,7 @@ await prueba("OK2", "Carla crea un grupo con su código (como la app)", "PERMITI
   const c = doc(carla, "codigos/QWE789");
   if ((await t.get(c)).exists()) throw new Error("repetido");
   t.set(c, { gid: "g2", creador: "carla", nombre: "Mi grupo", enfoques: 2 });
-  t.set(doc(carla, "grupos/g2"), { nombre: "Mi grupo", codigo: "QWE789", creador: "carla", creado: serverTimestamp(), fichas: ["a", "b"], aspectos: [], excluir: [], origen: "" });
+  t.set(doc(carla, "grupos/g2"), { nombre: "Mi grupo", codigo: "QWE789", creador: "carla", creado: serverTimestamp(), fichas: ["a", "b"], aspectos: [], excluir: [], origen: "", fuente: "merrill" });
 }));
 await prueba("OK3", "Carla se une a su grupo y guarda su perfil", "PERMITIDO", async () => {
   await setDoc(doc(carla, "grupos/g2/miembros/carla"), miembro("carla", { codigo: "QWE789" }));

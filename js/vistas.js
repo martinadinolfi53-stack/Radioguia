@@ -7,8 +7,10 @@ import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { avatar } from "./foto.js";
+import { FUENTES, fuenteId, elegida } from "./fuente.js";
+import { nombresDe } from "./otras-fuentes.js";
 
-export const estado = { q: "", qFav: "", filtro: {}, sel: null }; // búsqueda, filtro de categoría por región y selección en Favoritos (Set o null)
+export const estado = { q: "", qFav: "", filtro: {}, sel: null, favFuente: "" }; // búsqueda, filtro de categoría por región, selección en Favoritos (Set o null) y filtro por libro en Favoritos ("" = todos)
 
 const filaProyeccion = (p, conRegion) => `<div class="row">
   <a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span>
@@ -77,6 +79,27 @@ export function vistaPortada() {
       <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
       <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
     </div>
+    <div class="portada-fuente" role="group" aria-label="Libro que estás consultando">${FUENTES.filter((f) => f.lista).map((f) => {
+      const on = f.id === fuenteId;
+      return `<button type="button" data-fuente="${f.id}" class="${on ? "on" : ""}" aria-pressed="${on}">${esc(f.nombre)}</button>`;
+    }).join("")}</div>
+  </main>`;
+}
+
+// botones para elegir la fuente (al entrar y en Ajustes); las que todavía no tienen fichas aparecen "en preparación"
+const botonesFuente = () => FUENTES.map((f) => {
+  const on = elegida() && f.id === fuenteId;
+  return `<button class="fuente-op${on ? " on" : ""}" data-fuente="${f.id}" ${f.lista ? "" : "disabled"} aria-pressed="${on}">
+    <b>${esc(f.nombre)}</b><small>${esc(f.detalle)}</small>${f.lista ? "" : "<em>En preparación</em>"}</button>`;
+}).join("");
+
+// después de identificarse: de qué libro salen las fichas, el repaso y los juegos (js/fuente.js)
+export function vistaElegirFuente() {
+  return `<main class="portada">
+    <p class="portada-rx">RX</p>
+    <p class="portada-hola">¿Qué libro querés consultar?</p>
+    <div class="fuente-ops">${botonesFuente()}</div>
+    <small class="ident-nota">Cada libro tiene sus propias fichas, favoritos y juegos. Lo podés cambiar cuando quieras en Ajustes.</small>
   </main>`;
 }
 
@@ -121,12 +144,12 @@ export function vistaAyudaApp() {
 export function vistaInicio() {
   const q = estado.q.trim();
   const act = listas.activa();
-  return cabecera({ titulo: "Enfoques", sub: "Técnicas y proyecciones radiológicas", atras: "#" }) + `
+  return cabecera({ titulo: "Enfoques", sub: `Técnicas y proyecciones · ${FUENTE.corto}`, atras: "#" }) + `
   <div class="buscar-barra"><div class="wrap">${buscador("q-inicio", estado.q, "Región, proyección o método")}</div></div>
   <main class="wrap">
     ${q ? resultados(proyecciones, q) : `
       <div class="accesos">
-        <a class="acceso fav" href="#favoritos" style="--lc: var(--lc-${act.color})">${icono.estrella(true)}<span>${listas.todas().length > 1 ? esc(act.nombre) : "Favoritos"}</span><b>${act.ids.length}</b></a>
+        <a class="acceso fav" href="#favoritos" style="--lc: var(--lc-${act.color})">${icono.estrella(true)}<span>${listas.todas().length > 1 ? esc(act.nombre) : "Favoritos"}</span><b>${act.total}</b></a>
         <a class="acceso" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
       </div>
       ${menuRegiones(todos)}`}
@@ -191,6 +214,37 @@ function seleccionLista(favs) {
         <span class="sel-txt"><span class="t">${esc(p.nombre)}</span><span class="s">${esc([...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "))}</span></span></button>`).join("")}</div></section>`).join("")}`;
 }
 
+// Favoritos por región (las familias del menú), con los dos libros juntos: los del libro abierto como botones de zona
+// y los de otro libro como filas con su etiqueta; al tocar una de esas filas se cambia de libro y se abre la ficha
+function menuFavoritos(filtro, otras) {
+  // cada enfoque es una fila con la etiqueta de su libro (un color por libro); los del libro abierto abren la ficha directo
+  const etiqueta = (f) => `<span class="fuente-tag f-${esc(f.id)}">${esc(f.nombre)}</span>`;
+  const fila = ({ f, id, nombre, region }) => f.id === fuenteId
+    ? `<a class="row fav-otra" href="#p-${esc(id)}"><span class="sel-txt"><span class="t">${esc(nombre)}</span><span class="s">${esc(region)}</span></span>${etiqueta(f)}</a>`
+    : `<button class="row fav-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(id)}"><span class="sel-txt"><span class="t">${esc(nombre)}</span><span class="s">${esc(region)}</span></span>${etiqueta(f)}</button>`;
+  const porFamilia = {};
+  const agregar = (k, item) => (porFamilia[FAMILIAS.some((x) => x.id === k) ? k : ""] ||= []).push(item);
+  const abierta = FUENTES.find((f) => f.id === fuenteId);
+  for (const g of GRUPOS) for (const rid of g.regiones) for (const p of proyeccionesDe(rid).filter(filtro))
+    agregar(g.familia.id, { f: abierta, id: p.id, nombre: p.nombre, region: regionPorId[rid]?.nombre || "" });
+  let cargando = false;
+  for (const f of FUENTES.filter((x) => x.id !== fuenteId)) {
+    const suyas = otras.filter((x) => x.fuente === f.id);
+    if (!suyas.length) continue;
+    const nombres = nombresDe(f.id, () => { if (location.hash === "#favoritos") document.dispatchEvent(new Event("rx-rehacer")); });
+    if (!nombres) { cargando = true; continue; }
+    for (const x of suyas) if (nombres[x.id]) agregar(nombres[x.id].familia, { f, id: x.id, ...nombres[x.id] });
+  }
+  const secciones = [...FAMILIAS.map((f) => f.id), ""].map((k) => {
+    const fam = FAMILIAS.find((f) => f.id === k) || { nombre: "Otras", color: "var(--mute)" };
+    const items = porFamilia[k];
+    if (!items?.length) return "";
+    return `<section class="familia" style="--c:${fam.color}"><h2>${esc(fam.nombre)}</h2><div class="lista fav-otras">${items.map(fila).join("")}</div></section>`;
+  }).join("");
+  const nota = otras.length ? `<p class="fav-fuente-nota">Cada enfoque lleva la etiqueta de su libro; al abrir uno de otro libro, la app cambia a ese libro.</p>` : "";
+  return nota + secciones + (cargando ? `<div class="vacio">Cargando…</div>` : "");
+}
+
 // lista activa de favoritos: selector de listas arriba, acciones (editar, nueva, seleccionar, imprimir) y el menú filtrado
 export function vistaFavoritos() {
   const act = listas.activa(), todas = listas.todas();
@@ -198,13 +252,23 @@ export function vistaFavoritos() {
   if (estado.sel) for (const id of estado.sel) if (!act.ids.includes(id)) estado.sel.delete(id);
   if (estado.sel && !favs.length) estado.sel = null;
   const q = estado.qFav.trim();
+  // filtro por libro: "" muestra todos; si no, solo los enfoques de ese libro
+  const ff = estado.favFuente;
+  const otrasVer = act.otras.filter((x) => !ff || x.fuente === ff), localVer = !ff || ff === fuenteId ? favs : [];
+  const nDe = (id) => (id === fuenteId ? favs.length : act.otras.filter((x) => x.fuente === id).length);
+  const filtroFuente = estado.sel || !act.total ? "" : `<div class="chips fav-filtro" role="group" aria-label="Filtrar por libro">${[{ id: "", nombre: "Todos" }, ...FUENTES.filter((f) => f.lista)].map((f) => {
+      const on = ff === f.id, n = f.id ? nDe(f.id) : act.total;
+      return `<button class="chip${on ? " on" : ""}" data-fav-fuente="${esc(f.id)}" aria-pressed="${on}">${esc(f.nombre)} · ${n}</button>`;
+    }).join("")}</div>`;
   let cuerpo;
-  if (!favs.length) cuerpo = `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
-  else if (estado.sel) cuerpo = seleccionLista(favs);
-  else if (q) cuerpo = resultados(favs, q);
-  else cuerpo = menuRegiones((p) => act.ids.includes(p.id));
+  if (estado.sel) cuerpo = seleccionLista(favs);
+  else if (!localVer.length && !otrasVer.length) cuerpo = act.total
+    ? `<div class="vacio">No hay enfoques del ${esc(FUENTES.find((f) => f.id === ff)?.nombre || "")} en esta lista.</div>`
+    : `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
+  else if (q && localVer.length) cuerpo = resultados(localVer, q);
+  else cuerpo = menuFavoritos((p) => localVer.includes(p), otrasVer);
   const selector = estado.sel ? "" : `<div class="lst-selector" role="group" aria-label="Listas de favoritos">${todas.map((l) =>
-      `<button class="lst-chip${l.id === act.id ? " on" : ""}" data-lista="${esc(l.id)}" aria-pressed="${l.id === act.id}" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}<span>${esc(l.nombre)}</span><b>${l.ids.length}</b></button>`).join("")}
+      `<button class="lst-chip${l.id === act.id ? " on" : ""}" data-lista="${esc(l.id)}" aria-pressed="${l.id === act.id}" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}<span>${esc(l.nombre)}</span><b>${l.total}</b></button>`).join("")}
     <button class="lst-chip nueva" data-lista-nueva>${icono.mas}<span>Nueva lista</span></button></div>
     <div class="lst-acciones">
       <button class="btn-sec" data-lista-editar="${esc(act.id)}">${icono.lapiz}<span>Nombre y color</span></button>
@@ -212,9 +276,9 @@ export function vistaFavoritos() {
       <a class="btn-sec" href="#imprimir">${icono.imprimir}<span>Imprimir o PDF</span></a>
       <a class="btn-sec" href="#repaso-l-${esc(act.id)}">${icono.repaso}<span>Repasar</span></a>` : ""}
     </div>`;
-  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${favs.length} ${favs.length === 1 ? "proyección" : "proyecciones"}`, atras: "#enfoques" }) +
+  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${act.total} ${act.total === 1 ? "proyección" : "proyecciones"}`, atras: "#enfoques" }) +
     (favs.length && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
-    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${cuerpo}</main>` + barraPestanas("favoritos");
+    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${filtroFuente}${cuerpo}</main>` + barraPestanas("favoritos");
 }
 
 // Ajustes > Apariencia: diseño (Clásico, Pompa de jabón o Liquid Glass); en Pompa, la paleta de colores y los detalles jugados; en los otros, el tema
@@ -271,6 +335,9 @@ export function vistaAjustes() {
   return cabecera({ titulo: "Ajustes", atras: "#" }) + `
   <main class="wrap">
     ${cuenta()}
+    <section class="panel" id="fuente"><h2>Fuente</h2><p>El libro del que salen las fichas, el repaso y los juegos. Cada uno tiene su repaso y sus juegos; los favoritos son compartidos y muestran de qué libro es cada enfoque.</p>
+      <div class="fuente-ops">${botonesFuente()}</div>
+      <p>Ahora: ${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del libro, pendiente de revisión.</p></section>
     ${apariencia(op)}
     <section class="panel"><h2>Tamaño del texto</h2><div class="opciones">${op("texto", "normal", "Normal")}${op("texto", "grande", "Grande")}</div></section>
     <section class="panel"><h2>Sin conexión</h2><p>${pwa.estadoOffline()}</p></section>
@@ -279,7 +346,7 @@ export function vistaAjustes() {
       <div class="opciones"><a class="opcion" href="#repaso-reportes">Ver reportes</a></div></section>
     <section class="panel"><h2>Versión</h2><p>Versión instalada: <b>${esc(pwa.version() || "sin datos")}</b></p>
       <button class="opcion" data-buscar-act>Buscar actualización</button><p class="act-estado" aria-live="polite"></p></section>
-    <section class="panel"><h2>Fuente</h2><p>${esc(FUENTE.libro)}, ${esc(FUENTE.edicion)} (${esc(FUENTE.autores)}; ${esc(FUENTE.editorial)}). Contenido redactado a partir del manual, pendiente de revisión.</p></section>
+
     <p class="pie">Listas de favoritos y ajustes se guardan solo en este dispositivo.</p>
   </main>` + barraPestanas("ajustes");
 }

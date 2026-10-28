@@ -1,0 +1,571 @@
+// Capítulo 5 · Cintura escapular (Merrill, Atlas de posiciones radiográficas y procedimientos radiológicos, 11ª ed., vol. 1, págs. 165-225).
+// Redacción propia a partir del atlas; los valores técnicos se copian tal cual figuran en la fuente.
+// DFRI: el atlas recomienda 122 cm salvo que la proyección indique otra (pág. 32).
+// Parrilla: según la tabla de técnicas del capítulo (pág. 174), Bucky 16:1 para las fundamentales salvo la axilar
+// (superficie de la mesa con rejilla 8:1) y la corredera bicipital (superficie de la mesa). En las demás se anota
+// cuando el texto pide centrar en la rejilla o en un dispositivo de rejilla vertical.
+// Tipo: R = proyección «fundamental» del resumen de proyecciones (pág. 166); E = el resto.
+
+const DFRI = "122 cm";
+const BUCKY = "Sí (Bucky, rejilla 16:1)";
+const REJILLA = "Sí (rejilla)";
+const f = (ri, extra = {}) => ({ ri, dfri: DFRI, respiracion: "Suspendida", ...extra });
+const crit = (estructuras, evaluacion) => [["Estructuras que se muestran", estructuras], ...(evaluacion.length ? [["Criterios de evaluación", evaluacion]] : [])];
+const GONADAS = "Proteger las gónadas.";
+
+export default {
+  capitulo: 5,
+  titulo: "Cintura escapular",
+  paginas: "165-225",
+  regiones: [
+    { id: "hombro", nombre: "Hombro", detalle: "Articulación escapulohumeral y húmero proximal" },
+    { id: "acromioclaviculares", nombre: "Articulaciones acromioclaviculares", detalle: "" },
+    { id: "clavicula", nombre: "Clavícula", detalle: "" },
+    { id: "escapula", nombre: "Escápula", detalle: "Cuerpo, coracoides y espina" },
+  ],
+  proyecciones: [
+    // ───────── Hombro ─────────
+    {
+      id: "hombro-ap", region: "hombro", nombre: "AP de hombro (rotación externa, neutra o interna del húmero)", categoria: ["AP"], tipo: "R",
+      factores: f("24 × 30 cm, transversal", { parrilla: BUCKY, angulacion: "No", rotacion: "Sí · húmero en rotación externa, neutra o interna según lo que se quiera ver" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular a un punto 2,5 cm por debajo de la apófisis coracoides." },
+      posicion: [
+        "No rotar el brazo si se sospecha fractura o luxación.",
+        "Paciente de pie (preferible, porque el hombro lesionado duele con el movimiento y la presión) o en decúbito supino.",
+        "Articulación del hombro en la línea media de la rejilla; centro del RI 2,5 cm por debajo de la coracoides.",
+        "Si hace falta, rotar apenas al paciente para que el cuerpo de la escápula quede paralelo al RI. En supino, apoyar el hombro y la cadera elevados sobre saquitos de arena.",
+        GONADAS,
+        "Rotación externa: mano en supinación (si no está contraindicado), brazo levemente abducido, epicóndilo y epitróclea paralelos al RI (posición anatómica verdadera).",
+        "Rotación neutra: palma de la mano apoyada en el muslo; epicóndilo y epitróclea a unos 45° del RI.",
+        "Rotación interna: codo levemente flexionado, brazo rotado hacia interno y dorso de la mano sobre la cadera; epicóndilo y epitróclea perpendiculares al RI.",
+      ],
+      criterios: crit([
+        "Huesos y partes blandas del hombro y del húmero proximal; relación de la articulación escapulohumeral.",
+        "Rotación externa: troquíter y la inserción del supraespinoso.",
+        "Rotación neutra: parte posterior de la inserción del supraespinoso (a veces muestra pequeños depósitos de calcio).",
+        "Rotación interna: húmero proximal en lateral verdadera; si se abduce lo suficiente, la inserción del subescapular de perfil.",
+      ], [
+        "Parte superior de la escápula, mitad lateral de la clavícula y húmero proximal.",
+        "Partes blandas del hombro y detalle de la trabeculación ósea.",
+        "Rotación externa: cabeza humeral y troquíter de perfil (lateral); leve superposición de la cabeza sobre la glenoides; contorno del troquín entre la cabeza y el troquíter.",
+        "Rotación neutra: troquíter parcialmente superpuesto a la cabeza; cabeza parcialmente de perfil; leve superposición sobre la glenoides.",
+        "Rotación interna: troquín de perfil y hacia medial; contorno del troquíter superpuesto a la cabeza; más superposición sobre la glenoides que en las otras dos.",
+      ]),
+      notas: ["Un filtro de compensación para hombro mejora la imagen, sobre todo con radiografía digital."],
+      fuente: { paginas: [175, 176, 177, 178, 179] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "hombro-transtoracica-lawrence", region: "hombro", nombre: "Transtorácica lateral de hombro (D o I)", metodo: "Lawrence", categoria: ["Perfil", "Métodos especiales"], tipo: "R",
+      factores: { ri: "24 × 30 cm, longitudinal", dfri: DFRI, respiracion: "Inspiración máxima (o técnica respirando: respiraciones lentas y profundas, exposición mínima de 3 s)", parrilla: BUCKY, angulacion: "No (Sí · 10 a 15° cefálico si no puede elevar el hombro sano)", rotacion: "No" },
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, entrando en el plano medio coronal a la altura del cuello quirúrgico. Si el paciente no puede elevar el hombro sano, angular 10 a 15° cefálico." },
+      posicion: [
+        "Se usa en traumatismos, cuando el brazo no se puede rotar ni abducir: muestra el húmero proximal a 90° de la AP.",
+        "Paciente sentado o de pie en lateral junto a un dispositivo de rejilla vertical (mucho más fácil en el traumatizado); si no se puede, en decúbito con cabeza y hombros elevados con almohadillas.",
+        "El paciente eleva el brazo sano, apoya el antebrazo sobre la cabeza y sube ese hombro todo lo posible (así baja el hombro lesionado y los hombros no se superponen).",
+        "Plano medio coronal perpendicular al RI. No intentar rotar ni mover el brazo lesionado.",
+        "Centrar el RI en el cuello quirúrgico del húmero afectado.",
+        GONADAS,
+      ],
+      criterios: crit(["Lateral del hombro y húmero proximal proyectada a través del tórax."], [
+        "Húmero proximal.",
+        "Escápula, clavícula y húmero visibles a través de los campos pulmonares.",
+        "Escápula superpuesta a la columna torácica.",
+        "Clavícula y hombro sanos proyectados por encima del hombro más cercano al RI.",
+      ]),
+      notas: ["El aire en los pulmones mejora el contraste y reduce la exposición necesaria."],
+      fuente: { paginas: [180, 181] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "hombro-inferosuperior-axial-lawrence", region: "hombro", nombre: "Inferosuperior axial de hombro", metodo: "Lawrence (y modificación de Rafert)", categoria: ["Axiales", "Métodos especiales"], tipo: "R",
+      factores: f("24 × 30 cm con rejilla, transversal, vertical contra la cara superior del hombro", { parrilla: "Sí (sobre la mesa, rejilla 8:1)", angulacion: "Sí · 15 a 30° medial (Lawrence); ≈ 15° medial (Rafert)", rotacion: "Sí · húmero en rotación externa (Rafert: exagerada, pulgar hacia abajo)" }),
+      rc: { direccion: "horizontal", texto: "Lawrence: horizontal, a través de la axila, hacia la articulación AC; la angulación medial suele ser de 15 a 30° y aumenta cuanto más abducido esté el brazo. Modificación de Rafert: horizontal, unos 15° hacia medial, entrando por la axila y atravesando la AC." },
+      posicion: [
+        "Paciente en decúbito supino, con cabeza, hombros y codo elevados unos 8 cm.",
+        "Abducir el brazo afectado todo lo posible, perpendicular al eje del cuerpo, con el húmero en rotación externa; antebrazo y mano cómodos (agarrando un soporte o sobre saquitos de arena; puede hacer falta un tablero de extensión).",
+        "El paciente gira la cabeza hacia el lado contrario para apoyar el RI contra el cuello; sostener el RI con saquitos de arena o un soporte vertical.",
+        "Modificación de Rafert (defecto de Hill-Sachs): misma posición pero rotando el brazo extendido hacia externo hasta que la mano quede oblicua a 45°, con el pulgar hacia abajo; ayudar al paciente a rotar.",
+        GONADAS,
+      ],
+      criterios: crit(["Húmero proximal, articulación escapulohumeral, parte lateral de la coracoides y articulación AC; inserciones del subescapular (troquín) y redondo menor (troquíter). Con Rafert se ve la fractura por compresión de Hill-Sachs."], [
+        "Articulación escapulohumeral levemente superpuesta.",
+        "Coracoides apuntando hacia anterior.",
+        "Troquín de perfil y hacia anterior.",
+        "Articulación AC, acromion y extremo acromial de la clavícula proyectados a través de la cabeza humeral.",
+        "Partes blandas de la axila con detalle trabecular.",
+      ]),
+      notas: ["El defecto de Hill-Sachs es una fractura en cuña de la parte posterolateral de la cabeza humeral por luxación anterior; puede hacer falta una rotación externa exagerada para verlo."],
+      fuente: { paginas: [182, 183] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "hombro-inferosuperior-west-point", region: "hombro", nombre: "Inferosuperior axial de hombro", metodo: "West Point", categoria: ["Axiales", "Métodos especiales"], tipo: "E",
+      factores: f("18 × 24 cm, transversal, vertical contra la cara superior del hombro", { angulacion: "Sí · doble: 25° anterior y 25° medial", rotacion: "No" }),
+      rc: { direccion: "angulado", angulo: "25° anterior y 25° medial", texto: "Ángulo doble: 25° hacia anterior respecto de la horizontal y 25° hacia medial. Entra unos 13 cm por debajo y 4 cm medial al borde del acromion y sale por la cavidad glenoidea." },
+      posicion: [
+        "Paciente en decúbito prono con una almohadilla de unos 8 cm bajo el hombro en estudio; cabeza girada hacia el lado contrario.",
+        "Brazo afectado abducido 90° y rotado para que el antebrazo cuelgue apoyado en el borde de la mesa o en la bandeja del Bucky.",
+        "RI vertical sobre la parte superior del hombro, con el borde medial contra el cuello, sostenido con saquitos de arena o un soporte.",
+        GONADAS,
+      ],
+      criterios: crit(["Alteraciones óseas del reborde glenoideo anteroinferior y defectos de Hill-Sachs en la inestabilidad crónica del hombro."], [
+        "Cabeza humeral proyectada por fuera de la coracoides.",
+        "Articulación entre cabeza humeral y glenoides.",
+        "Acromion superpuesto a la parte posterior de la cabeza humeral.",
+        "Articulación del hombro.",
+      ]),
+      fuente: { paginas: [184, 185] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "hombro-inferosuperior-clements", region: "hombro", nombre: "Inferosuperior axial de hombro en decúbito lateral", metodo: "Modificación de Clements", categoria: ["Axiales", "Decúbitos", "Métodos especiales"], tipo: "E",
+      factores: f("18 × 24 cm, vertical contra la cara superior del hombro", { angulacion: "No (Sí · 5 a 15° medial si no llega a 90° de abducción)", rotacion: "No" }),
+      rc: { direccion: "horizontal", texto: "Horizontal al plano medio coronal, cruzando la región axilar. Angular 5 a 15° hacia medial si el paciente no llega a los 90° de abducción." },
+      posicion: [
+        "Para pacientes que no pueden ponerse en prono ni en supino: decúbito lateral sobre el lado sano, con caderas y rodillas flexionadas.",
+        "Brazo afectado abducido 90°, apuntando al techo.",
+        "RI apoyado sobre la parte superior del hombro, sostenido por el brazo sano o fijado.",
+        GONADAS,
+      ],
+      criterios: crit(["Articulación escapulohumeral en axial, con menos abducción y menos movimiento del tubo."], []),
+      revision: ["El atlas no da criterios de evaluación propios para esta modificación."],
+      fuente: { paginas: [186] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "hombro-superoinferior-axial", region: "hombro", nombre: "Superoinferior axial de hombro", categoria: ["Axiales"], tipo: "E",
+      factores: f("18 × 24 cm, longitudinal", { angulacion: "Sí · 5 a 15° hacia el codo", rotacion: "No" }),
+      rc: { direccion: "angulado", angulo: "5-15° hacia el codo", texto: "Angulado 5 a 15° a través de la articulación del hombro, hacia el codo; más ángulo si el paciente no puede extender bien el hombro sobre el RI." },
+      posicion: [
+        "Paciente sentado en el extremo de la mesa, lo bastante alto para extender bien el hombro sobre el RI.",
+        "RI cerca del extremo de la mesa, paralelo a su eje largo; el paciente se inclina hacia lateral hasta que el hombro quede sobre el centro del RI.",
+        "Codo apoyado en la mesa, flexionado 90°, mano en pronación; cabeza inclinada hacia el lado sano.",
+        "Corregir la inclinación anterior o posterior hasta que epicóndilo y epitróclea queden verticales.",
+        GONADAS,
+      ],
+      criterios: crit(["Relación entre el húmero proximal y la glenoides; también la AC, la parte externa de la coracoides y las inserciones del subescapular y redondo menor."], [
+        "Articulación escapulohumeral abierta (no lo estará si la flexibilidad es limitada).",
+        "Coracoides proyectada por encima de la clavícula.",
+        "Troquín de perfil.",
+        "Articulación AC a través de la cabeza humeral.",
+      ]),
+      fuente: { paginas: [187] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "hombro-ap-axial", region: "hombro", nombre: "AP axial de hombro", categoria: ["Axiales"], tipo: "E",
+      factores: f("18 × 24 cm, transversal", { parrilla: REJILLA, angulacion: "Sí · 35° cefálico", rotacion: "No" }),
+      rc: { direccion: "cefálico", angulo: "35°", texto: "A través de la articulación escapulohumeral, con 35° de angulación cefálica." },
+      posicion: [
+        "Paciente erguido o en decúbito supino.",
+        "Articulación escapulohumeral del lado en estudio en la línea media de la rejilla.",
+        GONADAS,
+      ],
+      criterios: crit(["Relación entre la cabeza del húmero y la glenoides; útil en la luxación posterior."], [
+        "Articulación escapulohumeral.",
+        "Húmero proximal.",
+        "Clavícula proyectada por encima del ángulo superior de la escápula.",
+      ]),
+      fuente: { paginas: [188] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "hombro-y-escapular", region: "hombro", nombre: "PA oblicua de hombro: «Y» escapular (OAD u OAI)", categoria: ["Oblicuas"], tipo: "R",
+      factores: f("24 × 30 cm", { parrilla: BUCKY, angulacion: "No", rotacion: "Sí · 45 a 60° (plano medio coronal respecto del RI)" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular a la articulación escapulohumeral." },
+      posicion: [
+        "Paciente erguido (preferible) o acostado. En traumatismo grave se hace en oblicua posterior en lugar de anterior.",
+        "Cara anterior del hombro en estudio contra la mesa vertical.",
+        "Rotar al paciente hasta que el plano medio coronal forme 45 a 60° con el RI; la posición del brazo no importa.",
+        "Palpar la escápula y dejar su cara plana perpendicular al RI.",
+        "Centro del RI a la altura de la articulación escapulohumeral.",
+        GONADAS,
+      ],
+      criterios: crit(["La «Y» escapular (cuerpo = trazo vertical; acromion y coracoides = brazos). En el hombro normal la cabeza humeral queda en el centro de la Y; en la luxación anterior queda debajo de la coracoides y en la posterior, debajo del acromion."], [
+        "Cabeza humeral y glenoides superpuestas.",
+        "Diáfisis humeral y cuerpo de la escápula superpuestos.",
+        "Cuerpo de la escápula sin superponerse al tórax óseo.",
+        "Acromion hacia lateral y libre.",
+        "Coracoides superpuesta o por debajo de la clavícula.",
+        "Escápula de perfil, con sus bordes lateral y vertebral superpuestos.",
+      ]),
+      notas: ["Útil ante sospecha de luxación del hombro. Un filtro de compensación para hombro mejora la imagen."],
+      fuente: { paginas: [189, 190, 191] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "glenoides-ap-oblicua-grashey", region: "hombro", nombre: "AP oblicua de cavidad glenoidea (OPD u OPI)", metodo: "Grashey", categoria: ["Oblicuas", "Métodos especiales"], tipo: "R",
+      factores: f("18 × 24 cm, transversal", { parrilla: BUCKY, angulacion: "No", rotacion: "Sí · 35 a 45° hacia el lado afectado (más en supino)" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, entrando 5 cm medial y 5 cm por debajo del borde superolateral del hombro." },
+      posicion: [
+        "Paciente de pie (más cómodo y más fácil de ajustar) o en decúbito supino.",
+        "Centrar el RI en la articulación escapulohumeral: 5 cm medial y 5 cm por debajo del borde superolateral del hombro.",
+        "Rotar el cuerpo unos 35 a 45° hacia el lado afectado, hasta que la escápula quede paralela al RI (en supino puede hacer falta más de 45°, con hombro y cadera elevados sobre bolsas de arena).",
+        "Brazo levemente abducido en rotación interna, con la palma sobre el abdomen.",
+        GONADAS,
+      ],
+      criterios: crit(["Espacio articular entre la cabeza humeral y la glenoides."], [
+        "Espacio articular abierto entre cabeza humeral y glenoides.",
+        "Glenoides de perfil.",
+        "Partes blandas de la articulación y detalle trabecular de glenoides y cabeza humeral.",
+      ]),
+      fuente: { paginas: [192, 193] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "hombro-salida-supraespinoso-neer", region: "hombro", nombre: "Tangencial de la salida del supraespinoso (OAD u OAI)", metodo: "Neer", categoria: ["Tangenciales", "Métodos especiales"], tipo: "E",
+      factores: f("24 × 30 cm, longitudinal", { parrilla: REJILLA, angulacion: "Sí · 10 a 15° caudal", rotacion: "Sí · 45 a 60° (el lado sano se aleja del RI)" }),
+      rc: { direccion: "caudal", angulo: "10-15°", texto: "Angulado 10 a 15° caudal, entrando por la parte superior de la cabeza humeral." },
+      posicion: [
+        "Paciente sentado o de pie frente a un dispositivo de rejilla vertical.",
+        "Hombro afectado centrado y en contacto con el RI; alejar el lado sano del RI.",
+        "Palpar la escápula afectada y dejar su cara plana perpendicular al RI (rotación promedio de 45 a 60°).",
+        "Brazo a lo largo del costado.",
+        GONADAS,
+      ],
+      criterios: crit(["Arco coracoacromial: cara posterior del acromion y articulación AC como límite superior de la salida; sirve para valorar pinzamientos."], [
+        "Cabeza humeral proyectada por debajo de la articulación AC.",
+        "Cabeza humeral y AC con detalle óseo.",
+        "Húmero y cuerpo de la escápula, en general paralelos.",
+      ]),
+      fuente: { paginas: [194] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "humero-proximal-stryker", region: "hombro", nombre: "AP axial de húmero proximal (muesca)", metodo: "Stryker", categoria: ["Axiales", "Métodos especiales"], tipo: "E",
+      factores: f("24 × 30 cm", { angulacion: "Sí · 10° cefálico", rotacion: "Sí · leve rotación interna del húmero (mano sobre la cabeza)" }),
+      rc: { direccion: "cefálico", angulo: "10°", texto: "Angulado 10° cefálico, entrando por la apófisis coracoides." },
+      posicion: [
+        "Paciente en decúbito supino, con la coracoides del hombro afectado centrada en la mesa.",
+        "Flexionar el brazo apenas más de 90° y apoyar la palma sobre la cabeza, con las yemas sobre ella (deja el húmero en leve rotación interna).",
+        "Diáfisis humeral vertical y paralela al plano medio sagital.",
+        GONADAS,
+      ],
+      criterios: crit(["Zonas posterosuperior y posterolateral de la cabeza humeral: muestra la lesión de Hill-Sachs, que las proyecciones convencionales suelen no ver."], [
+        "Coracoides y clavícula superpuestas.",
+        "Parte posterolateral de la cabeza humeral de perfil.",
+        "Eje largo del húmero alineado con el eje del cuerpo.",
+        "Trabeculación de la cabeza humeral.",
+      ]),
+      fuente: { paginas: [195] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "glenoides-ap-oblicua-apple", region: "hombro", nombre: "AP oblicua de cavidad glenoidea con abducción y peso (OPD u OPI)", metodo: "Apple", categoria: ["Oblicuas", "Métodos especiales"], tipo: "E",
+      factores: f("24 × 30 cm, transversal", { angulacion: "No", rotacion: "Sí · 35 a 45° hacia el lado afectado" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, a la altura de la apófisis coracoides." },
+      posicion: [
+        "Paciente sentado o de pie; RI centrado en la articulación escapulohumeral.",
+        "Rotar el cuerpo unos 35 a 45° hacia el lado afectado (cara posterior de ese lado contra el RI), con la escápula paralela al RI.",
+        "El paciente sostiene un peso de 250 g en la mano del lado afectado y abduce el brazo 90°.",
+        GONADAS,
+      ],
+      criterios: crit(["Articulación escapulohumeral: con el peso se ve la pérdida de cartílago articular."], [
+        "Espacio articular abierto entre cabeza humeral y glenoides.",
+        "Glenoides de perfil.",
+        "Partes blandas de la articulación y detalle trabecular de glenoides y cabeza.",
+        "Brazo a 90°.",
+      ]),
+      notas: ["Es como la Grashey pero con abducción y peso. Para evitar movimiento, dejar todo listo para exponer antes de que abduzca el brazo."],
+      fuente: { paginas: [196, 197] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "glenoides-ap-axial-oblicua-garth", region: "hombro", nombre: "AP axial oblicua de cavidad glenoidea (OPD u OPI)", metodo: "Garth", categoria: ["Oblicuas", "Axiales", "Métodos especiales"], tipo: "E",
+      factores: f("24 × 30 cm, longitudinal", { angulacion: "Sí · 45° caudal", rotacion: "Sí · 45° hacia el lado afectado" }),
+      rc: { direccion: "caudal", angulo: "45°", texto: "Angulado 45° caudal, a través de la articulación escapulohumeral." },
+      posicion: [
+        "Paciente en decúbito supino, sentado o de pie; RI centrado en la articulación glenohumeral.",
+        "Rotar el cuerpo unos 45° hacia el lado afectado (cara posterior de ese lado contra el RI).",
+        "Codo del lado afectado flexionado y brazo cruzado sobre el pecho.",
+        GONADAS,
+      ],
+      criterios: crit(["Articulación escapulohumeral, cabeza humeral, coracoides y cabeza y cuello escapulares. Se recomienda en el traumatismo agudo: luxaciones posteriores, fracturas de glenoides, Hill-Sachs y calcificaciones."], [
+        "Articulación escapulohumeral, cabeza humeral, ángulo lateral y cuello de la escápula libres de superposición.",
+        "Coracoides bien visible.",
+        "En la luxación posterior la cabeza humeral queda por encima de la glenoides; en la anterior, por debajo.",
+      ]),
+      fuente: { paginas: [198, 199] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "corredera-bicipital-fisk", region: "hombro", nombre: "Tangencial de la corredera bicipital (surco intertuberositario)", metodo: "Modificación de Fisk", categoria: ["Tangenciales", "Métodos especiales"], tipo: "R",
+      factores: f("18 × 24 cm", { parrilla: "No (sobre la mesa)", angulacion: "Sí · 10 a 15° posterior (en supino); No en la de Fisk de pie", rotacion: "No" }),
+      rc: { direccion: "angulado", angulo: "10-15°", texto: "En supino: angulado 10 a 15° hacia posterior (hacia abajo desde la horizontal) respecto del eje largo del húmero. Fisk de pie: perpendicular al RI, con el paciente inclinado hacia adelante y el húmero a 10-15° de la vertical." },
+      posicion: [
+        "Paciente en supino, sentado o de pie; extender el mentón o girar la cabeza hacia el lado contrario.",
+        "En supino: palpar la cara anterior del hombro para ubicar la corredera; mano en supinación y RI apoyado sobre la cara superior del hombro, inmovilizado.",
+        "Técnica original de Fisk (de pie en el extremo de la mesa): codo flexionado, el paciente se inclina hasta apoyar la cara posterior del antebrazo en la mesa y sostiene el RI; plomo entre el RI y el antebrazo; saquito bajo la mano para dejar el RI horizontal; inclinar hasta que el húmero quede a 10-15° de la vertical.",
+        GONADAS,
+      ],
+      criterios: crit(["La corredera bicipital de perfil, libre de las estructuras del hombro."], [
+        "Corredera bicipital de perfil.",
+        "Partes blandas, con mejor visualización de la corredera.",
+      ]),
+      notas: ["El cabezal del tubo puede limitar esta posición; se puede usar un equipo portátil."],
+      fuente: { paginas: [200, 201] }, ilustracion: null, estado: "pendiente-revision",
+    },
+
+    // ───────── Articulaciones acromioclaviculares ─────────
+    {
+      id: "ac-ap-bilateral-pearson", region: "acromioclaviculares", nombre: "AP bilateral de articulaciones acromioclaviculares (sin y con peso)", metodo: "Pearson", categoria: ["AP", "Métodos especiales"], tipo: "R",
+      factores: f("18 × 43 cm o dos de 18 × 24 cm, según el paciente", { dfri: "183 cm (menos magnificación: entran ambas AC y se distorsiona menos el espacio articular)", parrilla: BUCKY, angulacion: "No", rotacion: "No" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular a la línea media del cuerpo a la altura de las AC (una sola imagen); dirigido a cada AC si en espaldas anchas hacen falta dos exposiciones por lado." },
+      posicion: [
+        "Paciente erguido, sentado o de pie (en decúbito la luxación AC tiende a reducirse), frente a un dispositivo de rejilla vertical, con el centro del RI a la altura de las AC.",
+        "Línea media del cuerpo en la línea media de la rejilla; peso repartido en ambos pies para que no rote.",
+        "Brazos colgando sin apoyo a los costados; hombros en un mismo plano horizontal.",
+        "Dos exposiciones: primero sin peso; después con pesos iguales (250 a 500 g) atados a cada muñeca con una banda, sin que los sostenga con las manos ni levante el hombro lesionado.",
+        "Proteger las gónadas y la tiroides (queda en el haz primario).",
+      ],
+      criterios: crit(["Ambas articulaciones AC: luxación, separación y funcionamiento."], [
+        "AC con algo de partes blandas y sin densidad excesiva.",
+        "Ambas AC, sin y con peso, completas en una o dos radiografías.",
+        "Paciente sin rotar ni inclinar.",
+        "Marcadores de derecha/izquierda y de con/sin peso.",
+        "La separación, si existe, se ve claramente con peso.",
+      ]),
+      fuente: { paginas: [202, 203] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "ac-ap-axial-alexander", region: "acromioclaviculares", nombre: "AP axial de articulación acromioclavicular (unilateral)", metodo: "Alexander", categoria: ["Axiales", "Métodos especiales"], tipo: "E",
+      factores: f("18 × 24 cm, longitudinal", { parrilla: REJILLA, angulacion: "Sí · 15° cefálico", rotacion: "No" }),
+      rc: { direccion: "cefálico", angulo: "15°", texto: "Hacia la apófisis coracoides con 15° de angulación cefálica (proyecta la AC por encima del acromion)." },
+      posicion: [
+        "Se estudia cada lado por separado ante sospecha de subluxación o luxación AC.",
+        "Paciente erguido, sentado o de pie, con la espalda contra un dispositivo de rejilla vertical.",
+        "Hombro afectado centrado en la rejilla, con el centro del RI a la altura de la AC.",
+        "Ajustar para que la coracoides quede centrada en el RI.",
+        GONADAS,
+      ],
+      criterios: crit(["La articulación AC proyectada algo más arriba que en la AP."], [
+        "Articulación AC y clavícula proyectadas por encima del acromion.",
+        "AC visible con algo de partes blandas y sin densidad excesiva.",
+      ]),
+      fuente: { paginas: [204, 205] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "ac-pa-oblicua-axial-alexander", region: "acromioclaviculares", nombre: "PA oblicua axial de articulación acromioclavicular (OAD u OAI)", metodo: "Alexander", categoria: ["Oblicuas", "Axiales", "Métodos especiales"], tipo: "E",
+      factores: f("18 × 24 cm, longitudinal", { parrilla: REJILLA, angulacion: "Sí · 15° caudal", rotacion: "Sí · 45 a 60° (plano medio coronal respecto del RI)" }),
+      rc: { direccion: "caudal", angulo: "15°", texto: "A través de la articulación AC, con 15° de angulación caudal." },
+      posicion: [
+        "Paciente sentado o de pie frente al RI, con la mano del lado afectado bajo la axila contraria.",
+        "Rotar hasta que el plano medio coronal forme 45 a 60° con el RI (escápula perpendicular al RI); AC centrada en la línea media de la rejilla.",
+        "Justo antes de exponer, el paciente apoya el hombro contra el RI y tira con fuerza del brazo cruzado sobre el pecho (lleva la escápula hacia lateral y anterior y acerca la AC al RI).",
+        GONADAS,
+      ],
+      criterios: crit(["La articulación AC y la relación de los huesos del hombro."], [
+        "Articulación AC de perfil.",
+        "AC con algo de partes blandas y sin densidad excesiva.",
+      ]),
+      fuente: { paginas: [206] }, ilustracion: null, estado: "pendiente-revision",
+    },
+
+    // ───────── Clavícula ─────────
+    {
+      id: "clavicula-ap", region: "clavicula", nombre: "AP de clavícula", categoria: ["AP"], tipo: "R",
+      factores: f("24 × 30 cm, transversal", { respiracion: "Suspendida al final de la espiración (densidad más uniforme)", parrilla: BUCKY, angulacion: "No", rotacion: "No" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular a la zona media de la clavícula." },
+      posicion: [
+        "Paciente en decúbito supino o de pie. Con sospecha de fractura o patología destructiva, o si no puede estar erguido, en supino (menos riesgo de desplazar fragmentos).",
+        "Clavícula centrada en la línea media de la mesa o del dispositivo de rejilla vertical.",
+        "Brazos a los costados y hombros en un mismo plano horizontal; clavícula centrada en el RI.",
+        GONADAS,
+      ],
+      criterios: crit(["Frontal de la clavícula."], [
+        "Toda la clavícula centrada en la imagen.",
+        "Densidad uniforme.",
+        "Mitad lateral de la clavícula por encima de la escápula y mitad medial superpuesta al tórax.",
+      ]),
+      fuente: { paginas: [207] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "clavicula-pa", region: "clavicula", nombre: "PA de clavícula", categoria: ["PA"], tipo: "R",
+      factores: f("24 × 30 cm, transversal", { respiracion: "Suspendida al final de la espiración (densidad más uniforme)", parrilla: BUCKY, angulacion: "No", rotacion: "No" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular a la clavícula." },
+      posicion: [
+        "Igual que la AP, pero con el paciente de pie de espaldas al tubo, o en prono.",
+        "La clavícula queda más cerca del RI (menos DORI): mejor detalle.",
+        GONADAS,
+      ],
+      criterios: crit(["Frontal de la clavícula, con más detalle que la AP."], [
+        "Toda la clavícula centrada en la imagen.",
+        "Densidad uniforme.",
+        "Mitad lateral de la clavícula por encima de la escápula y mitad medial superpuesta al tórax.",
+      ]),
+      revision: ["El atlas remite a la AP para RI, respiración, estructuras y criterios; se copiaron de ahí."],
+      fuente: { paginas: [208] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "clavicula-ap-axial", region: "clavicula", nombre: "AP axial de clavícula (lordótica o en supino)", categoria: ["Axiales"], tipo: "R",
+      factores: f("24 × 30 cm, transversal", { respiracion: "Suspendida al final de una inspiración máxima (eleva y angula más la clavícula)", parrilla: BUCKY, angulacion: "Sí · 0 a 10° cefálico (lordótica de pie) o 15 a 30° cefálico (supino)", rotacion: "No" }),
+      rc: { direccion: "cefálico", angulo: "0-10° (de pie) · 15-30° (supino)", texto: "Entrando por la zona media de la clavícula. Lordótica de pie: 0 a 10° cefálico; en supino: 15 a 30° cefálico. Los pacientes delgados necesitan más angulación." },
+      posicion: [
+        "Lordótica de pie: paciente sentado o de pie, 30 cm delante de un RI vertical y mirando al tubo; se inclina hacia atrás en lordosis máxima apoyando cuello y hombros en el dispositivo (cuello en flexión máxima).",
+        "Probar la lordosis para estimar el ángulo y dejar que se enderece mientras se prepara el equipo.",
+        "Si no puede estar de pie, en supino sobre la mesa.",
+        "Clavícula centrada en el RI.",
+        GONADAS,
+      ],
+      criterios: crit(["Clavícula en axial, proyectada por encima de las costillas."], [
+        "Casi toda la clavícula por encima de costillas y escápula, con el extremo medial sobre la 1.ª o 2.ª costilla; clavícula horizontal.",
+        "Toda la clavícula con las articulaciones AC y EC.",
+      ]),
+      notas: ["Si el paciente está grave o no puede hacer la lordosis, angular el tubo da una imagen algo distorsionada; para más detalle se puede hacer la PA axial."],
+      fuente: { paginas: [209] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "clavicula-pa-axial", region: "clavicula", nombre: "PA axial de clavícula", categoria: ["Axiales"], tipo: "R",
+      factores: f("18 × 24 cm, transversal", { respiracion: "Suspendida al final de una inspiración máxima", parrilla: BUCKY, angulacion: "Sí · 15 a 30° caudal", rotacion: "No" }),
+      rc: { direccion: "caudal", angulo: "15-30°", texto: "Angulado 15 a 30° caudal, entrando por la zona media de la clavícula." },
+      posicion: [
+        "Como la AP axial, pero con el paciente en prono o de pie mirando al dispositivo de rejilla vertical.",
+        "Clavícula centrada en el RI.",
+        GONADAS,
+      ],
+      criterios: crit(["Clavícula en axial, proyectada por encima de las costillas."], [
+        "Casi toda la clavícula por encima de costillas y escápula, con el extremo medial sobre la 1.ª o 2.ª costilla; clavícula horizontal.",
+        "Toda la clavícula con las articulaciones AC y EC.",
+      ]),
+      revision: ["El atlas remite a la AP axial para respiración, estructuras y criterios; se copiaron de ahí."],
+      fuente: { paginas: [210] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "clavicula-tangencial", region: "clavicula", nombre: "Tangencial de clavícula (inferosuperior)", categoria: ["Tangenciales"], tipo: "E",
+      factores: f(null, { angulacion: "Sí · 25 a 40° respecto de la horizontal (y 15 a 25° lateral para el tercio medial)", rotacion: "No" }),
+      rc: { direccion: "angulado", angulo: "25-40°", texto: "Angulado para pasar entre la clavícula y la pared torácica, perpendicular al RI: unos 25 a 40° respecto de la horizontal. Para el tercio medial, sumar 15 a 25° hacia lateral." },
+      posicion: [
+        "Paciente en decúbito supino con los brazos a los costados.",
+        "Si se puede, bajar el hombro para dejar la clavícula horizontal; cabeza girada hacia el lado contrario.",
+        "RI de canto sobre la parte superior del hombro, lo más cerca posible del cuello, sostenido.",
+        GONADAS,
+      ],
+      criterios: crit(["Clavícula en inferosuperior, libre de la pared torácica."], [
+        "Zona media de la clavícula sin superposición.",
+        "Extremos acromial y esternal superpuestos.",
+        "Toda la clavícula con las articulaciones AC y EC.",
+      ]),
+      revision: ["La página no indica claramente el tamaño del RI (el dato que aparece cerca es el de la PA axial)."],
+      fuente: { paginas: [210, 211] }, ilustracion: null, estado: "pendiente-revision",
+    },
+
+    // ───────── Escápula ─────────
+    {
+      id: "escapula-ap", region: "escapula", nombre: "AP de escápula", categoria: ["AP"], tipo: "R",
+      factores: f("24 × 30 cm, longitudinal", { respiracion: "Respiración lenta (borra el detalle pulmonar)", parrilla: BUCKY, angulacion: "No", rotacion: "No" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular a la zona media de la escápula, unos 5 cm por debajo de la apófisis coracoides." },
+      posicion: [
+        "Paciente de pie (preferible si duele el hombro) o en supino.",
+        "Escápula afectada centrada en la línea media de la rejilla.",
+        "Brazo abducido en ángulo recto para llevar la escápula hacia lateral; codo flexionado y mano cómoda.",
+        "No rotar el cuerpo hacia el lado afectado (anularía el desplazamiento lateral de la escápula).",
+        "Borde superior del RI 5 cm por encima del hombro.",
+        GONADAS,
+      ],
+      criterios: crit(["AP de la escápula."], [
+        "Parte lateral de la escápula libre de costillas.",
+        "Escápula horizontal, no oblicua.",
+        "Detalle escapular a través de pulmón y costillas (la respiración superficial borra el pulmón).",
+        "Acromion y ángulo inferior.",
+      ]),
+      fuente: { paginas: [212, 213] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "escapula-lateral", region: "escapula", nombre: "Lateral de escápula (OAD u OAI)", categoria: ["Perfil", "Oblicuas"], tipo: "R",
+      factores: f("24 × 30 cm, longitudinal", { parrilla: BUCKY, angulacion: "No", rotacion: "Sí · 45 a 60° respecto del RI" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular a la zona media del borde medial de la escápula, que sobresale." },
+      posicion: [
+        "Paciente en OAD u OAI, de pie o sentado frente a un dispositivo de rejilla vertical (en prono es más difícil; en supino la escápula se magnifica).",
+        "Escápula afectada centrada en la rejilla; rotación habitual de 45 a 60° respecto del RI.",
+        "Para acromion y coracoides: codo flexionado y dorso de la mano sobre la espalda, lo bastante alto para que el húmero no tape la escápula (Mazujian: brazo cruzado sobre el pecho tomando el hombro contrario).",
+        "Para el cuerpo de la escápula: brazo extendido hacia arriba con el antebrazo sobre la cabeza, o cruzado sobre el pecho.",
+        "Tomar los bordes medial y lateral de la escápula entre pulgar e índice y ajustar la rotación hasta que el cuerpo quede perpendicular al RI.",
+        GONADAS,
+      ],
+      criterios: crit(["Lateral de la escápula; la posición del brazo decide qué parte superior se superpone al húmero."], [
+        "Bordes medial y lateral superpuestos.",
+        "Cuerpo de la escápula sin superponerse a las costillas.",
+        "El húmero no tapa la zona de interés.",
+        "Incluye acromion y ángulo inferior.",
+        "Densidad adecuada en el espesor lateral de la escápula.",
+      ]),
+      notas: ["En traumatizados se puede hacer en OPI u OPD. Un filtro de compensación para hombro mejora la imagen."],
+      fuente: { paginas: [214, 215] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "escapula-pa-oblicua-lorenz-lilienfeld", region: "escapula", nombre: "PA oblicua de escápula (OAD u OAI)", metodo: "Lorenz y Lilienfeld", categoria: ["Oblicuas", "Métodos especiales"], tipo: "E",
+      factores: f("24 × 30 cm, longitudinal", { parrilla: REJILLA, angulacion: "No", rotacion: "Sí · cuerpo en lateral, rotado levemente hacia adelante" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular al RI, entre la pared torácica y la zona media de la escápula que sobresale." },
+      posicion: [
+        "Paciente de pie (preferible si duele) o en decúbito lateral; cuerpo y centro de la escápula en la línea media de la rejilla.",
+        "Lorenz: brazo afectado perpendicular al eje del cuerpo, codo flexionado y mano sobre la cabeza.",
+        "Lilienfeld: brazo afectado extendido oblicuamente hacia arriba, con la mano sobre la cabeza.",
+        "En ambos: rotar el cuerpo apenas hacia adelante (el paciente se agarra de la mesa o del soporte); tomar los bordes de la escápula entre pulgar e índice y ajustar hasta que quede libre de la caja torácica.",
+        GONADAS,
+      ],
+      criterios: crit(["Oblicua de la escápula; la oblicuidad depende de la posición del brazo."], [
+        "Escápula en oblicua.",
+        "Borde medial junto a las costillas.",
+        "Acromion y ángulo inferior.",
+      ]),
+      fuente: { paginas: [216, 217] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "escapula-ap-oblicua", region: "escapula", nombre: "AP oblicua de escápula (OPD u OPI)", categoria: ["Oblicuas"], tipo: "E",
+      factores: f("24 × 30 cm, longitudinal", { parrilla: REJILLA, angulacion: "No", rotacion: "Sí · 15 a 25° (moderada) o 25 a 35° (pronunciada), alejándose del lado afectado" }),
+      rc: { direccion: "perpendicular", texto: "Perpendicular al borde lateral de la caja torácica, a la altura de la zona media de la escápula." },
+      posicion: [
+        "Paciente en supino o de pie (preferible si duele y no está contraindicado); cuerpo y escápula en la línea media de la rejilla.",
+        "Oblicuidad moderada: brazo hacia arriba con el codo flexionado y la mano supinada bajo la cabeza (o brazo cruzado sobre el tórax); girar al paciente alejándolo del lado afectado 15 a 25°.",
+        "Oblicuidad pronunciada: codo flexionado apoyado sobre la frente y rotación de 25 a 35°.",
+        "Tomar los bordes de la escápula entre pulgar e índice y ajustar hasta sacarla de la caja torácica.",
+        GONADAS,
+      ],
+      criterios: crit(["Oblicuas de la escápula, libre o casi libre de costillas."], [
+        "Escápula en oblicua.",
+        "Borde lateral junto a las costillas.",
+        "Acromion y ángulo inferior.",
+      ]),
+      fuente: { paginas: [218, 219] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "coracoides-ap-axial", region: "escapula", nombre: "AP axial de apófisis coracoides", categoria: ["Axiales"], tipo: "E",
+      factores: f("24 × 30 cm, transversal", { respiracion: "Suspendida al final de la espiración (densidad más uniforme)", parrilla: REJILLA, angulacion: "Sí · 15 a 45° cefálico (Kwak y col.: 30°)", rotacion: "No" }),
+      rc: { direccion: "cefálico", angulo: "15-45° (30° recomendado)", texto: "Entrando por la apófisis coracoides con 15 a 45° cefálicos; Kwak, Espiniella y Kattan recomiendan 30°. Los hombros redondeados necesitan más angulación." },
+      posicion: [
+        "Paciente en decúbito supino con los brazos a los costados; coracoides afectada en la zona media de la rejilla y centro del RI coincidiendo con el RC.",
+        "Hombros en un mismo plano horizontal.",
+        "Brazo afectado levemente abducido y mano supinada, inmovilizada con un saco de arena sobre la palma.",
+        GONADAS,
+      ],
+      criterios: crit(["Coracoides en inferosuperior, levemente elongada (en la AP directa se ve como una pequeña sombra ovalada)."], [
+        "Coracoides mínimamente superpuesta sobre sí misma.",
+        "Clavícula levemente superpuesta a la coracoides.",
+      ]),
+      fuente: { paginas: [220, 221] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "espina-escapular-laquerriere-pierquin", region: "escapula", nombre: "Tangencial de espina escapular (supino)", metodo: "Laquerrière-Pierquin", categoria: ["Tangenciales", "Métodos especiales"], tipo: "E",
+      factores: f("18 × 24 cm, transversal", { parrilla: REJILLA, angulacion: "Sí · 45° caudal (35° en obesos u hombros redondeados)", rotacion: "Sí · lo necesario para dejar el cuerpo de la escápula horizontal" }),
+      rc: { direccion: "caudal", angulo: "45°", texto: "A través de la región posterosuperior del hombro con 45° caudal (35° alcanza en obesos u hombros redondeados); luego centrar el RI en el RC." },
+      posicion: [
+        "Paciente en decúbito supino, con el hombro en la línea media de la rejilla.",
+        "Ajustar la rotación para que el cuerpo de la escápula quede horizontal (elevar el hombro contrario con sacos o esponjas si hace falta).",
+        "Girar la cabeza hacia el lado contrario lo suficiente para que no se superponga.",
+        "Funke: en mamas pequeñas, una cuña de 15° que angule el hombro hacia caudal evita superposiciones.",
+        GONADAS,
+      ],
+      criterios: crit(["Espina escapular de perfil y libre de superposición ósea, salvo a la altura del extremo lateral de la clavícula."], [
+        "Espina escapular por encima del cuerpo de la escápula.",
+        "Espina con sus partes blandas y sin densidad excesiva.",
+      ]),
+      notas: ["Si el dolor no deja estar en supino, se puede hacer en prono o erguido (ver la ficha siguiente)."],
+      fuente: { paginas: [222, 223] }, ilustracion: null, estado: "pendiente-revision",
+    },
+    {
+      id: "espina-escapular-tangencial-prono", region: "escapula", nombre: "Tangencial de espina escapular (prono o sentado)", categoria: ["Tangenciales"], tipo: "E",
+      factores: f("18 × 24 cm, transversal", { parrilla: REJILLA, angulacion: "Sí · 45° cefálico (prono) o 45° posteroinferior (sentado)", rotacion: "No" }),
+      rc: { direccion: "cefálico", angulo: "45°", texto: "En prono: a través de la espina escapular con 45° cefálico; sale por la parte anterosuperior del hombro. Sentado: a través de la parte anterosuperior del hombro con 45° posteroinferior, perpendicular al RI. Sentado conviene más DFRI por la mayor DORI." },
+      posicion: [
+        "Prono: hombro en la línea media de la rejilla, brazos a los costados y hombros en un mismo plano; evitar la rotación lateral de la escápula.",
+        "Cabeza apoyada sobre el mentón o la mejilla del lado afectado; mano de ese lado en supinación.",
+        "Cuña radiotransparente bajo el hombro y el brazo para dejar la escápula horizontal.",
+        "Sentado: espalda apoyada en el extremo de la mesa y RI sobre la mesa, alineado con el hombro, sostenido a 45°.",
+        GONADAS,
+      ],
+      criterios: crit(["Espina escapular de perfil, libre del cuerpo de la escápula."], [
+        "Espina escapular por encima del ala de la escápula.",
+        "Espina con sus partes blandas y sin densidad excesiva.",
+      ]),
+      fuente: { paginas: [224, 225] }, ilustracion: null, estado: "pendiente-revision",
+    },
+  ],
+};

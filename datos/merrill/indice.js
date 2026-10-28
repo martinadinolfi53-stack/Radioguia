@@ -1,6 +1,7 @@
 // Fuente Merrill: capítulos de técnicas del Atlas, en el orden del libro. Mismo formato que datos/bontrager/.
 // Mientras no haya capítulos cargados, datos/fuentes.js la marca como "en preparación".
 import cap04 from "./cap04-extremidad-superior.js";
+import cap05 from "./cap05-cintura-escapular.js";
 export { default as MENU } from "./menu.js";
 export { default as ANG_ROT } from "./angulacion-rotacion.js";
 export { default as VERSIONES } from "./versiones.js";
@@ -15,4 +16,4 @@ export const FUENTE = {
   ilustraciones: "ilustraciones/merrill/",
 };
 
-export const CAPITULOS = [cap04];
+export const CAPITULOS = [cap04, cap05];

@@ -9,8 +9,9 @@ import { esc, icono, cabecera } from "./util.js";
 import { GRUPOS, grupoDeRegion } from "./menu.js";
 import { ASPECTOS, CAMPOS, generarPreguntas } from "./repaso-preguntas.js";
 import * as nube from "./nube.js";
+import { clave } from "./fuente.js";
 
-const K_RES = "radioguia.repaso.resultados", K_SUELTOS = "radioguia.repaso.sueltos", K_CONF = "radioguia.repaso.config", K_SESION = "radioguia.repaso.sesion";
+const K_RES = clave("radioguia.repaso.resultados"), K_SUELTOS = clave("radioguia.repaso.sueltos"), K_CONF = clave("radioguia.repaso.config"), K_SESION = clave("radioguia.repaso.sesion");
 const leer = (st, k, def) => { try { const v = st.getItem(k); return v == null ? def : JSON.parse(v); } catch { return def; } };
 const escribir = (st, k, v) => { try { v == null ? st.removeItem(k) : st.setItem(k, JSON.stringify(v)); } catch {} };
 const local = (() => { try { return localStorage; } catch { return null; } })();
@@ -70,7 +71,7 @@ function validarOrigen() {
 export function resultados() { return leer(local, K_RES, []); }
 
 // preguntas reportadas por el usuario (dos opciones válidas, respuesta mal, etc.): se guardan acá y se mandan como texto
-const K_REP = "radioguia.repaso.reportes";
+const K_REP = clave("radioguia.repaso.reportes");
 const MOTIVOS = ["Hay más de una correcta", "La respuesta correcta está mal", "La pregunta es confusa", "Otro"];
 export const reportes = () => leer(local, K_REP, []);
 const reportada = (q) => reportes().some((x) => x.ficha === q.ficha && x.campo === q.campo && x.enunciado === q.enunciado && x.correcta === q.opciones[q.correcta]);

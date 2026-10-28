@@ -411,3 +411,34 @@ main.wrap:has(+ .pestanas) { padding-bottom: calc(env(safe-area-inset-bottom, 0p
 .ap-detalle[aria-checked="true"] .interruptor::after { transform: translateX(20px); }
 .panel h3 { margin: 16px 0 8px; font-size: .9em; font-weight: 600; }
 .panel h2 + h3 { margin-top: 4px; }
+/* elegir la fuente (vistaElegirFuente y Ajustes en js/vistas.js) */
+.fuente-ops { display: grid; gap: 10px; width: min(100%, 420px); margin: 4px auto 10px; }
+.fuente-op { display: grid; gap: 2px; padding: 14px 16px; border: 1px solid #2b394c; border-radius: 14px; background: #0f151e; color: #e7edf5; font: inherit; text-align: left; cursor: pointer; }
+.fuente-op b { font-size: 1.1em; }
+.fuente-op small { color: #93a0b2; }
+.fuente-op em { font-style: normal; font-size: .8em; color: #c9d3df; }
+.fuente-op.on { border-color: #5cc8ff; box-shadow: 0 0 0 1px #5cc8ff inset; }
+.fuente-op:disabled { opacity: .55; cursor: default; }
+.panel .fuente-ops { margin: 10px 0; width: 100%; }
+.panel .fuente-op { background: var(--surface-2); border-color: var(--line); color: var(--fg); }
+.panel .fuente-op small { color: var(--mute); }
+.panel .fuente-op.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+/* interruptor de libro debajo de Enfoques y Juegos: el libro activo queda resaltado; tocar el otro cambia de fuente */
+.portada-fuente { display: inline-flex; gap: 4px; margin-top: 36px; padding: 4px; border: 1px solid rgb(127 140 160 / .35); border-radius: 999px; }
+.portada-fuente button { min-height: 40px; min-width: 112px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; color: inherit; opacity: .7; font: inherit; font-size: .95em; font-weight: 600; cursor: pointer; }
+.portada-fuente button.on { background: #5cc8ff; color: #04121f; opacity: 1; cursor: default; }
+/* Favoritos compartidos: filtro por libro y etiqueta en los enfoques de otro libro */
+.fav-otras { margin-top: 10px; }
+.fav-filtro { margin: 14px 0 4px; }
+.fav-fuente-nota { margin: 6px 0 0; font-size: .85em; color: var(--mute); }
+.fav-otra { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 0; background: transparent; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.fav-otra .sel-txt { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.fav-otra .s { font-size: .85em; color: var(--mute); }
+/* etiqueta del libro: un color por fuente para distinguirlas de un vistazo */
+.fuente-tag { --fc: var(--mute); flex: none; padding: 3px 10px; border: 1px solid var(--fc); border-radius: 999px; background: color-mix(in srgb, var(--fc) 16%, transparent); font-size: .78em; font-weight: 700; color: var(--fc); }
+.fuente-tag.f-bontrager { --fc: #4fa3ff; }
+.fuente-tag.f-merrill { --fc: #f0a23a; }
+:root[data-theme="light"] .fuente-tag.f-bontrager { --fc: #1565c0; }
+:root[data-theme="light"] .fuente-tag.f-merrill { --fc: #b25d00; }
+a.row.fav-otra { display: flex; padding: 12px 16px; text-decoration: none; }
+#fuente { scroll-margin-top: calc(var(--top-h, 64px) + 12px); }

@@ -1,6 +1,6 @@
 // Juegos en grupo: cuenta (apodo o Google), grupos con link de invitación o código, desafío del día con vidas y ranking.
 // Rutas: #juegos-cuenta · #juegos-foto · #juegos-grupos · #juegos-nuevo · #juegos-grupo-<gid>[-historico] · #juegos-editar-<gid>
-//        #juegos-unirse-<CODIGO> (link de invitación; los links viejos traían el id del grupo) · #juegos-desafio[-<gid>]
+//        #juegos-unirse-<CODIGO> (link de invitación) o #juegos-unirse-<gid> (links de antes, siguen andando) · #juegos-desafio[-<gid>]
 // Los datos viven en Firebase (js/nube.js). Las pantallas se dibujan con lo que haya y se vuelven a dibujar cuando llega la respuesta.
 import { proyecciones, proyeccionPorId, regionPorId } from "./datos.js";
 import * as almacen from "./almacen.js";
@@ -209,12 +209,10 @@ const nombreOrigen = () => form.origen === "todas" ? "Todos los enfoques" : form
 
 function vistaUnirse(param) {
   const misGrupos = nube.estado().perfil?.grupos || [];
-  // link viejo con el id del grupo: sirve solo para quien ya está adentro; para entrar ahora hace falta el código
-  if (nube.limpiarCodigo(param).length !== 6) {
-    if (misGrupos.includes(param)) { history.replaceState(null, "", `#juegos-grupo-${param}`); return vistaGrupo(param, false); }
-    return fallo("Unirse", "#juegos-grupos", "Este link de invitación es de una versión anterior. Pedile el código del grupo a quien te invitó y escribilo en Juegos › Grupos.");
-  }
-  const c = dato(`invitacion:${param}`, () => nube.invitacion(param));
+  // links de antes: traen el id del grupo en vez del código
+  const viejo = nube.limpiarCodigo(param).length !== 6;
+  if (viejo && misGrupos.includes(param)) { history.replaceState(null, "", `#juegos-grupo-${param}`); return vistaGrupo(param, false); }
+  const c = dato(`invitacion:${param}`, () => viejo ? nube.leerGrupo(param).then((g) => ({ gid: g.id, nombre: g.nombre, enfoques: g.fichas.length, codigo: g.codigo })) : nube.invitacion(param));
   if (c.error) return fallo("Unirse", "#juegos", c.error);
   if (!c.ok) return cargando("Unirse", "#juegos");
   const inv = c.datos;

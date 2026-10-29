@@ -76,8 +76,8 @@ service cloud.firestore {
       function grupo() { return get(/databases/$(base)/documents/grupos/$(gid)).data; }
       function miembro() { return logueado() && exists(/databases/$(base)/documents/grupos/$(gid)/miembros/$(request.auth.uid)); }
 
-      // el grupo lo ven sus miembros; para unirse, la invitación muestra lo que hay en codigos/{CODIGO}
-      allow get: if miembro() || (logueado() && resource.data.creador == request.auth.uid);
+      // se ve de a uno con su id (lo trae el link de invitación; es imposible de adivinar), nunca la lista entera
+      allow get: if logueado();
       allow list: if false;
       allow create: if logueado() && nuevo().creador == request.auth.uid
         && nuevo().keys().hasOnly(['nombre', 'codigo', 'creador', 'creado', 'fichas', 'aspectos', 'excluir', 'origen', 'fuente'])
@@ -97,10 +97,10 @@ service cloud.firestore {
       match /miembros/{uid} {
         function camposMiembro() { return nuevo().keys().hasOnly(['uid', 'apodo', 'foto', 'puntos', 'partidas', 'racha', 'ultimaFecha', 'codigo']); }
         allow read: if miembro() || yo(uid);
-        // para unirse hay que tener el código del grupo (lo trae el link de invitación o se escribe a mano)
+        // para unirse hace falta el link (con el id del grupo) o el código; si se manda el código, tiene que ser el del grupo
         allow create: if yo(uid) && camposMiembro() && nuevo().uid == uid && texto(nuevo().apodo, 24) && fotoOk(nuevo())
           && nuevo().puntos == 0 && nuevo().partidas == 0 && nuevo().racha == 0 && nuevo().ultimaFecha == ''
-          && nuevo().codigo == grupo().codigo;
+          && (!('codigo' in nuevo()) || nuevo().codigo == grupo().codigo);
         // cambiar el apodo o la foto, o sumar exactamente los puntos de la partida de hoy en el mismo momento en que se cierra
         allow update: if yo(uid) && camposMiembro() && nuevo().uid == uid && texto(nuevo().apodo, 24) && fotoOk(nuevo())
           && (soloCambia(['apodo', 'foto'])

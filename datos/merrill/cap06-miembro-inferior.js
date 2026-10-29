@@ -352,7 +352,7 @@ export default {
       posicion: [
         "Paciente en supino o sentado, con las piernas totalmente extendidas.",
         "RI bajo el tobillo, centrado en la línea media del tobillo.",
-        "Pasar una tira de gasa larga alrededor de la zona de las cabezas de los metatarsianos; el paciente tira de ella para mantener el tobillo en flexión dorsal a 90°.",
+        "Pasar una tira de gasa larga alrededor de la zona de las cabezas de los metatarsianos; el paciente tira de ella para mantener el tobillo en flexión dorsal, con la planta perpendicular.",
         "Si no llega a dejar la planta perpendicular al RI, elevar la pierna sobre saquitos de arena.",
         GONADAS,
       ],
@@ -880,6 +880,7 @@ export default {
         "Detalle óseo de la eminencia, el fémur distal y la tibia proximal.",
       ]),
       notas: ["Se suele incluir en la rutina de rodilla para buscar cuerpos libres («ratones articulares»); también sirve en osteocondritis disecante y en la luxación congénita de rótula."],
+      revision: ["El atlas no escribe el sentido de la angulación; caudal se deduce de que el RC queda perpendicular a la pierna con el paciente en prono."],
       fuente: { paginas: [314, 315] }, ilustracion: null, estado: "pendiente-revision",
     },
     {

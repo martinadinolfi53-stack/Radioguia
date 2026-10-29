@@ -203,7 +203,7 @@ export default {
       posicion: [
         "Decúbito supino con los brazos a lo largo del cuerpo.",
         "No quitar el collarín sin permiso de enfermería o del médico.",
-        "Rejilla vertical al costado, paralela al cuello, con el borde superior unos 2,5 cm por encima del MAE (centrada en C4).",
+        "Rejilla vertical al costado, paralela al cuello, con el borde superior unos 2,43 cm por encima del MAE (centrada en C4).",
         "Elevar un poco la barbilla; en traumatismo reciente, consultar antes al médico.",
         "Sujetar la rejilla con el calibrador bajo los hombros, almohadas contra la baranda o cinta.",
         "Bajar los hombros hacia los pies todo lo posible.",

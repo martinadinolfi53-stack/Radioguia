@@ -110,6 +110,8 @@ export async function borrarCuenta() {
     } catch {}
     await fb.deleteDoc(fb.doc(db, "grupos", gid, "miembros", u.uid)).catch(() => {});
   }
+  // Firestore no borra las subcolecciones solo: los favoritos sincronizados van aparte
+  await fb.deleteDoc(fb.doc(db, "usuarios", u.uid, "privado", "favoritos")).catch(() => {});
   await fb.deleteDoc(fb.doc(db, "usuarios", u.uid));
   try { await fb.deleteUser(u); }
   catch (e) {

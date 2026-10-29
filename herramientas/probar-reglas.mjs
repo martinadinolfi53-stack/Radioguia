@@ -124,6 +124,8 @@ await prueba("OK8", "Borrar mi cuenta: anonimizar mis partidas, dejar el grupo y
   await setDoc(doc(beto, "usuarios/beto"), { apodo: "Beto" });
   await deleteDoc(doc(beto, "usuarios/beto"));
 });
+await prueba("OK10", "Guardar y leer los favoritos propios sincronizados", "PERMITIDO", async () => { await setDoc(doc(ana, "usuarios/ana/privado/favoritos"), { datos: "[]", actualizado: 1 }); await getDoc(doc(ana, "usuarios/ana/privado/favoritos")); });
+await prueba("P10", "Leer los favoritos de otra persona", "BLOQUEADO", () => getDoc(doc(beto, "usuarios/ana/privado/favoritos")));
 await prueba("OK9", "Reportar una pregunta", "PERMITIDO", () => setDoc(doc(collection(carla, "reportes")), { uid: "carla", enunciado: "¿?", motivo: "Error", comentario: "", opciones: ["a"] }));
 
 await env.cleanup();

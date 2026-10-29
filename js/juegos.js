@@ -11,8 +11,9 @@ import { resultados, empezarRepaso } from "./repaso.js";
 import { vistaGrupos } from "./grupos.js";
 import { avatar } from "./foto.js";
 import * as nube from "./nube.js";
+import { clave } from "./fuente.js";
 
-const K_STATS = "radioguia.juegos.stats";
+const K_STATS = clave("radioguia.juegos.stats");
 const local = (() => { try { return localStorage; } catch { return null; } })();
 const leer = () => { try { return JSON.parse(local?.getItem(K_STATS)) || null; } catch { return null; } };
 const guardar = () => { try { local?.setItem(K_STATS, JSON.stringify(st)); } catch {} };

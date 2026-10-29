@@ -411,6 +411,12 @@ main.wrap:has(+ .pestanas) { padding-bottom: calc(env(safe-area-inset-bottom, 0p
 .ap-detalle[aria-checked="true"] .interruptor::after { transform: translateX(20px); }
 .panel h3 { margin: 16px 0 8px; font-size: .9em; font-weight: 600; }
 .panel h2 + h3 { margin-top: 4px; }
+
+/* Tus datos (#privacidad) */
+.privacidad .panel p + p { margin-top: 10px; }
+.privacidad .panel ul { margin: 0 0 10px; padding-left: 20px; display: grid; gap: 8px; }
+a.ident-nota { color: var(--accent); text-decoration: underline; }
+.ident-cancelar { background: none; border: 0; padding: 0 0 0 8px; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; }
 /* elegir la fuente (vistaElegirFuente y Ajustes en js/vistas.js) */
 .fuente-ops { display: grid; gap: 10px; width: min(100%, 420px); margin: 4px auto 10px; }
 .fuente-op { display: grid; gap: 2px; padding: 14px 16px; border: 1px solid #2b394c; border-radius: 14px; background: #0f151e; color: #e7edf5; font: inherit; text-align: left; cursor: pointer; }

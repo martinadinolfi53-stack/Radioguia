@@ -17,6 +17,7 @@ import { iniciarGrupos } from "./grupos.js";
 import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificacion } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { vistaFoto } from "./foto.js";
+import { vistaPrivacidad } from "./privacidad.js";
 import { elegida, elegirFuente } from "./fuente.js";
 import { iniciarLente } from "./lente.js";
 
@@ -45,6 +46,7 @@ function ruta() {
   if (h === "#imprimir") return { tipo: "imprimir" };
   if (h === "#ajustes" || h === "#ajustes-fuente") return { tipo: "ajustes" };
   if (h === "#ayuda-app") return { tipo: "ayuda-app" };
+  if (h === "#privacidad") return { tipo: "privacidad" };
   if (h === "#enfoques") return { tipo: "inicio" };
   if (h.startsWith("#repaso")) return { tipo: "repaso", h };
   if (h.startsWith("#juegos")) return { tipo: "juegos", h };
@@ -59,6 +61,8 @@ function volverA(r) {
 }
 
 function render() {
+  // qué datos se guardan: se puede leer antes de identificarse
+  if (!identificado() && location.hash === "#privacidad") { app.innerHTML = vistaPrivacidad("#"); document.title = "RX"; return; }
   // primero hay que identificarse (una sola vez por dispositivo)
   if (!identificado()) {
     recordarDestino(location.hash);
@@ -89,6 +93,7 @@ function render() {
     case "imprimir": app.innerHTML = vistaImprimir(); break;
     case "ajustes": app.innerHTML = vistaAjustes(); break;
     case "ayuda-app": app.innerHTML = vistaAyudaApp(); break;
+    case "privacidad": app.innerHTML = vistaPrivacidad("#ajustes"); break;
     case "calc": app.innerHTML = vistaCalculadora(r.id, vuelta); break;
     case "repaso": app.innerHTML = vistaRepaso(r.h); break;
     case "juegos": app.innerHTML = vistaJuegos(r.h); break;
@@ -158,7 +163,7 @@ app.addEventListener("click", async (e) => {
 });
 
 app.addEventListener("click", async (e) => {
-  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir],[data-cerrar-sesion]");
+  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir],[data-cerrar-sesion],[data-borrar-cuenta]");
   if (!t) return;
   const rehacer = () => { const y = scrollY; render(); scrollTo(0, y); };
   if (t.dataset.fav) { e.preventDefault(); tocarEstrella(t.dataset.fav, rehacer); }
@@ -194,6 +199,13 @@ app.addEventListener("click", async (e) => {
     try { if (usuario) await nube.salir(); } catch {}
     // olvida el nombre y vuelve a empezar, así no quedan datos de la cuenta anterior en pantalla
     try { localStorage.removeItem("radioguia.nombre"); } catch {}
+    location.hash = ""; location.reload();
+  }
+  else if ("borrarCuenta" in t.dataset) {
+    if (!confirm("¿Borrar tu cuenta? Se borran tu perfil, tu foto y tu lugar en todos tus grupos, con sus puntos. No se puede deshacer.")) return;
+    t.disabled = true; t.textContent = "Borrando…";
+    try { await nube.borrarCuenta(); }
+    catch (er) { alert(er?.code?.includes("popup") ? "Para borrar la cuenta, Google pide confirmar que sos vos. Probá otra vez y completá la ventana de Google." : "No se pudo borrar la cuenta. Revisá la conexión y probá otra vez."); t.disabled = false; t.textContent = "Borrar mi cuenta y mis datos"; return; }
     location.hash = ""; location.reload();
   }
 });

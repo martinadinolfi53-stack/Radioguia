@@ -21,10 +21,24 @@ const buscador = (id, valor, placeholder) => `<div class="search"><span class="l
   <input id="${id}" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="${placeholder}" value="${esc(valor)}" aria-label="Buscar">
   <button class="borrar" data-borrar="${id}" ${valor ? "" : "hidden"} aria-label="Borrar búsqueda">${icono.cerrar}</button></div>`;
 
+// palabras que no ayudan a elegir una ficha ("proyección lateral de codo" = "lateral codo")
+const VACIAS = new Set(["de", "del", "la", "las", "el", "los", "en", "con", "y", "o", "a", "al", "para", "por", "proyeccion", "proyecciones", "incidencia", "incidencias", "enfoque", "enfoques", "rx"]);
+// "ap" o "pa" sueltas son palabras enteras (si no, "ap" aparece en "escápula", "apoyar"…); "laterales" también encuentra "lateral"
+function contiene(texto, t) {
+  if (t.length <= 2) return new RegExp(`(^|[^a-z0-9])${t.replace(/[^a-z0-9]/g, "\\$&")}($|[^a-z0-9])`).test(texto);
+  return texto.includes(t) || (t.length > 5 && t.endsWith("es") && texto.includes(t.slice(0, -2))) || (t.length > 3 && t.endsWith("s") && texto.includes(t.slice(0, -1)));
+}
+
+// si una palabra es región, proyección o método de alguna ficha ("hombro"), se busca solo en el título:
+// así no aparecen las de tórax o columna que nombran el hombro en la posición del paciente.
+// Las demás palabras ("sentado", "Bucky") se buscan en toda la ficha.
 export function buscar(lista, q) {
-  const terms = norm(q).split(/\s+/).filter(Boolean);
-  return lista.filter((p) => terms.every((t) => p._todo.includes(t)))
-    .map((p) => ({ p, s: terms.filter((t) => p._titulo.includes(t)).length }))
+  const todas = norm(q).split(/\s+/).filter(Boolean);
+  const terms = todas.filter((t) => !VACIAS.has(t));
+  if (!terms.length) terms.push(...todas);
+  const deTitulo = new Set(terms.filter((t) => proyecciones.some((p) => contiene(p._titulo, t))));
+  return lista.filter((p) => terms.every((t) => contiene(deTitulo.has(t) ? p._titulo : p._todo, t)))
+    .map((p) => ({ p, s: terms.filter((t) => contiene(p._titulo, t)).length }))
     .sort((a, b) => b.s - a.s).map((x) => x.p);
 }
 

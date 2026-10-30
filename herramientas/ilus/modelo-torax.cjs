@@ -1,6 +1,6 @@
 // Esquemas de tórax, vía aérea, esternón, esternoclaviculares y costillas con las figuras por capas del modelo 3D
 // (herramientas/ilus3d/figuras/torax.py). Reemplazan a los de torax.cjs cuando existe el render <id>-tubo.
-// Textos resumidos de datos/cap01-torax.js y datos/cap07-torax-oseo.js.
+// Textos resumidos de datos/bontrager/cap01-torax.js y datos/bontrager/cap07-torax-oseo.js.
 const E = require("./estilo.cjs");
 const { RED, MUTE, BLUE } = E;
 const fs = require("fs"), path = require("path");

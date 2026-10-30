@@ -613,7 +613,7 @@ I["ped-ext-sup-lateral"] = () => {
   );
 };
 
-// ======================= VERSIONES (un esquema por posición; ver datos/versiones.js) =======================
+// ======================= VERSIONES (un esquema por posición; ver datos/bontrager/versiones.js) =======================
 // columna de texto a la derecha del dibujo
 const col = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
 

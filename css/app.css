@@ -188,8 +188,8 @@ a.row.reg .chev { grid-row: 1 / 3; grid-column: 2; align-self: center; color: va
 
 /* visor de imágenes */
 .visor { position: fixed; inset: 0; z-index: 60; background: rgb(0 0 0 / .92); display: grid; place-items: center; touch-action: none; }
-.visor-lienzo { width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; }
-.visor img { max-width: 96vw; max-height: 90vh; transform-origin: center; background: #fff; border-radius: 8px; }
+.visor-lienzo { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.visor img { position: absolute; max-width: none; background: #fff; border-radius: 8px; user-select: none; -webkit-user-drag: none; }
 .visor-cerrar { position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(10px + env(safe-area-inset-right, 0px)); color: #fff; background: rgb(255 255 255 / .12); z-index: 1; }
 
 /* calculadora */
@@ -239,22 +239,17 @@ a.row.reg .chev { grid-row: 1 / 3; grid-column: 2; align-self: center; color: va
 .parte .sub { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0 0 8px; padding-left: 10px; border-left: 3px solid var(--c); font-size: 1em; font-weight: 600; line-height: 1.3; }
 .parte .sub small { font-size: .8em; font-weight: 400; color: var(--mute); }
 
-/* modo edición */
-.tag.ed { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
-.edicion .panel { display: grid; gap: 12px; }
+/* formularios (listas de favoritos) */
 .ed-campo { display: grid; gap: 6px; }
 .ed-campo span { font-size: .82em; color: var(--mute); }
-.ed-campo input, .ed-campo textarea, .ed-campo select, .ed-clave input { font: inherit; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+.ed-campo input, .ed-campo textarea, .ed-campo select { font: inherit; color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; }
 .ed-campo textarea { resize: vertical; line-height: 1.45; }
-.ed-campo input:focus, .ed-campo textarea:focus, .ed-campo select:focus, .ed-clave input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.ed-campo input:focus, .ed-campo textarea:focus, .ed-campo select:focus { outline: 2px solid var(--accent); outline-offset: 0; }
 .ayuda { margin: 0; font-size: .85em; color: var(--mute); }
 .ed-acciones { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 0; }
-.ed-acciones button, .ed-clave button { padding: 12px 18px; border-radius: 12px; border: 1px solid var(--line); font-weight: 600; }
-.ed-acciones .pri, .ed-clave .pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.ed-clave { display: flex; gap: 8px; }
+.ed-acciones button { padding: 12px 18px; border-radius: 12px; border: 1px solid var(--line); font-weight: 600; }
+.ed-acciones .pri { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .ed-error { color: var(--warn); margin: 0; }
-.edicion { display: grid; gap: 12px; }
-.ed-estado { margin: 0; font-size: .9em; color: var(--accent); min-height: 1.2em; }
 
 /* Portada (vistaPortada en js/vistas.js): la pantalla del pulgar, donde se elige Enfoques o Juegos */
 .portada { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: calc(env(safe-area-inset-top, 0px) + 24px) 16px calc(env(safe-area-inset-bottom, 0px) + 24px); background: #000; color: #e7edf5; text-align: center; }
@@ -380,3 +375,76 @@ button.sel-fila { width: 100%; text-align: left; padding: 10px 14px; gap: 12px; 
 .sel-fila.on .casilla { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .sel-fila.on { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
 .portada-hola .portada-foto { display: block; width: 72px; height: 72px; margin: 0 auto 12px; border: 2px solid rgba(255,255,255,.25); }
+
+/* ---------- barra de pestañas de abajo (Enfoques, Favoritos, Juegos, Ajustes) ---------- */
+main.wrap:has(+ .pestanas) { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 110px); }
+.pestanas { position: fixed; z-index: 20; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  display: flex; gap: 2px; padding: 5px; width: min(calc(100% - 32px), 420px); border-radius: 22px;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: 0 10px 30px rgb(0 0 0 / .3); }
+.pestanas a { flex: 1; display: grid; justify-items: center; gap: 1px; padding: 6px 0 5px; border-radius: 16px; color: var(--mute); font-size: 11px; font-weight: 600; }
+.pestanas a svg { width: 24px; height: 24px; }
+.pestanas a.on { color: var(--accent); background: var(--surface-2); }
+@media print { .pestanas { display: none; } }
+
+/* ---------- Ajustes > Tu cuenta ---------- */
+.aj-cuenta { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
+.aj-cuenta span { display: grid; min-width: 0; }
+.aj-cuenta small { color: var(--mute); overflow-wrap: anywhere; }
+.aj-salir { color: var(--rojo, #ff6b6b); }
+
+/* ---------- Ajustes > Apariencia: muestras para elegir ---------- */
+.ap-disenos, .ap-paletas { display: grid; gap: 10px; }
+.ap-disenos { grid-template-columns: repeat(3, 1fr); }
+.ap-paletas { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
+.ap-op { display: grid; justify-items: center; gap: 8px; padding: 12px 8px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface-2); font-size: .88em; text-align: center; }
+.ap-op.on { border: 2px solid var(--accent); padding: 11px 7px; font-weight: 600; }
+.ap-muestra { width: 54px; height: 54px; border-radius: 50%; border: 2px solid transparent; background: radial-gradient(30% 22% at 34% 26%, rgb(255 255 255 / .8), transparent 70%) padding-box, var(--mbg) padding-box, var(--miris) border-box; box-shadow: 0 6px 14px rgb(0 0 0 / .3); }
+.ap-muestra.clasico { border-radius: 14px; background: linear-gradient(135deg, #141b25 50%, #5cc8ff 50%); border-color: #263142; }
+.ap-muestra.vidrio { border-radius: 16px; border: 0; background: linear-gradient(160deg, rgb(255 255 255 / .55), rgb(255 255 255 / .12) 45%), radial-gradient(80% 80% at 20% 10%, #2f4fd8, transparent), radial-gradient(80% 80% at 90% 90%, #f08a3c, transparent), #c2459e; box-shadow: inset 1px 1px 0 #fff, 0 6px 14px rgb(0 0 0 / .3); }
+.ap-muestra.pompa { border-radius: 16px; --mbg: linear-gradient(#0e1228, #0e1228); --miris: conic-gradient(#ff7ad9, #ffd36e, #7dffb0, #6ee7ff, #8a7bff, #ff7ad9); }
+.ap-detalle { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; padding: 6px 0; border-top: 1px solid var(--line); text-align: left; width: 100%; }
+.ap-detalle:first-of-type { border-top: 0; }
+.ap-detalle small { display: block; color: var(--mute); font-size: .82em; }
+.interruptor { flex: none; width: 52px; height: 32px; border-radius: 99px; background: var(--line); position: relative; transition: background .2s; }
+.interruptor::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgb(0 0 0 / .3); transition: transform .2s; }
+.ap-detalle[aria-checked="true"] .interruptor { background: var(--accent); }
+.ap-detalle[aria-checked="true"] .interruptor::after { transform: translateX(20px); }
+.panel h3 { margin: 16px 0 8px; font-size: .9em; font-weight: 600; }
+.panel h2 + h3 { margin-top: 4px; }
+
+/* Tus datos (#privacidad) */
+.privacidad .panel p + p { margin-top: 10px; }
+.privacidad .panel ul { margin: 0 0 10px; padding-left: 20px; display: grid; gap: 8px; }
+a.ident-nota { color: var(--accent); text-decoration: underline; }
+.ident-cancelar { background: none; border: 0; padding: 0 0 0 8px; color: var(--accent); font: inherit; text-decoration: underline; cursor: pointer; }
+/* elegir la fuente (vistaElegirFuente y Ajustes en js/vistas.js) */
+.fuente-ops { display: grid; gap: 10px; width: min(100%, 420px); margin: 4px auto 10px; }
+.fuente-op { display: grid; gap: 2px; padding: 14px 16px; border: 1px solid #2b394c; border-radius: 14px; background: #0f151e; color: #e7edf5; font: inherit; text-align: left; cursor: pointer; }
+.fuente-op b { font-size: 1.1em; }
+.fuente-op small { color: #93a0b2; }
+.fuente-op em { font-style: normal; font-size: .8em; color: #c9d3df; }
+.fuente-op.on { border-color: #5cc8ff; box-shadow: 0 0 0 1px #5cc8ff inset; }
+.fuente-op:disabled { opacity: .55; cursor: default; }
+.panel .fuente-ops { margin: 10px 0; width: 100%; }
+.panel .fuente-op { background: var(--surface-2); border-color: var(--line); color: var(--fg); }
+.panel .fuente-op small { color: var(--mute); }
+.panel .fuente-op.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+/* interruptor de libro debajo de Enfoques y Juegos: el libro activo queda resaltado; tocar el otro cambia de fuente */
+.portada-fuente { display: inline-flex; gap: 4px; margin-top: 36px; padding: 4px; border: 1px solid rgb(127 140 160 / .35); border-radius: 999px; }
+.portada-fuente button { min-height: 40px; min-width: 112px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; color: inherit; opacity: .7; font: inherit; font-size: .95em; font-weight: 600; cursor: pointer; }
+.portada-fuente button.on { background: #5cc8ff; color: #04121f; opacity: 1; cursor: default; }
+/* Favoritos compartidos: filtro por libro y etiqueta en los enfoques de otro libro */
+.fav-otras { margin-top: 10px; }
+.fav-filtro { margin: 14px 0 4px; }
+.fav-fuente-nota { margin: 6px 0 0; font-size: .85em; color: var(--mute); }
+.fav-otra { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 0; background: transparent; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.fav-otra .sel-txt { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.fav-otra .s { font-size: .85em; color: var(--mute); }
+/* etiqueta del libro: un color por fuente para distinguirlas de un vistazo */
+.fuente-tag { --fc: var(--mute); flex: none; padding: 3px 10px; border: 1px solid var(--fc); border-radius: 999px; background: color-mix(in srgb, var(--fc) 16%, transparent); font-size: .78em; font-weight: 700; color: var(--fc); }
+.fuente-tag.f-bontrager { --fc: #4fa3ff; }
+.fuente-tag.f-merrill { --fc: #f0a23a; }
+:root[data-theme="light"] .fuente-tag.f-bontrager { --fc: #1565c0; }
+:root[data-theme="light"] .fuente-tag.f-merrill { --fc: #b25d00; }
+a.row.fav-otra { display: flex; padding: 12px 16px; text-decoration: none; }
+#fuente { scroll-margin-top: calc(var(--top-h, 64px) + 12px); }

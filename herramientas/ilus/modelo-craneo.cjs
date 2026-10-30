@@ -1,6 +1,6 @@
 // Esquemas de cráneo, cara, arcos, nasales, mandíbula, ATM y senos con las figuras por capas del modelo 3D
 // (herramientas/ilus3d/figuras/craneo.py). Reemplazan a los de craneo.cjs cuando existe el render <id>-tubo.
-// Textos resumidos de datos/cap08-craneo-cara-senos.js.
+// Textos resumidos de datos/bontrager/cap08-craneo-cara-senos.js.
 const E = require("./estilo.cjs");
 const { RED, MUTE } = E;
 const fs = require("fs"), path = require("path");

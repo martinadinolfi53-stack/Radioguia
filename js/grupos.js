@@ -1,6 +1,6 @@
 // Juegos en grupo: cuenta (apodo o Google), grupos con link de invitación o código, desafío del día con vidas y ranking.
 // Rutas: #juegos-cuenta · #juegos-foto · #juegos-grupos · #juegos-nuevo · #juegos-grupo-<gid>[-historico] · #juegos-editar-<gid>
-//        #juegos-unirse-<gid> (link de invitación) · #juegos-desafio[-<gid>]
+//        #juegos-unirse-<CODIGO> (link de invitación) o #juegos-unirse-<gid> (links de antes, siguen andando) · #juegos-desafio[-<gid>]
 // Los datos viven en Firebase (js/nube.js). Las pantallas se dibujan con lo que haya y se vuelven a dibujar cuando llega la respuesta.
 import { proyecciones, proyeccionPorId, regionPorId } from "./datos.js";
 import * as almacen from "./almacen.js";
@@ -10,6 +10,13 @@ import { ASPECTOS, CAMPOS, generarPreguntas } from "./repaso-preguntas.js";
 import * as nube from "./nube.js";
 import { registrarDesafio } from "./juegos.js";
 import { vistaFoto, avatar, iniciarFoto } from "./foto.js";
+import { clave, fuenteId, FUENTES } from "./fuente.js";
+
+// cada grupo juega con las fichas de una fuente; los grupos de antes de que hubiera varias son del Bontrager
+const fuenteDe = (g) => g.fuente || "bontrager";
+const nombreFuente = (id) => FUENTES.find((f) => f.id === id)?.nombre || id;
+const avisoOtraFuente = (g) => `<div class="jg-hecho"><b>Este grupo usa el ${esc(nombreFuente(fuenteDe(g)))}</b><small>Ahora estás consultando el ${esc(nombreFuente(fuenteId))}. Para jugar, cambiá de fuente.</small></div>
+  <button class="rp-empezar jg-centro" data-fuente="${esc(fuenteDe(g))}">Cambiar al ${esc(nombreFuente(fuenteDe(g)))}</button>`;
 
 let rerender = () => {};
 const local = (() => { try { return localStorage; } catch { return null; } })();
@@ -41,6 +48,9 @@ function mensaje(e) {
   if (c.includes("unauthorized-domain")) return "Falta autorizar esta página en Firebase (Authentication > Configuración > Dominios autorizados).";
   if (c.includes("operation-not-allowed") || c.includes("admin-restricted")) return "Ese tipo de ingreso no está habilitado en Firebase.";
   if (c.includes("permission-denied")) return "No tenés permiso para esto (¿seguís en el grupo?).";
+  if (c === "rg/ios-instalada") return nube.IOS_INSTALADA;
+  if (c === "rg/google-sin-respuesta") return "Google no respondió. Si ya confirmaste en la ventana de Google, cerrala y probá otra vez.";
+  if (c === "rg/sin-respuesta") return "El servidor no respondió. Revisá la conexión y probá otra vez.";
   return e?.message || "Algo salió mal.";
 }
 
@@ -134,7 +144,7 @@ function vistaCuenta() {
 function vistaListaGrupos() {
   const c = dato("grupos", () => nube.misGrupos());
   const cuerpo = c.error ? `<div class="vacio">${esc(c.error)}</div>` : !c.ok ? `<div class="vacio">Cargando…</div>`
-    : c.datos.length ? `<div class="jg-lista">${c.datos.map((g) => `<a class="jg-tarjeta" href="#juegos-grupo-${esc(g.id)}"><span><b>${esc(g.nombre)}</b><small>${g.fichas.length} enfoques · código ${esc(g.codigo)}</small></span>${icono.chev}</a>`).join("")}</div>`
+    : c.datos.length ? `<div class="jg-lista">${c.datos.map((g) => `<a class="jg-tarjeta" href="#juegos-grupo-${esc(g.id)}"><span><b>${esc(g.nombre)}</b><small>${g.fichas.length} enfoques · ${esc(nombreFuente(fuenteDe(g)))} · código ${esc(g.codigo)}</small></span>${icono.chev}</a>`).join("")}</div>`
     : `<div class="vacio"><b>Todavía no estás en ningún grupo.</b> Creá uno e invitá a tus compañeros, o unite con el código que te pasaron.</div>`;
   return cabecera({ titulo: "Grupos", sub: nube.estado().perfil?.apodo, atras: "#juegos", derecha: `<a class="ico" href="#juegos-cuenta" aria-label="Tu cuenta">${icono.ajustes}</a>` }) + `
   <main class="wrap juegos">
@@ -197,20 +207,26 @@ function fichasDelForm() {
 const nombreOrigen = () => form.origen === "todas" ? "Todos los enfoques" : form.origen === "zonas" ? "Zonas: " + GRUPOS.filter((z) => form.zonas.has(z.id)).map((z) => z.nombre).join(", ")
   : form.origen === "elegidos" ? "" : listas().find((x) => `lista:${x.id}` === form.origen)?.nombre || "";
 
-function vistaUnirse(gid) {
-  if (nube.estado().perfil?.grupos?.includes(gid)) { history.replaceState(null, "", `#juegos-grupo-${gid}`); return vistaGrupo(gid, false); }
-  const c = dato(`grupo:${gid}`, () => nube.leerGrupo(gid));
+function vistaUnirse(param) {
+  const misGrupos = nube.estado().perfil?.grupos || [];
+  // links de antes: traen el id del grupo en vez del código
+  const viejo = nube.limpiarCodigo(param).length !== 6;
+  if (viejo && misGrupos.includes(param)) { history.replaceState(null, "", `#juegos-grupo-${param}`); return vistaGrupo(param, false); }
+  const c = dato(`invitacion:${param}`, () => viejo ? nube.leerGrupo(param).then((g) => ({ gid: g.id, nombre: g.nombre, enfoques: g.fichas.length, codigo: g.codigo })) : nube.invitacion(param));
   if (c.error) return fallo("Unirse", "#juegos", c.error);
   if (!c.ok) return cargando("Unirse", "#juegos");
+  const inv = c.datos;
+  if (misGrupos.includes(inv.gid)) { history.replaceState(null, "", `#juegos-grupo-${inv.gid}`); return vistaGrupo(inv.gid, false); }
   return cabecera({ titulo: "Unirse al grupo", atras: "#juegos" }) + `
   <main class="wrap juegos">
-    <section class="jg-invitacion"><small>Te invitaron a</small><b>${esc(c.datos.nombre)}</b><small>${c.datos.fichas.length} enfoques en el desafío del día</small></section>
-    <button class="rp-empezar" data-gr="unirse" data-gid="${esc(gid)}">Unirme como ${esc(nube.estado().perfil.apodo)}</button>
+    <section class="jg-invitacion"><small>Te invitaron a</small><b>${esc(inv.nombre || `el grupo ${inv.codigo}`)}</b>${Number.isInteger(inv.enfoques) ? `<small>${inv.enfoques} enfoques en el desafío del día</small>` : ""}</section>
+    <button class="rp-empezar" data-gr="unirse" data-gid="${esc(inv.gid)}" data-codigo="${esc(inv.codigo)}">Unirme como ${esc(nube.estado().perfil.apodo)}</button>
     ${cache.errUnirse ? `<p class="jg-error">${esc(cache.errUnirse)}</p>` : ""}
   </main>`;
 }
 
-const linkInvitacion = (gid) => `${location.origin}${location.pathname}#juegos-unirse-${gid}`;
+// el link lleva el código: sin el código no se puede entrar al grupo
+const linkInvitacion = (codigo) => `${location.origin}${location.pathname}#juegos-unirse-${codigo}`;
 const tiempo = (ms) => { const s = Math.round(ms / 1000); return s >= 60 ? `${Math.floor(s / 60)} min ${s % 60} s` : `${s} s`; };
 
 function vistaGrupo(gid, hist) {
@@ -236,7 +252,7 @@ function vistaGrupo(gid, hist) {
       : `<div class="vacio">${hist ? "Todavía nadie jugó." : "Esta semana todavía nadie jugó el desafío. ¡Sé el primero!"}</div>`;
   }
   const jugado = hoyP.ok && hoyP.datos;
-  const boton = !hoyP.ok ? "" : jugado?.terminada
+  const boton = fuenteDe(g) !== fuenteId ? avisoOtraFuente(g) : !hoyP.ok ? "" : jugado?.terminada
     ? `<div class="jg-hecho"><b>Desafío de hoy: ${jugado.puntos} puntos</b><small>${jugado.correctas} correctas${jugado.sinVidas ? " · te quedaste sin vidas" : ""}. Mañana hay uno nuevo.</small></div>`
     : jugado ? `<div class="jg-hecho"><b>Ya empezaste el desafío de hoy</b><small>Si se cortó, seguí desde donde quedaste.</small></div><a class="rp-empezar jg-centro" href="#juegos-desafio-${esc(gid)}">Seguir</a>`
     : `<a class="rp-empezar jg-centro" href="#juegos-desafio-${esc(gid)}">Jugar el desafío del día</a>`;
@@ -288,7 +304,7 @@ function panelCreador(gid, g) {
 }
 
 // ---------- desafío del día ----------
-const K_JUEGO = "radioguia.juegos.desafio";
+const K_JUEGO = clave("radioguia.juegos.desafio");
 let juego = leer(K_JUEGO, null); // { gid, fecha, nombre, preguntas, respuestas, actual, vidas, vidasIni, inicio, fin, resultado }
 const guardarJuego = () => escribir(K_JUEGO, juego);
 
@@ -307,6 +323,7 @@ function vistaDesafio(gid) {
   const err = cg.error || cc.error || ch.error;
   if (err) return fallo("Desafío del día", atras, err);
   if (!cg.ok || !cc.ok || !ch.ok) return cargando("Desafío del día", atras);
+  if (fuenteDe(cg.datos) !== fuenteId) return cabecera({ titulo: "Desafío del día", atras }) + `<main class="wrap juegos">${avisoOtraFuente(cg.datos)}</main>`;
   if (ch.datos) {
     history.replaceState(null, "", atras);
     return vistaGrupo(gid, false);
@@ -393,8 +410,8 @@ async function terminarDesafio() {
 }
 
 // ---------- eventos ----------
-async function compartir(gid, nombre, codigo) {
-  const url = linkInvitacion(gid), aviso = document.getElementById("gr-compartido");
+async function compartir(nombre, codigo) {
+  const url = linkInvitacion(codigo), aviso = document.getElementById("gr-compartido");
   const texto = `Sumate a mi grupo "${nombre}" en RadioGuía para jugar el desafío del día. Si no abre el link, el código es ${codigo}.`;
   try {
     if (navigator.share) await navigator.share({ title: "RadioGuía · Invitación", text: texto, url });
@@ -422,16 +439,17 @@ export function iniciarGrupos(app, render) {
       case "google": return hacer(t, "errCuenta", async () => { await nube.entrarGoogle(); olvidar("grupos"); despues(); });
       case "salir":
         if (!nube.estado().conGoogle && !confirm("Estás jugando solo con apodo: si salís, no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Salir igual?")) return;
-        return hacer(t, "errCuenta", async () => { await nube.salir(); Object.keys(cache).forEach((k) => k !== "sesion" && delete cache[k]); juego = null; guardarJuego(); });
+        // salir borra la copia local de la cuenta; se recarga para empezar limpio
+        return hacer(t, "errCuenta", async () => { await nube.salir(); location.hash = ""; location.reload(); });
       case "origen": form.origen = t.dataset.val; return rerender();
       case "guardar-grupo": return hacer(t, "errForm", async () => {
         const fichas = fichasDelForm(), origen = nombreOrigen();
         if (form.gid) { await nube.editarGrupo(form.gid, { nombre: form.nombre, fichas, ...(origen ? { origen } : {}) }); olvidar(`grupo:${form.gid}`, "grupos"); location.hash = `#juegos-grupo-${form.gid}`; }
-        else { const nuevo = await nube.crearGrupo({ nombre: form.nombre, fichas, aspectos: ASPECTOS.map((a) => a.id), origen }); olvidar("grupos"); location.hash = `#juegos-grupo-${nuevo}`; }
+        else { const nuevo = await nube.crearGrupo({ nombre: form.nombre, fichas, aspectos: ASPECTOS.map((a) => a.id), origen, fuente: fuenteId }); olvidar("grupos"); location.hash = `#juegos-grupo-${nuevo}`; }
         form = null;
       });
-      case "unirse": return hacer(t, "errUnirse", async () => { await nube.unirse(gid); olvidar("grupos"); location.hash = `#juegos-grupo-${gid}`; });
-      case "invitar": return compartir(gid, t.dataset.nombre, t.dataset.codigo);
+      case "unirse": return hacer(t, "errUnirse", async () => { await nube.unirse(gid, t.dataset.codigo); olvidar("grupos"); location.hash = `#juegos-grupo-${gid}`; });
+      case "invitar": return compartir(t.dataset.nombre, t.dataset.codigo);
       case "dejar":
         if (!confirm("¿Salir del grupo? Tus puntos en este grupo se pierden.")) return;
         return hacer(t, "errGrupo", async () => { await nube.dejarGrupo(gid); olvidar("grupos"); location.hash = "#juegos-grupos"; });
@@ -471,7 +489,7 @@ export function iniciarGrupos(app, render) {
     }
     if (f.id === "gr-codigo") {
       e.preventDefault();
-      return hacer(f.querySelector("button"), "errCodigo", async () => { const gid = await nube.grupoPorCodigo(f.elements.codigo.value); location.hash = `#juegos-unirse-${gid}`; });
+      return hacer(f.querySelector("button"), "errCodigo", async () => { const { codigo } = await nube.invitacion(f.elements.codigo.value); location.hash = `#juegos-unirse-${codigo}`; });
     }
   });
 

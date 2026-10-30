@@ -4,11 +4,13 @@
 //
 // Firestore (reglas en herramientas/firestore.rules):
 //   config/desafio                         { preguntas, vidas }  lo cambia Martin desde la consola para ajustar la dificultad
-//   usuarios/{uid}                         { apodo, foto, grupos: [gid] }   foto: JPEG cuadrado chico como data URL
-//   codigos/{CODIGO}                       { gid, creador }  para unirse escribiendo el código del grupo
-//   grupos/{gid}                           { nombre, codigo, creador, creado, fichas, aspectos, excluir, origen }
-//   grupos/{gid}/miembros/{uid}            { uid, apodo, foto, puntos, partidas, racha, ultimaFecha }  acumulado para el ranking histórico
-//   grupos/{gid}/partidas/{fecha}_{uid}    { uid, apodo, fecha, semana, correctas, respondidas, vidas, sinVidas, puntos, bonus, duracionMs, terminada, detalle }
+//   usuarios/{uid}                         { apodo, foto, grupos: [gid] }   foto: JPEG cuadrado chico como data URL; solo lo lee su dueño
+//   codigos/{CODIGO}                       { gid, creador, nombre, enfoques }  invitación: con el código se ve el nombre del grupo y se puede entrar
+//   grupos/{gid}                           { nombre, codigo, creador, creado, fichas, aspectos, excluir, origen }  solo lo leen sus miembros
+//   grupos/{gid}/miembros/{uid}            { uid, apodo, foto, puntos, partidas, racha, ultimaFecha, codigo }  acumulado para el ranking histórico
+//   grupos/{gid}/partidas/{fecha}_{uid}    { uid, apodo, fecha, semana, correctas, respondidas, vidas, sinVidas, puntos, bonus, duracionMs, terminada, detalle, creado }
+//   reportes/{id}                          { uid, apodo, creado, ficha, fichaNombre, campo, enunciado, opciones, correcta, elegida, motivo, comentario }
+//                                          preguntas reportadas en el repaso; los escribe cualquiera y solo los lee quien figura en ADMINS de las reglas
 import { firebaseConfig } from "../config/firebase.js";
 
 export const DESAFIO = { preguntas: 15, vidas: 5, puntosPorAcierto: 10, bonusPorDia: 2, bonusMax: 10 };
@@ -19,11 +21,21 @@ const oyentes = new Set();
 const avisar = () => oyentes.forEach((f) => { try { f(); } catch {} });
 export const alCambiar = (f) => oyentes.add(f);
 
-// emulador local para probar sin tocar el proyecto real: ?emulador en la dirección
-const EMULADOR = /[?&]emulador\b/.test(location.search);
+// emulador local para probar sin tocar el proyecto real: ?emulador en la dirección (solo en la computadora propia)
+const EMULADOR = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /[?&]emulador\b/.test(location.search);
 
-export async function iniciar() {
-  if (fb) return fb;
+// una espera de la red que nunca termina deja la pantalla trabada: pasado el tiempo, falla con un código propio
+const conLimite = (promesa, ms, code) => Promise.race([promesa, new Promise((_, no) => setTimeout(() => no(Object.assign(new Error(code), { code })), ms))]);
+// la app instalada en la pantalla de inicio del iPhone no recibe la respuesta de la ventana de Google
+export const IOS_INSTALADA = "En el iPhone, la app instalada en la pantalla de inicio no puede terminar el ingreso con Google. Entrá con un apodo, o abrí RadioGuía en Safari para usar Google.";
+export const iosInstalada = () => /iphone|ipad|ipod/i.test(navigator.userAgent) && (navigator.standalone === true || matchMedia("(display-mode: standalone)").matches);
+
+// una sola carga aunque la pidan varias pantallas a la vez; si falla (sin internet) se puede volver a intentar
+let cargando = null;
+export function iniciar() {
+  return (cargando ||= cargar().catch((e) => { cargando = null; throw e; }));
+}
+async function cargar() {
   fb = await import("./vendor/firebase.js");
   app = fb.initializeApp(firebaseConfig);
   auth = fb.getAuth(app);
@@ -54,21 +66,69 @@ export async function entrarAnonimo(apodo) {
   await guardarApodo(apodo);
 }
 export async function entrarGoogle() {
+  if (iosInstalada()) throw Object.assign(new Error("ios-instalada"), { code: "rg/ios-instalada" });
   await iniciar();
   const prov = new fb.GoogleAuthProvider();
-  // si ya jugaba con apodo, se vincula la misma cuenta a Google para no perder grupos ni puntos
-  const r = auth.currentUser?.isAnonymous ? await fb.linkWithPopup(auth.currentUser, prov) : await fb.signInWithPopup(auth, prov);
+  let r;
+  try {
+    // si ya jugaba con apodo, se vincula la misma cuenta a Google para no perder grupos ni puntos
+    r = await conLimite(auth.currentUser?.isAnonymous ? fb.linkWithPopup(auth.currentUser, prov) : fb.signInWithPopup(auth, prov), 120000, "rg/google-sin-respuesta");
+  } catch (e) {
+    // esa cuenta de Google ya tiene su propio jugador: se entra con ella (el jugador de solo apodo de este celular queda atrás)
+    const cred = e?.code === "auth/credential-already-in-use" && fb.GoogleAuthProvider.credentialFromError(e);
+    if (!cred) throw e;
+    r = await conLimite(fb.signInWithCredential(auth, cred), 30000, "rg/google-sin-respuesta");
+  }
   usuario = r.user;
+  // el perfil de esa cuenta puede no haber llegado todavía: se lee antes de decidir si hace falta un apodo
+  if (!perfil?.apodo) { try { const leido = (await conLimite(fb.getDoc(fb.doc(db, "usuarios", r.user.uid)), 20000, "rg/sin-respuesta")).data(); if (leido) perfil = { ...leido, ...(perfil || {}) }; } catch {} }
   if (!perfil?.apodo) await guardarApodo(limpiarApodo(r.user.displayName?.split(" ")[0]) || "Jugador");
   avisar();
 }
-export async function salir() { await iniciar(); await fb.signOut(auth); }
+
+// cierra la sesión y borra la copia local de la nube (perfiles, rankings), así no queda nada de la cuenta en el celular.
+// Después hay que recargar la página: la base local queda cerrada.
+export async function salir() {
+  await iniciar();
+  await fb.signOut(auth);
+  await limpiarLocal();
+}
+async function limpiarLocal() {
+  try { await fb.terminate(db); await fb.clearIndexedDbPersistence(db); } catch {}
+  try { for (const k of ["radioguia.juegos.desafio", "radioguia.juegos.despues", "radioguia.nombre"]) localStorage.removeItem(k); } catch {}
+}
+
+// "Borrar mi cuenta": saca el apodo de las partidas, deja los grupos, borra el perfil y la cuenta. Después hay que recargar.
+export async function borrarCuenta() {
+  await iniciar();
+  const u = auth.currentUser;
+  if (!u) return;
+  for (const gid of perfil?.grupos || []) {
+    try {
+      const mias = await fb.getDocs(fb.query(fb.collection(db, "grupos", gid, "partidas"), fb.where("uid", "==", u.uid)));
+      await Promise.all(mias.docs.map((d) => fb.updateDoc(d.ref, { apodo: "Cuenta borrada" })));
+    } catch {}
+    await fb.deleteDoc(fb.doc(db, "grupos", gid, "miembros", u.uid)).catch(() => {});
+  }
+  // Firestore no borra las subcolecciones solo: los favoritos sincronizados van aparte
+  await fb.deleteDoc(fb.doc(db, "usuarios", u.uid, "privado", "favoritos")).catch(() => {});
+  await fb.deleteDoc(fb.doc(db, "usuarios", u.uid));
+  try { await fb.deleteUser(u); }
+  catch (e) {
+    // Google pide haber entrado hace poco para borrar la cuenta
+    if (e?.code !== "auth/requires-recent-login") throw e;
+    await fb.reauthenticateWithPopup(u, new fb.GoogleAuthProvider());
+    await fb.deleteUser(u);
+  }
+  await limpiarLocal();
+}
 
 export async function guardarApodo(apodo) {
   apodo = limpiarApodo(apodo);
   if (!apodo) throw new Error("Escribí un apodo.");
   const uid = auth.currentUser.uid;
-  await fb.setDoc(fb.doc(db, "usuarios", uid), { apodo }, { merge: true });
+  // queda guardado en el celular al instante; si el servidor tarda en confirmar, se sigue igual y se sincroniza solo
+  await conLimite(fb.setDoc(fb.doc(db, "usuarios", uid), { apodo }, { merge: true }), 15000, "rg/sin-respuesta").catch((e) => { if (e.code !== "rg/sin-respuesta") throw e; });
   perfil = { ...(perfil || {}), apodo };
   // el apodo también se ve en el ranking de cada grupo
   await Promise.all((perfil.grupos || []).map((g) => fb.updateDoc(fb.doc(db, "grupos", g, "miembros", uid), { apodo }).catch(() => {})));
@@ -89,7 +149,7 @@ export async function guardarFoto(foto) {
 const LETRAS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sin O/0 ni I/1, que se confunden
 const nuevoCodigo = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => LETRAS[b % LETRAS.length]).join("");
 
-export async function crearGrupo({ nombre, fichas, aspectos, excluir = [], origen }) {
+export async function crearGrupo({ nombre, fichas, aspectos, excluir = [], origen, fuente }) {
   await iniciar();
   nombre = String(nombre || "").trim().slice(0, 40);
   if (!nombre) throw new Error("Poné un nombre al grupo.");
@@ -97,18 +157,19 @@ export async function crearGrupo({ nombre, fichas, aspectos, excluir = [], orige
   const uid = auth.currentUser.uid;
   const ref = fb.doc(fb.collection(db, "grupos"));
   let codigo;
+  // el código y el grupo se crean juntos: las reglas comprueban que uno apunte al otro
   for (let i = 0; i < 5; i++) {
     codigo = nuevoCodigo();
     try {
       await fb.runTransaction(db, async (t) => {
         if ((await t.get(fb.doc(db, "codigos", codigo))).exists()) throw new Error("repetido");
-        t.set(fb.doc(db, "codigos", codigo), { gid: ref.id, creador: uid });
+        t.set(fb.doc(db, "codigos", codigo), { gid: ref.id, creador: uid, nombre, enfoques: fichas.length });
+        t.set(ref, { nombre, codigo, creador: uid, creado: fb.serverTimestamp(), fichas, aspectos, excluir, origen: origen || "", fuente });
       });
       break;
     } catch (e) { if (e.message !== "repetido" || i === 4) throw e; }
   }
-  await fb.setDoc(ref, { nombre, codigo, creador: uid, creado: fb.serverTimestamp(), fichas, aspectos, excluir, origen: origen || "" });
-  await unirse(ref.id);
+  await unirse(ref.id, codigo);
   return ref.id;
 }
 
@@ -118,14 +179,19 @@ export async function editarGrupo(gid, cambios) {
   if (cambios.nombre != null) ok.nombre = String(cambios.nombre).trim().slice(0, 40);
   for (const k of ["fichas", "aspectos", "excluir", "origen"]) if (cambios[k] != null) ok[k] = cambios[k];
   await fb.updateDoc(fb.doc(db, "grupos", gid), ok);
+  // lo que muestra la invitación
+  const g = await leerGrupo(gid);
+  await fb.updateDoc(fb.doc(db, "codigos", g.codigo), { nombre: g.nombre, enfoques: g.fichas.length }).catch(() => {});
 }
 
-export async function grupoPorCodigo(codigo) {
+export const limpiarCodigo = (codigo) => String(codigo || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+// la invitación: { gid, nombre, enfoques } (los grupos creados antes de este cambio no tienen nombre ni enfoques acá)
+export async function invitacion(codigo) {
   await iniciar();
-  codigo = String(codigo || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-  const c = await fb.getDoc(fb.doc(db, "codigos", codigo));
-  if (!c.exists()) throw new Error("No hay ningún grupo con ese código.");
-  return c.data().gid;
+  codigo = limpiarCodigo(codigo);
+  const c = codigo.length === 6 && await fb.getDoc(fb.doc(db, "codigos", codigo));
+  if (!c || !c.exists()) throw new Error("No hay ningún grupo con ese código.");
+  return { codigo, ...c.data() };
 }
 
 export async function leerGrupo(gid) {
@@ -135,11 +201,12 @@ export async function leerGrupo(gid) {
   return { id: gid, ...g.data() };
 }
 
-export async function unirse(gid) {
+// para entrar hace falta el código del grupo: las reglas lo comparan con el del grupo
+export async function unirse(gid, codigo) {
   await iniciar();
   const uid = auth.currentUser.uid;
   const m = fb.doc(db, "grupos", gid, "miembros", uid);
-  if (!(await fb.getDoc(m)).exists()) await fb.setDoc(m, { uid, apodo: perfil?.apodo || "Jugador", foto: perfil?.foto || "", puntos: 0, partidas: 0, racha: 0, ultimaFecha: "" });
+  if (!(await fb.getDoc(m)).exists()) await fb.setDoc(m, { uid, apodo: perfil?.apodo || "Jugador", foto: perfil?.foto || "", puntos: 0, partidas: 0, racha: 0, ultimaFecha: "", codigo });
   await fb.setDoc(fb.doc(db, "usuarios", uid), { grupos: fb.arrayUnion(gid) }, { merge: true });
   perfil = { ...(perfil || {}), grupos: [...new Set([...(perfil?.grupos || []), gid])] };
   avisar();
@@ -197,7 +264,7 @@ export async function empezarPartida(gid, vidas) {
   const ref = refPartida(gid);
   await fb.runTransaction(db, async (t) => {
     if ((await t.get(ref)).exists()) throw new Error("Ya jugaste el desafío de hoy en este grupo.");
-    t.set(ref, { uid: auth.currentUser.uid, apodo: perfil?.apodo || "Jugador", fecha: hoy(), semana: semana(), correctas: 0, respondidas: 0, vidas, sinVidas: false, puntos: 0, bonus: 0, duracionMs: 0, terminada: false, detalle: [] });
+    t.set(ref, { uid: auth.currentUser.uid, apodo: perfil?.apodo || "Jugador", fecha: hoy(), semana: semana(), correctas: 0, respondidas: 0, vidas, sinVidas: false, puntos: 0, bonus: 0, duracionMs: 0, terminada: false, detalle: [], creado: fb.serverTimestamp() });
   });
 }
 
@@ -227,3 +294,23 @@ export async function partidasDesde(gid, fecha) {
 }
 
 export const uid = () => auth?.currentUser?.uid || null;
+
+// ---------- reportes de preguntas ----------
+export async function enviarReporte(rep) {
+  await iniciar();
+  if (!auth.currentUser) throw new Error("Sin cuenta.");
+  const t = (x, n) => String(x ?? "").slice(0, n);
+  await fb.setDoc(fb.doc(fb.collection(db, "reportes")), {
+    uid: auth.currentUser.uid, apodo: t(perfil?.apodo, 24), creado: fb.serverTimestamp(),
+    ficha: t(rep.ficha, 80), fichaNombre: t(rep.fichaNombre, 160), campo: t(rep.campo, 40), enunciado: t(rep.enunciado, 600),
+    opciones: (rep.opciones || []).slice(0, 6).map((o) => t(o, 600)), correcta: t(rep.correcta, 600), elegida: rep.elegida == null ? "" : t(rep.elegida, 600),
+    motivo: t(rep.motivo, 60), comentario: t(rep.comentario, 500),
+  });
+}
+// solo funciona para quien figura en ADMINS de las reglas; a los demás Firestore les responde permission-denied
+export async function leerReportes() {
+  await iniciar();
+  const docs = (await fb.getDocs(fb.collection(db, "reportes"))).docs.map((d) => ({ id: d.id, ...d.data(), creado: d.data().creado?.toMillis?.() || 0 }));
+  return docs.sort((a, b) => b.creado - a.creado);
+}
+export async function borrarReporte(id) { await iniciar(); await fb.deleteDoc(fb.doc(db, "reportes", id)); }

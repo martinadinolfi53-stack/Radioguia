@@ -1,6 +1,6 @@
 // Esquemas de abdomen, estudios contrastados y portátiles con las figuras por capas del modelo 3D
 // (herramientas/ilus3d/figuras/abdomen.py). Reemplazan a los de abdomen.cjs cuando existe el render <id>-tubo.
-// Textos resumidos de datos/cap09-abdomen-contraste.js y datos/cap10-portatiles.js.
+// Textos resumidos de datos/bontrager/cap09-abdomen-contraste.js y datos/bontrager/cap10-portatiles.js.
 const E = require("./estilo.cjs");
 const { RED, MUTE, BLUE } = E;
 const fs = require("fs"), path = require("path");

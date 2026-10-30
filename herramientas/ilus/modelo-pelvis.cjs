@@ -1,5 +1,5 @@
 // Esquemas de pelvis, caderas, acetábulo y fémur con las figuras por capas del modelo 3D (herramientas/ilus3d/figuras/pelvis.py).
-// Reemplazan a los de pelvis.cjs cuando existe el render <id>-tubo. Textos resumidos de datos/cap05-femur-cintura-pelvica.js.
+// Reemplazan a los de pelvis.cjs cuando existe el render <id>-tubo. Textos resumidos de datos/bontrager/cap05-femur-cintura-pelvica.js.
 const E = require("./estilo.cjs");
 const { RED, MUTE } = E;
 const fs = require("fs"), path = require("path");

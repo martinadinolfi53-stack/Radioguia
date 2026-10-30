@@ -1,5 +1,5 @@
 // Esquemas de columna con las figuras por capas del modelo 3D (herramientas/ilus3d/figuras/columna.py).
-// Reemplazan a los de columna.cjs cuando existe el render <id>-tubo. Textos resumidos de datos/cap06-columna.js.
+// Reemplazan a los de columna.cjs cuando existe el render <id>-tubo. Textos resumidos de datos/bontrager/cap06-columna.js.
 const E = require("./estilo.cjs");
 const { RED, MUTE, BLUE } = E;
 const fs = require("fs"), path = require("path");

@@ -1,25 +1,28 @@
 // Arranque y navegación por #hash:
-// #  portada (Enfoques o Juegos) · #enfoques inicio de enfoques · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #imprimir (lista activa) · #calc · #calc-<proyección> · #ajustes · #ayuda-app (instalar en el celular) · #repaso… (js/repaso.js) · #juegos… (js/juegos.js)
+// #  portada (Enfoques o Juegos) · #ajustes-fuente (Ajustes, en la parte de elegir libro) · #enfoques inicio de enfoques · #g-<botón del menú> · #g-<botón>-fav · #r-<región> · #r-<región>-fav · #p-<proyección> · #favoritos · #imprimir (lista activa) · #calc · #calc-<proyección> · #ajustes · #ayuda-app (instalar en el celular) · #repaso… (js/repaso.js) · #juegos… (js/juegos.js)
 import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { listas, preferencias, aplicarPreferencias } from "./almacen.js";
 import { tocarEstrella, hojaLista, quitarDeLista } from "./listas-ui.js";
 import { vistaImprimir, opcionesImpresion, preguntarEImprimir } from "./imprimir.js";
-import { estado, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes } from "./vistas.js";
+import { estado, vistaElegirFuente, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes, vistaFamilia } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
 import { mostrarTermino } from "./glosario.js";
 import { ampliar } from "./imagenes.js";
 import { pwa } from "./pwa.js";
-import { edicion, vistaEditar, leerFormulario } from "./edicion.js";
-import { grupoPorId, grupoDeRegion } from "./menu.js";
+import { grupoPorId, grupoDeRegion, FAMILIAS } from "./menu.js";
 import { vistaRepaso, iniciarRepaso } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
 import { iniciarGrupos } from "./grupos.js";
 import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificacion } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { vistaFoto } from "./foto.js";
+import { vistaPrivacidad } from "./privacidad.js";
+import { elegida, elegirFuente } from "./fuente.js";
+import { iniciarLente } from "./lente.js";
 
 const app = document.getElementById("app");
+iniciarLente(app);
 aplicarPreferencias();
 listas.limpiar(new Set(proyecciones.map((p) => p.id)));
 
@@ -38,11 +41,12 @@ function ruta() {
     const fav = h.endsWith("-fav"), id = h.slice(3, fav ? -4 : undefined);
     if (regionPorId[id]) return { tipo: "region", r: regionPorId[id], fav };
   }
-  if (h.startsWith("#editar-") && proyeccionPorId[h.slice(8)] && edicion.activa()) return { tipo: "editar", p: proyeccionPorId[h.slice(8)] };
+  if (h.startsWith("#f-")) { const f = FAMILIAS.find((x) => x.id === h.slice(3)); if (f) return { tipo: "familia", f }; }
   if (h === "#favoritos") return { tipo: "favoritos" };
   if (h === "#imprimir") return { tipo: "imprimir" };
-  if (h === "#ajustes") return { tipo: "ajustes" };
+  if (h === "#ajustes" || h === "#ajustes-fuente") return { tipo: "ajustes" };
   if (h === "#ayuda-app") return { tipo: "ayuda-app" };
+  if (h === "#privacidad") return { tipo: "privacidad" };
   if (h === "#enfoques") return { tipo: "inicio" };
   if (h.startsWith("#repaso")) return { tipo: "repaso", h };
   if (h.startsWith("#juegos")) return { tipo: "juegos", h };
@@ -53,11 +57,12 @@ function ruta() {
 function volverA(r) {
   if (r.tipo === "ficha") return historial.findLast((x) => !x.startsWith("#p-") && !x.startsWith("#calc")) || `#g-${grupoDeRegion[r.p.region]?.id}`;
   if (r.tipo === "calc") return pantallaAnterior;
-  if (r.tipo === "editar") return `#p-${r.p.id}`;
   return "#";
 }
 
 function render() {
+  // qué datos se guardan: se puede leer antes de identificarse
+  if (!identificado() && location.hash === "#privacidad") { app.innerHTML = vistaPrivacidad("#"); document.title = "RX"; return; }
   // primero hay que identificarse (una sola vez por dispositivo)
   if (!identificado()) {
     recordarDestino(location.hash);
@@ -72,6 +77,12 @@ function render() {
     document.title = "RX";
     return;
   }
+  // y elegir de qué libro consultar (una vez; se cambia en Ajustes)
+  if (!elegida()) {
+    app.innerHTML = vistaElegirFuente();
+    document.title = "RX";
+    return;
+  }
   const r = ruta();
   const vuelta = volverA(r);
   switch (r.tipo) {
@@ -82,16 +93,18 @@ function render() {
     case "imprimir": app.innerHTML = vistaImprimir(); break;
     case "ajustes": app.innerHTML = vistaAjustes(); break;
     case "ayuda-app": app.innerHTML = vistaAyudaApp(); break;
+    case "privacidad": app.innerHTML = vistaPrivacidad("#ajustes"); break;
     case "calc": app.innerHTML = vistaCalculadora(r.id, vuelta); break;
-    case "editar": app.innerHTML = vistaEditar(r.p, vuelta); break;
     case "repaso": app.innerHTML = vistaRepaso(r.h); break;
     case "juegos": app.innerHTML = vistaJuegos(r.h); break;
     case "inicio": app.innerHTML = vistaInicio(); break;
+    case "familia": app.innerHTML = vistaFamilia(r.f); break;
     default: app.innerHTML = vistaPortada();
   }
   // el título es el nombre sugerido del PDF
   document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : r.tipo === "imprimir" ? `${listas.activa().nombre} · RadioGuía` : "RadioGuía";
   altoCabecera();
+  if (location.hash === "#ajustes-fuente") document.getElementById("fuente")?.scrollIntoView();
 }
 
 // la barra del buscador y la de filtros se pegan debajo de la cabecera, que puede ocupar dos renglones
@@ -108,7 +121,7 @@ addEventListener("hashchange", (e) => {
   if (!antes.startsWith("#p-")) historial.push(antes); else if (!historial.length) historial.push(antes);
   if (historial.length > 30) historial.shift();
   render();
-  scrollTo(0, 0);
+  if (location.hash !== "#ajustes-fuente") scrollTo(0, 0);
 });
 
 // solo se reemplaza el contenido, así el buscador no pierde el foco ni cierra el teclado
@@ -119,17 +132,39 @@ function refrescarMain() {
   if (nuevo && actual) actual.replaceWith(nuevo);
 }
 
+// elegir la fuente (al entrar, en Ajustes o desde un grupo de otro libro): si cambia, la app se recarga con esos datos
+app.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-fuente]");
+  if (b && elegirFuente(b.dataset.fuente) === false) render();
+});
+
+// favorito de otro libro: cambia a ese libro y abre la ficha
+app.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-ir-fuente]");
+  if (b) elegirFuente(b.dataset.irFuente, `#p-${b.dataset.irFicha}`);
+  const f = e.target.closest("[data-fav-fuente]");
+  if (f) { estado.favFuente = f.dataset.favFuente; const y = scrollY; render(); scrollTo(0, y); }
+});
+// una vista avisa que terminó de cargar algo (por ejemplo, los nombres de otro libro en Favoritos)
+document.addEventListener("rx-rehacer", () => { const y = scrollY; render(); scrollTo(0, y); });
+
+// Ajustes → Buscar actualización
 app.addEventListener("click", async (e) => {
-  const t = e.target.closest("[data-desconectar],[data-exportar],[data-salir-edicion],[data-restaurar],[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir]");
+  const b = e.target.closest("[data-buscar-act]");
+  if (!b) return;
+  const est = b.nextElementSibling;
+  b.disabled = true; est.textContent = "Buscando…";
+  const r = await pwa.buscarActualizacion().catch(() => "error");
+  est.textContent = r === "nueva" ? "Hay una versión nueva: se está descargando y la app se va a recargar sola."
+    : r === "al-dia" ? "Ya tenés la última versión."
+    : r === "sin-sw" ? "Esta vista no usa el modo sin conexión: recargá la página para ver lo último."
+    : "No se pudo comprobar. Revisá la conexión a internet.";
+  b.disabled = false;
+});
+
+app.addEventListener("click", async (e) => {
+  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir],[data-cerrar-sesion],[data-borrar-cuenta]");
   if (!t) return;
-  if ("exportar" in t.dataset) return edicion.exportar();
-  if ("desconectar" in t.dataset) { edicion.configurarGithub(null); return render(); }
-  if ("salirEdicion" in t.dataset) { edicion.salir(); return render(); }
-  if (t.dataset.restaurar) {
-    if (!confirm("¿Volver a los datos originales de esta ficha? Se pierden tus cambios.")) return;
-    try { await edicion.restaurar(t.dataset.restaurar); } catch (err) { return alert(err.message); }
-    location.hash = `#p-${t.dataset.restaurar}`; return location.reload();
-  }
   const rehacer = () => { const y = scrollY; render(); scrollTo(0, y); };
   if (t.dataset.fav) { e.preventDefault(); tocarEstrella(t.dataset.fav, rehacer); }
   else if (t.dataset.lista) { listas.elegir(t.dataset.lista); estado.qFav = ""; rehacer(); }
@@ -156,6 +191,23 @@ app.addEventListener("click", async (e) => {
   } else if (t.dataset.pref) { preferencias.set(t.dataset.pref, t.dataset.val); render(); }
   else if ("instalar" in t.dataset) { await pwa.instalar(); render(); }
   else if ("cerrarAviso" in t.dataset) { preferencias.set("avisoInstalar", false); render(); }
+  else if ("cerrarSesion" in t.dataset) {
+    const { usuario, conGoogle } = nube.estado();
+    const aviso = usuario && !conGoogle ? "Estás solo con apodo: si cerrás la sesión, no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Cerrar igual?" : "¿Cerrar la sesión? Tus favoritos quedan guardados en este celular.";
+    if (!confirm(aviso)) return;
+    t.disabled = true;
+    try { if (usuario) await nube.salir(); } catch {}
+    // olvida el nombre y vuelve a empezar, así no quedan datos de la cuenta anterior en pantalla
+    try { localStorage.removeItem("radioguia.nombre"); } catch {}
+    location.hash = ""; location.reload();
+  }
+  else if ("borrarCuenta" in t.dataset) {
+    if (!confirm("¿Borrar tu cuenta? Se borran tu perfil, tu foto y tu lugar en todos tus grupos, con sus puntos. No se puede deshacer.")) return;
+    t.disabled = true; t.textContent = "Borrando…";
+    try { await nube.borrarCuenta(); }
+    catch (er) { alert(er?.code?.includes("popup") ? "Para borrar la cuenta, Google pide confirmar que sos vos. Probá otra vez y completá la ventana de Google." : "No se pudo borrar la cuenta. Revisá la conexión y probá otra vez."); t.disabled = false; t.textContent = "Borrar mi cuenta y mis datos"; return; }
+    location.hash = ""; location.reload();
+  }
 });
 
 app.addEventListener("input", (e) => {
@@ -171,38 +223,12 @@ app.addEventListener("input", (e) => {
   }
 });
 
-app.addEventListener("submit", async (e) => {
-  const f = e.target;
-  if (f.id === "form-clave") {
-    e.preventDefault();
-    const ok = await edicion.entrar(f.elements.clave.value);
-    if (ok) render(); else document.getElementById("clave-error").hidden = false;
-  } else if (f.id === "form-edicion") {
-    e.preventDefault();
-    const id = f.dataset.id, estadoEl = document.getElementById("ed-estado"), btn = f.querySelector('[type="submit"]');
-    btn.disabled = true; estadoEl.textContent = "Guardando…";
-    try { estadoEl.textContent = await edicion.guardar(id, leerFormulario(f)); }
-    catch (err) { estadoEl.textContent = "Quedó guardado en este celular, pero no se pudo publicar: " + err.message; }
-    // se recarga para que el buscador y el glosario tomen los datos nuevos
-    setTimeout(() => { location.hash = `#p-${id}`; location.reload(); }, 1600);
-  } else if (f.id === "form-github") {
-    e.preventDefault();
-    const est = document.getElementById("gh-estado");
-    const repo = f.elements.repo.value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, ""), token = f.elements.token.value.trim();
-    if (!/^[\w.-]+\/[\w.-]+$/.test(repo) || !token) { est.textContent = "Completá el repositorio (usuario/nombre) y el token."; return; }
-    edicion.configurarGithub({ repo, token, rama: "main" });
-    est.textContent = "Probando…";
-    try { await edicion.probarGithub(); est.textContent = "Conectado."; setTimeout(render, 900); }
-    catch (err) { edicion.configurarGithub(null); est.textContent = "No se pudo conectar: " + err.message; }
-  }
-});
-
 iniciarIdentificacion(app, render);
 iniciarRepaso(app, render);
 iniciarJuegos(app);
 iniciarGrupos(app, render);
 pwa.iniciar(() => { if (["portada", "inicio", "ajustes", "ayuda-app"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
-// cuando llega la cuenta: pedir la foto si falta, o mostrarla en la portada
-nube.alCambiar(() => { const p = nube.estado().perfil; if (identificado() && (ruta().tipo === "portada" || (p && !p.foto))) render(); });
+// cuando llega la cuenta: pedir la foto si falta, o mostrarla en la portada y en Ajustes
+nube.alCambiar(() => { const p = nube.estado().perfil; if (identificado() && (ruta().tipo === "portada" || ruta().tipo === "ajustes" || (p && !p.foto))) render(); });
 render();

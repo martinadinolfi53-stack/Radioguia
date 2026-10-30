@@ -108,3 +108,14 @@
 .rp-min { margin-top: 10px; }
 .rp-reloj { flex: none; min-width: 64px; text-align: right; font-size: 1.35em; font-variant-numeric: tabular-nums; color: var(--accent); }
 .rp-barra.reloj span { background: var(--warn); transition: width .25s linear; }
+
+/* reportes de todos (#repaso-reportes) */
+.rp-adm { display: grid; gap: 8px; }
+.rp-adm p { margin: 0; }
+.rp-adm .rp-ficha a { color: var(--accent); }
+.rp-adm ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.rp-adm li.ok { color: var(--ok); }
+.rp-adm li.mal { color: #e5484d; }
+.rp-adm li small { color: var(--mute); }
+.rp-adm .rp-limpiar { margin-top: 0; justify-self: start; }
+.rp-uid code { overflow-wrap: anywhere; font-size: .9em; }

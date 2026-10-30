@@ -1,5 +1,5 @@
 // Garth, PA transaxilar de Hobbs y oblicua PA / Neer rehechas con las vistas genéricas del modelo 3D
-// (herramientas/ilus3d/figuras/hombro_vistas.py). Textos resumidos de datos/cap03-humero-cintura-escapular.js.
+// (herramientas/ilus3d/figuras/hombro_vistas.py). Textos resumidos de datos/bontrager/cap03-humero-cintura-escapular.js.
 const E = require("./estilo.cjs");
 const { RED, MUTE, BLUE } = E;
 const fs = require("fs"), path = require("path");

@@ -1,6 +1,6 @@
 // Genera los esquemas didácticos (SVG) de las fichas.
 // Cada archivo herramientas/ilus/<zona>.cjs exporta { "<id de proyección>": () => "<svg…>" } usando las primitivas de estilo.cjs.
-// Para las fichas con versiones (datos/versiones.js), las claves "<id>--v1", "<id>--v2"… dan un esquema por versión.
+// Para las fichas con versiones (datos/bontrager/versiones.js), las claves "<id>--v1", "<id>--v2"… dan un esquema por versión.
 // Este script escribe ilustraciones/<id>.svg y una vista previa PNG opcional.
 // Uso (desde la carpeta radioguia):  node herramientas/ilustrar.mjs [zona…]   (sin zonas = todas)
 // Después correr  node herramientas/preparar.mjs  para que la app las tome.
@@ -11,9 +11,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const raiz = join(fileURLToPath(import.meta.url), "..", "..");
 const require = createRequire(import.meta.url);
-const { CAPITULOS } = await import(pathToFileURL(join(raiz, "datos/indice.js")));
+const { CAPITULOS } = await import(pathToFileURL(join(raiz, "datos/bontrager/indice.js")));
 const ids = new Set(CAPITULOS.flatMap((c) => c.proyecciones.map((p) => p.id)));
-const VERSIONES = (await import(pathToFileURL(join(raiz, "datos/versiones.js")))).default;
+const VERSIONES = (await import(pathToFileURL(join(raiz, "datos/bontrager/versiones.js")))).default;
 // "<id>" o "<id>--v<N>" con N entre 1 y la cantidad de versiones de esa ficha; devuelve el motivo si no vale
 function claveInvalida(clave) {
   const m = clave.match(/^(.+)--v(\d+)$/);
@@ -21,7 +21,7 @@ function claveInvalida(clave) {
   const [, base, n] = m;
   if (!ids.has(base)) return `"${base}" no es una proyección de la app`;
   const cant = VERSIONES[base]?.versiones.length || 0;
-  if (!cant) return `"${base}" no tiene versiones en datos/versiones.js`;
+  if (!cant) return `"${base}" no tiene versiones en datos/bontrager/versiones.js`;
   if (+n < 1 || +n > cant) return `versión ${n} fuera de rango (la ficha tiene ${cant})`;
   return null;
 }

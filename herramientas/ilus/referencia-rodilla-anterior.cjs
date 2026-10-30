@@ -442,7 +442,7 @@ I["ped-ext-inf-lateral"] = () => svg(
   txt(12, 290, "RI según el tamaño · DFRI 100 cm", 11.5, MUTE) + txt(12, 306, "Sin parrilla", 11.5, MUTE)
 );
 
-// ======================= VERSIONES (un esquema por posición; ver datos/versiones.js) =======================
+// ======================= VERSIONES (un esquema por posición; ver datos/bontrager/versiones.js) =======================
 const col = (x, y, filas) => filas.map(([t, c = INK, w = 400, size = 11.5], i) => txt(x, y + i * 15, t, size, c, "start", w)).join("");
 const g = (tr, inner) => `<g transform="${tr}">${inner}</g>`;
 

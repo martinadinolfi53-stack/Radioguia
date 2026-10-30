@@ -43,7 +43,8 @@ for (const p of proyecciones) if (p.metodo && !p.nombre.includes(p.metodo)) p.no
 // texto indexado para el buscador: región, nombre, método y categoría pesan más que el resto
 for (const p of proyecciones) {
   const r = regionPorId[p.region];
-  p._titulo = norm([r?.nombre, r?.detalle, p.nombre, p.metodo, ...(p.categoria || [])].join(" "));
+  // "Perfil" es la lateral: así "codo lateral" encuentra también la "Lateromedial de codo"
+  p._titulo = norm([r?.nombre, r?.detalle, p.nombre, p.metodo, ...(p.categoria || []), p.categoria?.includes("Perfil") ? "lateral" : ""].join(" "));
   p._todo = norm([p._titulo, p.rc?.texto, ...(p.posicion || []), ...(p.versiones || []).flatMap((v) => [v.nombre, v.rc?.texto, ...v.posicion]), ...Object.values(p.factores || {})].join(" "));
 }
 

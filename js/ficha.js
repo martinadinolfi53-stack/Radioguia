@@ -75,6 +75,7 @@ export function vistaFicha(p, volver) {
 
     <div class="pie-ficha">
       <a class="btn" href="#calc-${p.id}">${icono.calc}<span>Calculadora de técnica</span></a>
+      <a class="btn" href="#rellenar-${p.id}">${icono.imprimir}<span>Ficha para rellenar</span></a>
       <p class="fuente">${icono.libro} ${esc(FUENTE.corto)}${p.fuente.volumen ? `, vol. ${p.fuente.volumen}` : ""}, pág${p.fuente.paginas.length > 1 ? "s" : ""}. ${p.fuente.paginas.join(", ")}</p>
     </div>
   </main>`;

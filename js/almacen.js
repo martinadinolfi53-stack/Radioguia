@@ -1,4 +1,5 @@
-// Listas de favoritos y preferencias, guardados en este dispositivo (localStorage). Todo envuelto en try/catch:
+// Listas de favoritos y preferencias, guardados en este dispositivo (localStorage); con cuenta de Google los
+// favoritos además viajan a la nube (js/sync-favoritos.js). Todo envuelto en try/catch:
 // en modo privado o con datos bloqueados la app funciona igual, solo que sin recordar.
 import { fuenteId } from "./fuente.js";
 const leer = (k, def) => { try { const v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); } catch { return def; } };
@@ -34,7 +35,9 @@ function cargarListas() {
   return { v: 1, activa: "fav", listas: [{ id: "fav", nombre: "Favoritos", color: "amarillo", ids: [...new Set(leer(K_FAV_VIEJO, []))] }] };
 }
 let datos = cargarListas();
-const guardar = () => escribir(K_LISTAS, datos);
+// js/sync-favoritos.js se entera de cada cambio para subirlo a la cuenta de Google
+let avisarCambio = () => {};
+const guardar = () => { escribir(K_LISTAS, datos); avisarCambio(); };
 const buscarLista = (id) => datos.listas.find((l) => l.id === id);
 // antes de compartirlas, el Merrill tenía sus listas aparte (radioguia.listas.merrill): se suman a la lista del mismo id o a la primera
 (function migrarListasSeparadas() {
@@ -91,6 +94,14 @@ export const listas = {
   },
   // saca proyecciones de la fuente abierta que ya no existen (las de otros libros se revisan cuando se abre ese libro)
   limpiar(validos) { for (const l of datos.listas) l.ids = l.ids.filter((r) => { const x = deRef(r); return x.fuente !== fuenteId || validos.has(x.id); }); guardar(); },
+};
+
+// para sincronizar con la cuenta: el guardado entero tal cual, reemplazarlo (sin volver a avisar) y enterarse de los cambios
+export const favoritosGuardados = {
+  leer: () => JSON.parse(JSON.stringify(datos)),
+  reemplazar(d) { escribir(K_LISTAS, d); datos = cargarListas(); },
+  borrar() { try { localStorage.removeItem(K_LISTAS); localStorage.removeItem(K_FAV_VIEJO); } catch {} datos = cargarListas(); },
+  alCambiar(f) { avisarCambio = f; },
 };
 
 const PREF_DEF = { tema: "oscuro", texto: "normal", avisoInstalar: true, diseno: "clasico", paleta: "original", subir: "no", rebote: "no", pompitas: "no" };

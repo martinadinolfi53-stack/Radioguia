@@ -10,7 +10,8 @@ import { avatar } from "./foto.js";
 import { FUENTES, fuenteId, elegida } from "./fuente.js";
 import { nombresDe, proyeccionesDe as proyeccionesDeOtra } from "./otras-fuentes.js";
 
-export const estado = { q: "", qFav: "", filtro: {}, sel: null, favFuente: "" }; // búsqueda, filtro de categoría por región, selección en Favoritos (Set o null) y filtro por libro en Favoritos ("" = todos)
+export const estado = { q: "", qFav: "", filtro: {}, sel: null, favFuente: "", abiertas: {} }; // búsqueda, filtro de categoría por región, selección en Favoritos (Set o null), filtro por libro en Favoritos ("" = todos)
+// y partes abiertas en cada región del menú (abiertas[familia] = Set de grupos; al entrar están todas cerradas)
 
 const filaProyeccion = (p, conRegion) => `<div class="row">
   <a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span>
@@ -85,10 +86,10 @@ function menuRegiones(filtro) {
 // una región grande (por ejemplo Miembro superior): cada parte se despliega y muestra sus enfoques
 export function vistaFamilia(f) {
   const partes = GRUPOS.filter((g) => g.familia === f).map((g) => ({ g, lista: g.regiones.flatMap((id) => proyeccionesDe(id)) })).filter((x) => x.lista.length);
-  const total = partes.reduce((a, x) => a + x.lista.length, 0);
+  const total = partes.reduce((a, x) => a + x.lista.length, 0), abiertas = (estado.abiertas[f.id] ||= new Set());
   return cabecera({ titulo: f.nombre, sub: `${total} enfoques`, atras: "#enfoques" }) + `
   <main class="wrap" style="--c:${f.color}">
-    ${partes.map(({ g, lista }, i) => `<details class="sec region"${i === 0 ? " open" : ""}><summary><span class="t">${esc(g.nombre)}</span><span class="s">${lista.length}</span>${icono.chev}</summary>
+    ${partes.map(({ g, lista }) => `<details class="sec region" data-parte="${esc(g.id)}"${abiertas.has(g.id) ? " open" : ""}><summary><span class="t">${esc(g.nombre)}</span><span class="s">${lista.length}</span>${icono.chev}</summary>
       <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></details>`).join("")}
   </main>` + barraPestanas("enfoques");
 }
@@ -361,7 +362,9 @@ function cuenta() {
   const detalle = conGoogle ? `Con Google · ${esc(usuario.email || "")}` : usuario ? "Solo con apodo, en este celular" : "Sin cuenta";
   return `<section class="panel"><h2>Tu cuenta</h2>
       <div class="aj-cuenta">${avatar(perfil?.foto, apodo)}<span><b>${esc(apodo)}</b><small>${detalle}</small></span></div>
-      <div class="opciones">${usuario ? `<a class="opcion" href="#juegos-cuenta">Editar perfil</a>` : ""}<button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button></div>
+      <p class="aj-nota">${conGoogle ? "Tus favoritos se guardan en tu cuenta de Google: los ves en cualquier dispositivo donde entres con ella."
+        : "Tus favoritos se guardan solo en este dispositivo y se borran al cerrar sesión. Entrá con Google para tenerlos en todos lados."}</p>
+      <div class="opciones">${usuario ? `<a class="opcion" href="#juegos-cuenta">${conGoogle ? "Editar perfil" : "Perfil y Google"}</a>` : `<a class="opcion" href="#juegos-cuenta">Entrar con Google</a>`}<button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button></div>
       <div class="opciones"><a class="opcion" href="#privacidad">Qué datos guarda RadioGuía</a>${usuario ? `<button class="opcion aj-salir" data-borrar-cuenta>Borrar mi cuenta y mis datos</button>` : ""}</div></section>`;
 }
 
@@ -382,6 +385,6 @@ export function vistaAjustes() {
     <section class="panel"><h2>Versión</h2><p>Versión instalada: <b>${esc(pwa.version() || "sin datos")}</b></p>
       <button class="opcion" data-buscar-act>Buscar actualización</button><p class="act-estado" aria-live="polite"></p></section>
 
-    <p class="pie">Listas de favoritos y ajustes se guardan solo en este dispositivo.</p>
+    <p class="pie">Los ajustes se guardan solo en este dispositivo.</p>
   </main>` + barraPestanas("ajustes");
 }

@@ -92,7 +92,7 @@ export function vistaIdentificacion() {
     </form>
     <p class="ident-o">o</p>
     ${nube.iosInstalada() ? `<small class="ident-nota">${esc(nube.IOS_INSTALADA)}</small>` : `<button class="ident-google" data-id-google ${ocupado ? "disabled" : ""}>Entrar con Google</button>
-    <small class="ident-nota">Con Google no perdés tus grupos ni tus puntos si cambiás de celular. RadioGuía solo recibe tu nombre, email y foto; nunca tu contraseña.</small>`}
+    <small class="ident-nota">Con Google no perdés tus grupos, tus puntos ni tus favoritos si cambiás de celular. RadioGuía solo recibe tu nombre, email y foto; nunca tu contraseña.</small>`}
     <a class="ident-nota" href="#privacidad">Qué datos guarda RadioGuía</a>
     ${ocupado ? `<p class="ident-estado">Entrando… <button class="ident-cancelar" data-id-cancelar>Cancelar</button></p>` : ""}
     ${error ? `<p class="ident-error" role="alert">${esc(error)}</p>` : ""}

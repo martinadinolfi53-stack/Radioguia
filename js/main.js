@@ -20,6 +20,7 @@ import { vistaFoto } from "./foto.js";
 import { vistaPrivacidad } from "./privacidad.js";
 import { elegida, elegirFuente } from "./fuente.js";
 import { iniciarLente } from "./lente.js";
+import { iniciarSyncFavoritos, cerrarSesion, olvidarFavoritos } from "./sync-favoritos.js";
 
 const app = document.getElementById("app");
 iniciarLente(app);
@@ -114,14 +115,28 @@ function altoCabecera() {
 }
 addEventListener("resize", altoCabecera);
 
+// dónde estaba cada pantalla: al volver de una más adentro (por ejemplo, de una ficha a su región) se retoma ese lugar
+const posiciones = {};
+const nivel = (h) => (h.startsWith("#p-") ? 4 : /^#(g|r)-/.test(h) ? 3 : h.startsWith("#f-") ? 2 : h === "#enfoques" || h === "#favoritos" ? 1 : 0);
+addEventListener("scroll", () => { posiciones[location.hash || "#"] = scrollY; }, { passive: true });
+// partes abiertas o cerradas en una región del menú
+app.addEventListener("toggle", (e) => {
+  const d = e.target, r = ruta();
+  if (d.dataset?.parte && r.tipo === "familia") { const s = (estado.abiertas[r.f.id] ||= new Set()); d.open ? s.add(d.dataset.parte) : s.delete(d.dataset.parte); }
+}, true);
+
 addEventListener("hashchange", (e) => {
-  const antes = new URL(e.oldURL).hash || "#";
+  const antes = new URL(e.oldURL).hash || "#", ahora = location.hash || "#";
+  const volviendo = nivel(antes) > nivel(ahora) && posiciones[ahora] != null, y = posiciones[ahora];
   pantallaAnterior = antes;
   estado.sel = null;
   if (!antes.startsWith("#p-")) historial.push(antes); else if (!historial.length) historial.push(antes);
   if (historial.length > 30) historial.shift();
+  // al entrar a una región desde el menú, todas sus partes empiezan cerradas; al volver de una ficha quedan como estaban
+  if (!volviendo && ahora.startsWith("#f-")) delete estado.abiertas[ahora.slice(3)];
   render();
-  if (location.hash !== "#ajustes-fuente") scrollTo(0, 0);
+  if (volviendo) scrollTo(0, y);
+  else if (location.hash !== "#ajustes-fuente") scrollTo(0, 0);
 });
 
 // solo se reemplaza el contenido, así el buscador no pierde el foco ni cierra el teclado
@@ -198,18 +213,20 @@ app.addEventListener("click", async (e) => {
   else if ("cerrarAviso" in t.dataset) { preferencias.set("avisoInstalar", false); render(); }
   else if ("cerrarSesion" in t.dataset) {
     const { usuario, conGoogle } = nube.estado();
-    const aviso = usuario && !conGoogle ? "Estás solo con apodo: si cerrás la sesión, no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Cerrar igual?" : "¿Cerrar la sesión? Tus favoritos quedan guardados en este celular.";
+    const aviso = conGoogle ? "¿Cerrar la sesión? Tus favoritos quedan guardados en tu cuenta de Google y vuelven cuando entres de nuevo."
+      : usuario ? "Estás solo con apodo: si cerrás la sesión se borran tus favoritos de este celular y no vas a poder volver a esta cuenta ni a sus grupos y puntos. ¿Cerrar igual?"
+      : "Si cerrás la sesión se borran tus favoritos de este celular. ¿Cerrar igual?";
     if (!confirm(aviso)) return;
     t.disabled = true;
-    try { if (usuario) await nube.salir(); } catch {}
+    await cerrarSesion();
     // olvida el nombre y vuelve a empezar, así no quedan datos de la cuenta anterior en pantalla
     try { localStorage.removeItem("radioguia.nombre"); } catch {}
     location.hash = ""; location.reload();
   }
   else if ("borrarCuenta" in t.dataset) {
-    if (!confirm("¿Borrar tu cuenta? Se borran tu perfil, tu foto y tu lugar en todos tus grupos, con sus puntos. No se puede deshacer.")) return;
+    if (!confirm("¿Borrar tu cuenta? Se borran tu perfil, tu foto, tus favoritos y tu lugar en todos tus grupos, con sus puntos. No se puede deshacer.")) return;
     t.disabled = true; t.textContent = "Borrando…";
-    try { await nube.borrarCuenta(); }
+    try { await nube.borrarCuenta(); olvidarFavoritos(); }
     catch (er) { alert(er?.code?.includes("popup") ? "Para borrar la cuenta, Google pide confirmar que sos vos. Probá otra vez y completá la ventana de Google." : "No se pudo borrar la cuenta. Revisá la conexión y probá otra vez."); t.disabled = false; t.textContent = "Borrar mi cuenta y mis datos"; return; }
     location.hash = ""; location.reload();
   }
@@ -232,6 +249,8 @@ iniciarIdentificacion(app, render);
 iniciarRepaso(app, render);
 iniciarJuegos(app);
 iniciarGrupos(app, render);
+// con cuenta de Google, cuando llegan favoritos de otro dispositivo se redibuja (salvo que esté escribiendo)
+iniciarSyncFavoritos(() => { if (!document.activeElement?.matches("input, textarea")) render(); });
 pwa.iniciar(() => { if (["portada", "inicio", "ajustes", "ayuda-app"].includes(ruta().tipo) && !document.activeElement?.matches("input")) render(); });
 matchMedia("(prefers-color-scheme: light)").addEventListener?.("change", () => preferencias.get("tema") === "sistema" && aplicarPreferencias());
 // cuando llega la cuenta: pedir la foto si falta, o mostrarla en la portada y en Ajustes

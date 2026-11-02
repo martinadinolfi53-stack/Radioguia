@@ -2,22 +2,21 @@
 // Rutas: #juegos-cuenta · #juegos-foto · #juegos-grupos · #juegos-nuevo · #juegos-grupo-<gid>[-historico] · #juegos-editar-<gid>
 //        #juegos-unirse-<CODIGO> (link de invitación) o #juegos-unirse-<gid> (links de antes, siguen andando) · #juegos-desafio[-<gid>]
 // Los datos viven en Firebase (js/nube.js). Las pantallas se dibujan con lo que haya y se vuelven a dibujar cuando llega la respuesta.
-import { proyecciones, proyeccionPorId, regionPorId } from "./datos.js";
+import { proyecciones, proyeccionPorId, regionPorId, GRUPOS, grupoDeRegion, generarPreguntas, clave, linkFicha, libroJuego, etiquetaLibro } from "./juego-datos.js";
 import * as almacen from "./almacen.js";
 import { esc, icono, cabecera } from "./util.js";
-import { GRUPOS, grupoDeRegion } from "./menu.js";
-import { ASPECTOS, CAMPOS, generarPreguntas } from "./repaso-preguntas.js";
+import { ASPECTOS, CAMPOS } from "./repaso-preguntas.js";
 import * as nube from "./nube.js";
 import { cerrarSesion } from "./sync-favoritos.js";
 import { registrarDesafio } from "./juegos.js";
 import { vistaFoto, avatar, iniciarFoto } from "./foto.js";
-import { clave, fuenteId, FUENTES } from "./fuente.js";
+import { FUENTES } from "./fuente.js";
 
-// cada grupo juega con las fichas de una fuente; los grupos de antes de que hubiera varias son del Bontrager
+// cada grupo juega con las fichas de una fuente o de "ambos" (mezcladas); los grupos de antes de que hubiera varias son del Bontrager
 const fuenteDe = (g) => g.fuente || "bontrager";
-const nombreFuente = (id) => FUENTES.find((f) => f.id === id)?.nombre || id;
-const avisoOtraFuente = (g) => `<div class="jg-hecho"><b>Este grupo usa el ${esc(nombreFuente(fuenteDe(g)))}</b><small>Ahora estás consultando el ${esc(nombreFuente(fuenteId))}. Para jugar, cambiá de fuente.</small></div>
-  <button class="rp-empezar jg-centro" data-fuente="${esc(fuenteDe(g))}">Cambiar al ${esc(nombreFuente(fuenteDe(g)))}</button>`;
+const nombreFuente = (id) => (id === "ambos" ? "los dos libros" : `el ${FUENTES.find((f) => f.id === id)?.nombre || id}`);
+const avisoOtraFuente = (g) => `<div class="jg-hecho"><b>Este grupo usa ${esc(nombreFuente(fuenteDe(g)))}</b><small>Ahora estás consultando ${esc(nombreFuente(libroJuego))}. Para jugar, cambiá de fuente.</small></div>
+  <button class="rp-empezar jg-centro" data-fuente="${esc(fuenteDe(g))}">${fuenteDe(g) === "ambos" ? "Cambiar a Ambos" : `Cambiar al ${esc(FUENTES.find((f) => f.id === fuenteDe(g))?.nombre || fuenteDe(g))}`}</button>`;
 
 let rerender = () => {};
 const local = (() => { try { return localStorage; } catch { return null; } })();
@@ -145,7 +144,7 @@ function vistaCuenta() {
 function vistaListaGrupos() {
   const c = dato("grupos", () => nube.misGrupos());
   const cuerpo = c.error ? `<div class="vacio">${esc(c.error)}</div>` : !c.ok ? `<div class="vacio">Cargando…</div>`
-    : c.datos.length ? `<div class="jg-lista">${c.datos.map((g) => `<a class="jg-tarjeta" href="#juegos-grupo-${esc(g.id)}"><span><b>${esc(g.nombre)}</b><small>${g.fichas.length} enfoques · ${esc(nombreFuente(fuenteDe(g)))} · código ${esc(g.codigo)}</small></span>${icono.chev}</a>`).join("")}</div>`
+    : c.datos.length ? `<div class="jg-lista">${c.datos.map((g) => `<a class="jg-tarjeta" href="#juegos-grupo-${esc(g.id)}"><span><b>${esc(g.nombre)}</b><small>${g.fichas.length} enfoques · ${esc(fuenteDe(g) === "ambos" ? "Ambos" : FUENTES.find((f) => f.id === fuenteDe(g))?.nombre || fuenteDe(g))} · código ${esc(g.codigo)}</small></span>${icono.chev}</a>`).join("")}</div>`
     : `<div class="vacio"><b>Todavía no estás en ningún grupo.</b> Creá uno e invitá a tus compañeros, o unite con el código que te pasaron.</div>`;
   return cabecera({ titulo: "Grupos", sub: nube.estado().perfil?.apodo, atras: "#juegos", derecha: `<a class="ico" href="#juegos-cuenta" aria-label="Tu cuenta">${icono.ajustes}</a>` }) + `
   <main class="wrap juegos">
@@ -253,7 +252,7 @@ function vistaGrupo(gid, hist) {
       : `<div class="vacio">${hist ? "Todavía nadie jugó." : "Esta semana todavía nadie jugó el desafío. ¡Sé el primero!"}</div>`;
   }
   const jugado = hoyP.ok && hoyP.datos;
-  const boton = fuenteDe(g) !== fuenteId ? avisoOtraFuente(g) : !hoyP.ok ? "" : jugado?.terminada
+  const boton = fuenteDe(g) !== libroJuego ? avisoOtraFuente(g) : !hoyP.ok ? "" : jugado?.terminada
     ? `<div class="jg-hecho"><b>Desafío de hoy: ${jugado.puntos} puntos</b><small>${jugado.correctas} correctas${jugado.sinVidas ? " · te quedaste sin vidas" : ""}. Mañana hay uno nuevo.</small></div>`
     : jugado ? `<div class="jg-hecho"><b>Ya empezaste el desafío de hoy</b><small>Si se cortó, seguí desde donde quedaste.</small></div><a class="rp-empezar jg-centro" href="#juegos-desafio-${esc(gid)}">Seguir</a>`
     : `<a class="rp-empezar jg-centro" href="#juegos-desafio-${esc(gid)}">Jugar el desafío del día</a>`;
@@ -324,7 +323,7 @@ function vistaDesafio(gid) {
   const err = cg.error || cc.error || ch.error;
   if (err) return fallo("Desafío del día", atras, err);
   if (!cg.ok || !cc.ok || !ch.ok) return cargando("Desafío del día", atras);
-  if (fuenteDe(cg.datos) !== fuenteId) return cabecera({ titulo: "Desafío del día", atras }) + `<main class="wrap juegos">${avisoOtraFuente(cg.datos)}</main>`;
+  if (fuenteDe(cg.datos) !== libroJuego) return cabecera({ titulo: "Desafío del día", atras }) + `<main class="wrap juegos">${avisoOtraFuente(cg.datos)}</main>`;
   if (ch.datos) {
     history.replaceState(null, "", atras);
     return vistaGrupo(gid, false);
@@ -352,6 +351,7 @@ function vistaPreguntaDesafio() {
   <div class="rp-barra"><span style="width:${(s.respuestas.length / total) * 100}%"></span></div>
   <main class="wrap repaso">
     <section class="rp-preg">
+      ${etiquetaLibro(q.ficha)}
       ${q.conNombre ? `<p class="rp-ficha">${esc(p?.nombre)}<small>${esc(q.dato)}</small></p>` : `<p class="rp-ficha"><small>${esc(q.dato)}</small></p>`}
       <h2>${esc(q.enunciado)}</h2>
       ${q.imagen ? `<div class="rp-img"><img src="${esc(q.imagen)}" alt="Esquema de la proyección"></div>` : ""}
@@ -379,7 +379,7 @@ function vistaFinDesafio() {
       <small>Tiempo: ${tiempo(r.duracionMs)}</small>
     </section>
     <a class="rp-empezar jg-centro" href="#juegos-grupo-${esc(s.gid)}">Ver el ranking</a>
-    ${errores.length ? `<p class="label">Para repasar</p><div class="lista">${errores.map(({ q, i }) => `<div class="row"><a href="#p-${esc(q.ficha)}"><span class="t">${esc(proyeccionPorId[q.ficha]?.nombre)}</span>
+    ${errores.length ? `<p class="label">Para repasar</p><div class="lista">${errores.map(({ q, i }) => `<div class="row"><a ${linkFicha(q.ficha)}><span class="t">${esc(proyeccionPorId[q.ficha]?.nombre)}</span>
       <span class="s">${esc(q.enunciado)}</span><span class="rp-err">Correcta: ${esc(q.opciones[q.correcta])}</span><span class="rp-err mal">Tu respuesta: ${esc(q.opciones[s.respuestas[i]])}</span></a></div>`).join("")}</div>` : ""}
   </main>`;
 }
@@ -446,7 +446,7 @@ export function iniciarGrupos(app, render) {
       case "guardar-grupo": return hacer(t, "errForm", async () => {
         const fichas = fichasDelForm(), origen = nombreOrigen();
         if (form.gid) { await nube.editarGrupo(form.gid, { nombre: form.nombre, fichas, ...(origen ? { origen } : {}) }); olvidar(`grupo:${form.gid}`, "grupos"); location.hash = `#juegos-grupo-${form.gid}`; }
-        else { const nuevo = await nube.crearGrupo({ nombre: form.nombre, fichas, aspectos: ASPECTOS.map((a) => a.id), origen, fuente: fuenteId }); olvidar("grupos"); location.hash = `#juegos-grupo-${nuevo}`; }
+        else { const nuevo = await nube.crearGrupo({ nombre: form.nombre, fichas, aspectos: ASPECTOS.map((a) => a.id), origen, fuente: libroJuego }); olvidar("grupos"); location.hash = `#juegos-grupo-${nuevo}`; }
         form = null;
       });
       case "unirse": return hacer(t, "errUnirse", async () => { await nube.unirse(gid, t.dataset.codigo); olvidar("grupos"); location.hash = `#juegos-grupo-${gid}`; });

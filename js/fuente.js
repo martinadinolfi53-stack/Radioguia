@@ -14,7 +14,9 @@ export const fuenteId = elegida() ? leer() : "bontrager";
 export const fuenteInfo = FUENTES.find((f) => f.id === fuenteId);
 // "Ambos": el menú y el buscador muestran los enfoques de todos los libros juntos, cada uno con su etiqueta.
 // Los datos cargados siguen siendo los de un libro (fuenteId): al abrir una ficha de otro, la app cambia a ese libro sin salir de Ambos.
-export const ambos = () => leer(KA) === "1";
+// se lee una vez al abrir, como el libro: entrar o salir de Ambos recarga (el repaso y los juegos arman sus fichas al cargar)
+const enAmbos = leer(KA) === "1";
+export const ambos = () => enAmbos;
 export const AMBOS = { id: "ambos", nombre: "Ambos" };
 
 // los datos de la fuente se cargan una sola vez al abrir: cambiar de fuente recarga la app
@@ -24,12 +26,13 @@ export function elegirFuente(id, destino = "#", seguirEnAmbos = false) {
   if (id === "ambos") {
     escribir(KA, "1");
     if (!elegida()) escribir(K, fuenteId);
-    return false;
+    if (enAmbos) return false;
+  } else {
+    if (!valida(id)) return;
+    escribir(K, id);
+    if (!seguirEnAmbos) escribir(KA, null);
+    if (id === fuenteId && enAmbos === seguirEnAmbos) return false;
   }
-  if (!valida(id)) return;
-  escribir(K, id);
-  if (!seguirEnAmbos) escribir(KA, null);
-  if (id === fuenteId) return false;
   location.hash = destino;
   location.reload();
   return true;

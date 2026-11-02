@@ -451,6 +451,7 @@ a.ident-nota { color: var(--accent); text-decoration: underline; }
 :root[data-theme="light"] .fuente-tag.f-merrill { --fc: #b25d00; }
 :root[data-theme="light"] .fuente-tag.f-ambos { --fc: #0b7bb5; }
 .q-filtro { margin: 4px 0 12px; }
+.rp-libro { display: inline-block; margin-bottom: 8px; }
 a.row.fav-otra { display: flex; padding: 12px 16px; text-decoration: none; }
 /* resultados del buscador con todos los libros: la etiqueta del libro antes de la estrella */
 .row.res .fuente-tag { margin-left: 6px; }

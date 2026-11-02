@@ -3,15 +3,13 @@
 // Mi perfil vive en este dispositivo y funciona sin cuenta. Desafío del día, Grupos y Ranking usan la cuenta (js/grupos.js).
 // Las estadísticas se acumulan con cada repaso terminado (evento rg:repaso-resultado de js/repaso.js), así no se pierden
 // cuando el repaso descarta resultados viejos (guarda los últimos 50).
-import { proyeccionPorId } from "./datos.js";
+import { proyeccionPorId, GRUPOS, grupoDeRegion, clave } from "./juego-datos.js";
 import { esc, icono, cabecera, barraPestanas } from "./util.js";
-import { GRUPOS, grupoDeRegion } from "./menu.js";
 import { ASPECTOS } from "./repaso-preguntas.js";
 import { resultados, empezarRepaso } from "./repaso.js";
 import { vistaGrupos } from "./grupos.js";
 import { avatar } from "./foto.js";
 import * as nube from "./nube.js";
-import { clave } from "./fuente.js";
 
 const K_STATS = clave("radioguia.juegos.stats");
 const local = (() => { try { return localStorage; } catch { return null; } })();

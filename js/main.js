@@ -162,7 +162,7 @@ function refrescarMain() {
 // elegir la fuente (al entrar, en Ajustes o desde un grupo de otro libro): si cambia, la app se recarga con esos datos
 app.addEventListener("click", (e) => {
   const b = e.target.closest("[data-fuente]");
-  if (b && elegirFuente(b.dataset.fuente) === false) render();
+  if (b && elegirFuente(b.dataset.fuente, location.hash || "#") === false) render();
 });
 
 // enfoque de otro libro (Favoritos, buscador, menú con Ambos): cambia a ese libro y abre la ficha.
@@ -170,6 +170,7 @@ app.addEventListener("click", (e) => {
 app.addEventListener("click", (e) => {
   const b = e.target.closest("[data-ir-fuente]");
   if (b) {
+    e.preventDefault();
     try {
       const abiertas = Object.fromEntries(Object.entries(estado.abiertas).map(([k, v]) => [k, [...v]]));
       sessionStorage.setItem(K_VOLVER, JSON.stringify({ desde: location.hash || "#", historial, posiciones, abiertas, q: estado.q, qFuente: estado.qFuente }));

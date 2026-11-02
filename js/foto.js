@@ -1,12 +1,15 @@
 // Foto de perfil: obligatoria para jugar (con apodo o con Google). Se elige o se saca con la cámara,
 // se recorta cuadrada en el teléfono y se guarda chiquita (JPEG de 160 px) en la cuenta, ver nube.guardarFoto.
-// Una copia grande (720 px) queda solo en este dispositivo para la portada, donde ocupa todo el ancho.
+// Una copia grande (720 px) va aparte en la cuenta (privado/foto) y en este dispositivo, para la portada, donde ocupa todo el ancho.
 // Uso: vistaFoto({ titulo, sub, atras, listo }) dibuja la pantalla; listo() se llama cuando la foto quedó guardada.
 import { esc, cabecera } from "./util.js";
 import * as nube from "./nube.js";
 
 const LADO = 160, GRANDE = 720;
-const K_GRANDE = "radioguia.foto.grande"; // { uid, chica, dato }: copia grande de la foto "chica" de esa cuenta; con otra cuenta u otra foto no se usa
+const K_GRANDE = "radioguia.foto.grande"; // { uid, chica, dato, nube }: copia grande de la foto "chica" de esa cuenta; con otra cuenta u otra foto no se usa.
+// nube: ya está también en la cuenta
+const MAX_NUBE = 280000; // las reglas aceptan hasta 300000 caracteres en privado/
+let pedida = "", subida = ""; // una sola bajada y una sola subida por sesión para cada foto
 let elegida = null; // { url, img, ancho, alto, pos, dato } de la foto que se está por usar
 let error = "", guardando = false, opciones = {};
 
@@ -56,6 +59,15 @@ function cuadrada(px, calidad) {
   return c.toDataURL("image/jpeg", calidad);
 }
 function recortar() { elegida.dato = cuadrada(LADO, 0.82); }
+// la grande, achicando la calidad (y si hace falta el tamaño) hasta que entre en la cuenta
+function grande() {
+  for (const [px, q] of [[GRANDE, 0.8], [GRANDE, 0.7], [GRANDE, 0.6], [600, 0.6], [480, 0.6]]) {
+    const d = cuadrada(px, q);
+    if (d.length <= MAX_NUBE) return d;
+  }
+  return "";
+}
+const guardarLocal = (g) => { try { localStorage.setItem(K_GRANDE, JSON.stringify(g)); } catch {} };
 
 // foto de la portada: la copia grande de este dispositivo o, si no hay (la foto se eligió en otro lado), la de la cuenta.
 // La portada se dibuja apenas abre la app (también al cambiar de libro, que recarga), antes de que llegue la cuenta:
@@ -66,10 +78,29 @@ export function fotoGrande() {
   try { g = JSON.parse(localStorage.getItem(K_GRANDE)); } catch {}
   if (!listo) return g?.dato || "";
   if (!perfil?.foto) return "";
-  // la copia vale si es de esta cuenta y de la foto que tiene ahora (si la cambió en otro celular, ya no)
-  if (g?.uid === usuario?.uid && g.chica === perfil.foto && g.dato) return g.dato;
-  try { localStorage.setItem(K_GRANDE, JSON.stringify({ uid: usuario.uid, chica: perfil.foto, dato: perfil.foto })); } catch {}
-  return perfil.foto;
+  const chica = perfil.foto, uid = usuario?.uid;
+  // la copia vale si es de esta cuenta y de la foto que tiene ahora (si la cambió en otro celular, ya no);
+  // las copias de antes no anotaban la foto chica: se toman como de la foto actual y se completan
+  if (g?.uid === uid && g.dato && g.dato !== chica && (g.chica ?? chica) === chica) {
+    if (!g.chica) guardarLocal(g = { ...g, chica });
+    // las que se eligieron antes de que existiera la copia en la cuenta se suben una vez
+    if (!g.nube && subida !== chica) {
+      subida = chica;
+      nube.guardarFotoGrande(chica, g.dato).then(() => guardarLocal({ ...g, nube: true })).catch(() => { subida = ""; });
+    }
+    return g.dato;
+  }
+  // acá no hay copia grande: mientras se busca la de la cuenta, se muestra la chica
+  if (pedida !== chica) {
+    pedida = chica;
+    nube.leerFotoGrande(chica).then((dato) => {
+      if (!dato || nube.estado().perfil?.foto !== chica) return;
+      guardarLocal({ uid, chica, dato, nube: true });
+      const img = document.querySelector(".portada-hero img");
+      if (img) img.src = dato;
+    }).catch(() => { pedida = ""; });
+  }
+  return chica;
 }
 
 export function iniciarFoto(app, rerender) {
@@ -91,7 +122,13 @@ export function iniciarFoto(app, rerender) {
     guardando = true; error = ""; rerender();
     try {
       await nube.guardarFoto(elegida.dato);
-      try { localStorage.setItem(K_GRANDE, JSON.stringify({ uid: nube.estado().usuario?.uid, chica: elegida.dato, dato: cuadrada(GRANDE, 0.8) })); } catch {}
+      const chica = elegida.dato, dato = grande(), uid = nube.estado().usuario?.uid;
+      if (dato) {
+        guardarLocal({ uid, chica, dato });
+        // la copia en la cuenta no frena: si falla (sin conexión), se sube sola la próxima vez que se abra la portada
+        subida = chica;
+        nube.guardarFotoGrande(chica, dato).then(() => guardarLocal({ uid, chica, dato, nube: true })).catch(() => { subida = ""; });
+      }
       URL.revokeObjectURL(elegida.url);
       elegida = null;
       opciones.listo?.();

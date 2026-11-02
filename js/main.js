@@ -90,7 +90,13 @@ function render() {
     case "ficha": app.innerHTML = vistaFicha(r.p, vuelta); break;
     case "grupo": app.innerHTML = vistaGrupo(r.g, r.fav); break;
     case "region": app.innerHTML = vistaRegion(r.r, r.fav); break;
-    case "favoritos": app.innerHTML = vistaFavoritos(); break;
+    case "favoritos": {
+      app.innerHTML = vistaFavoritos();
+      // la lista elegida siempre a la vista en la fila de listas (que se desliza de costado)
+      const on = app.querySelector(".fav-lista.on"), fila = on?.parentElement;
+      if (on) { const a = on.getBoundingClientRect(), f = fila.getBoundingClientRect(); if (a.right > f.right || a.left < f.left) fila.scrollLeft += a.left - f.left - 2; }
+      break;
+    }
     case "imprimir": app.innerHTML = vistaImprimir(); break;
     case "ajustes": app.innerHTML = vistaAjustes(); break;
     case "ayuda-app": app.innerHTML = vistaAyudaApp(); break;

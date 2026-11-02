@@ -90,15 +90,15 @@
 .rp-limpiar { margin-top: 12px; color: var(--accent); font-weight: 600; min-height: 40px; }
 /* ¿Qué enfoques?: rueda como el selector de la hora; la opción del medio es la elegida */
 .rp-enfoques { padding-top: 6px; padding-bottom: 6px; }
-.rueda { position: relative; height: 216px; margin: 0 -4px; }
-.rueda-marco { position: absolute; left: 0; right: 0; top: 50%; height: var(--alto, 62px); transform: translateY(-50%); border-radius: 14px; transition: height .15s; background: var(--surface-2); pointer-events: none; }
-.rueda-lista { position: relative; height: 100%; overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory; padding: 77px 0; scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); }
+.rueda { position: relative; height: 270px; margin: 0 -4px; }
+.rueda-marco { position: absolute; left: 0; right: 0; top: 50%; height: var(--alto, 60px); transform: translateY(-50%); border-radius: 14px; transition: height .15s; background: var(--surface-2); pointer-events: none; }
+.rueda-lista { position: relative; height: 100%; overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory; padding: 113px 0; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
 .rueda-lista::-webkit-scrollbar { display: none; }
 .rueda-lista:focus-visible { outline: none; }
-.rueda-op { display: grid; align-content: center; justify-items: center; gap: 1px; width: 100%; min-height: 62px; padding: 6px 16px; border: 0; background: none; color: var(--fg); text-align: center; scroll-snap-align: center; transform-origin: center; will-change: transform, opacity; }
-.rueda-op b { font-size: 1.12em; font-weight: 600; line-height: 1.25; overflow-wrap: break-word; }
-.rueda-op small { color: var(--mute); font-size: .82em; font-variant-numeric: tabular-nums; }
+.rueda-op { display: grid; align-content: center; justify-items: center; gap: 1px; width: 100%; min-height: 44px; padding: 4px 44px; border: 0; background: none; color: var(--fg); text-align: center; scroll-snap-align: center; transform-origin: center; will-change: transform, opacity; }
+.rueda-op b { font-size: .98em; font-weight: 600; line-height: 1.25; overflow-wrap: break-word; }
+.rueda-op small { color: var(--mute); font-size: .78em; font-variant-numeric: tabular-nums; }
 .rueda-op.on small { color: var(--accent); }
 
 /* ¿Qué preguntar?: un renglón por aspecto con interruptor y, abajo, sus tipos de pregunta */

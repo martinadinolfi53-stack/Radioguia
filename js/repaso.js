@@ -237,20 +237,21 @@ export function armarRueda(app) {
   const ops = [...lista.querySelectorAll(".rueda-op")];
   const centro = () => lista.getBoundingClientRect().top + lista.clientHeight / 2;
   const medio = (el) => { const r = el.getBoundingClientRect(); return r.top + r.height / 2; };
-  // las que se alejan del medio se inclinan y se apagan, como un cilindro
+  // la del medio se agranda y resalta; las demás se achican y se apagan hacia los bordes, para ver todo el panorama
   const pintar = () => {
     const c = centro(), h = lista.clientHeight / 2;
     for (const el of ops) {
-      const d = Math.max(-1, Math.min(1, (medio(el) - c) / h));
-      el.style.transform = `perspective(500px) rotateX(${(-d * 55).toFixed(1)}deg) scale(${(1 - Math.abs(d) * 0.12).toFixed(3)})`;
-      el.style.opacity = (1 - Math.abs(d) * 0.72).toFixed(2);
+      const d = Math.max(-1, Math.min(1, (medio(el) - c) / h)), a = Math.abs(d);
+      const cerca = Math.max(0, 1 - a * 3); // 1 justo en el medio, 0 desde un renglón más allá
+      el.style.transform = `perspective(600px) rotateX(${(-d * 30).toFixed(1)}deg) scale(${(0.86 - a * 0.26 + cerca * 0.36).toFixed(3)})`;
+      el.style.opacity = (0.75 - a * 0.45 + cerca * 0.25).toFixed(2);
     }
   };
   const masCerca = () => { const c = centro(); return ops.reduce((a, el) => (Math.abs(medio(el) - c) < Math.abs(medio(a) - c) ? el : a), ops[0]); };
   const llevar = (el, suave) => lista.scrollBy({ top: medio(el) - centro(), behavior: suave ? "smooth" : "instant" });
   // al abrir: la elegida al medio, con el marco a su alto (un nombre largo ocupa dos renglones)
   const on = lista.querySelector(".rueda-op.on") || ops[0];
-  lista.parentElement.style.setProperty("--alto", Math.max(62, on.offsetHeight) + "px");
+  lista.parentElement.style.setProperty("--alto", Math.max(60, Math.round(on.offsetHeight * 1.22) + 6) + "px");
   llevar(on, false);
   pintar();
   let tocando = false, espera = 0;

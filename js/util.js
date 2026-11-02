@@ -72,3 +72,15 @@ export function abrirHoja(titulo, cuerpo, alCerrar) {
 const PESTANAS = [["enfoques", "#enfoques", "Enfoques", icono.libro], ["favoritos", "#favoritos", "Favoritos", icono.estrella(false)], ["juegos", "#juegos", "Juegos", icono.repaso], ["ajustes", "#ajustes", "Ajustes", icono.ajustes]];
 export const barraPestanas = (activa) => `<nav class="pestanas" aria-label="Secciones">${PESTANAS.map(([id, h, txt, ic]) =>
   `<a href="${h}"${id === activa ? ' class="on" aria-current="page"' : ""}>${ic}<span>${txt}</span></a>`).join("")}</nav>`;
+
+// RX sobre la foto: relleno translúcido con borde. El borde sale de engordar la silueta de las letras (filtro SVG),
+// así no aparecen líneas donde se cruzan los trazos de la X, como pasa con -webkit-text-stroke.
+export const RX_BORDE = `<svg class="rx-svg" viewBox="0 0 170 74" role="img" aria-label="RX"><defs><filter id="rx-borde" x="-10%" y="-10%" width="120%" height="120%">
+  <feMorphology in="SourceAlpha" operator="dilate" radius="2.2" result="gordo"/>
+  <feComposite in="gordo" in2="SourceAlpha" operator="out" result="borde"/>
+  <feFlood flood-color="#fff"/><feComposite in2="borde" operator="in" result="b"/>
+  <feFlood flood-color="#fff" flood-opacity=".22"/><feComposite in2="SourceAlpha" operator="in" result="r"/>
+  <feMerge><feMergeNode in="r"/><feMergeNode in="b"/></feMerge></filter></defs>
+  <text x="85" y="62" text-anchor="middle" filter="url(#rx-borde)">RX</text></svg>`;
+// ícono del celular de la portada ("Usarla como app")
+export const AYUDA_ICONO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>';

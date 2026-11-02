@@ -115,14 +115,28 @@ function altoCabecera() {
 }
 addEventListener("resize", altoCabecera);
 
+// dónde estaba cada pantalla: al volver de una más adentro (por ejemplo, de una ficha a su región) se retoma ese lugar
+const posiciones = {};
+const nivel = (h) => (h.startsWith("#p-") ? 4 : /^#(g|r)-/.test(h) ? 3 : h.startsWith("#f-") ? 2 : h === "#enfoques" || h === "#favoritos" ? 1 : 0);
+addEventListener("scroll", () => { posiciones[location.hash || "#"] = scrollY; }, { passive: true });
+// partes abiertas o cerradas en una región del menú
+app.addEventListener("toggle", (e) => {
+  const d = e.target, r = ruta();
+  if (d.dataset?.parte && r.tipo === "familia") { const s = (estado.abiertas[r.f.id] ||= new Set()); d.open ? s.add(d.dataset.parte) : s.delete(d.dataset.parte); }
+}, true);
+
 addEventListener("hashchange", (e) => {
-  const antes = new URL(e.oldURL).hash || "#";
+  const antes = new URL(e.oldURL).hash || "#", ahora = location.hash || "#";
+  const volviendo = nivel(antes) > nivel(ahora) && posiciones[ahora] != null, y = posiciones[ahora];
   pantallaAnterior = antes;
   estado.sel = null;
   if (!antes.startsWith("#p-")) historial.push(antes); else if (!historial.length) historial.push(antes);
   if (historial.length > 30) historial.shift();
+  // al entrar a una región desde el menú, todas sus partes empiezan cerradas; al volver de una ficha quedan como estaban
+  if (!volviendo && ahora.startsWith("#f-")) delete estado.abiertas[ahora.slice(3)];
   render();
-  if (location.hash !== "#ajustes-fuente") scrollTo(0, 0);
+  if (volviendo) scrollTo(0, y);
+  else if (location.hash !== "#ajustes-fuente") scrollTo(0, 0);
 });
 
 // solo se reemplaza el contenido, así el buscador no pierde el foco ni cierra el teclado

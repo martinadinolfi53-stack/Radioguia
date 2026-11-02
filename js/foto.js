@@ -66,8 +66,12 @@ export function fotoGrande() {
   try { g = JSON.parse(localStorage.getItem(K_GRANDE)); } catch {}
   if (!listo) return g?.dato || "";
   if (!perfil?.foto) return "";
-  // la copia vale si es de esta cuenta y de la foto que tiene ahora (si la cambió en otro celular, ya no)
-  if (g?.uid === usuario?.uid && g.chica === perfil.foto && g.dato) return g.dato;
+  // la copia vale si es de esta cuenta y de la foto que tiene ahora (si la cambió en otro celular, ya no);
+  // las copias de antes no anotaban la foto chica: se toman como de la foto actual y se completan
+  if (g?.uid === usuario?.uid && g.dato && (g.chica ?? perfil.foto) === perfil.foto) {
+    if (!g.chica) try { localStorage.setItem(K_GRANDE, JSON.stringify({ ...g, chica: perfil.foto })); } catch {}
+    return g.dato;
+  }
   try { localStorage.setItem(K_GRANDE, JSON.stringify({ uid: usuario.uid, chica: perfil.foto, dato: perfil.foto })); } catch {}
   return perfil.foto;
 }

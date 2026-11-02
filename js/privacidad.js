@@ -10,6 +10,7 @@ export function vistaPrivacidad(atras) {
     <section class="panel"><h2>Qué se guarda y quién lo ve</h2>
       <ul>
         <li><b>Tu apodo y tu foto de perfil:</b> los ven los compañeros de los grupos a los que te unís, en el ranking.</li>
+        <li><b>Una copia grande de tu foto</b>, para la pantalla de inicio: solo en este celular.</li>
         <li><b>Tus partidas del desafío</b> (puntos, aciertos y qué preguntas fallaste): las ven los miembros del grupo; las estadísticas de dificultad, quien creó el grupo.</li>
         <li><b>Tu email:</b> no lo ve ningún otro usuario. Queda en la cuenta de Firebase, a la que solo accede el administrador de RadioGuía.</li>
         <li><b>Favoritos y listas:</b> si entrás con Google, se guardan también en tu cuenta para verlos en otros dispositivos, y solo los ves vos. Sin Google, quedan solo en este celular.</li>

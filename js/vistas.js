@@ -6,11 +6,11 @@ import { pwa } from "./pwa.js";
 import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
-import { avatar } from "./foto.js";
-import { FUENTES, fuenteId, elegida } from "./fuente.js";
-import { nombresDe, proyeccionesDe as proyeccionesDeOtra } from "./otras-fuentes.js";
+import { avatar, fotoGrande } from "./foto.js";
+import { FUENTES, fuenteId, elegida, ambos, AMBOS } from "./fuente.js";
+import { nombresDe, proyeccionesDe as proyeccionesDeOtra, gruposDe } from "./otras-fuentes.js";
 
-export const estado = { q: "", qFav: "", filtro: {}, sel: null, favFuente: "", abiertas: {} }; // búsqueda, filtro de categoría por región, selección en Favoritos (Set o null), filtro por libro en Favoritos ("" = todos)
+export const estado = { q: "", qFav: "", qFuente: "", filtro: {}, sel: null, favFuente: "", abiertas: {} }; // búsqueda, filtro de categoría por región, selección en Favoritos (Set o null), filtro por libro en Favoritos ("" = todos)
 // y partes abiertas en cada región del menú (abiertas[familia] = Set de grupos; al entrar están todas cerradas)
 
 const filaProyeccion = (p, conRegion) => `<div class="row">
@@ -55,25 +55,46 @@ function resultados(q) {
   }
   const deFicha = new Map(todas.map((x) => [x.p, x.f]));
   // a igual coincidencia, primero el libro abierto (buscar ordena sin mover los empates)
-  const res = buscar(todas.map((x) => x.p), q, todas.map((x) => x.p)).map((p) => ({ f: deFicha.get(p), p }));
+  const todos = buscar(todas.map((x) => x.p), q, todas.map((x) => x.p)).map((p) => ({ f: deFicha.get(p), p }));
+  // filtro por libro arriba de los resultados ("" = todos), con cuántos hay en cada uno
+  const libros = FUENTES.filter((f) => f.lista);
+  if (estado.qFuente && !libros.some((f) => f.id === estado.qFuente)) estado.qFuente = "";
+  const chips = `<div class="chips q-filtro" role="group" aria-label="Filtrar por libro">${[{ id: "", nombre: "Todos" }, ...libros].map((f) => {
+    const on = estado.qFuente === f.id, n = f.id ? todos.filter((x) => x.f.id === f.id).length : todos.length;
+    return `<button type="button" class="chip${on ? " on" : ""}" data-q-fuente="${esc(f.id)}" aria-pressed="${on}">${esc(f.nombre)} · ${n}</button>`;
+  }).join("")}</div>`;
+  const res = estado.qFuente ? todos.filter((x) => x.f.id === estado.qFuente) : todos;
   const espera = cargando ? `<div class="vacio">Buscando en los otros libros…</div>` : "";
-  if (!res.length) return espera || `<div class="vacio">No hay proyecciones que coincidan con <b>“${esc(q)}”</b>. Probá con la región (por ejemplo “tórax”), la proyección (“lateral”) o el método (“Pigg-O-Stat”).</div>`;
-  const cuantos = FUENTES.filter((f) => res.some((x) => x.f === f)).map((f) => `${res.filter((x) => x.f === f).length} ${esc(f.nombre)}`).join(" · ");
-  return `<p class="label">${res.length} ${res.length === 1 ? "resultado" : "resultados"} · ${cuantos}</p><div class="lista">${res.map(filaResultado).join("")}</div>` + espera;
+  if (!todos.length) return espera || `<div class="vacio">No hay proyecciones que coincidan con <b>“${esc(q)}”</b>. Probá con la región (por ejemplo “tórax”), la proyección (“lateral”) o el método (“Pigg-O-Stat”).</div>`;
+  return chips + (res.length ? `<div class="lista">${res.map(({ f, p }) => filaLibro(f, p, true)).join("")}</div>` : `<div class="vacio">Este libro no tiene resultados para <b>“${esc(q)}”</b>.</div>`) + espera;
 }
 
 const etiquetaFuente = (f) => `<span class="fuente-tag f-${esc(f.id)}">${esc(f.nombre)}</span>`;
 const detalle = (p, region) => esc([region, ...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "));
-const filaResultado = ({ f, p }) => f.id === fuenteId
-  ? `<div class="row res"><a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, regionPorId[p.region]?.nombre)}</span></a>${etiquetaFuente(f)}${botonFav(p.id)}</div>`
-  : `<div class="row res"><button class="res-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(p.id)}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, p._region)}</span></button>${etiquetaFuente(f)}</div>`;
+// un enfoque con la etiqueta de su libro: los del libro abierto abren la ficha; los de otro libro cambian a ese libro
+const filaLibro = (f, p, conRegion) => f.id === fuenteId
+  ? `<div class="row res"><a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, conRegion && regionPorId[p.region]?.nombre)}</span></a>${etiquetaFuente(f)}${botonFav(p.id)}</div>`
+  : `<div class="row res"><button class="res-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(p.id)}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, conRegion && p._region)}</span></button>${etiquetaFuente(f)}</div>`;
+
+// con "Ambos", los botones del menú de los otros libros (null si alguno todavía está cargando)
+function gruposOtros() {
+  const otros = [];
+  for (const f of FUENTES.filter((x) => x.lista && x.id !== fuenteId)) {
+    const g = gruposDe(f.id);
+    if (!g) return null;
+    otros.push(...g.map((x) => ({ ...x, f })));
+  }
+  return otros;
+}
 
 // menú principal: botones por zona agrupados por región, con su color (ver js/menu.js); "filtro" deja solo las proyecciones que cumplen (favoritos)
 function menuRegiones(filtro) {
   const fav = filtro !== todos;
   if (!fav) {
     // menú por región: una fila por región grande; adentro se despliegan sus partes con los enfoques
-    const filas = FAMILIAS.map((f) => ({ f, n: GRUPOS.filter((g) => g.familia === f).reduce((a, g) => a + g.regiones.reduce((b, id) => b + proyeccionesDe(id).length, 0), 0) })).filter((x) => x.n);
+    const otros = ambos() ? gruposOtros() || [] : [];
+    const filas = FAMILIAS.map((f) => ({ f, n: GRUPOS.filter((g) => g.familia === f).reduce((a, g) => a + g.regiones.reduce((b, id) => b + proyeccionesDe(id).length, 0), 0)
+      + otros.filter((g) => g.familia === f.id).reduce((a, g) => a + g.lista.length, 0) })).filter((x) => x.n);
     return `<section class="familia"><h2>Regiones</h2><div class="grupos">${filas.map(({ f, n }) =>
       `<a class="grupo" style="--c:${f.color}" href="#f-${f.id}"><span class="t">${esc(f.nombre)}</span><span class="s">${n}</span></a>`).join("")}</div></section>`;
   }
@@ -85,12 +106,24 @@ function menuRegiones(filtro) {
 
 // una región grande (por ejemplo Miembro superior): cada parte se despliega y muestra sus enfoques
 export function vistaFamilia(f) {
-  const partes = GRUPOS.filter((g) => g.familia === f).map((g) => ({ g, lista: g.regiones.flatMap((id) => proyeccionesDe(id)) })).filter((x) => x.lista.length);
-  const total = partes.reduce((a, x) => a + x.lista.length, 0), abiertas = (estado.abiertas[f.id] ||= new Set());
+  const abierta = FUENTES.find((x) => x.id === fuenteId);
+  const partes = GRUPOS.filter((g) => g.familia === f).map((g) => ({ g, lista: g.regiones.flatMap((id) => proyeccionesDe(id)).map((p) => ({ f: abierta, p })) }));
+  // con "Ambos" se suman los enfoques del otro libro en la parte equivalente (mismo id, mismo nombre o alguna región en común:
+  // el "Brazo (húmero)" de un libro y el "Húmero" del otro) o, si no hay, en una parte propia al final
+  const otros = ambos() ? gruposOtros() : [];
+  for (const g of (otros || []).filter((x) => x.familia === f.id)) {
+    const items = g.lista.map((p) => ({ f: g.f, p }));
+    const misma = partes.find((x) => x.g.id === g.id || norm(x.g.nombre) === norm(g.nombre) || x.g.regiones.some((r) => g.regiones.includes(r)));
+    if (misma) misma.lista.push(...items); else partes.push({ g, lista: items });
+  }
+  const conLista = partes.filter((x) => x.lista.length);
+  const total = conLista.reduce((a, x) => a + x.lista.length, 0), abiertas = (estado.abiertas[f.id] ||= new Set());
+  const fila = ({ f: libro, p }) => (ambos() ? filaLibro(libro, p) : filaProyeccion(p));
   return cabecera({ titulo: f.nombre, sub: `${total} enfoques`, atras: "#enfoques" }) + `
   <main class="wrap" style="--c:${f.color}">
-    ${partes.map(({ g, lista }) => `<details class="sec region" data-parte="${esc(g.id)}"${abiertas.has(g.id) ? " open" : ""}><summary><span class="t">${esc(g.nombre)}</span><span class="s">${lista.length}</span>${icono.chev}</summary>
-      <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></details>`).join("")}
+    ${conLista.map(({ g, lista }) => `<details class="sec region" data-parte="${esc(g.id)}"${abiertas.has(g.id) ? " open" : ""}><summary><span class="t">${esc(g.nombre)}</span><span class="s">${lista.length}</span>${icono.chev}</summary>
+      <div class="lista">${lista.map(fila).join("")}</div></details>`).join("")}
+    ${otros ? "" : `<div class="vacio">Cargando el otro libro…</div>`}
   </main>` + barraPestanas("enfoques");
 }
 
@@ -99,30 +132,35 @@ const todos = () => true;
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
 const AYUDA_ICONO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>';
 
-const fotoPortada = () => { const p = nube.estado().perfil; return p?.foto ? avatar(p.foto, p.apodo, "portada-foto") : ""; };
+// la foto de perfil arriba, a todo el ancho, que se va difuminando hasta el saludo
+const fotoPortada = () => { const f = fotoGrande(); return f ? `<div class="portada-hero" aria-hidden="true"><img src="${esc(f)}" alt=""></div>` : ""; };
 
 export function vistaPortada() {
-  return `<main class="portada">
+  const hero = fotoPortada();
+  return `<main class="portada${hero ? " con-foto" : ""}">${hero}
     <div class="portada-barra">
       <a class="portada-boton" href="#ayuda-app" aria-label="Cómo usarla como app en el celular">${AYUDA_ICONO}<span>Usarla como app</span></a>
       <h1 class="portada-rx">RX</h1>
       <a class="portada-boton" href="#ajustes" aria-label="Ajustes">${icono.ajustes}<span>Ajustes</span></a>
     </div>
-    <p class="portada-hola">${fotoPortada()}Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
+    <p class="portada-hola">Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
     <div class="portada-ops">
       <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
       <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
     </div>
-    <div class="portada-fuente" role="group" aria-label="Libro que estás consultando">${FUENTES.filter((f) => f.lista).map((f) => {
-      const on = f.id === fuenteId;
+    <div class="portada-fuente" role="group" aria-label="Libro que estás consultando">${opcionesLibro().map((f) => {
+      const on = f.id === (ambos() ? "ambos" : fuenteId);
       return `<button type="button" data-fuente="${f.id}" class="${on ? "on" : ""}" aria-pressed="${on}">${esc(f.nombre)}</button>`;
     }).join("")}</div>
   </main>`;
 }
 
+// interruptor de la portada: un libro, "Ambos" en el medio y el otro libro
+const opcionesLibro = () => { const l = FUENTES.filter((f) => f.lista); return l.length > 1 ? [l[0], AMBOS, ...l.slice(1)] : l; };
+
 // botones para elegir la fuente (al entrar y en Ajustes); las que todavía no tienen fichas aparecen "en preparación"
-const botonesFuente = () => FUENTES.map((f) => {
-  const on = elegida() && f.id === fuenteId;
+const botonesFuente = () => [...FUENTES, { ...AMBOS, detalle: "Los dos libros juntos en el menú y el buscador, cada enfoque con su etiqueta", lista: true }].map((f) => {
+  const on = elegida() && f.id === (ambos() ? "ambos" : fuenteId);
   return `<button class="fuente-op${on ? " on" : ""}" data-fuente="${f.id}" ${f.lista ? "" : "disabled"} aria-pressed="${on}">
     <b>${esc(f.nombre)}</b><small>${esc(f.detalle)}</small>${f.lista ? "" : "<em>En preparación</em>"}</button>`;
 }).join("");
@@ -189,7 +227,7 @@ export function vistaInicio() {
         <a class="acceso" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
       </div>
       ${menuRegiones(todos)}`}
-    <p class="pie">${proyecciones.length} proyecciones · ${regiones.length} regiones · Fuente: ${esc(FUENTE.corto)}</p>
+    <p class="pie">${ambos() ? `${proyecciones.length + (gruposOtros() || []).reduce((n, g) => n + g.lista.length, 0)} proyecciones · Fuentes: ${FUENTES.filter((f) => f.lista).map((f) => esc(f.nombre)).join(" y ")}` : `${proyecciones.length} proyecciones · ${regiones.length} regiones · Fuente: ${esc(FUENTE.corto)}`}</p>
   </main>` + barraPestanas("enfoques");
 }
 

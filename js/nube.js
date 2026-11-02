@@ -97,7 +97,7 @@ export async function salir() {
 }
 async function limpiarLocal() {
   try { await fb.terminate(db); await fb.clearIndexedDbPersistence(db); } catch {}
-  try { for (const k of ["radioguia.juegos.desafio", "radioguia.juegos.despues", "radioguia.nombre"]) localStorage.removeItem(k); } catch {}
+  try { for (const k of ["radioguia.juegos.desafio", "radioguia.juegos.despues", "radioguia.nombre", "radioguia.foto.grande"]) localStorage.removeItem(k); } catch {}
 }
 
 // "Borrar mi cuenta": saca el apodo de las partidas, deja los grupos, borra el perfil y la cuenta. Después hay que recargar.

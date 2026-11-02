@@ -3,13 +3,12 @@
 // Rutas: #repaso (elegir) · #repaso-l-<lista> (elegir, con esa lista) · #repaso-jugar · #repaso-partida-<código> (partida compartida)
 // Las preguntas salen de js/repaso-preguntas.js. Los resultados se guardan en este dispositivo con un formato pensado
 // para mandarlos después a un ranking de grupo (ver guardarResultado).
-import { proyecciones, proyeccionPorId, regionPorId, CATEGORIAS } from "./datos.js";
+import { CATEGORIAS } from "./datos.js";
+import { proyecciones, proyeccionPorId, regionPorId, GRUPOS, grupoDeRegion, generarPreguntas, clave, linkFicha, etiquetaLibro } from "./juego-datos.js";
 import * as almacen from "./almacen.js";
 import { esc, icono, cabecera } from "./util.js";
-import { GRUPOS, grupoDeRegion } from "./menu.js";
-import { ASPECTOS, CAMPOS, generarPreguntas } from "./repaso-preguntas.js";
+import { ASPECTOS, CAMPOS } from "./repaso-preguntas.js";
 import * as nube from "./nube.js";
-import { clave } from "./fuente.js";
 
 const K_RES = clave("radioguia.repaso.resultados"), K_SUELTOS = clave("radioguia.repaso.sueltos"), K_CONF = clave("radioguia.repaso.config"), K_SESION = clave("radioguia.repaso.sesion");
 const leer = (st, k, def) => { try { const v = st.getItem(k); return v == null ? def : JSON.parse(v); } catch { return def; } };
@@ -238,6 +237,7 @@ function vistaPregunta() {
     : `<div class="rp-barra" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${s.respuestas.length}"><span style="width:${(s.respuestas.length / total) * 100}%"></span></div>`}
   <main class="wrap repaso">
     <section class="rp-preg">
+      ${etiquetaLibro(q.ficha)}
       ${q.conNombre ? `<p class="rp-ficha">${esc(p?.nombre)}<small>${esc(regionPorId[p?.region]?.nombre || "")} · ${esc(q.dato)}</small></p>` : `<p class="rp-ficha"><small>${esc(q.dato)}</small></p>`}
       <h2>${esc(q.enunciado)}</h2>
       ${q.imagen ? `<button class="rp-img" data-ampliar="${esc(q.imagen)}" data-alt="Esquema" aria-label="Ampliar esquema"><img src="${esc(q.imagen)}" alt="Esquema de la proyección"></button>` : ""}
@@ -247,7 +247,7 @@ function vistaPregunta() {
     ${respondida && !s.reloj ? `<section class="rp-fb ${resp === q.correcta ? "ok" : "mal"}">
       <p><b>${resp === q.correcta ? "¡Correcto!" : "Incorrecto."}</b> ${resp === q.correcta ? "" : `La respuesta era <b>${"ABCD"[q.correcta]}</b>.`}</p>
       ${q.completa ? `<p>En la ficha: ${esc(q.completa)}</p>` : ""}
-      <a class="rp-link" href="#p-${esc(q.ficha)}">${icono.libro}<span>Ver la ficha de ${esc(p?.nombre)}</span></a>
+      <a class="rp-link" ${linkFicha(q.ficha)}>${icono.libro}<span>Ver la ficha de ${esc(p?.nombre)}</span></a>
       ${reportada(q) ? `<p class="rp-reportada">Pregunta reportada. Gracias.</p>` : s.reportando ? `<div class="rp-reporte">
         <label for="rp-coment">¿Qué está mal? <small>(opcional)</small></label>
         <input id="rp-coment" type="text" autocomplete="off" placeholder="Por ejemplo: la B también es correcta">
@@ -280,7 +280,7 @@ function vistaResultado() {
     </div>
     ${errores.length ? `<p class="label">Para repasar</p><div class="lista">${errores.map(({ q, i }) => {
       const p = proyeccionPorId[q.ficha];
-      return `<div class="row"><a href="#p-${esc(q.ficha)}"><span class="t">${esc(p?.nombre)}</span>
+      return `<div class="row"><a ${linkFicha(q.ficha)}><span class="t">${esc(p?.nombre)}</span>
         <span class="s">${esc(q.enunciado)}</span><span class="rp-err">Correcta: ${esc(q.opciones[q.correcta])}</span>${s.respuestas[i] !== undefined ? `<span class="rp-err mal">Tu respuesta: ${esc(q.opciones[s.respuestas[i]])}</span>` : ""}</a></div>`;
     }).join("")}</div>` : `<div class="vacio"><b>¡Todas bien!</b> Probá con más preguntas o con otra lista.</div>`}
   </main>`;
@@ -308,7 +308,7 @@ function vistaAdmin() {
   const lista = admin.lista;
   return cab + `<main class="wrap repaso">
     ${lista.length ? lista.map((x) => `<section class="panel rp-adm">
-      <p class="rp-ficha"><a href="#p-${esc(x.ficha)}">${esc(x.fichaNombre || x.ficha)}</a><small>${esc(x.apodo || "Sin apodo")} · ${x.creado ? new Date(x.creado).toLocaleString("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}</small></p>
+      <p class="rp-ficha"><a ${linkFicha(x.ficha)}>${esc(x.fichaNombre || x.ficha)}</a><small>${esc(x.apodo || "Sin apodo")} · ${x.creado ? new Date(x.creado).toLocaleString("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}</small></p>
       <p><b>${esc(x.motivo)}</b>${x.comentario ? `: ${esc(x.comentario)}` : ""}</p>
       <p>${esc(x.enunciado)}</p>
       <ul>${(x.opciones || []).map((o) => `<li class="${o === x.correcta ? "ok" : o === x.elegida ? "mal" : ""}">${esc(o)}${o === x.correcta ? " <small>(correcta según la app)</small>" : o === x.elegida ? " <small>(eligió esta)</small>" : ""}</li>`).join("")}</ul>

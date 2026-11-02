@@ -81,12 +81,12 @@ service cloud.firestore {
       allow list: if false;
       allow create: if logueado() && nuevo().creador == request.auth.uid
         && nuevo().keys().hasOnly(['nombre', 'codigo', 'creador', 'creado', 'fichas', 'aspectos', 'excluir', 'origen', 'fuente'])
-        && texto(nuevo().nombre, 40) && nuevo().fichas is list && nuevo().fichas.size() <= 400
+        && texto(nuevo().nombre, 40) && nuevo().fichas is list && nuevo().fichas.size() <= 800
         && nuevo().codigo is string
         && getAfter(/databases/$(base)/documents/codigos/$(nuevo().codigo)).data.gid == gid;
       allow update: if logueado() && resource.data.creador == request.auth.uid
         && soloCambia(['nombre', 'fichas', 'aspectos', 'excluir', 'origen', 'fuente'])
-        && texto(nuevo().nombre, 40) && nuevo().fichas is list && nuevo().fichas.size() <= 400;
+        && texto(nuevo().nombre, 40) && nuevo().fichas is list && nuevo().fichas.size() <= 800;
       allow delete: if false;
 
       function cierraPartida(uid, fecha) {

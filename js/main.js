@@ -18,7 +18,7 @@ import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificaci
 import * as nube from "./nube.js";
 import { vistaFoto } from "./foto.js";
 import { vistaPrivacidad } from "./privacidad.js";
-import { elegida, elegirFuente } from "./fuente.js";
+import { elegida, elegirFuente, ambos } from "./fuente.js";
 import { iniciarLente } from "./lente.js";
 import { iniciarSyncFavoritos, cerrarSesion, olvidarFavoritos } from "./sync-favoritos.js";
 
@@ -117,8 +117,20 @@ addEventListener("resize", altoCabecera);
 
 // dónde estaba cada pantalla: al volver de una más adentro (por ejemplo, de una ficha a su región) se retoma ese lugar
 const posiciones = {};
+const K_VOLVER = "radioguia.volver"; // dónde estaba antes de saltar a una ficha de otro libro
 const nivel = (h) => (h.startsWith("#p-") ? 4 : /^#(g|r)-/.test(h) ? 3 : h.startsWith("#f-") ? 2 : h === "#enfoques" || h === "#favoritos" ? 1 : 0);
 addEventListener("scroll", () => { posiciones[location.hash || "#"] = scrollY; }, { passive: true });
+// si se llegó desde un enfoque de otro libro, se retoma dónde estaba (ver el click de [data-ir-fuente])
+try {
+  const v = JSON.parse(sessionStorage.getItem(K_VOLVER) || "null");
+  sessionStorage.removeItem(K_VOLVER);
+  if (v) {
+    historial.push(...v.historial, v.desde);
+    Object.assign(posiciones, v.posiciones);
+    for (const [k, ids] of Object.entries(v.abiertas || {})) estado.abiertas[k] = new Set(ids);
+    estado.q = v.q || ""; estado.qFuente = v.qFuente || "";
+  }
+} catch {}
 // partes abiertas o cerradas en una región del menú
 app.addEventListener("toggle", (e) => {
   const d = e.target, r = ruta();
@@ -150,13 +162,23 @@ function refrescarMain() {
 // elegir la fuente (al entrar, en Ajustes o desde un grupo de otro libro): si cambia, la app se recarga con esos datos
 app.addEventListener("click", (e) => {
   const b = e.target.closest("[data-fuente]");
-  if (b && elegirFuente(b.dataset.fuente) === false) render();
+  if (b && elegirFuente(b.dataset.fuente, location.hash || "#") === false) render();
 });
 
-// favorito de otro libro: cambia a ese libro y abre la ficha
+// enfoque de otro libro (Favoritos, buscador, menú con Ambos): cambia a ese libro y abre la ficha.
+// Antes de recargar se guarda dónde estaba la persona, así "Volver" la lleva al mismo lugar (búsqueda, partes abiertas, scroll)
 app.addEventListener("click", (e) => {
   const b = e.target.closest("[data-ir-fuente]");
-  if (b) elegirFuente(b.dataset.irFuente, `#p-${b.dataset.irFicha}`);
+  if (b) {
+    e.preventDefault();
+    try {
+      const abiertas = Object.fromEntries(Object.entries(estado.abiertas).map(([k, v]) => [k, [...v]]));
+      sessionStorage.setItem(K_VOLVER, JSON.stringify({ desde: location.hash || "#", historial, posiciones, abiertas, q: estado.q, qFuente: estado.qFuente }));
+    } catch {}
+    elegirFuente(b.dataset.irFuente, `#p-${b.dataset.irFicha}`, ambos());
+  }
+  const q = e.target.closest("[data-q-fuente]");
+  if (q) { estado.qFuente = q.dataset.qFuente; refrescarMain(); }
   const f = e.target.closest("[data-fav-fuente]");
   if (f) { estado.favFuente = f.dataset.favFuente; const y = scrollY; render(); scrollTo(0, y); }
 });

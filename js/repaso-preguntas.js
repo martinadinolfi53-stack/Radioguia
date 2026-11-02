@@ -42,11 +42,11 @@ function hash(str) {
   h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
   return h1 >>> 0;
 }
-function azar(semilla) {
+export function azar(semilla) {
   let a = hash(String(semilla));
   return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
-const mezclar = (lista, r) => { const a = [...lista]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+export const mezclar = (lista, r) => { const a = [...lista]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 // palabras con contenido, para medir cuánto se parecen dos textos
 // (sin las palabras que están en casi todas las fichas, y recortadas a 5 letras para que «pulmones» y «pulmonares» cuenten igual)

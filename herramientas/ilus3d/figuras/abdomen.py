@@ -1,7 +1,6 @@
 # Figuras de abdomen, estudios contrastados y portátiles en el estilo por capas (Bontrager 9.ª ed., caps. 9 y 10).
 # Uso (desde herramientas/ilus3d):  python3 figuras/abdomen.py [id…]   ->  render/<id>-tubo y render/<id>-otra
-# Siguen con el dibujo a mano: las pediátricas (el modelo es adulto), las intraoperatorias con arco en C y la axiolateral
-# modificada de Clements (la geometría del tubo no se puede dibujar sin inventar).
+# Siguen con el dibujo a mano: las pediátricas (el modelo es adulto).
 # El modelo no tiene órganos: la ventana muestra la columna, la pelvis y las costillas como referencia.
 import os, sys; sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 import numpy as np
@@ -89,6 +88,38 @@ par('port-pelvis-cadera-ap--v2', _rot15, AP, 'medio:eias_R|trocanter_mayor_R|0.5
 _dm = lambda: Pose().cadera_flex('L', 90).rodilla_flex('L', 90)
 par('port-cadera-axiolateral-danelius', _dm, (-0.62, 0.78, 0.0), 'medio:cabeza_femur_R|trocanter_mayor_R', (0.30, 0.24), radio=0.11, encuadre=0.30,
     desde=(0, 0, -1), arriba_img=(0, 1, 0), ri_radio=0.16, arriba_tubo=(0, 0, 1))
+# Clements-Nakayama (pág. 317): supino, las dos piernas extendidas, la afectada en posición neutra, brazos cruzados sobre el
+# tórax. RC mediolateral, perpendicular al cuello femoral (la misma dirección horizontal que en Danelius-Miller) e inclinado
+# ≈15-20° hacia posterior respecto de la horizontal; RI sobre la bandeja del Bucky extendida, inclinado ≈15° de la vertical y
+# perpendicular al RC. La segunda vista mira perpendicular al plano del rayo, para que se vean las dos inclinaciones.
+_cl = lambda: (Pose().hombro_flex('R', 20).hombro_rot_ext('R', -95).codo_flex('R', 115)
+               .hombro_flex('L', 20).hombro_rot_ext('L', -95).codo_flex('L', 115))
+_h = np.array([-0.62, 0.78, 0.0]); _h /= np.linalg.norm(_h)
+D_CL = _h * np.cos(np.radians(17.5)) + np.array([0, 0, -np.sin(np.radians(17.5))])
+# piernas cortadas por encima de las rodillas con un plano que contiene el RC: desde el tubo el corte queda de canto
+_n = np.array([0, 1.0, 0]) - D_CL[1] * D_CL; _n /= np.linalg.norm(_n)
+par('port-cadera-axiolateral-clements', _cl, tuple(D_CL), 'medio:cabeza_femur_R|trocanter_mayor_R', (0.30, 0.24), radio=0.11, encuadre=0.30,
+    huesos=['pelvis', 'muslo_R', 'muslo_L'], cortes=[('rodilla_R', tuple(_n), -0.12)],
+    desde=(0.78 / 1.0, 0.62, 0.0), arriba_img=(0, 0, 1), ri_radio=0.16, arriba_tubo=(0, 0, 1),
+    puntos=['cabeza_femur_R', 'trocanter_mayor_R'])
+
+# Intraoperatorias con arco en C (pág. 318). El "RI" de estas vistas es el intensificador de imagen; el arco se dibuja en el cjs.
+# Colangiograma: supino, PA (tubo debajo de la mesa, intensificador arriba). El manual no da punto de centrado: el arco se pone
+# sobre la vía biliar (cuadrante superior derecho). Desde arriba, mirando como el intensificador; de costado, desde los pies
+# (sin las piernas) para que el arco se vea en su plano.
+TRONCO = ['torax', 'L1', 'L2', 'L3', 'L4', 'L5', 'pelvis', 'cintura_R', 'cintura_L', 'brazo_R', 'brazo_L', 'cubito_R', 'cubito_L',
+          'radio_R', 'radio_L', 'mano_R', 'mano_L', 'C7', 'C6', 'C4', 'C2', 'cabeza']
+VIA_BILIAR = f'medio:{L1}|centro:Right eleventh rib|0.6'
+F['intraop-abdomen-pa-colangiograma-tubo'] = lambda: tubo('intraop-abdomen-pa-colangiograma', Pose(), PA, VIA_BILIAR, (0.23, 0.23),
+    radio=0.16, encuadre=0.34, huesos=ABD, cortes=CORTE, vista=AP, arriba=(0, 1, 0), ri_radio=0.30)
+F['intraop-abdomen-pa-colangiograma-otra'] = lambda: costado('intraop-abdomen-pa-colangiograma', Pose(), PA, VIA_BILIAR, (0.23, 0.23),
+    huesos=['torax', 'L1', 'L2', 'L3', 'L4', 'L5', 'pelvis'], region=TRONCO, desde=(0, 1, 0), arriba_img=(0, 0, 1), encuadre=0.5, ri_radio=0.30)
+# Lateral de cadera con arco: RC horizontal, tubo superior (por encima y afuera de la cadera) e intensificador inferior (entre las
+# piernas): la dirección contraria a la de Danelius-Miller. La pierna sana va elevada como en Danelius-Miller para que entre el
+# intensificador (el manual no lo dice; la foto no deja verlo).
+D_ARCO = tuple(-_h)
+par('intraop-cadera-lateral', _dm, D_ARCO, 'medio:cabeza_femur_R|trocanter_mayor_R', (0.23, 0.23), radio=0.11, encuadre=0.30,
+    huesos=['pelvis', 'muslo_R', 'muslo_L', 'L5', 'L4'], desde=(0, 0, -1), arriba_img=(0, 1, 0), ri_radio=0.25, arriba_tubo=(0, 0, 1))
 
 if __name__ == '__main__':
     for k in (sys.argv[1:] or F):

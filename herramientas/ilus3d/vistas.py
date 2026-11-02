@@ -30,16 +30,17 @@ def _extra(pose, d, centro, ri, normal, debajo_de, arriba_ri, ri_radio=None):
     return ri_detras(pose, d, centro, *ri, debajo_de=debajo_de, normal=normal, arriba=arriba_ri, radio=ri_radio, al_rc=True) + [('rc_ini', _antes(pose, centro, d))]
 
 def tubo(id, pose, d, centro, ri, radio=0.12, encuadre=0.26, cortes=(), region=None, huesos=(), normal=None, arriba=(0, 1, 0),
-         debajo_de=None, arriba_ri=(0, 1, 0), musculos=None, destacar=(), contexto=(), puntos=(), piel_dentro=0.12, vista=None, **kw):
+         debajo_de=None, arriba_ri=(0, 1, 0), musculos=None, destacar=(), contexto=(), puntos=(), piel_dentro=0.12, vista=None, piel_modelo=False, **kw):
     """vista desde el tubo: cuerpo realista con la ventana sobre el punto del RC y el RI detrás. vista: dirección de la cámara
     cuando no conviene mirar en el sentido del rayo (rayo muy angulado: se mira perpendicular al RI, como en las fotos del libro)"""
     v = dict(punto=centro, radio=radio, encuadre=encuadre, destacar=list(destacar), contexto=list(contexto), piel_dentro=piel_dentro)
     if musculos: v['musculos'] = musculos
+    if piel_modelo: v['piel_modelo'] = True     # piel del modelo anatómico: con la rodilla flexionada el avatar no acompaña a los huesos
     return figura(id + '-tubo', pose, dir=vista if vista is not None else d, arriba=arriba, huesos=huesos, region=region, cortes=cortes, ventana=v,
                   puntos=[centro] + list(puntos) + _extra(pose, d, centro, ri, normal, debajo_de, arriba_ri, kw.pop('ri_radio', None)), **kw)
 
 def costado(id, pose, d, centro, ri, cortes=(), region=None, huesos=(), normal=None, debajo_de=None, arriba_ri=(0, 1, 0),
-            destacar=(), contexto=(), puntos=(), desde=None, encuadre=0, arriba_img=None, **kw):
+            destacar=(), contexto=(), puntos=(), desde=None, encuadre=0, arriba_img=None, piel_modelo=False, **kw):
     """vista de costado respecto del rayo: horizontal, perpendicular al rayo, con el tubo arriba del dibujo y el RI de canto abajo
     (arriba_img=(0, 1, 0): paciente de pie, derecho en el dibujo). desde: dirección de la cámara (por defecto, desde la derecha
     del paciente cuando el rayo es AP/PA). Piel semitransparente en todo el cuerpo y huesos adentro."""
@@ -49,6 +50,7 @@ def costado(id, pose, d, centro, ri, cortes=(), region=None, huesos=(), normal=N
         if abs(desde[0]) > 0.5 and desde[0] < 0: desde = -desde          # AP/PA: mirar desde la derecha del paciente (X negativo -> +X)
         if abs(desde[2]) > 0.5 and desde[2] > 0: desde = -desde          # lateral: mirar al paciente de frente
     v = dict(punto=centro, radio=-1, piel=0.5, encuadre=encuadre, destacar=list(destacar), contexto=list(contexto))
+    if piel_modelo: v['piel_modelo'] = True
     return figura(id + '-otra', pose, dir=tuple(desde), arriba=tuple(arriba_img if arriba_img is not None else -dh), huesos=huesos, region=region, cortes=cortes, ventana=v,
                   puntos=[centro] + list(puntos) + _extra(pose, d, centro, ri, normal, debajo_de, arriba_ri, kw.pop('ri_radio', None)), **kw)
 

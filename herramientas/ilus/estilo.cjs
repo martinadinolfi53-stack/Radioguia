@@ -296,7 +296,7 @@ function modelo(o) {
     const L = Math.min(n * k, 80), pe = [q[0] + nv[0] * L, q[1] + nv[1] * L];
     s += separador(318) + titulo(330, "", o.otraTitulo || (o.otra === "arriba" ? "Vista desde arriba" : _vistaDe(g.info.dir)), "otra") + g.svg + (o.extraOtra ? o.extraOtra(g, q) : "") +
       `<line x1="${_r1(a[0])}" y1="${_r1(a[1])}" x2="${_r1(b[0])}" y2="${_r1(b[1])}" stroke="${INK}" stroke-width="6" stroke-linecap="butt"/>` +
-      txt(_r1(Math.max(a[0], b[0]) + 6), _r1(Math.max(a[1], b[1]) + 4), "RI", 10.5, INK, "start", 700) +
+      (o.riTexto === "" ? "" : txt(_r1(Math.max(a[0], b[0]) + 6), _r1(Math.max(a[1], b[1]) + 4), o.riTexto || "RI", 10.5, INK, "start", 700)) +
       (o.ang ? `<line x1="${_r1(q[0])}" y1="${_r1(q[1])}" x2="${_r1(pe[0])}" y2="${_r1(pe[1])}" stroke="${RED}" stroke-width="1.3" stroke-dasharray="3 4"/>` +
         (s0[0] >= pe[0] && !_angDer(s0, pe, o.ang)
           ? txt(_r1(s0[0]), _r1(s0[1] - 8), o.ang, 11.5, RED, "middle", 700)      // no entra a la derecha: arriba del comienzo de la flecha

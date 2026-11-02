@@ -10,6 +10,47 @@ const def = (o) => { if (fs.existsSync(path.join(RENDER, o.id + "-tubo.webp"))) 
 const R = (t) => [t, RED, 700];
 const M = (t) => [t, MUTE];
 const r1 = (n) => Math.round(n * 10) / 10;
+// ángulo del RC respecto de la horizontal en la vista de costado (y, si se pide, la inclinación del RI respecto de la vertical)
+const rad = (d) => (d * Math.PI) / 180;
+const extremosRI = (g) => {
+  const P = ["b0", "b1", "b2", "b3"].map((n) => g.p(n)); let a = P[0], b = P[1], dm = -1;
+  for (const p of P) for (const r of P) { const d = Math.hypot(p[0] - r[0], p[1] - r[1]); if (d > dm) { dm = d; a = p; b = r; } }
+  return a[1] > b[1] ? [a, b] : [b, a];     // [abajo, arriba]
+};
+const horizontal = (label, labelRI) => (g, q) => {
+  const ini = g.p("rc_ini"), s = Math.sign(ini[0] - q[0]) || -1, L = 74, r = 44;
+  const ang = Math.atan2(ini[1] - q[1], (ini[0] - q[0]) * s);
+  const pA = [q[0] + s * r, q[1]], pB = [q[0] + s * r * Math.cos(ang), q[1] + r * Math.sin(ang)];
+  const m = [q[0] + s * (r + 12) * Math.cos(ang / 2), q[1] + (r + 12) * Math.sin(ang / 2) + 4];
+  let out = `<line x1="${r1(q[0])}" y1="${r1(q[1])}" x2="${r1(q[0] + s * L)}" y2="${r1(q[1])}" stroke="${RED}" stroke-width="1.3" stroke-dasharray="3 4"/>` +
+    `<path d="M${r1(pA[0])},${r1(pA[1])} A${r},${r} 0 0 ${s > 0 ? 0 : 1} ${r1(pB[0])},${r1(pB[1])}" fill="none" stroke="${RED}" stroke-width="1.5"/>` +
+    E.txt(r1(m[0]), r1(m[1]), label, 11.5, RED, s > 0 ? "start" : "end", 700);
+  if (labelRI) {
+    const [lo, hi] = extremosRI(g), h = lo[1] - hi[1];
+    out += `<line x1="${r1(lo[0])}" y1="${r1(lo[1])}" x2="${r1(lo[0])}" y2="${r1(lo[1] - h - 10)}" stroke="${BLUE}" stroke-width="1.3" stroke-dasharray="3 4"/>` +
+      E.txt(r1(lo[0] + (hi[0] < lo[0] ? 6 : -6)), r1(lo[1] - h - 14), labelRI, 11.5, BLUE, hi[0] < lo[0] ? "start" : "end", 700);
+  }
+  return out;
+};
+// arco en C: tubo en el comienzo de la flecha del RC e intensificador en el lugar del RI, unidos por el arco hacia el lado indicado
+// (lado = 1 o -1: a la izquierda o a la derecha del rayo)
+const arcoC = (lado) => (g, q) => {
+  const ini = g.p("rc_ini"), u0 = [ini[0] - q[0], ini[1] - q[1]], n0 = Math.hypot(...u0);
+  let k = Math.min(n0, Math.max(40, q[1] - 46)) / n0;          // mismo comienzo de flecha que E.modelo
+  if (q[0] + u0[0] * k > 500) k = Math.max(0, (500 - q[0]) / u0[0]);
+  const T = [q[0] + u0[0] * k, q[1] + u0[1] * k], [lo, hi] = extremosRI(g), B = [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2];
+  const d = Math.hypot(B[0] - T[0], B[1] - T[1]), u = [(B[0] - T[0]) / d, (B[1] - T[1]) / d], n = [-u[1] * lado, u[0] * lado];
+  const P0 = [T[0] - u[0] * 26, T[1] - u[1] * 26], P1 = [B[0] + u[0] * 14, B[1] + u[1] * 14], h = Math.max(60, d * 0.55);
+  const c0 = [P0[0] + n[0] * h - u[0] * 20, P0[1] + n[1] * h - u[1] * 20], c1 = [P1[0] + n[0] * h + u[0] * 20, P1[1] + n[1] * h + u[1] * 20];
+  const caja = (c, w, hh, t) => {
+    const a = (Math.atan2(u[1], u[0]) * 180) / Math.PI + 90;
+    return `<g transform="translate(${r1(c[0])},${r1(c[1])}) rotate(${r1(a)})"><rect x="${-w / 2}" y="${-hh / 2}" width="${w}" height="${hh}" rx="5" fill="#e6e8ee" stroke="#8a8f9c" stroke-width="1.4"/></g>` +
+      E.txt(r1(c[0] + n[0] * (hh / 2 + 30)), r1(c[1] + n[1] * (hh / 2 + 30) + 4), t, 10.5, MUTE, "middle", 400);
+  };
+  const Tc = [T[0] - u[0] * 14, T[1] - u[1] * 14], Bc = [B[0] + u[0] * 9, B[1] + u[1] * 9];
+  return `<path d="M${r1(P0[0])},${r1(P0[1])} C${r1(c0[0])},${r1(c0[1])} ${r1(c1[0])},${r1(c1[1])} ${r1(P1[0])},${r1(P1[1])}" fill="none" stroke="#cfd3dc" stroke-width="10" stroke-linecap="round"/>` +
+    caja(Tc, 40, 24, "Tubo") + caja(Bc, 64, 14, "Intensificador");
+};
 const giro = (label) => (g) => {
   const a = g.p("cabeza_humero_R"), b = g.p("cabeza_humero_L"), u = [b[0] - a[0], b[1] - a[1]], n = Math.hypot(...u);
   const p0 = [a[0] - u[0] / n * 20, a[1] - u[1] / n * 20], p1 = [b[0] + u[0] / n * 20, b[1] + u[1] / n * 20];
@@ -143,5 +184,22 @@ def({ id: "port-cadera-axiolateral-danelius", blanco: "medio:cabeza_femur_R|troc
   otraTitulo: "Vista desde el techo", tubo: "Desde el tubo (entre las piernas)",
   rc: [R("RC horizontal"), "⊥ al RI y al cuello femoral"],
   pos: ["Apoyo bajo la cadera", "Parrilla vertical contra el", "costado, sobre la cresta", "Otra pierna elevada (nunca", "sobre el tubo)"] });
+
+def({ id: "port-cadera-axiolateral-clements", blanco: "medio:cabeza_femur_R|trocanter_mayor_R", ri: "24 × 30", otra: "costado",
+  otraTitulo: "Vista perpendicular al rayo", tubo: "Desde el tubo", extraOtra: horizontal("≈15-20°", "≈15°"),
+  rc: [R("RC ≈15-20° hacia posterior"), R("(respecto de la horizontal)"), "⊥ al cuello femoral y al RI,", "centrado en el cuello"],
+  pos: ["Decúbito supino, lado afectado", "cerca del borde de la mesa", "Las dos piernas extendidas,", "la afectada en posición neutra", "Brazos cruzados sobre el tórax", "RI en la bandeja del Bucky,", "inclinado ≈15° de la vertical"],
+  pie: [M("Parrilla alineada con el RC"), M("DFRI 100 cm")] });
+
+def({ id: "intraop-abdomen-pa-colangiograma", blanco: "medio:centro:First lumbar vertebra|centro:Right eleventh rib|0.6", ri: "Intensificador",
+  riTexto: "", otra: "costado", tubo: "Desde arriba (lado del intensificador)", otraTitulo: "Vista desde los pies", extraOtra: arcoC(1),
+  rc: [R("PA: tubo debajo de la mesa,"), R("intensificador arriba"), "El manual no da ángulo", "ni punto de centrado"],
+  pos: ["Decúbito supino", "Campo estéril", "Delantales y protecciones", "plomadas para todo el personal", "Pedal: el médico maneja la", "fluoroscopia sin las manos"] });
+
+def({ id: "intraop-cadera-lateral", blanco: "medio:cabeza_femur_R|trocanter_mayor_R", ri: "Intensificador", riTexto: "", otra: "costado",
+  otraTitulo: "Vista desde el techo", tubo: "Desde el tubo (arriba y afuera)", extraOtra: arcoC(-1),
+  rc: [R("RC horizontal"), R("superoinferior:"), "tubo superior, intensificador", "inferior (entre las piernas)"],
+  pos: ["Decúbito supino", "Campo estéril", "Delantales y protecciones", "plomadas", "Máxima radiación del lado", "del tubo: alejarse de ahí"],
+  pie: [M("Pierna sana elevada para que"), M("entre el arco (no lo dice el manual)")] });
 
 module.exports = I;

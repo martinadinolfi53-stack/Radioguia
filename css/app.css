@@ -40,6 +40,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .top-row { display: flex; align-items: center; gap: 12px; min-height: 60px; padding-block: 8px; }
 .top .titulo { flex: 1; min-width: 0; }
 .top h1 { margin: 0; font-size: 1.15em; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.top-fuente { text-decoration: none; }
 .top p { margin: 2px 0 0; font-size: .8em; line-height: 1.35; color: var(--mute); overflow-wrap: anywhere; }
 .logo { width: 40px; height: 40px; border-radius: 10px; flex: none; }
 .ico { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex: none; color: var(--fg); }
@@ -447,4 +448,10 @@ a.ident-nota { color: var(--accent); text-decoration: underline; }
 :root[data-theme="light"] .fuente-tag.f-bontrager { --fc: #1565c0; }
 :root[data-theme="light"] .fuente-tag.f-merrill { --fc: #b25d00; }
 a.row.fav-otra { display: flex; padding: 12px 16px; text-decoration: none; }
+/* resultados del buscador con todos los libros: la etiqueta del libro antes de la estrella */
+.row.res .fuente-tag { margin-left: 6px; }
+.row.res:not(:has(.starb)) { padding-right: 14px; }
+.res-otra { flex: 1; min-width: 0; display: grid; align-content: center; padding: 12px 6px 12px 16px; border: 0; background: transparent; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.res-otra .s { font-size: .82em; color: var(--mute); }
+.res-otra:active { background: var(--surface-2); }
 #fuente { scroll-margin-top: calc(var(--top-h, 64px) + 12px); }

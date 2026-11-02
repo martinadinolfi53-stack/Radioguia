@@ -1,5 +1,6 @@
 // Utilidades compartidas por las vistas.
 import { listas } from "./almacen.js";
+import { fuenteInfo } from "./fuente.js";
 
 export const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -21,10 +22,12 @@ export const icono = {
   libro: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v16H6.5A2.5 2.5 0 004 21.5z"/><path d="M4 5.5v16"/></svg>',
 };
 
+// arriba a la derecha siempre se ve de qué libro son los datos (tocarla lleva a cambiar de libro en Ajustes)
 export function cabecera({ titulo, sub, atras, derecha = "", chica = false }) {
   return `<header class="top${chica ? " chica" : ""}"><div class="wrap top-row">
     ${atras ? `<a class="ico" href="${atras}" data-atras aria-label="Volver">${icono.atras}</a>` : `<img class="logo" src="iconos/icono-192.png" alt="">`}
     <div class="titulo"><h1>${esc(titulo)}</h1>${sub ? `<p>${esc(sub)}</p>` : ""}</div>
+    <a class="fuente-tag f-${esc(fuenteInfo.id)} top-fuente" href="#ajustes-fuente" aria-label="Libro: ${esc(fuenteInfo.nombre)}. Cambiar de libro">${esc(fuenteInfo.nombre)}</a>
     ${derecha}
   </div></header>`;
 }

@@ -146,7 +146,12 @@ app.addEventListener("click", (e) => {
   if (f) { estado.favFuente = f.dataset.favFuente; const y = scrollY; render(); scrollTo(0, y); }
 });
 // una vista avisa que terminó de cargar algo (por ejemplo, los nombres de otro libro en Favoritos)
-document.addEventListener("rx-rehacer", () => { const y = scrollY; render(); scrollTo(0, y); });
+// en Enfoques y Favoritos se cambia solo la lista, así el buscador no pierde lo que se está escribiendo
+document.addEventListener("rx-rehacer", () => {
+  const t = ruta().tipo;
+  if (t === "inicio" || t === "favoritos") return refrescarMain();
+  const y = scrollY; render(); scrollTo(0, y);
+});
 
 // Ajustes → Buscar actualización
 app.addEventListener("click", async (e) => {

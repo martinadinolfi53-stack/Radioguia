@@ -1,20 +1,26 @@
-// Nombres de los enfoques de otros libros, para mostrar en Favoritos los que se guardaron desde otra fuente.
-// Se cargan solo cuando hacen falta (la primera vez que se abre Favoritos con enfoques de otro libro) y quedan en memoria.
+// Enfoques de los otros libros: para mostrar en Favoritos los que se guardaron desde otra fuente y para que el buscador
+// encuentre en todos los libros. Se cargan solo cuando hacen falta y quedan en memoria.
+import { armar } from "./datos.js";
+
 const cache = {}, cargando = {};
 
-// devuelve { <id>: { nombre, region, familia } } o null mientras carga (familia: la clave de js/menu.js, según el menú de ese libro);
-// alListo se llama cuando termina de cargar
-export function nombresDe(fuente, alListo) {
+// { nombres: { <id>: { nombre, region, familia } }, proyecciones } o null mientras carga
+// (familia: la clave de js/menu.js, según el menú de ese libro); al terminar de cargar se rehace la pantalla
+function cargar(fuente) {
   if (cache[fuente]) return cache[fuente];
   if (!cargando[fuente]) {
-    cargando[fuente] = import(`../datos/${fuente}/indice.js`).then(({ CAPITULOS, MENU }) => {
-      const m = {}, familia = Object.fromEntries(MENU.flatMap((g) => g.regiones.map((r) => [r, g.familia])));
-      for (const c of CAPITULOS) {
-        const reg = Object.fromEntries(c.regiones.map((r) => [r.id, r.nombre]));
-        for (const p of c.proyecciones) m[p.id] = { nombre: p.metodo && !p.nombre.includes(p.metodo) ? `${p.nombre} · ${p.metodo}` : p.nombre, region: reg[p.region] || "", familia: familia[p.region] || "" };
-      }
-      cache[fuente] = m;
-    }).catch(() => { cache[fuente] = {}; }).then(() => alListo?.());
+    cargando[fuente] = import(`../datos/${fuente}/indice.js`).then((indice) => {
+      const { proyecciones, regionPorId } = armar(indice);
+      const familia = Object.fromEntries(indice.MENU.flatMap((g) => g.regiones.map((r) => [r, g.familia])));
+      const nombres = {};
+      for (const p of proyecciones) nombres[p.id] = { nombre: p.nombre, region: regionPorId[p.region]?.nombre || "", familia: familia[p.region] || "" };
+      for (const p of proyecciones) p._region = nombres[p.id].region;
+      cache[fuente] = { nombres, proyecciones };
+    }).catch(() => { cache[fuente] = { nombres: {}, proyecciones: [] }; })
+      .then(() => document.dispatchEvent(new Event("rx-rehacer")));
   }
   return null;
 }
+
+export const nombresDe = (fuente) => cargar(fuente)?.nombres ?? null;
+export const proyeccionesDe = (fuente) => cargar(fuente)?.proyecciones ?? null;

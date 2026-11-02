@@ -179,6 +179,13 @@ def segmentos(c):
             if i < n and w > w0[i]: w0[i] = w; seg[i] = _seg(b)
     return seg.astype(str)
 
+def _de_mandibula(b):
+    """hueso de MakeHuman que cuelga de 'jaw' (labio inferior: special04, oris01/02/06/07; lengua)"""
+    while b:
+        if b == 'jaw': return True
+        b = P.SK['bones'][b]['parent']
+    return False
+
 def posado(c, ajustado=None):
     """partes del avatar posadas como el cuerpo c (después de c.posar): lista de (nombre, P, caras, uv o None).
     ajustado: piel llevada a la forma del cuerpo de BodyParts3D (AVATAR_AJUSTE=1)"""
@@ -190,6 +197,7 @@ def posado(c, ajustado=None):
     G = {}
     for b, M in D['S'].items():
         seg = _seg(b); T = c.T.get(seg, c.T['pelvis'])
+        if 'mandibula' in c.T and _de_mandibula(b): T = c.T['mandibula']      # boca abierta: mentón, labio inferior y lengua
         if seg.startswith('radio_') and seg in c.T:
             # la pronosupinación del modelo es un giro del radio alrededor de su eje: el antebrazo del avatar la reparte entre
             # lowerarm01 (nada) y lowerarm02 (todo), como el giro escalonado de rig.piel_posada

@@ -56,5 +56,6 @@ class Pose(dict):
     def cuello_lat(self, s, g): return self._rep(['C2', 'C3', 'C4', 'C5', 'C6', 'C7'], Z, -_sg(s) * g)
     def cabeza_flex(self, g): return self.mov('cabeza', X, g)                # mentón hacia el pecho (+) / extensión (-)
     def cabeza_rot(self, s, g): return self._rep(['C1', 'C2'], Y, _sg(s) * g)   # la cara gira hacia el lado s
+    def boca_abrir(self, g): return self.mov('mandibula', 'boca', g)             # apertura de la boca (giro de la mandíbula)
     def cabeza_lat(self, s, g): return self.mov('cabeza', Z, -_sg(s) * g)
     def pelvis(self, eje, g): return self.mov('pelvis', eje, g)

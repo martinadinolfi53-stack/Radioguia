@@ -175,7 +175,7 @@ function desdeDedos(id, medial, caja, incl) {
   return { f, yRI, base0, top, wedge, ang, hor, dir };
 }
 I["pie-ap-oblicua-medial"] = () => {
-  const d = desdeDedos("pie-ap-oblicua-medial", true, [180, 30, 300, 230], 35), f = d.f;
+  const d = desdeDedos("pie-ap-oblicua-medial", true, [180, 30, 300, 230], 35.5), f = d.f;
   const b3 = f.p("base_mt3_R"), ang = d.ang;
   return svg(
     view("Vista desde los dedos · pie oblicuado hacia medial") +

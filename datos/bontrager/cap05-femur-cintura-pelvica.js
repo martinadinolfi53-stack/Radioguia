@@ -79,7 +79,7 @@ export default {
       rc: { direccion: "horizontal", texto: "Horizontal y perpendicular al fémur, al punto medio del RI." },
       posicion: [
         "No mover al paciente de la posición de decúbito supino. Levantar con cuidado la pierna lesionada y poner un apoyo debajo de la rodilla y de la pierna.",
-        "RI vertical entre las piernas, lo más arriba posible pero incluyendo la rodilla en la parte distal. Sujetar el RI con parrilla con cinta adhesiva.",
+        "RI vertical entre las piernas, lo más arriba posible pero incluyendo la rodilla en la parte distal. Utilizar cinta adhesiva para mantener el RI con parrilla parado en su posición.",
         "Proteger los tejidos radiosensibles en hombres y mujeres.",
       ],
       criterios: SIN_CRITERIOS,

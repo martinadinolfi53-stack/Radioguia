@@ -17,6 +17,7 @@ def par(id, pose, d, centro, ri, otra='costado', radio=0.15, encuadre=0.27, hues
     kt = {k: v for k, v in kw.items() if k not in ('desde', 'arriba_img', 'arriba_tubo')}
     if 'arriba_tubo' in kw: kt['arriba'] = kw.pop('arriba_tubo')
     F[id + '-tubo'] = lambda: tubo(id, pose(), d, centro, ri, radio=radio, encuadre=encuadre, huesos=huesos, **kt)
+    kw = {k: v for k, v in kw.items() if k != 'huesos_hasta'}
     if otra == 'costado': F[id + '-otra'] = lambda: costado(id, pose(), d, centro, ri, huesos=huesos, encuadre=enc_otra, **kw)
     # desde la cabeza: el tronco cortado 4 cm por encima de la cresta, para ver el giro de la pelvis sin el tórax delante
     elif otra == 'arriba': F[id + '-otra'] = lambda: arriba(id, pose(), d, centro, ri, huesos=huesos, cortes=[('cresta_iliaca_R', (0, -1, 0), 0.04)], region=TRONCO_BAJO,
@@ -34,17 +35,25 @@ par('caderas-ap-unilateral', lambda: _rot(17), AP, 'medio:cabeza_femur_R+trocant
 # inlet: RC 40° caudal a la altura de las EIAS; outlet: 20-45° cefálico, 2,5-5 cm por debajo de la sínfisis
 par('pelvis-ap-axial-inlet', Pose, angulado(AP, 40, 'caudal'), f'medio:{EIAS}|{EIAS}', (0.43, 0.35), normal=AP)
 par('pelvis-ap-axial-outlet', Pose, angulado(AP, 32, 'cefalico'), 'medio:sinfisis|rodilla_R+rodilla_L|0.08', (0.43, 0.35), normal=AP)
-# rana bilateral: caderas y rodillas flexionadas, fémures abducidos 40-45° desde la vertical, plantas juntas
-_rana = lambda: (Pose().cadera_flex('R', 60).cadera_abd('R', 45).rodilla_flex('R', 95)
-                 .cadera_flex('L', 60).cadera_abd('L', 45).rodilla_flex('L', 95))
-par('cadera-lateral-rana-bilateral', _rana, AP, 'medio:cabeza_femur_R+cabeza_femur_L|cabeza_femur_R+cabeza_femur_L', (0.43, 0.35), encuadre=0.42, enc_otra=0.55)
-# rana unilateral: v1 cuello femoral (fémur abducido 45° desde la vertical); v2 cabeza y acetábulo (paciente oblicuo 35-45°
-# hacia el lado afectado, pierna abducida hasta la mesa)
-_rana1 = lambda: Pose().cadera_flex('R', 60).cadera_abd('R', 45).rodilla_flex('R', 95)
-par('cadera-lateral-rana-unilateral--v1', _rana1, AP, 'medio:cabeza_femur_R|trocanter_mayor_R', (0.30, 0.24), radio=0.11, encuadre=0.30, enc_otra=0.5)
-_rana2 = lambda: Pose().cadera_flex('R', 45).cadera_abd('R', 50).rodilla_flex('R', 80)
+# rana: las caderas quedan muy flexionadas y abducidas, y la piel del avatar no acompaña del todo a los huesos (la rodilla
+# asomaba): desde el tubo se dibujan solo los huesos a menos de 18 cm del RC (pelvis y fémur proximal). La segunda vista es desde los pies, con la mesa abajo, para que se vea el
+# ángulo del muslo con la vertical (medido proyectando cabeza femoral -> rodilla sobre el plano transversal).
+PIES = (0, 1, 0)
+# rana bilateral: caderas y rodillas flexionadas, fémures abducidos 40-45° desde la vertical (acá 42°), plantas juntas
+_rana = lambda: (Pose().cadera_flex('R', 60).cadera_abd('R', 40).rodilla_flex('R', 95)
+                 .cadera_flex('L', 60).cadera_abd('L', 40).rodilla_flex('L', 95))
+par('cadera-lateral-rana-bilateral', _rana, AP, 'medio:cabeza_femur_R+cabeza_femur_L|cabeza_femur_R+cabeza_femur_L', (0.43, 0.35), encuadre=0.42, enc_otra=0.55,
+    desde=PIES, huesos_hasta=0.18, puntos=['rodilla_R', 'rodilla_L', 'cabeza_femur_R', 'cabeza_femur_L'])
+# rana unilateral: v1 cuello femoral (fémur abducido 45° desde la vertical)
+_rana1 = lambda: Pose().cadera_flex('R', 60).cadera_abd('R', 43).rodilla_flex('R', 95)
+par('cadera-lateral-rana-unilateral--v1', _rana1, AP, 'medio:cabeza_femur_R|trocanter_mayor_R', (0.30, 0.24), radio=0.11, encuadre=0.30, enc_otra=0.5,
+    desde=PIES, huesos_hasta=0.14, puntos=['rodilla_R', 'cabeza_femur_R'])
+# v2 cabeza y acetábulo: paciente oblicuo 35-45° hacia el lado afectado (acá 40°) y el muslo abducido hasta apoyarse en la
+# mesa. Pose buscada para que rodilla y tobillo queden a la altura de la mesa (≈7 y ≈6 cm sobre el apoyo, el grosor del muslo
+# y de la pierna) y no colgando por debajo: el muslo queda a 99° de la vertical, con algo de rotación externa
+_rana2 = lambda: Pose().cadera_flex('R', 75).cadera_abd('R', 60).rodilla_flex('R', 100).cadera_rot_int('R', -20)
 par('cadera-lateral-rana-unilateral--v2', _rana2, oblicuo('AP', 40, 'R'), 'medio:cabeza_femur_R|trocanter_mayor_R', (0.30, 0.24), radio=0.11, encuadre=0.30,
-    otra='arriba')
+    enc_otra=0.5, desde=PIES, huesos_hasta=0.14, normal=oblicuo('AP', 40, 'R'), puntos=['rodilla_R', 'cabeza_femur_R', 'eias_R', 'eias_L'])
 # Danelius-Miller: decúbito supino, pierna sana flexionada y levantada, afectada con 15° de rotación interna; RC horizontal
 # (paralelo a la mesa) desde abajo y medial, perpendicular al cuello femoral; RI vertical contra el costado, sobre la cresta
 _dm = lambda: Pose().cadera_flex('L', 90).rodilla_flex('L', 90).cadera_rot_int('R', ROT(15))
@@ -61,8 +70,9 @@ par('acetabulo-pa-oblicua-axial-teufel', Pose, angulado(oblicuo('PA', 37, 'R'), 
 par('femur-ap', lambda: Pose().cadera_rot_int('R', ROT(5)), AP, 'centro:Right femur', (0.35, 0.43), radio=0.27, encuadre=0.34, huesos=FEMUR, otra=None)
 par('femur-lateral', lambda: Pose().rodilla_flex('R', 45).cadera_flex('R', 20).cadera_flex('L', -35), (-1, 0, 0), 'centro:Right femur', (0.35, 0.43),
     radio=0.27, encuadre=0.34, huesos=FEMUR, otra=None, ri_radio=0.30)
-par('femur-lateral-haz-horizontal', lambda: Pose().cadera_flex('R', 8), (1, 0, 0), 'centro:Right femur', (0.35, 0.43), radio=0.27, encuadre=0.34,
-    huesos=FEMUR, otra=None, ri_radio=0.12)
+# haz horizontal: desde el tubo con el techo arriba (acostado) y una vista desde el techo con el RI parado entre las piernas
+par('femur-lateral-haz-horizontal', lambda: Pose().cadera_flex('R', 8).cadera_abd('L', 12), (1, 0, 0), 'centro:Right femur', (0.35, 0.43), radio=0.27,
+    encuadre=0.34, huesos=FEMUR, ri_radio=0.12, arriba_tubo=(0, 0, 1), desde=(0, 0, -1), arriba_img=(0, 1, 0), enc_otra=0.75)
 
 if __name__ == '__main__':
     for k in (sys.argv[1:] or F):

@@ -232,8 +232,19 @@ class Cuerpo:
                     ax = np.array([R[2, 1] - R[1, 2], R[0, 2] - R[2, 0], R[1, 0] - R[0, 1]]) / (2 * np.sin(ang))
                     Rh = rotm(ax, ang / 2); Mh = np.eye(4); Mh[:3, :3] = Rh; Mh[:3, 3] = c - Rh @ c
                     T['rotula_' + s] = Tm @ Mh
+        if pose.get('mandibula'):     # boca abierta: la mandíbula (y los dientes de abajo) gira sobre los cóndilos
+            T['mandibula'] = T['cabeza'] @ self._boca(sum(g for _, g in pose['mandibula']))
         self.T = T
         return T
+
+    def es_mandibula(self, nombre): return nombre == 'Mandible' or ' lower ' in nombre and 'tooth' in nombre
+
+    def _boca(self, g):
+        """giro de apertura de la boca: eje entre los dos cóndilos (lo más alto de la mandíbula, a cada lado); + = abrir"""
+        P = self.puntos('Mandible'); top = P[P[:, 1] > P[:, 1].max() - 0.012]
+        cR, cL = top[top[:, 0] < P[:, 0].mean()].mean(0), top[top[:, 0] >= P[:, 0].mean()].mean(0)
+        a = cL - cR; a /= np.linalg.norm(a); c = (cR + cL) / 2
+        Rr = rotm(a, np.radians(g)); M = np.eye(4); M[:3, :3] = Rr; M[:3, 3] = c - Rr @ c; return M
 
     def _local(self, s, movs, giro=1.0):
         """Transformación local del segmento s. giro escala solo la rotación axial del húmero (eje Y en el brazo)."""
@@ -425,7 +436,8 @@ class Cuerpo:
         return out
 
     def huesos_posados(self):
-        return {k: (aplicar(self.T[h['seg']], h['P']), h['I']) for k, h in self.huesos.items()}
+        seg = lambda h: 'mandibula' if 'mandibula' in self.T and self.es_mandibula(h['nombre']) else h['seg']
+        return {k: (aplicar(self.T[seg(h)], h['P']), h['I']) for k, h in self.huesos.items()}
 
 def aplicar(T, P): return P @ T[:3, :3].T + T[:3, 3]
 

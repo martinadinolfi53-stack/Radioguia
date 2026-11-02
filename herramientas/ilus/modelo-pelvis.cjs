@@ -1,7 +1,8 @@
 // Esquemas de pelvis, caderas, acetábulo y fémur con las figuras por capas del modelo 3D (herramientas/ilus3d/figuras/pelvis.py).
 // Reemplazan a los de pelvis.cjs cuando existe el render <id>-tubo. Textos resumidos de datos/bontrager/cap05-femur-cintura-pelvica.js.
 const E = require("./estilo.cjs");
-const { RED, MUTE } = E;
+const { RED, MUTE, BLUE } = E;
+const r1 = (n) => Math.round(n * 10) / 10;
 const fs = require("fs"), path = require("path");
 const RENDER = path.join(__dirname, "../ilus3d/render");
 const I = {};
@@ -31,19 +32,44 @@ def({ id: "pelvis-ap-axial-outlet", blanco: "medio:sinfisis|rodilla_R+rodilla_L|
   rc: [R("RC cefálico"), "Hombres 20-35°", "Mujeres 30-45°", "2,5-5 cm por debajo de la", "sínfisis del pubis"],
   pos: ["Decúbito supino", "Pelvis sin rotar"] });
 
+// rana, vista desde los pies (la mesa abajo): línea punteada vertical desde la cabeza femoral, el muslo (cabeza femoral ->
+// rodilla) y el arco entre los dos con el ángulo del libro. El modelo está posado con ese ángulo medido en el plano transversal.
+const muslo = (lado, label) => (g) => {
+  const h = g.p("cabeza_femur_" + lado), k = g.p("rodilla_" + lado), r = 30;
+  const a = Math.atan2(k[0] - h[0], -(k[1] - h[1])), sg = Math.sign(a) || 1;
+  const top = [h[0], h[1] - 62], p2 = [h[0] + r * Math.sin(a), h[1] - r * Math.cos(a)], am = a / 2;
+  return `<line x1="${r1(h[0])}" y1="${r1(h[1])}" x2="${r1(top[0])}" y2="${r1(top[1])}" stroke="${BLUE}" stroke-width="1.5" stroke-dasharray="4 3"/>` +
+    `<line x1="${r1(h[0])}" y1="${r1(h[1])}" x2="${r1(k[0])}" y2="${r1(k[1])}" stroke="${BLUE}" stroke-width="2"/>` +
+    `<path d="M${r1(h[0])},${r1(h[1] - r)} A${r},${r} 0 0 ${sg > 0 ? 1 : 0} ${r1(p2[0])},${r1(p2[1])}" fill="none" stroke="${BLUE}" stroke-width="1.6"/>` +
+    E.txt(r1(h[0] + (r + 8) * Math.sin(am) + sg * 2), r1(h[1] - (r + 8) * Math.cos(am) - 4), label, 11.5, BLUE, sg > 0 ? "start" : "end", 700);
+};
+// oblicua: línea entre las dos EIAS contra la horizontal de la mesa
+const giro = (label) => (g) => {
+  const R_ = g.p("eias_R"), L_ = g.p("eias_L"), lo = R_[1] > L_[1] ? R_ : L_, hi = lo === R_ ? L_ : R_, d = Math.sign(hi[0] - lo[0]), r = 28;
+  const a = Math.atan2(lo[1] - hi[1], Math.abs(hi[0] - lo[0])), p2 = [lo[0] + d * r * Math.cos(a), lo[1] - r * Math.sin(a)];
+  return `<line x1="${r1(lo[0])}" y1="${r1(lo[1])}" x2="${r1(hi[0])}" y2="${r1(hi[1])}" stroke="${BLUE}" stroke-width="2"/>` +
+    `<line x1="${r1(lo[0])}" y1="${r1(lo[1])}" x2="${r1(lo[0] + d * 58)}" y2="${r1(lo[1])}" stroke="${BLUE}" stroke-width="1.5" stroke-dasharray="4 3"/>` +
+    `<path d="M${r1(lo[0] + d * r)},${r1(lo[1])} A${r},${r} 0 0 ${d > 0 ? 0 : 1} ${r1(p2[0])},${r1(p2[1])}" fill="none" stroke="${BLUE}" stroke-width="1.6"/>` +
+    E.txt(r1(lo[0] + d * (r + 30)), r1(lo[1] - 6), label, 11.5, BLUE, d > 0 ? "start" : "end", 700);
+};
+const ambos = (...fs_) => (g) => fs_.map((f) => f(g)).join("");
+
 def({ id: "cadera-lateral-rana-bilateral", blanco: "medio:cabeza_femur_R+cabeza_femur_L|cabeza_femur_R+cabeza_femur_L", ri: "35 × 43", otra: "costado",
+  otraTitulo: "Vista desde los pies", extraOtra: ambos(muslo("R", "40-45°"), muslo("L", "40-45°")),
   rc: [R("RC perpendicular al RI"), "a la altura de las cabezas", "femorales (≈7-8 cm por", "debajo de las EIAS)"],
-  pos: ["Caderas y rodillas", "flexionadas", "Fémures abducidos 40-45°", "desde la vertical", "Plantas de los pies juntas"],
+  pos: ["Acostado boca arriba", "Caderas y rodillas", "flexionadas", "Muslos abiertos 40-45°", "desde la vertical", "Plantas de los pies juntas"],
   pie: [M("Sin traumatismo")] });
 
 def({ id: "cadera-lateral-rana-unilateral--v1", blanco: "medio:cabeza_femur_R|trocanter_mayor_R", ri: "24 × 30", otra: "costado",
+  otraTitulo: "Vista desde los pies", extraOtra: muslo("R", "45°"),
   rc: [R("RC perpendicular"), "a la mitad del cuello", "femoral"],
-  pos: ["Cuello femoral:", "cadera y rodilla flexionadas", "Fémur a 45° de abducción", "desde la vertical"],
+  pos: ["Cuello femoral:", "acostado boca arriba,", "cadera y rodilla flexionadas", "Muslo abierto 45°", "desde la vertical"],
   pie: [M("Con 20-30° el cuello sale"), M("menos acortado")] });
 
-def({ id: "cadera-lateral-rana-unilateral--v2", blanco: "medio:cabeza_femur_R|trocanter_mayor_R", ri: "24 × 30", otra: "arriba",
+def({ id: "cadera-lateral-rana-unilateral--v2", blanco: "medio:cabeza_femur_R|trocanter_mayor_R", ri: "24 × 30", otra: "costado",
+  otraTitulo: "Vista desde los pies", extraOtra: ambos(giro("35-45°"), muslo("R", "apoyado en la mesa")),
   rc: [R("RC perpendicular"), "a la cabeza femoral"],
-  pos: ["Cabeza y acetábulo:", "paciente oblicuo 35-45°", "hacia el lado afectado", "Pierna abducida hasta", "la mesa"] });
+  pos: ["Cabeza y acetábulo:", "paciente girado 35-45°", "hacia el lado afectado", "Muslo abierto hasta quedar", "apoyado en la mesa"] });
 
 def({ id: "cadera-axiolateral-danelius-miller", blanco: "medio:cabeza_femur_R|trocanter_mayor_R", ri: "24 × 30", otra: "costado",
   otraTitulo: "Vista desde el techo", tubo: "Desde el tubo (entre las piernas)",
@@ -67,9 +93,10 @@ def({ id: "femur-lateral", blanco: "centro:Right femur", ri: "35 × 43",
   rc: [R("RC perpendicular al fémur"), "a la parte media del RI"],
   pos: ["Decúbito lateral sobre el lado afectado", "Rodilla flexionada ≈45°", "Pierna sana llevada hacia atrás", "Cadera hacia el cátodo"] });
 
-def({ id: "femur-lateral-haz-horizontal", blanco: "centro:Right femur", ri: "35 × 43",
-  rc: [R("RC horizontal"), "perpendicular al fémur, al punto medio del RI"],
-  pos: ["Sin mover al paciente (decúbito supino)", "Pierna lesionada apenas elevada, con apoyo", "RI vertical entre las piernas, incluyendo", "la rodilla"],
+def({ id: "femur-lateral-haz-horizontal", blanco: "centro:Right femur", ri: "35 × 43", otra: "costado",
+  otraTitulo: "Vista desde el techo", tubo: "Desde el tubo (al costado)",
+  rc: [R("RC horizontal"), "perpendicular al fémur,", "al punto medio del RI"],
+  pos: ["Acostado boca arriba, sin moverlo", "Pierna lesionada apenas elevada,", "con un apoyo bajo la rodilla", "RI parado entre las piernas,", "incluyendo la rodilla, sujeto", "con cinta adhesiva para que", "no se caiga"],
   pie: [M("Fémur proximal: Danelius-Miller")] });
 
 module.exports = I;

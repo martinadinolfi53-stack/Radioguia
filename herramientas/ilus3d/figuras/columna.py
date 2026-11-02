@@ -34,7 +34,8 @@ _hombros_abajo = lambda: Pose().hombro_elevar('R', -10).hombro_elevar('L', -10)
 SUP_H = dict(arriba_tubo=(0, 0, 1), desde=(0, 0, -1), arriba_img=(0, 1, 0))
 
 # ---------- cervical ----------
-par('columna-cervical-ap-boca-abierta', Pose, AP, 'medio:centro:Atlas|centro:Axis', (0.18, 0.24), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO, **DE_PIE)
+_boca = lambda: Pose().boca_abrir(25)          # boca bien abierta: los incisivos se separan ≈4 cm
+par('columna-cervical-ap-boca-abierta', _boca, AP, 'medio:centro:Atlas|centro:Axis', (0.18, 0.24), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO, **DE_PIE)
 _menton = lambda: Pose().cabeza_flex(-30)
 par('columna-cervical-odontoides-fuchs', _menton, AP, 'centro:Axis', (0.24, 0.18), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO)
 par('columna-cervical-odontoides-judd', _menton, PA, 'centro:Axis', (0.24, 0.18), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO)

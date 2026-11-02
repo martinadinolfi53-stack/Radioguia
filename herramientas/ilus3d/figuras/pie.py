@@ -63,7 +63,10 @@ F['dedos-pie-ap'] = lambda: fig('dedos-pie-ap', _planta(), LAT, SUP, cortes=[('t
 # g = aducción de cadera; la planta queda inclinada algo menos (medido con la normal de la planta respecto de la mesa):
 # g 40,6 -> 35° (centro de 30-40°, pie); g ±43,6 -> 37,5° (centro de 30-45°, dedos)
 _obl = lambda g: Pose().cadera_flex('R', 60).cadera_abd('R', -g).rodilla_flex('R', 110).tobillo_dorsi('R', -40)
-F['pie-ap-oblicua-medial'] = lambda: fig('pie-ap-oblicua-medial', _obl(40.6), desde_dedos(_obl(40.6)), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
+# pie medial: con el muslo a 60° y la aducción sola, los dedos quedaban 2,4 cm más altos que el talón; con el muslo a 50° (como
+# _obl_med de los dedos) la planta apoya pareja y queda a 35,5° del RI (normal de la planta)
+_obl_pie = lambda: Pose().cadera_flex('R', 50).cadera_abd('R', -42).rodilla_flex('R', 110).tobillo_dorsi('R', -40)
+F['pie-ap-oblicua-medial'] = lambda: fig('pie-ap-oblicua-medial', _obl_pie(), desde_dedos(_obl_pie()), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
 F['dedos-pie-ap-oblicua--v1'] = lambda: fig('dedos-pie-ap-oblicua--v1', _obl_med(), desde_dedos(_obl_med()), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
 # lateral: solo abducir la cadera dejaba el pie apuntando 45° hacia afuera y con los dedos hacia la mesa; abducción 20° + rotación
 # externa 41° deja el pie derecho hacia adelante y la planta a 37,5° (medido con la normal)

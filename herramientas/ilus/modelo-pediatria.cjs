@@ -46,7 +46,7 @@ def({ id: "torax-ped-lateral-pigg", blanco: "linea_mamilar", ri: "24 × 18", otr
   rc: RC_TORAX,
   pos: ["Misma posición que la PA:", "girar 90° el asiento y las", "piezas (lateral izquierda)", "Protección plomada justo por", "encima de la cresta ilíaca"],
   pie: [M("DFRI 180 cm"), NOTA] });
-def({ id: "torax-ped-lateral-mesa", blanco: "linea_mamilar", ri: "24 × 18", otra: "costado", otraTitulo: "Desde los pies",
+def({ id: "torax-ped-lateral-mesa", blanco: "linea_mamilar", ri: "24 × 18", otra: "costado", otraTitulo: "De frente",
   tubo: "Desde el tubo (techo)",
   rc: RC_TORAX,
   pos: ["Decúbito lateral (por lo", "general izquierdo)", "Brazos arriba, la cabeza", "entre ellos; piernas", "flexionadas e inmovilizadas", "Lateral verdadera"],

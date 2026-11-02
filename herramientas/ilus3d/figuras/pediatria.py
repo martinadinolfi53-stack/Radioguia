@@ -31,7 +31,8 @@ par('torax-ped-pa-pigg', lambda: brazos_arriba(sentado(Pose())), PA, 'linea_mami
 par('torax-ped-lateral-pigg', lambda: brazos_arriba(sentado(Pose())), LAT_I, 'linea_mamilar', (0.18, 0.24), enc_otra=0.45,
     desde=(0, 0, -1), puntos=['caderas'], arriba_img=(0, 1, 0), ri_radio=0.10)
 # lateral en la mesa: decúbito lateral izquierdo, brazos arriba, piernas flexionadas; rayo vertical (de derecha a izquierda)
-_lat_mesa = lambda: brazos_arriba(Pose()).cadera_flex('R', 45).cadera_flex('L', 45).rodilla_flex('R', 60).rodilla_flex('L', 60)
+# brazos paralelos a la cabeza (abd -10): con 10° de abducción el brazo de abajo atravesaba la mesa
+_lat_mesa = lambda: Pose().hombro_flex('R', 165).hombro_flex('L', 165).hombro_abd('R', -10).hombro_abd('L', -10).cadera_flex('R', 45).cadera_flex('L', 45).rodilla_flex('R', 60).rodilla_flex('L', 60)
 par('torax-ped-lateral-mesa', _lat_mesa, LAT_I, 'linea_mamilar', (0.18, 0.24), enc_otra=0.45,
     desde=(0, 0, -1), arriba_img=(-1, 0, 0))
 
@@ -51,7 +52,7 @@ par('ped-ext-inf-lateral', _rana_d, AP, 'rodilla_R', (0.30, 0.40), encuadre=0.30
 # en flexión dorsal de 30°): el pie queda por delante de la rodilla y se ve desde arriba; rayo vertical hacia abajo
 _kite_ap = lambda: Pose().cadera_flex('R', 90).rodilla_flex('R', 60).tobillo_dorsi('R', 30).cadera_flex('L', 90).rodilla_flex('L', 90)
 par('ped-pie-ap-mediolateral-kite--v1', _kite_ap, (0, -1, 0), 'mediotarso_R', (0.18, 0.24), encuadre=0.20, arriba_tubo=(0, 0, 1),
-    arriba_ri=(0, 0, 1), arriba_img=(0, 1, 0), region=['pelvis', 'muslo_R', 'pierna_R', 'pie_R', 'dedos_pie_R'])
+    arriba_ri=(0, 0, 1), arriba_img=(0, 1, 0), ri_radio=0.10, region=['pelvis', 'muslo_R', 'pierna_R', 'pie_R', 'dedos_pie_R'])
 _kite_lat = lambda: Pose().cadera_abd('R', 40).cadera_rot_int('R', -60).rodilla_flex('R', 30)
 par('ped-pie-ap-mediolateral-kite--v2', _kite_lat, AP, 'base_mt_R', (0.18, 0.24), encuadre=0.20)
 

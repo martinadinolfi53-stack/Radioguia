@@ -69,6 +69,24 @@ function resultados(q) {
   return chips + (res.length ? `<div class="lista">${res.map(({ f, p }) => filaLibro(f, p, true)).join("")}</div>` : `<div class="vacio">Este libro no tiene resultados para <b>“${esc(q)}”</b>.</div>`) + espera;
 }
 
+// buscador de Favoritos: busca solo en los enfoques de la lista (de todos los libros), cada uno con la etiqueta de su libro
+function resultadosFav(locales, otras, q) {
+  const abierta = FUENTES.find((f) => f.id === fuenteId);
+  const todas = locales.map((p) => ({ f: abierta, p })), base = [...proyecciones];
+  let cargando = false;
+  for (const f of FUENTES.filter((x) => x.id !== fuenteId)) {
+    const ids = new Set(otras.filter((x) => x.fuente === f.id).map((x) => x.id));
+    if (!ids.size) continue;
+    const suyas = proyeccionesDeOtra(f.id);
+    if (suyas) { base.push(...suyas); todas.push(...suyas.filter((p) => ids.has(p.id)).map((p) => ({ f, p }))); } else cargando = true;
+  }
+  const deFicha = new Map(todas.map((x) => [x.p, x.f]));
+  // qué palabras son de título se decide con los libros enteros, no solo con la lista
+  const res = buscar(todas.map((x) => x.p), q, base);
+  if (!res.length) return cargando ? `<div class="vacio">Buscando…</div>` : `<div class="vacio">No hay enfoques en esta lista que coincidan con <b>“${esc(q)}”</b>.</div>`;
+  return `<div class="lista">${res.map((p) => filaLibro(deFicha.get(p), p, true)).join("")}</div>` + (cargando ? `<div class="vacio">Buscando en los otros libros…</div>` : "");
+}
+
 const etiquetaFuente = (f) => `<span class="fuente-tag f-${esc(f.id)}">${esc(f.nombre)}</span>`;
 const detalle = (p, region) => esc([region, ...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "));
 // un enfoque con la etiqueta de su libro: los del libro abierto abren la ficha; los de otro libro cambian a ese libro
@@ -338,7 +356,7 @@ export function vistaFavoritos() {
   else if (!localVer.length && !otrasVer.length) cuerpo = act.total
     ? `<div class="vacio">No hay enfoques del ${esc(FUENTES.find((f) => f.id === ff)?.nombre || "")} en esta lista.</div>`
     : `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
-  else if (q && localVer.length) cuerpo = resultados(localVer, q);
+  else if (q) cuerpo = resultadosFav(localVer, otrasVer, q);
   else cuerpo = menuFavoritos((p) => localVer.includes(p), otrasVer);
   // arriba, separados: las listas (una fila que se desliza de costado) y las herramientas de la lista elegida
   const herr = (attr, ico, txt, ok = true) => ok ? `<${attr.startsWith("href") ? "a" : "button"} class="fav-herr" ${attr}><span class="fav-herr-ico">${ico}</span><span>${txt}</span></${attr.startsWith("href") ? "a" : "button"}>` : "";
@@ -354,7 +372,7 @@ export function vistaFavoritos() {
       ${herr(`href="#repaso-l-${esc(act.id)}"`, icono.repaso, "Repasar", favs.length > 0)}
     </div></div>`;
   return cabecera({ titulo: "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${act.nombre} · ${act.total} ${act.total === 1 ? "enfoque" : "enfoques"}`, atras: "#enfoques" }) + cabeza +
-    (favs.length && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
+    (act.total && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
     `<main class="wrap" style="--lc: var(--lc-${act.color})">${filtroFuente}${cuerpo}</main>` + barraPestanas("favoritos");
 }
 

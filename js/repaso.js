@@ -176,8 +176,27 @@ function vistaElegir(aviso) {
   // filtros: cada botón muestra cuántos enfoques del origen tiene
   const cuantos = (k, v) => delOrigen.filter((p) => pasaFiltros(p, { ...conf.filtros, [k]: [v] })).length;
   const filaFiltro = (k, titulo, valores) => `<h3>${titulo}</h3><div class="rp-chips">${valores.map(([v, txt]) => chip(conf.filtros[k].includes(v), `data-rp="filtro" data-k="${k}" data-val="${esc(v)}"`, `${esc(txt)} <small>${cuantos(k, v)}</small>`)).join("")}</div>`;
-  const origenes = [op(conf.origen === "todas", 'data-rp="origen" data-val="todas"', "Todas las fichas", `${proyecciones.length} enfoques`), ...listas().map((l) => op(conf.origen === `lista:${l.id}`, `data-rp="origen" data-val="lista:${esc(l.id)}"`, esc(l.nombre), `${l.ids.length} ${l.ids.length === 1 ? "enfoque" : "enfoques"}`)),
-    op(conf.origen === "sueltos", 'data-rp="origen" data-val="sueltos"', "Elegir enfoques", `${sueltos.size} ${sueltos.size === 1 ? "elegido" : "elegidos"}`)].join("");
+  // rueda de "¿Qué enfoques?": como el selector de la hora del iPhone, lo elegido queda al medio
+  const items = [["todas", "Todas las fichas", `${proyecciones.length} enfoques`],
+    ...listas().map((l) => [`lista:${l.id}`, l.nombre, `${l.ids.length} ${l.ids.length === 1 ? "enfoque" : "enfoques"}`]),
+    ["sueltos", "Elegir enfoques", `${sueltos.size} ${sueltos.size === 1 ? "elegido" : "elegidos"}`]];
+  const rueda = `<div class="rueda"><div class="rueda-marco" aria-hidden="true"></div>
+    <div class="rueda-lista" role="listbox" aria-label="Qué enfoques" tabindex="0">${items.map(([v, txt, det]) =>
+      `<button class="rueda-op${conf.origen === v ? " on" : ""}" role="option" aria-selected="${conf.origen === v}" data-rueda="${esc(v)}"><b>${esc(txt)}</b><small>${det}</small></button>`).join("")}</div></div>`;
+  // ¿qué preguntar?: un renglón por aspecto con interruptor; prendido, abajo sus tipos de pregunta
+  const aspectos = ASPECTOS.map((a) => {
+    const on = conf.aspectos.includes(a.id), campos = CAMPOS.filter((c) => c.aspecto === a.id);
+    const prendidos = campos.filter((c) => !conf.excluir.includes(c.id)).length;
+    return `<div class="rp-asp${on ? " on" : ""}">
+      <button class="rp-asp-cab" role="switch" aria-checked="${on}" data-rp="aspecto" data-val="${a.id}">
+        <span class="rp-asp-txt"><b>${esc(a.nombre)}</b><small>${on && campos.length > 1 ? `${prendidos} de ${campos.length} tipos de pregunta` : esc(a.detalle)}</small></span>
+        <span class="interruptor" aria-hidden="true"></span></button>
+      ${on && campos.length > 1 ? `<div class="rp-tipos">${campos.map((c) => {
+        const si = !conf.excluir.includes(c.id);
+        return `<button class="rp-tipo${si ? " on" : ""}" data-rp="campo" data-val="${c.id}" aria-pressed="${si}">${si ? icono.tilde : ""}<span>${esc(c.nombre)}</span></button>`;
+      }).join("")}</div>` : ""}</div>`;
+  }).join("");
+  const modo = (v, txt, det) => `<button class="rp-modo${conf.modo === v ? " on" : ""}" data-rp="modo" data-val="${v}" aria-pressed="${conf.modo === v}"><b>${txt}</b><small>${det}</small></button>`;
   const ultimos = resultados().slice(0, 5);
   const enCurso = sesion && !sesion.resultado && sesion.respuestas.length < sesion.preguntas.length;
 
@@ -185,7 +204,7 @@ function vistaElegir(aviso) {
   <main class="wrap repaso">
     ${aviso ? `<div class="vacio">${esc(aviso)}</div>` : ""}
     ${enCurso ? `<a class="rp-seguir" href="#repaso-jugar"><span><b>Seguir el repaso</b><small>Vas por la pregunta ${sesion.actual + 1} de ${sesion.preguntas.length}</small></span>${icono.chev}</a>` : ""}
-    <section class="panel"><h2>¿Qué enfoques?</h2><div class="opciones rp-col">${origenes}</div>
+    <section class="panel rp-enfoques"><h2>¿Qué enfoques?</h2>${rueda}
       ${conf.origen === "sueltos" ? selectorSueltos() : ""}</section>
     <details class="panel rp-filtros"${nFiltros ? " open" : ""}><summary><h2>Filtrar enfoques</h2><span>${nFiltros ? `${fichas.length} de ${delOrigen.length} enfoques` : "Sin filtros"}</span>${icono.chev}</summary>
       ${filaFiltro("familias", "Región", FAMILIAS.map((x) => [x.nombre, x.nombre]))}
@@ -193,14 +212,10 @@ function vistaElegir(aviso) {
       ${filaFiltro("cats", "Tipo de proyección", CATEGORIAS.map((c) => [c, c]))}
       ${nFiltros ? `<button class="rp-limpiar" data-rp="limpiar">Quitar filtros</button>` : ""}
     </details>
-    <section class="panel"><h2>¿Qué preguntar?</h2><div class="rp-aspectos">${ASPECTOS.map((a) => {
-      const on = conf.aspectos.includes(a.id);
-      return `<div class="rp-aspecto">${op(on, `data-rp="aspecto" data-val="${a.id}"`, esc(a.nombre), esc(a.detalle))}
-        ${on ? `<div class="rp-chips">${CAMPOS.filter((c) => c.aspecto === a.id).map((c) => chip(!conf.excluir.includes(c.id), `data-rp="campo" data-val="${c.id}"`, esc(c.nombre))).join("")}</div>` : ""}</div>`;
-    }).join("")}</div></section>
-    <section class="panel"><h2>¿Cómo jugar?</h2><div class="opciones rp-col">
-      ${op(conf.modo === "normal", 'data-rp="modo" data-val="normal"', "Normal", "Después de cada respuesta ves si acertaste y seguís cuando quieras")}
-      ${op(conf.modo === "reloj", 'data-rp="modo" data-val="reloj"', "Contrarreloj", "Respondé todas las que puedas antes de que se acabe el tiempo")}</div>
+    <section class="panel rp-preguntar"><h2>¿Qué preguntar?</h2><div class="rp-asps">${aspectos}</div></section>
+    <section class="panel"><h2>¿Cómo jugar?</h2><div class="rp-modos">
+      ${modo("normal", "Normal", "Ves si acertaste después de cada respuesta")}
+      ${modo("reloj", "Contrarreloj", "Todas las que puedas antes de que se acabe el tiempo")}</div>
       ${conf.modo === "reloj" ? `<div class="rp-chips rp-min">${MINUTOS.map((m) => chip(conf.minutos === m, `data-rp="minutos" data-val="${m}"`, `${m} ${m === 1 ? "minuto" : "minutos"}`)).join("")}</div>` : ""}</section>
     ${conf.modo === "reloj" ? "" : `<section class="panel"><h2>¿Cuántas preguntas?</h2><div class="opciones">${CANTIDADES.map((c) => op(conf.cantidad === c, `data-rp="cantidad" data-val="${c}"`, String(c))).join("")}${op(!conf.cantidad, 'data-rp="cantidad" data-val="0"', `Todas${max ? ` (${max})` : ""}`)}</div></section>`}
     ${fichas.length ? "" : `<div class="vacio">${delOrigen.length ? "<b>Ningún enfoque pasa los filtros.</b><br>Sacá alguno de los filtros de arriba." : conf.origen === "sueltos" ? "Elegí al menos un enfoque de la lista de arriba." : "<b>Esta lista está vacía.</b><br>Agregá enfoques con la estrella o elegí enfoques sueltos."}</div>`}
@@ -211,6 +226,53 @@ function vistaElegir(aviso) {
     ${ultimos.length ? `<section class="panel"><h2>Últimos resultados</h2><div class="rp-hist">${ultimos.map((r) => `<div><span>${esc(r.origen?.nombre || "")}<small>${new Date(r.fecha).toLocaleDateString("es-AR", { day: "numeric", month: "short" })} · ${r.preguntas} preguntas</small></span><b>${r.correctas}/${r.preguntas}</b></div>`).join("")}</div></section>` : ""}
     <p class="pie">Preguntas armadas con los datos de las fichas (Bontrager 9ª ed.). Los resultados se guardan en este dispositivo.</p>
   </main>`;
+}
+
+// ---------- rueda de "¿Qué enfoques?" ----------
+// se desliza para arriba o para abajo; la opción que queda al medio es la elegida (al soltar). Tocar una la trae al medio.
+// main.js la llama después de dibujar el repaso.
+export function armarRueda(app) {
+  const lista = app.querySelector(".rueda-lista");
+  if (!lista) return;
+  const ops = [...lista.querySelectorAll(".rueda-op")];
+  const centro = () => lista.getBoundingClientRect().top + lista.clientHeight / 2;
+  const medio = (el) => { const r = el.getBoundingClientRect(); return r.top + r.height / 2; };
+  // las que se alejan del medio se inclinan y se apagan, como un cilindro
+  const pintar = () => {
+    const c = centro(), h = lista.clientHeight / 2;
+    for (const el of ops) {
+      const d = Math.max(-1, Math.min(1, (medio(el) - c) / h));
+      el.style.transform = `perspective(500px) rotateX(${(-d * 55).toFixed(1)}deg) scale(${(1 - Math.abs(d) * 0.12).toFixed(3)})`;
+      el.style.opacity = (1 - Math.abs(d) * 0.72).toFixed(2);
+    }
+  };
+  const masCerca = () => { const c = centro(); return ops.reduce((a, el) => (Math.abs(medio(el) - c) < Math.abs(medio(a) - c) ? el : a), ops[0]); };
+  const llevar = (el, suave) => lista.scrollBy({ top: medio(el) - centro(), behavior: suave ? "smooth" : "instant" });
+  // al abrir: la elegida al medio, con el marco a su alto (un nombre largo ocupa dos renglones)
+  const on = lista.querySelector(".rueda-op.on") || ops[0];
+  lista.parentElement.style.setProperty("--alto", Math.max(62, on.offsetHeight) + "px");
+  llevar(on, false);
+  pintar();
+  let tocando = false, espera = 0;
+  const elegir = () => {
+    if (tocando) return;
+    const el = masCerca(), v = el.dataset.rueda;
+    if (Math.abs(medio(el) - centro()) > 2) return llevar(el, true); // termina de acomodarse y vuelve a pasar por acá
+    if (v === conf.origen) return;
+    conf.origen = v; guardarConf();
+    const y = scrollY; renderRepaso(); scrollTo(0, y);
+  };
+  lista.addEventListener("scroll", () => { requestAnimationFrame(pintar); clearTimeout(espera); espera = setTimeout(elegir, 160); }, { passive: true });
+  lista.addEventListener("touchstart", () => { tocando = true; }, { passive: true });
+  lista.addEventListener("touchend", () => { tocando = false; clearTimeout(espera); espera = setTimeout(elegir, 160); }, { passive: true });
+  lista.addEventListener("click", (e) => { const el = e.target.closest(".rueda-op"); if (el) { llevar(el, true); clearTimeout(espera); espera = setTimeout(elegir, 400); } });
+  // con teclado: flechas arriba y abajo
+  lista.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+    e.preventDefault();
+    const i = ops.indexOf(masCerca()) + (e.key === "ArrowDown" ? 1 : -1);
+    if (ops[i]) llevar(ops[i], true);
+  });
 }
 
 // enfoques sueltos: un desplegable por zona del menú, con casilla para toda la zona

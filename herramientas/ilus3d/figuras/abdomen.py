@@ -99,7 +99,7 @@ D_CL = _h * np.cos(np.radians(17.5)) + np.array([0, 0, -np.sin(np.radians(17.5))
 # piernas cortadas por encima de las rodillas con un plano que contiene el RC: desde el tubo el corte queda de canto
 _n = np.array([0, 1.0, 0]) - D_CL[1] * D_CL; _n /= np.linalg.norm(_n)
 par('port-cadera-axiolateral-clements', _cl, tuple(D_CL), 'medio:cabeza_femur_R|trocanter_mayor_R', (0.30, 0.24), radio=0.11, encuadre=0.30,
-    huesos=['pelvis', 'muslo_R', 'muslo_L'], cortes=[('rodilla_R', tuple(_n), -0.12)],
+    huesos=['pelvis', 'muslo_R', 'muslo_L'], cortes=[('rodilla_R', tuple(_n), -0.12)], enc_otra=0.34,
     desde=(0.78 / 1.0, 0.62, 0.0), arriba_img=(0, 0, 1), ri_radio=0.16, arriba_tubo=(0, 0, 1),
     puntos=['cabeza_femur_R', 'trocanter_mayor_R'])
 
@@ -117,9 +117,16 @@ F['intraop-abdomen-pa-colangiograma-otra'] = lambda: costado('intraop-abdomen-pa
 # Lateral de cadera con arco: RC horizontal, tubo superior (por encima y afuera de la cadera) e intensificador inferior (entre las
 # piernas): la dirección contraria a la de Danelius-Miller. La pierna sana va elevada como en Danelius-Miller para que entre el
 # intensificador (el manual no lo dice; la foto no deja verlo).
-D_ARCO = tuple(-_h)
-par('intraop-cadera-lateral', _dm, D_ARCO, 'medio:cabeza_femur_R|trocanter_mayor_R', (0.23, 0.23), radio=0.11, encuadre=0.30,
-    huesos=['pelvis', 'muslo_R', 'muslo_L', 'L5', 'L4'], desde=(0, 0, -1), arriba_img=(0, 1, 0), ri_radio=0.25, arriba_tubo=(0, 0, 1))
+D_ARCO = -_h
+# desde el tubo el tronco se corta 10 cm por encima de la cresta con un plano que contiene el RC (el corte queda de canto)
+_nt = np.array([0, -1.0, 0]) - (-D_ARCO[1]) * D_ARCO; _nt /= np.linalg.norm(_nt)
+SIN_BRAZOS = ['torax', 'L1', 'L2', 'L3', 'L4', 'L5', 'pelvis', 'muslo_R', 'muslo_L', 'pierna_R', 'pierna_L', 'pie_R', 'pie_L',
+              'dedos_pie_R', 'dedos_pie_L']     # desde el tubo el brazo derecho tapaba la cadera
+_arco = dict(radio=0.11, huesos=['pelvis', 'muslo_R', 'muslo_L', 'L5', 'L4'], ri_radio=0.25)
+F['intraop-cadera-lateral-tubo'] = lambda: tubo('intraop-cadera-lateral', _dm(), tuple(D_ARCO), 'medio:cabeza_femur_R|trocanter_mayor_R', (0.23, 0.23),
+    encuadre=0.30, arriba=(0, 0, 1), cortes=[('cresta_iliaca_R', tuple(_nt), 0.10)], region=SIN_BRAZOS, **_arco)
+F['intraop-cadera-lateral-otra'] = lambda: costado('intraop-cadera-lateral', _dm(), tuple(D_ARCO), 'medio:cabeza_femur_R|trocanter_mayor_R', (0.23, 0.23),
+    encuadre=0.5, desde=(0, 0, -1), arriba_img=(0, 1, 0), cortes=CORTE, huesos=_arco['huesos'], ri_radio=0.25)
 
 if __name__ == '__main__':
     for k in (sys.argv[1:] or F):

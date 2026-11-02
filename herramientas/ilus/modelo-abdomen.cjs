@@ -21,10 +21,10 @@ const horizontal = (label, labelRI) => (g, q) => {
   const ini = g.p("rc_ini"), s = Math.sign(ini[0] - q[0]) || -1, L = 74, r = 44;
   const ang = Math.atan2(ini[1] - q[1], (ini[0] - q[0]) * s);
   const pA = [q[0] + s * r, q[1]], pB = [q[0] + s * r * Math.cos(ang), q[1] + r * Math.sin(ang)];
-  const m = [q[0] + s * (r + 12) * Math.cos(ang / 2), q[1] + (r + 12) * Math.sin(ang / 2) + 4];
+  const m = [q[0] + s * r * 0.75, q[1] + 17];      // debajo de la horizontal: no pisa la flecha ni la columna del texto
   let out = `<line x1="${r1(q[0])}" y1="${r1(q[1])}" x2="${r1(q[0] + s * L)}" y2="${r1(q[1])}" stroke="${RED}" stroke-width="1.3" stroke-dasharray="3 4"/>` +
     `<path d="M${r1(pA[0])},${r1(pA[1])} A${r},${r} 0 0 ${s > 0 ? 0 : 1} ${r1(pB[0])},${r1(pB[1])}" fill="none" stroke="${RED}" stroke-width="1.5"/>` +
-    E.txt(r1(m[0]), r1(m[1]), label, 11.5, RED, s > 0 ? "start" : "end", 700);
+    E.txt(r1(m[0]), r1(m[1]), label, 11.5, RED, "middle", 700);
   if (labelRI) {
     const [lo, hi] = extremosRI(g), h = lo[1] - hi[1];
     out += `<line x1="${r1(lo[0])}" y1="${r1(lo[1])}" x2="${r1(lo[0])}" y2="${r1(lo[1] - h - 10)}" stroke="${BLUE}" stroke-width="1.3" stroke-dasharray="3 4"/>` +
@@ -45,7 +45,7 @@ const arcoC = (lado) => (g, q) => {
   const caja = (c, w, hh, t) => {
     const a = (Math.atan2(u[1], u[0]) * 180) / Math.PI + 90;
     return `<g transform="translate(${r1(c[0])},${r1(c[1])}) rotate(${r1(a)})"><rect x="${-w / 2}" y="${-hh / 2}" width="${w}" height="${hh}" rx="5" fill="#e6e8ee" stroke="#8a8f9c" stroke-width="1.4"/></g>` +
-      E.txt(r1(c[0] + n[0] * (hh / 2 + 30)), r1(c[1] + n[1] * (hh / 2 + 30) + 4), t, 10.5, MUTE, "middle", 400);
+      E.txt(r1(c[0] - n[0] * (w / 2 + 34)), r1(c[1] - n[1] * (w / 2 + 34) + 4), t, 10.5, MUTE, "middle", 400);   // del lado contrario al arco
   };
   const Tc = [T[0] - u[0] * 14, T[1] - u[1] * 14], Bc = [B[0] + u[0] * 9, B[1] + u[1] * 9];
   return `<path d="M${r1(P0[0])},${r1(P0[1])} C${r1(c0[0])},${r1(c0[1])} ${r1(c1[0])},${r1(c1[1])} ${r1(P1[0])},${r1(P1[1])}" fill="none" stroke="#cfd3dc" stroke-width="10" stroke-linecap="round"/>` +
@@ -186,7 +186,7 @@ def({ id: "port-cadera-axiolateral-danelius", blanco: "medio:cabeza_femur_R|troc
   pos: ["Apoyo bajo la cadera", "Parrilla vertical contra el", "costado, sobre la cresta", "Otra pierna elevada (nunca", "sobre el tubo)"] });
 
 def({ id: "port-cadera-axiolateral-clements", blanco: "medio:cabeza_femur_R|trocanter_mayor_R", ri: "24 × 30", otra: "costado",
-  otraTitulo: "Vista perpendicular al rayo", tubo: "Desde el tubo", extraOtra: horizontal("≈15-20°", "≈15°"),
+  otraTitulo: "Perpendicular al rayo", tubo: "Desde el tubo", extraOtra: horizontal("≈15-20°", "≈15°"),
   rc: [R("RC ≈15-20° hacia posterior"), R("(respecto de la horizontal)"), "⊥ al cuello femoral y al RI,", "centrado en el cuello"],
   pos: ["Decúbito supino, lado afectado", "cerca del borde de la mesa", "Las dos piernas extendidas,", "la afectada en posición neutra", "Brazos cruzados sobre el tórax", "RI en la bandeja del Bucky,", "inclinado ≈15° de la vertical"],
   pie: [M("Parrilla alineada con el RC"), M("DFRI 100 cm")] });

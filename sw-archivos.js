@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "39541d6e62";
+self.RG_VERSION = "9b1747c9e2";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -243,8 +243,8 @@ self.RG_EXTRAS = {
  "ilustraciones/humero-lateral-trauma.svg": "e0f1d870",
  "ilustraciones/humero-transtoracica.svg": "dae9a0df",
  "ilustraciones/intestino-delgado-pa.svg": "afe78039",
- "ilustraciones/intraop-abdomen-pa-colangiograma.svg": "4ccf44ab",
- "ilustraciones/intraop-cadera-lateral.svg": "70eaca03",
+ "ilustraciones/intraop-abdomen-pa-colangiograma.svg": "2693c0ac",
+ "ilustraciones/intraop-cadera-lateral.svg": "058b2815",
  "ilustraciones/mandibula-ap-axial.svg": "a9e99763",
  "ilustraciones/mandibula-axiolateral-trauma.svg": "7e51d7a8",
  "ilustraciones/mandibula-axiolateral.svg": "ac238808",
@@ -283,7 +283,7 @@ self.RG_EXTRAS = {
  "ilustraciones/pierna-mediolateral.svg": "abed73de",
  "ilustraciones/port-abdomen-ap-supino.svg": "a56a1834",
  "ilustraciones/port-abdomen-decubito-lateral.svg": "ef0e6ea1",
- "ilustraciones/port-cadera-axiolateral-clements.svg": "681f5a9e",
+ "ilustraciones/port-cadera-axiolateral-clements.svg": "6dc095fa",
  "ilustraciones/port-cadera-axiolateral-danelius.svg": "445dee68",
  "ilustraciones/port-pelvis-cadera-ap--v1.svg": "bf98ab67",
  "ilustraciones/port-pelvis-cadera-ap--v2.svg": "2396750d",
@@ -293,8 +293,8 @@ self.RG_EXTRAS = {
  "ilustraciones/pulgar-ap.svg": "e173eda4",
  "ilustraciones/pulgar-lateral.svg": "3884cf60",
  "ilustraciones/pulgar-pa-oblicua.svg": "3d7eeb30",
- "ilustraciones/rodilla-ap-oblicuas--v1.svg": "6be9409d",
- "ilustraciones/rodilla-ap-oblicuas--v2.svg": "55dbce8d",
+ "ilustraciones/rodilla-ap-oblicuas--v1.svg": "06cb5a68",
+ "ilustraciones/rodilla-ap-oblicuas--v2.svg": "8a70c789",
  "ilustraciones/rodilla-ap-pa-bilateral-carga--v1.svg": "df4b4ad5",
  "ilustraciones/rodilla-ap-pa-bilateral-carga--v2.svg": "dade7d40",
  "ilustraciones/rodilla-ap.svg": "0138c5aa",

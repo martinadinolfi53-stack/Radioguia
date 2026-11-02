@@ -375,7 +375,16 @@ button.sel-fila { width: 100%; text-align: left; padding: 10px 14px; gap: 12px; 
 .casilla { flex: none; width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--mute); display: grid; place-items: center; }
 .sel-fila.on .casilla { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .sel-fila.on { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
-.portada-hola .portada-foto { display: block; width: 72px; height: 72px; margin: 0 auto 12px; border: 2px solid rgba(255,255,255,.25); }
+/* foto de perfil a todo el ancho arriba de la portada, que se va difuminando hasta el saludo (el fondo de cada tema se ve a través) */
+.portada.con-foto { --hero: min(100vw, 560px, 64dvh); position: relative; justify-content: flex-start; overflow-x: clip; }
+.portada-hero { position: absolute; top: 0; left: 0; right: 0; height: var(--hero); overflow: hidden; pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000 35%, transparent 88%); mask-image: linear-gradient(#000 35%, transparent 88%); }
+.portada-hero img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; }
+.portada.con-foto > :not(.portada-hero) { position: relative; }
+.portada.con-foto .portada-barra { margin-bottom: max(16px, calc(var(--hero) - 190px)); }
+.portada.con-foto .portada-rx { color: #fff; text-shadow: 0 2px 18px rgb(0 0 0 / .55); }
+.portada.con-foto .portada-boton { border-color: transparent; background: rgb(0 0 0 / .35); color: #fff; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.portada.con-foto .portada-hola { margin-top: 0; font-size: 1.3em; font-weight: 600; text-shadow: 0 1px 12px var(--bg, #000), 0 0 2px var(--bg, #000); }
 
 /* ---------- barra de pestañas de abajo (Enfoques, Favoritos, Juegos, Ajustes) ---------- */
 main.wrap:has(+ .pestanas) { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 110px); }

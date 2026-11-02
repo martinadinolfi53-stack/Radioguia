@@ -6,7 +6,7 @@ import { pwa } from "./pwa.js";
 import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
-import { avatar } from "./foto.js";
+import { avatar, fotoGrande } from "./foto.js";
 import { FUENTES, fuenteId, elegida, ambos, AMBOS } from "./fuente.js";
 import { nombresDe, proyeccionesDe as proyeccionesDeOtra, gruposDe } from "./otras-fuentes.js";
 
@@ -132,16 +132,18 @@ const todos = () => true;
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
 const AYUDA_ICONO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>';
 
-const fotoPortada = () => { const p = nube.estado().perfil; return p?.foto ? avatar(p.foto, p.apodo, "portada-foto") : ""; };
+// la foto de perfil arriba, a todo el ancho, que se va difuminando hasta el saludo
+const fotoPortada = () => { const f = fotoGrande(); return f ? `<div class="portada-hero" aria-hidden="true"><img src="${esc(f)}" alt=""></div>` : ""; };
 
 export function vistaPortada() {
-  return `<main class="portada">
+  const hero = fotoPortada();
+  return `<main class="portada${hero ? " con-foto" : ""}">${hero}
     <div class="portada-barra">
       <a class="portada-boton" href="#ayuda-app" aria-label="Cómo usarla como app en el celular">${AYUDA_ICONO}<span>Usarla como app</span></a>
       <h1 class="portada-rx">RX</h1>
       <a class="portada-boton" href="#ajustes" aria-label="Ajustes">${icono.ajustes}<span>Ajustes</span></a>
     </div>
-    <p class="portada-hola">${fotoPortada()}Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
+    <p class="portada-hola">Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>
     <div class="portada-ops">
       <a class="portada-op" href="#enfoques"><span class="portada-img"><img src="iconos/icono-512.png" alt="" width="512" height="512"></span><b>Enfoques</b><small>Fichas y calculadora</small></a>
       <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>

@@ -1,10 +1,12 @@
 // Foto de perfil: obligatoria para jugar (con apodo o con Google). Se elige o se saca con la cámara,
 // se recorta cuadrada en el teléfono y se guarda chiquita (JPEG de 160 px) en la cuenta, ver nube.guardarFoto.
+// Una copia grande (720 px) queda solo en este dispositivo para la portada, donde ocupa todo el ancho.
 // Uso: vistaFoto({ titulo, sub, atras, listo }) dibuja la pantalla; listo() se llama cuando la foto quedó guardada.
 import { esc, cabecera } from "./util.js";
 import * as nube from "./nube.js";
 
-const LADO = 160;
+const LADO = 160, GRANDE = 720;
+const K_GRANDE = "radioguia.foto.grande"; // { uid, dato }: la copia grande es de una cuenta; con otra cuenta no se muestra
 let elegida = null; // { url, img, ancho, alto, pos, dato } de la foto que se está por usar
 let error = "", guardando = false, opciones = {};
 
@@ -42,15 +44,25 @@ async function abrir(archivo) {
   recortar();
 }
 
-function recortar() {
-  const { img, ancho, alto, pos } = elegida, lado = Math.min(ancho, alto);
+// recorte cuadrado de la foto elegida, de "px" de lado
+function cuadrada(px, calidad) {
+  const { img, ancho, alto, pos } = elegida, lado = Math.min(ancho, alto), n = Math.min(px, lado);
   const c = document.createElement("canvas");
-  c.width = c.height = LADO;
+  c.width = c.height = n;
   const ctx = c.getContext("2d");
   ctx.fillStyle = "#fff";
-  ctx.fillRect(0, 0, LADO, LADO);
-  ctx.drawImage(img, (ancho - lado) * (ancho > alto ? pos : 0.5), (alto - lado) * (alto > ancho ? pos : 0.5), lado, lado, 0, 0, LADO, LADO);
-  elegida.dato = c.toDataURL("image/jpeg", 0.82);
+  ctx.fillRect(0, 0, n, n);
+  ctx.drawImage(img, (ancho - lado) * (ancho > alto ? pos : 0.5), (alto - lado) * (alto > ancho ? pos : 0.5), lado, lado, 0, 0, n, n);
+  return c.toDataURL("image/jpeg", calidad);
+}
+function recortar() { elegida.dato = cuadrada(LADO, 0.82); }
+
+// foto de la portada: la copia grande de este dispositivo o, si no hay (la foto se eligió en otro lado), la de la cuenta
+export function fotoGrande() {
+  const { usuario, perfil } = nube.estado();
+  if (!perfil?.foto) return "";
+  try { const g = JSON.parse(localStorage.getItem(K_GRANDE)); if (g?.uid === usuario?.uid && g.dato) return g.dato; } catch {}
+  return perfil.foto;
 }
 
 export function iniciarFoto(app, rerender) {
@@ -72,6 +84,7 @@ export function iniciarFoto(app, rerender) {
     guardando = true; error = ""; rerender();
     try {
       await nube.guardarFoto(elegida.dato);
+      try { localStorage.setItem(K_GRANDE, JSON.stringify({ uid: nube.estado().usuario?.uid, dato: cuadrada(GRANDE, 0.8) })); } catch {}
       URL.revokeObjectURL(elegida.url);
       elegida = null;
       opciones.listo?.();

@@ -30,6 +30,15 @@ const asiento = (g, q) => {
     E.txt(r1(h[0] - 54), r1(ys + 6), "Pigg-O-Stat", 10, MUTE, "end", 400);
 };
 
+// Kite AP de costado: banco bajo las nalgas, apoyado en el piso (a la altura del RI)
+const banco = (g) => {
+  const h = g.p("caderas"), yRI = Math.max(...["b0", "b1", "b2", "b3"].map((n) => g.p(n)[1]));
+  const ys = g.abajo(h[0] - 10, h[0] + 10) + 1, x0 = Math.min(h[0] - 40, g.x + 2), x1 = h[0] + 22;
+  return `<rect x="${r1(x0)}" y="${r1(ys)}" width="${r1(x1 - x0)}" height="${r1(Math.max(8, yRI + 3 - ys))}" rx="4" fill="#dfe3ea" stroke="#8a8f9c" stroke-width="1.2"/>` +
+    E.txt(r1((x0 + x1) / 2), r1(ys + Math.max(8, yRI + 3 - ys) / 2 + 4), "apoyo", 10, MUTE, "middle", 400) +
+    `<line x1="${r1(x0 - 10)}" y1="${r1(yRI + 3)}" x2="${r1(Math.max(...["b0", "b1", "b2", "b3"].map((n) => g.p(n)[0])) + 6)}" y2="${r1(yRI + 3)}" stroke="#b5bac6" stroke-width="2"/>`;
+};
+
 // ---------- tórax ----------
 const RC_TORAX = [R("RC ⊥ en la mitad de los"), R("campos pulmonares,"), "a la altura de la línea", "mamilar (pezones)"];
 def({ id: "torax-ped-ap-mesa", blanco: "linea_mamilar", ri: "18 × 24", otra: "costado", otraTitulo: "De costado",
@@ -66,7 +75,7 @@ def({ id: "ped-ext-inf-ap", blanco: "rodilla_R", ri: "Según el tamaño", otra: 
 def({ id: "ped-ext-inf-lateral", blanco: "rodilla_R", ri: "Según el tamaño", otra: "costado", otraTitulo: "De costado",
   rc: RC_MEDIO, pos: ["Semidecúbito supino", "Pierna afectada en abducción", "(pata de rana) hasta la", "lateral, con cinta o banda", "No si hay traumatismo o", "enfermedad de la cadera"],
   pie: [M("Sin parrilla"), NOTA] });
-def({ id: "ped-pie-ap-mediolateral-kite--v1", blanco: "mediotarso_R", ri: "18 × 24", otra: "costado", otraTitulo: "De costado",
+def({ id: "ped-pie-ap-mediolateral-kite--v1", blanco: "mediotarso_R", ri: "18 × 24", otra: "costado", otraTitulo: "De costado", extraOtra: banco,
   tubo: "Desde el tubo (arriba)",
   rc: [R("AP: RC ⊥ a los tarsianos"), R("medios"), "(Kite: sin angular el rayo)"],
   pos: ["Sentado sobre un apoyo,", "rodilla flexionada y la", "planta sobre el RI", "No enderezar el pie al", "apoyarlo"],

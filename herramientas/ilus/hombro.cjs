@@ -132,7 +132,7 @@ I["humero-ap"] = () => {
   const f = E.figura("humero-ap", { caja: [40, 34, 340, 290] });
   const c = f.p("centro:Right humerus");
   return svg(
-    view("Vista desde el tubo · de pie o decúbito supino") + side(24, 52, "D") +
+    view("Vista desde el tubo · parado o decúbito supino") + side(24, 52, "D") +
     riEn(f, c, 35, 43) + txt(f1(c[0] - 17.5 * f.ppc + 6), f1(c[1] - 21.5 * f.ppc + 16), "RI 35 x 43 vertical", 11.5, INK) +
     f.svg + coll(f1(c[0] - 9 * f.ppc), f1(f.p("acromion_R")[1] - 3 * f.ppc), f1(16 * f.ppc), f1(f.p("codo_R")[1] - f.p("acromion_R")[1] + 6 * f.ppc)) +
     crossP(c) + refline(...lerp(f.p("epicondilo_lat_R"), f.p("epicondilo_med_R"), -0.6).map(f1), ...lerp(f.p("epicondilo_lat_R"), f.p("epicondilo_med_R"), 1.6).map(f1)) +
@@ -155,7 +155,7 @@ I["humero-lateral-rotacion--v2"] = () => {
   const f = E.figura("humero-lateral-rotacion--v2", { caja: [40, 30, 340, 296] });
   const c = f.p("centro:Right humerus"), el = lerp(f.p("epicondilo_lat_R"), f.p("epicondilo_med_R"), 0.5);
   return svg(
-    view("AP de pie o en decúbito · vista desde el tubo") + side(24, 52, "D") +
+    view("AP parado o en decúbito · vista desde el tubo") + side(24, 52, "D") +
     riEn(f, c, 35, 43) + txt(f1(c[0] - 17.5 * f.ppc - 6), f1(c[1] - 21.5 * f.ppc + 14), "RI 35 x 43", 11.5, INK, "end") + txt(f1(c[0] - 17.5 * f.ppc - 6), f1(c[1] - 21.5 * f.ppc + 28), "vertical", 11.5, INK, "end") +
     f.svg + crossP(c) + ring(el) + bluePt(el) +
     note(c[0] + 10, c[1] + 2, 420, 92, ["RC perpendicular, en la parte", "media del húmero"], RED) +
@@ -329,7 +329,7 @@ I["hombro-transaxilar-hobbs"] = () => {
   const f = E.figura("hombro-transaxilar-hobbs", { caja: [130, 28, 300, 298] });
   const t = f.p("cabeza_humero_R");
   return svg(
-    view("Vista desde el tubo · PA, de pie o en decúbito") + side(48, 70, "D") +
+    view("Vista desde el tubo · PA, parado o en decúbito") + side(48, 70, "D") +
     txt(30, 96, "vista por detrás:", 10.5, MUTE) + txt(30, 108, "el lado derecho", 10.5, MUTE) + txt(30, 120, "queda a la derecha", 10.5, MUTE) +
     riEn(f, t, 18, 24) + f.svg + crossP(t) +
     note(t[0] + 10, t[1] + 6, 470, 210, ["RC perpendicular, centrado en", "la articulación glenohumeral"], RED) +
@@ -428,7 +428,7 @@ I["escapula-ap"] = () => {
   const f = E.figura("escapula-ap", { caja: [16, 40, 430, 250] });
   const t = f.p("centro:Right scapula");
   return svg(
-    view("Vista desde el tubo · de pie o decúbito supino") + side(24, 52, "D") +
+    view("Vista desde el tubo · parado o decúbito supino") + side(24, 52, "D") +
     riEn(f, t, 24, 30) + f.svg + crossP(t) +
     lab(...f.p("coracoides_R"), 120, 300, "coracoides", "end") +
     note(t[0] + 10, t[1] + 6, 470, 110, ["RC perpendicular, en la parte", "media de la escápula"], RED) +
@@ -458,7 +458,7 @@ I["ac-pearson"] = () => {
   const peso = (p) => `<line x1="${f1(p[0])}" y1="${f1(p[1])}" x2="${f1(p[0])}" y2="${f1(p[1] + 16)}" stroke="${INK}" stroke-width="1.5"/>` +
     `<rect x="${f1(p[0] - 9)}" y="${f1(p[1] + 16)}" width="18" height="14" rx="2" fill="#7b8190"/>`;
   return svg(
-    view("Vista desde el tubo · de pie, brazos a los costados") +
+    view("Vista desde el tubo · parado, brazos a los costados") +
     riTop(f1(R[0] - 6 * f.ppc), f1(y[1] - 13 * f.ppc), f1(L[0] - R[0] + 12 * f.ppc), f1(22 * f.ppc)) + f.svg +
     coll(f1(R[0] - 3 * f.ppc), f1(y[1] - 7 * f.ppc), f1(L[0] - R[0] + 6 * f.ppc), f1(11 * f.ppc)) +
     bluePt(R) + bluePt(L) + crossP(y) + azul(R, 80, 60, "Acromioclavicular der.") + azul(L, 470, 60, "Acromioclavicular izq.") +

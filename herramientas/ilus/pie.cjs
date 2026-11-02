@@ -71,7 +71,7 @@ I["tobillo-ap"] = () => {
   const c = tobilloCostado("tobillo-ap"), p = desdePies("tobillo-ap-pies");
   const ta = p.f.p("talon_R"), b3 = p.f.p("base_mt3_R");
   return svg(
-    view("Vista lateral · decúbito supino, pierna extendida") + c.svg + p.svg +
+    view("Vista de costado · decúbito supino, pierna extendida") + c.svg + p.svg +
     refline(f1(ta[0]), 40, f1(ta[0]), f1(p.yRI - 2)) + linea(ta, lerp(ta, b3, 1.6)) +
     txt(PX + 14, 270, "Sin rotación: eje del pie", 11.5, BLUE, "start", 700) +
     txt(PX + 14, 286, "vertical, paralelo al RC", 11.5, BLUE) +
@@ -82,7 +82,7 @@ I["tobillo-ap"] = () => {
 I["tobillo-ap-mortaja"] = () => {
   const c = tobilloCostado("tobillo-ap-mortaja"), p = desdePies("tobillo-ap-mortaja-pies");
   return svg(
-    view("Vista lateral · decúbito supino, pierna extendida") + c.svg + p.svg +
+    view("Vista de costado · decúbito supino, pierna extendida") + c.svg + p.svg +
     refline(PX + 24, f1(p.mm[1]), PX + 186, f1(p.mm[1])) +
     txt(PX + 14, 270, "Pierna y pie rotados 15-20° hacia", 11.5, BLUE, "start", 700) +
     txt(PX + 14, 286, "medial: línea intermaleolar (azul)", 11.5, BLUE) +
@@ -94,7 +94,7 @@ I["tobillo-ap-oblicua-45"] = () => {
   const c = tobilloCostado("tobillo-ap-oblicua-45"), p = desdePies("tobillo-ap-oblicua-45-pies");
   const ta = p.f.p("talon_R"), b3 = p.f.p("base_mt3_R"), eje = lerp(ta, b3, 1.6);
   return svg(
-    view("Vista lateral · decúbito supino, pierna extendida") + c.svg + p.svg +
+    view("Vista de costado · decúbito supino, pierna extendida") + c.svg + p.svg +
     refline(f1(ta[0]), 40, f1(ta[0]), f1(p.yRI - 2)) + linea(ta, eje) + arco(ta, 70, -90, angulo(ta, b3), "45°", BLUE, 18) +
     txt(PX + 14, 270, "Pierna y pie rotados 45°", 11.5, BLUE, "start", 700) +
     txt(PX + 14, 286, "hacia medial (eje del pie", 11.5, BLUE) + txt(PX + 14, 302, "a 45° de la vertical)", 11.5, BLUE)
@@ -146,7 +146,7 @@ I["pie-ap-dorsoplantar"] = () => {
   const b3 = f.p("base_mt3_R"), yRI = apoyo(f, b3[0], 60) + 1;
   const ta = f.p("talon_R");
   return svg(
-    view("Vista lateral · rodilla flexionada, planta apoyada en el RI") +
+    view("Vista de costado · rodilla flexionada, planta apoyada en el RI") +
     table(0, 760, f1(yRI + 10)) + riBar(ta[0] - 30, f.p("punta_dedo1_pie_R")[0] + 24, yRI) + txt(f1(ta[0] - 36), f1(yRI + 8), "RI 24 × 30 vert.", 11.5, INK, "end") +
     f.svg + redDot(b3) +
     tube(b3[0], b3[1] - 4, -10, 190, { angLabel: "10°" }) +
@@ -218,7 +218,7 @@ I["calcaneo-plantodorsal-axial"] = () => {
   const e = [f.borde("der", b3[1] - 2, b3[1] + 2), b3[1]];           // entrada: planta a la altura de la base del 3.er MT
   const u = [Math.cos(rad(130)), Math.sin(rad(130))], k = (yRI - e[1]) / u[1], out = add(e, u, k);
   return svg(
-    view("Vista lateral · decúbito supino, pie en flexión dorsal") +
+    view("Vista de costado · decúbito supino, pie en flexión dorsal") +
     table(0, 760, f1(yRI + 9), "") + riBar(ta[0] - 70, ta[0] + 50, yRI) + txt(f1(ta[0] - 70), f1(yRI + 36), "RI 18 × 24 vert.", 11.5, INK) +
     recorte(f, 0, 30, 760, 300) +
     `<line x1="${f1(e[0])}" y1="${f1(e[1])}" x2="${f1(out[0])}" y2="${f1(out[1])}" stroke="${RED}" stroke-width="1.4" stroke-dasharray="5 4"/>` +
@@ -251,7 +251,7 @@ I["dedos-pie-ap"] = () => {
   const f = E.figura("dedos-pie-ap", { caja: [200, 30, 540, 236] });
   const j = f.p("mtf_pie_R"), yRI = apoyo(f, f.p("cabeza_mt1_R")[0], 30) + 1;
   return svg(
-    view("Vista lateral · rodilla flexionada, planta sobre el RI") +
+    view("Vista de costado · rodilla flexionada, planta sobre el RI") +
     table(0, 760, f1(yRI + 10)) + riBar(j[0] - 90, j[0] + 120, yRI) + txt(f1(j[0] + 120), f1(yRI + 36), "RI 18 × 24 horiz.", 11.5, INK, "end") +
     f.svg + redDot(j) +
     tube(j[0], j[1] - 4, -12.5, 190, { angLabel: "10-15°" }) +
@@ -328,7 +328,7 @@ I["dedos-pie-tangencial-sesamoideos--v1"] = () => {
   const ang = angulo(h, ta);                                     // planta: de la cabeza del 1.er MT al talón
   const e2 = add(h, [Math.cos(rad(ang)), Math.sin(rad(ang))], 1.15 * Math.hypot(ta[0] - h[0], ta[1] - h[1]));
   return svg(
-    view("Decúbito prono · vista lateral (desde medial)") +
+    view("Decúbito prono · vista de costado (desde medial)") +
     table(0, 760, f1(yRI + 9)) + riBar(h[0] - 80, h[0] + 80, yRI) + txt(f1(h[0] - 80), f1(yRI + 36), "RI 18 × 24 horiz.", 11.5, INK) +
     recorte(f, 0, 30, 760, 300) +
     linea(h, e2) + refline(f1(h[0]), f1(h[1]), f1(h[0]), f1(h[1] - 120)) +
@@ -346,7 +346,7 @@ I["dedos-pie-tangencial-sesamoideos--v2"] = () => {
   const h = f.p("cabeza_mt1_R"), tip = f.p("punta_dedo1_pie_R"), ta = f.p("talon_R");
   const yRI = apoyo(f, ta[0], 8) + 1, mano = [150, 70];
   return svg(
-    view("Decúbito supino (alternativa) · vista lateral") +
+    view("Decúbito supino (alternativa) · vista de costado") +
     table(0, 760, f1(yRI + 9)) + riBar(ta[0] - 60, ta[0] + 50, yRI) + txt(f1(ta[0] - 60), f1(yRI + 36), "RI 18 × 24 horiz.", 11.5, INK) +
     recorte(f, 0, 30, 760, 300) +
     `<path d="M${f1(tip[0])},${f1(tip[1])} Q${f1((tip[0] + mano[0]) / 2)},${f1(Math.min(tip[1], mano[1]) - 30)} ${mano[0]},${mano[1]}" fill="none" stroke="#9fc3e8" stroke-width="3"/>` +
@@ -364,7 +364,7 @@ I["pie-ap-lateral-carga--v1"] = () => {
   const f = E.figura("pie-ap-lateral-carga--v1", { caja: [60, 30, 340, 250] });
   const b3 = f.p("base_mt3_R"), yRI = apoyo(f, b3[0], 40) + 1;
   return svg(
-    view("AP · vista lateral, de pie") +
+    view("AP · vista de costado, parado") +
     `<rect x="40" y="${f1(yRI + 9)}" width="400" height="10" fill="#cfd3dc"/>` +
     riBar(f.p("talon_R")[0] - 20, f.p("punta_dedo1_pie_R")[0] + 20, yRI) + txt(60, f1(yRI + 40), "RI 24 × 30 horiz. (35 × 43 los dos pies)", 11, INK) +
     f.svg + redDot(b3) +

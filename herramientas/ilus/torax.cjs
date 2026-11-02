@@ -321,7 +321,7 @@ I["torax-pa"] = () => {
   // panel 1: de costado
   const M = afinP(199, 113, 0.8);
   const t7 = M(PT7), back = M([421, 188]);
-  const p1 = view("1 · Vista lateral · de pie") +
+  const p1 = view("1 · Vista de costado · parado") +
     wall(254, 40, 306, "Bucky vertical") +
     perfil(M, { brazos: "caderas" }) + huesosPerfil(M, { pulmones: true }) +
     `<rect x="${f1(t7[0] - 7)}" y="${f1(t7[1] - 6)}" width="14" height="12" rx="3" fill="none" stroke="${RED}" stroke-width="1.3" stroke-dasharray="3 2"/>` +
@@ -429,7 +429,7 @@ I["torax-ap-lordotica"] = () => {
   const hombro = M([452, 132]);
   const riTopY = hombro[1] - 24;
   return svg(
-    view("Vista lateral · de pie, apoyado de espaldas") +
+    view("Vista de costado · parado, apoyado de espaldas") +
     `<rect x="20" y="304" width="380" height="6" fill="#cfd3dc"/>` +
     wall(120, 40, 304, "") + txt(110, 300, "Bucky", 10, MUTE, "end") +
     ri(127, riTopY, 5, 170) +
@@ -595,7 +595,7 @@ I["esternon-lateral"] = () => {
   const [rx, ry, rw, rh] = rectL(M, 404, 127, 516, 267);
   const [cx1, cy1, cw, ch] = rectL(M, 452, 132, 500, 238);
   return svg(
-    view("Vista desde el tubo · de pie, de costado al RI") +
+    view("Vista desde el tubo · parado, de costado al RI") +
     riTop(rx, ry, rw, rh) +
     `<clipPath id="cvE"><rect x="0" y="28" width="760" height="290"/></clipPath><g clip-path="url(#cvE)">` +
     perfil(M, { brazos: "atras" }) + huesosPerfil(M, { pulmones: false }) + `</g>` +
@@ -636,7 +636,7 @@ I["esternoclaviculares-pa"] = () => {
   const e = ecEspalda(M, 0, "cvC", 0, 760);
   const mx = M([-40, 0])[0];
   return svg(
-    view("Vista desde el tubo · PA (de pie, de espaldas)") + e.svg +
+    view("Vista desde el tubo · PA (parado, de espaldas)") + e.svg +
     medida(mx, e.c7[1] + 2, mx, e.rc[1] - 2) + `<line x1="${f1(mx - 4)}" y1="${f1(e.c7[1])}" x2="${f1(e.c7[0])}" y2="${f1(e.c7[1])}" stroke="${BLUE}" stroke-width="1" stroke-dasharray="2 2"/>` +
     `<line x1="${f1(mx - 4)}" y1="${f1(e.rc[1])}" x2="${f1(e.rc[0] - 12)}" y2="${f1(e.rc[1])}" stroke="${BLUE}" stroke-width="1" stroke-dasharray="2 2"/>` +
     txt(mx - 6, (e.c7[1] + e.rc[1]) / 2 + 4, "7 cm", 11, BLUE, "end", 700) +
@@ -681,7 +681,7 @@ I["costillas-ap-encima-diafragma"] = () => {
   const [rx, ry, rw, rh] = rectL(M, -118, -12, 118, 180);
   const hom = M([0, 8]);
   return svg(
-    view("Vista desde el tubo · AP de pie (de frente)") +
+    view("Vista desde el tubo · AP parado (de frente)") +
     riTop(rx, ry, rw, rh) +
     frente(M, { brazos: "abajo" }) + huesosFrente(M) +
     side(...M([-56, -30]), "D") + side(...M([56, -30]), "I") +
@@ -706,7 +706,7 @@ I["costillas-ap-debajo-diafragma"] = () => {
   const rc = M([0, 133]), xi = M([0, 114]), cm = M([46, 146]), cr = M([62, 200]);
   const [rx, ry, rw, rh] = rectL(M, -82, 67, 82, 199);
   return svg(
-    view("Vista desde el tubo · AP de pie (de frente)") +
+    view("Vista desde el tubo · AP parado (de frente)") +
     riTop(rx, ry, rw, rh) +
     `<clipPath id="cvF"><rect x="0" y="28" width="760" height="290"/></clipPath><g clip-path="url(#cvF)">` +
     frente(M, { brazos: "abajo" }) + huesosFrente(M, { pelvis: true }) + `</g>` +

@@ -245,7 +245,7 @@ I["pelvis-ap-axial-inlet"] = () => {
   const ex = 382, ey = 205, tgt = [382, 199];
   const riX = tgt[0] + (270 - tgt[1]) * Math.tan((40 * Math.PI) / 180);
   return svg(
-    view("Vista lateral · decúbito supino") +
+    view("Vista de costado · decúbito supino") +
     table(30, 730, 252) +
     ri(riX - 86, 268, 172, 10, "RI 35 x 43 horizontal · parrilla", riX + 96, 278) +
     supinoExt() + coxalPerfil(SUP) +
@@ -264,7 +264,7 @@ I["pelvis-ap-axial-outlet"] = () => {
   const sx = 419, sy = 211, tgt = [452, 202], a = 32;
   const riX = tgt[0] - (270 - tgt[1]) * Math.tan((a * Math.PI) / 180);
   return svg(
-    view("Vista lateral · decúbito supino") +
+    view("Vista de costado · decúbito supino") +
     table(30, 730, 252) +
     ri(riX - 86, 268, 172, 10, "RI 35 x 43 horizontal · parrilla", riX + 96, 278) +
     supinoExt() + coxalPerfil(SUP) +

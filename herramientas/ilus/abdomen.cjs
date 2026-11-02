@@ -316,7 +316,7 @@ const I = {};
 I["abdomen-ap-supino"] = () => {
   const E0 = escena(1, NX, NY), cr = E0.X(354), sx = E0.X(419), sy = E0.Y(211);
   return svg(
-    view("Vista lateral · decúbito supino") +
+    view("Vista de costado · decúbito supino") +
     table(30, 730, 252) +
     ri(cr - 84, 268, 168, 10, "RI 35 x 43 vertical · parrilla", cr + 94, 278) +
     supinoL(E0) + lumbaresL(E0) + coxalL(E0) + sinfisisL(E0) +
@@ -755,7 +755,7 @@ I["cistografia-ap-axial"] = () => {
   const inX = E0.X(400), sk = E0.Y(198.5);
   const proj = inX + (268 - sk) * Math.tan(R(12.5));
   return svg(
-    view("Vista lateral · decúbito supino") +
+    view("Vista de costado · decúbito supino") +
     table(30, 730, 252) +
     ri(proj - 70, 268, 140, 10, "RI 30 x 35 vertical · parrilla", proj + 80, 278) +
     supinoL(E0) + lumbaresL(E0) + coxalL(E0) + vejigaL(E0) + sinfisisL(E0) +
@@ -796,7 +796,7 @@ I["cistografia-lateral"] = () => {
   const sx = E0.X(419), sy = E0.Y(211);
   const px = sx - 49, py = sy + 49;
   return svg(
-    view("Vista lateral de la pelvis") +
+    view("Vista de costado de la pelvis") +
     clipR("cpCL", 30, 30, 460, 270, supinoL(E0) + lumbaresL(E0) + coxalL(E0) + vejigaL(E0) + sinfisisL(E0)) +
     `<rect x="30" y="30" width="460" height="270" fill="none" stroke="#e2e4ea"/>` +
     dot(sx, sy) + lab(sx + 6, sy - 4, sx + 40, sy - 34, "sínfisis del pubis", "start", BLUE) +
@@ -823,7 +823,7 @@ function semisentado(E0, th) {
 I["port-abdomen-ap-supino"] = () => {
   const E0 = escena(1, NX, 244), cr = E0.X(354);
   return svg(
-    view("Vista lateral · decúbito supino en la cama") +
+    view("Vista de costado · decúbito supino en la cama") +
     `<rect x="30" y="252" width="700" height="22" rx="4" fill="#e6e8ee" stroke="#b5bac6"/>` + txt(36, 290, "Cama", 10, MUTE) +
     gris(cr - 70, 246, 20, 7, 2) + gris(cr + 50, 246, 20, 7, 2) +
     `<rect x="${cr - 84}" y="236" width="168" height="9" fill="${INK}"/>` +

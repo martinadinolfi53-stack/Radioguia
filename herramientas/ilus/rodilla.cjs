@@ -57,7 +57,7 @@ I["pierna-ap"] = () => {
   const m = lerp(k, t, 0.5), top = [m[0], arriba(f, m[0])];
   const L = 43 * f.ppc;
   return svg(
-    view("Vista lateral · decúbito supino, pierna extendida") +
+    view("Vista de costado · decúbito supino, pierna extendida") +
     table(0, 760, f1(yMesa + 9)) + riBar(m[0] - L / 2, m[0] + L / 2, yMesa) + txt(f1(m[0] - L / 2), f1(yMesa + 54), "RI 35 × 43 vert.", 11.5, INK) +
     recorte(f, 0, 30, 760, 300) +
     tube(top[0], top[1] - 2, 0, 120, { anodo: ["cátodo", "ánodo"] }) + rayo(top, [m[0], yMesa]) +
@@ -105,7 +105,7 @@ I["rodilla-ap"] = () => {
     return rayo([top[0] - L * dx, top[1] - L * dy], top) + txt(f1(top[0] - 84 * dx + (a < 0 ? 8 : -8)), f1(top[1] - 84 * dy), lbl, 11, RED, anchor, 700);
   };
   return svg(
-    view("Vista lateral · decúbito supino, pierna extendida") +
+    view("Vista de costado · decúbito supino, pierna extendida") +
     table(0, 590, f1(yMesa + 9)) + riBar(X[0] - 12 * f.ppc, X[0] + 12 * f.ppc, yMesa) + txt(f1(X[0] + 12 * f.ppc + 6), f1(yMesa + 8), "RI 24 × 30 vert.", 11.5, INK) +
     recorte(f, 0, 30, 590, 300) +
     alt(-5, "3-5° cefálico", "start") + alt(5, "3-5° caudal", "end") +
@@ -190,7 +190,7 @@ I["rodilla-pa-axial-bilateral-rosenberg"] = () => {
   const f = E.figura("rodilla-pa-axial-bilateral-rosenberg", { caja: [150, 30, 200, 270] });
   const j = interlinea(f), yP = f.abajo(f.x, f.x + f.w) + 1, xB = f.x + f.w + 10;
   return svg(
-    view("Vista lateral · de pie, de frente al bucky (PA)") +
+    view("PA de rodillas · paciente parado, de frente al bucky (visto de costado)") +
     piso(60, 600, yP) + bucky(xB, 34, yP - 30) + riV(xB - 6, j[1] - 17 * f.ppc, j[1] + 17 * f.ppc) +
     f.svg + flexion(f, "45°") +
     beam(j[0], j[1], 10, 190, { ref: 0, angLabel: "10°" }) + redDot(j, 3.5) +
@@ -207,7 +207,7 @@ I["rodilla-ap-pa-bilateral-carga--v1"] = () => {
   const f = E.figura("rodilla-ap-pa-bilateral-carga--v1", { caja: [130, 40, 200, 248] });
   const j = interlinea(f), yP = f.abajo(f.x, f.x + f.w) + 1, xB = f.x - 30;
   return svg(
-    view("AP · vista lateral, de pie") +
+    view("AP · vista de costado, parado") +
     escalon(xB - 10, yP, 230) + txt(f1(xB - 10), f1(yP + 30), "escalón, si hace falta", 11, MUTE) +
     bucky(xB, 34, yP) + riV(xB + 12, j[1] - 17 * f.ppc, j[1] + 17 * f.ppc) +
     f.svg + beam(j[0], j[1], 180, 170, { ref: 180 }) + redDot(j, 3.5) + rayo(j, [xB + 20, j[1]]) +
@@ -222,7 +222,7 @@ I["rodilla-ap-pa-bilateral-carga--v2"] = () => {
   const f = E.figura("rodilla-ap-pa-bilateral-carga--v2", { caja: [120, 40, 200, 258] });
   const j = interlinea(f), yP = f.abajo(f.x, f.x + f.w) + 1, xB = f.x + f.w + 8;
   return svg(
-    view("PA (alternativa) · de frente al bucky") +
+    view("PA (alternativa) · paciente parado, de frente al bucky") +
     piso(30, 400, yP) + bucky(xB, 34, yP - 30) + riV(xB - 6, j[1] - 17 * f.ppc, j[1] + 17 * f.ppc) +
     f.svg + flexion(f, "20°") + beam(j[0], j[1], 10, 190, { ref: 0, angLabel: "10°" }) + redDot(j, 3.5) +
     txt(f1(xB + 18), f1(j[1] + 17 * f.ppc), "RI 35 × 43 horiz.", 11, INK) +
@@ -243,7 +243,7 @@ I["fosa-rotula-pa-rotula"] = () => {
   const { f, yMesa, pat } = prono("fosa-rotula-pa-rotula", { en: ["rodilla_R", 240, 170], ppc: 6.2 });
   const top = [pat[0], arriba(f, pat[0])];
   return svg(
-    view("Vista lateral · decúbito prono, pierna extendida") +
+    view("Vista de costado · decúbito prono, pierna extendida") +
     table(0, 700, f1(yMesa + 9)) + riBar(pat[0] - 12 * f.ppc, pat[0] + 12 * f.ppc, yMesa) + txt(f1(pat[0] + 12 * f.ppc + 6), f1(yMesa + 8), "RI 18 × 24 vert.", 11.5, INK) +
     recorte(f, 0, 30, 760, 300) +
     tube(top[0], top[1] - 2, 0, 80) + rayo(top, pat) + redDot(pat, 3.5) +
@@ -376,7 +376,7 @@ I["fosa-rotula-tangencial-hobbs"] = () => {
     `<rect x="${f1(hip[0] - 46)}" y="${f1(ySilla + 8)}" width="7" height="${f1(yP - ySilla - 8)}" fill="#cfd3dc"/>` +
     `<rect x="${f1(hip[0] + 50)}" y="${f1(ySilla + 8)}" width="7" height="${f1(yP - ySilla - 8)}" fill="#cfd3dc"/>`;
   return svg(
-    view("Vista lateral · sentado, pies debajo de la silla") +
+    view("Vista de costado · sentado, pies debajo de la silla") +
     piso(60, 600, yP) + silla +
     `<rect x="${f1(xRI - 30)}" y="${f1(yRI + 9)}" width="70" height="${f1(yP - yRI - 9)}" rx="4" fill="#d7dbe3" stroke="#8a8f9c"/>` + riBar(xRI - 36, xRI + 46, yRI) +
     f.svg + tube(tg[0], tg[1] - 2, 0, 110) + rayo(tg, [tg[0], yRI]) + redDot(tg, 3.5) +

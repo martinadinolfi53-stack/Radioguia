@@ -286,7 +286,7 @@ function bocaAbierta() {
   const [c1x, c1y] = p(306, 356), [c2x, c2y] = p(366, 362), [ox, oy] = p(318, 366);
   const rx = p(226, 418)[0];
   return svg(
-    view("Vista lateral · decúbito supino") + table(30, 730, 252) +
+    view("Vista de costado · decúbito supino") + table(30, 730, 252) +
     ri(rx, 268, 160, 10) + txt(rx + 170, 278, "RI 18 x 24 vertical · parrilla", 12, INK) +
     C.fig + C.c12 +
     etiquetaHueso(c1x - 2, c1y - 1, "C1", "end") + etiquetaHueso(c2x, c2y, "C2") +
@@ -312,7 +312,7 @@ function fuchs() {
   const r = (dir * Math.PI) / 180, ux = Math.cos(r), uy = Math.sin(r);
   const yRI = 268, xRI = T[0] + (yRI - T[1]) / Math.tan(r);
   return svg(
-    view("Vista lateral · decúbito supino") + table(30, 730, 252) +
+    view("Vista de costado · decúbito supino") + table(30, 730, 252) +
     ri(xRI - 75, yRI, 150, 10) + txt(xRI + 85, yRI + 10, "RI 18 x 24 horizontal · parrilla", 12, INK) +
     C.fig + C.mand + C.c12 +
     refline(A[0] - ux * 40, A[1] - uy * 40, B[0], B[1]) + dot(...A) + dot(...B) +
@@ -337,7 +337,7 @@ function judd() {
   const r = (dir * Math.PI) / 180, ux = Math.cos(r), uy = Math.sin(r);
   const yRI = 268, xRI = T[0] + (yRI - T[1]) / Math.tan(r);
   return svg(
-    view("Vista lateral · decúbito prono") + table(30, 730, 252) +
+    view("Vista de costado · decúbito prono") + table(30, 730, 252) +
     ri(xRI - 75, yRI, 150, 10) + txt(xRI + 85, yRI + 10, "RI 18 x 24 horizontal · parrilla", 12, INK) +
     `<g transform="matrix(1 0 0 -1 0 ${f1(K)})">` + C.fig + C.mand + C.c12 + `</g>` +
     refline(B[0] - ux * 30, B[1] - uy * 30, A[0], A[1]) + dot(...A) + dot(...B) +
@@ -370,7 +370,7 @@ function apAxialCervical({ idx, ang, angLabel, collar = false, titulo, notas }) 
   const [m1x, m1y] = num(G.H.P(276, 322));
   const nombre = "C" + (idx + 1);
   return svg(
-    view("Vista lateral · decúbito supino") + table(30, 730, 252) +
+    view("Vista de costado · decúbito supino") + table(30, 730, 252) +
     ri(tx - 70, 268, 140, 10, notas.ri, tx + 80, 278) +
     G.fig + (collar ? collarin(E.tp("M167,220 C173,215 179,210 187,206 L190,251 L165,251 Z")) : "") +
     G.mand + G.vs + resaltar(tx, ty, G.w, G.h) +
@@ -569,7 +569,7 @@ function dorsalAP() {
   const ester = hueso("M193,206 C196,201 200,199 204,199 C224,192 244,187 262,186 L263,190 C245,191 226,196 206,204 C202,206 197,208 193,206 Z");
   const notch = [196, 203];
   return svg(
-    view("Vista lateral · decúbito supino") + table(30, 730, 252) +
+    view("Vista de costado · decúbito supino") + table(30, 730, 252) +
     ri(t7 - 86, 268, 172, 10, "RI 35 x 43 vertical · parrilla", t7 + 96, 278) +
     supinoFlex() + ester + dorsales(E) +
     etiquetaHueso(t7 - 5, E.Y(TY - 5.5) - 3, "T7", "end") +
@@ -627,7 +627,7 @@ function dorsalOblicua() {
 function lumbarAP() {
   const E = SUP, rc = E.X(330), cr = E.X(354);
   return svg(
-    view("Vista lateral · decúbito supino") + table(30, 730, 252) +
+    view("Vista de costado · decúbito supino") + table(30, 730, 252) +
     ri(rc - 84, 268, 168, 10, "RI 30 x 35 o 35 x 43 vertical · parrilla", rc + 94, 278) +
     supinoFlex() + lumbares(E, { marca: "L3" }) + coxal(E) +
     `<line x1="${cr}" y1="178" x2="${cr}" y2="212" stroke="${BLUE}" stroke-width="1.2" stroke-dasharray="3 3"/>` +
@@ -786,7 +786,7 @@ function sacroAP() {
   const E = SUP, S = sinfisis(E);
   const ex = E.X(392), ey = E.Y(199), a = 15, t = Math.tan((a * Math.PI) / 180);
   return svg(
-    view("Vista lateral · decúbito supino") + table(30, 730, 252) +
+    view("Vista de costado · decúbito supino") + table(30, 730, 252) +
     ri(ex - 26 - 80, 268, 160, 10, "RI 24 x 30 vertical · parrilla", ex + 66, 278) +
     supinoExt() + lumbares(E, { etiquetas: false }) + coxal(E) + S.s +
     hueso(E.tp("M386,225 C398,226 410,234 418,244 L415,249 C404,247 394,245 387,240 Z")) + resaltar(E.X(402), E.Y(237), 36, 26) +
@@ -804,7 +804,7 @@ function coccixAP() {
   const E = SUP, S = sinfisis(E);
   const ex = E.X(392), ey = E.Y(198), a = 10, t = Math.tan((a * Math.PI) / 180);
   return svg(
-    view("Vista lateral · decúbito supino") + table(30, 730, 252) +
+    view("Vista de costado · decúbito supino") + table(30, 730, 252) +
     ri(ex + 26 - 60, 268, 120, 10, "RI 18 x 24 vertical · parrilla", ex + 96, 278) +
     supinoApoyo() + lumbares(E, { etiquetas: false }) + coxal(E) + S.s +
     hueso(E.tp(COCCIX)) + etiquetaHueso(E.X(428), E.Y(246), "cóccix") + etiquetaHueso(S.sx + 7, S.sy - 3, "sínfisis") +
@@ -856,7 +856,7 @@ function siAP() {
   const [ax, ay] = [E.X(402), E.Y(208)];
   const ex = E.X(429), ey = E.Y(199), t = Math.tan((30 * Math.PI) / 180);
   return svg(
-    view("Vista lateral · decúbito supino") + table(30, 730, 252) +
+    view("Vista de costado · decúbito supino") + table(30, 730, 252) +
     ri(ex - 110, 268, 150, 10, "RI 24 x 30 vertical · parrilla", ex + 50, 278) +
     supinoExt() + lumbares(E, { etiquetas: false }) + coxal(E) + S.s +
     hueso(E.tp("M386,225 C398,226 410,234 418,244 L415,249 C404,247 394,245 387,240 Z")) + etiquetaHueso(E.X(378), E.Y(236) + 26, "sacro", "end") +
@@ -929,7 +929,7 @@ function oblCervPost() {
   const dx = -300, F = perfilDePie(560, 97, 0.62);
   const [c4x, c4y] = F.pos.C4, X = c4x + dx;
   return svg(
-    view("Oblicua posterior · vista lateral del haz") +
+    view("Oblicua posterior · vista de costado del haz") +
     `<rect x="220" y="34" width="12" height="266" fill="#cfd3dc"/>` + txt(226, 314, "Bucky", 11, MUTE, "middle") +
     g(`translate(${dx} 0)`, F.fig + F.vs) + resaltar(X, c4y, 0.62 * 13, 0.62 * 16) + etiquetaHueso(X - 8, c4y + 18, "C4", "end") +
     beam(X, c4y, 180 + 17.5, 118, { ref: 180, angLabel: "15-20°" }) + dash(X, c4y, 232, c4y - (X - 232) * Math.tan((17.5 * Math.PI) / 180)) +
@@ -941,7 +941,7 @@ function oblCervAnt() {
   const W = 752, F = perfilDePie(560, 97, 0.62);
   const [c4x0, c4y] = F.pos.C4, X = W - c4x0, dir = 180 - 17.5;
   return svg(
-    view("Oblicua anterior · vista lateral del haz") +
+    view("Oblicua anterior · vista de costado del haz") +
     `<rect x="60" y="34" width="12" height="266" fill="#cfd3dc"/>` + txt(66, 314, "Bucky", 11, MUTE, "middle") +
     g(`translate(${W} 0) scale(-1 1)`, F.fig + F.vs) + resaltar(X, c4y, 0.62 * 13, 0.62 * 16) + etiquetaHueso(X + 8, c4y + 18, "C4") +
     beam(X, c4y, dir, 118, { ref: 180, angLabel: "15-20°" }) + dash(X, c4y, 72, c4y + (X - 72) * Math.tan((17.5 * Math.PI) / 180)) +

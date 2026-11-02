@@ -16,6 +16,7 @@ def par(id, pose, d, centro, ri, encuadre=0.22, enc_otra=0.40, **kw):
     kt = {k: v for k, v in kw.items() if k not in ('desde', 'arriba_img')}
     if 'arriba_tubo' in kt: kt['arriba'] = kt.pop('arriba_tubo')
     ko = {k: v for k, v in kw.items() if k != 'arriba_tubo'}
+    if 'region_otra' in kw: ko['region'] = ko.pop('region_otra'); kt.pop('region_otra', None)
     F[id + '-tubo'] = lambda: tubo(id, pose(), d, centro, ri, radio=-1, encuadre=encuadre, **kt)
     F[id + '-otra'] = lambda: costado(id, pose(), d, centro, ri, encuadre=enc_otra, **ko)
 
@@ -52,7 +53,8 @@ par('ped-ext-inf-lateral', _rana_d, AP, 'rodilla_R', (0.30, 0.40), encuadre=0.30
 # en flexión dorsal de 30°): el pie queda por delante de la rodilla y se ve desde arriba; rayo vertical hacia abajo
 _kite_ap = lambda: Pose().cadera_flex('R', 90).rodilla_flex('R', 60).tobillo_dorsi('R', 30).cadera_flex('L', 90).rodilla_flex('L', 90)
 par('ped-pie-ap-mediolateral-kite--v1', _kite_ap, (0, -1, 0), 'mediotarso_R', (0.18, 0.24), encuadre=0.20, arriba_tubo=(0, 0, 1),
-    arriba_ri=(0, 0, 1), arriba_img=(0, 1, 0), ri_radio=0.10, region=['pelvis', 'muslo_R', 'pierna_R', 'pie_R', 'dedos_pie_R'])
+    arriba_ri=(0, 0, 1), arriba_img=(0, 1, 0), ri_radio=0.10, region=['pelvis', 'muslo_R', 'pierna_R', 'pie_R', 'dedos_pie_R'],
+    region_otra=None, puntos=['caderas'])     # de costado: el nene entero sentado en el apoyo
 _kite_lat = lambda: Pose().cadera_abd('R', 40).cadera_rot_int('R', -60).rodilla_flex('R', 30)
 par('ped-pie-ap-mediolateral-kite--v2', _kite_lat, AP, 'base_mt_R', (0.18, 0.24), encuadre=0.20)
 

@@ -343,36 +343,53 @@ a.row.reg .chev { grid-row: 1 / 3; grid-column: 2; align-self: center; color: va
 .imp-ver { margin-top: 6px; }
 .imp-ver-rc { margin-top: 4px; }
 .imp-ver-rc p { display: inline; }
-.imp-ilus { margin: 0; text-align: center; break-inside: avoid; }
-.imp-ilus img { max-width: 100%; max-height: 9cm; height: auto; }
+/* la ilustración flota a la derecha del texto para ocupar menos hojas; nunca se parte entre dos hojas */
+.imp-hoja { display: flow-root; }
+.imp-hoja > * + * { margin-top: 10px; }
+.imp-ilus { float: right; width: 46%; margin: 0 0 8px 14px; text-align: center; break-inside: avoid; page-break-inside: avoid; }
+.imp-ver .imp-ilus { width: 40%; }
+.imp-ver { display: flow-root; }
+.imp-ilus img { display: block; width: 100%; height: auto; max-height: 9cm; object-fit: contain; break-inside: avoid; page-break-inside: avoid; }
+.imp-pie { clear: both; }
 .imp-pie { font-size: .78em; color: #5b6676; border-top: 1px solid #dde3eb; padding-top: 6px; }
-@media (max-width: 520px) { .imp-factores { grid-template-columns: 1fr; } .imp-hoja { padding: 16px; } }
+@media screen and (max-width: 520px) { .imp-factores { grid-template-columns: 1fr; } .imp-hoja { padding: 16px; } .imp-ilus, .imp-ver .imp-ilus { float: none; width: 100%; margin: 0 0 8px; } }
 
-/* ficha para rellenar: renglones y campos vacíos donde se escribe a mano o en la pantalla */
+/* ficha para rellenar: espacios vacíos (sin renglones) donde se escribe a mano o en la pantalla */
 .imp-hoja.rellenar .imp-factores dd { font-weight: 400; }
-.imp-campo { display: inline-block; min-width: 8em; width: 100%; min-height: 1.45em; border-bottom: 1px solid #9aa6b5; outline: none; color: #0b3d6b; overflow-wrap: anywhere; }
+.imp-campo { display: inline-block; min-width: 8em; width: 100%; min-height: 1.45em; outline: none; color: #0b3d6b; overflow-wrap: anywhere; }
 .imp-region .imp-campo, .imp-h-campo .imp-campo { width: auto; min-width: 12em; vertical-align: bottom; }
 .imp-h-campo { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; }
 .imp-h-campo .imp-campo { flex: 1; font-weight: 400; }
-.imp-renglones { --alto: 1.9em; min-height: calc(var(--n) * var(--alto)); line-height: var(--alto); outline: none; color: #0b3d6b; overflow-wrap: anywhere;
-  background: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--alto) - 1px), #9aa6b5 calc(var(--alto) - 1px), #9aa6b5 var(--alto));
-  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.imp-renglones { --alto: 1.7em; min-height: calc(var(--n) * var(--alto)); line-height: 1.5; outline: none; color: #0b3d6b; overflow-wrap: anywhere; }
 .imp-campo:focus, .imp-renglones:focus { background-color: #eef6ff; }
 .imp-dibujo { height: 6cm; border: 1px solid #9aa6b5; border-radius: 4px; }
 @media print {
-  @page { size: A4; margin: 14mm 12mm; }
+  @page { size: A4; margin: 12mm 11mm; }
   html, body { background: #fff !important; color: #000; }
   body { padding: 0; }
   body::before, .top, .imp-opciones, .imprimir > .label, #entrada, .hoja, .visor { display: none !important; }
   main.wrap.imprimir { display: block; max-width: none; padding: 0; }
   .imp-hojas { display: block; }
-  .imp-hoja { box-shadow: none; border-radius: 0; padding: 0; font-size: 10.5pt; break-after: page; }
-  .imp-hoja:last-child { break-after: auto; }
-  .imp-hoja h3, .imp-hoja h4 { break-after: avoid; }
+  /* las fichas van seguidas (no una por hoja) para usar menos papel; lo que nunca se parte son las ilustraciones */
+  .imp-hoja { display: flow-root; box-shadow: none; border-radius: 0; padding: 0 0 4mm; margin: 0 0 5mm; border-bottom: 1.5pt solid #0b6fb3; font-size: 9pt; line-height: 1.32; }
+  .imp-cab { break-after: avoid; page-break-after: avoid; }
+  .imp-hoja.rellenar { break-inside: avoid; page-break-inside: avoid; }
+  .imp-hoja:last-child { border-bottom: 0; }
+  .imp-hoja > * + * { margin-top: 2.2mm; }
+  .imp-hoja h2 { font-size: 13pt; }
+  .imp-hoja h3 { font-size: 7.5pt; margin-bottom: 1mm; }
+  .imp-hoja h4 { font-size: 8.5pt; margin: 1.5mm 0 .5mm; }
+  .imp-hoja ul { padding-left: 4mm; }
+  .imp-hoja h3, .imp-hoja h4 { break-after: avoid; page-break-after: avoid; }
   .imp-hoja li, .imp-factores div { break-inside: avoid; }
-  .imp-ilus img { max-height: 7.5cm; }
-  .imp-ver .imp-ilus img { max-height: 5.5cm; }
-  .imp-factores { grid-template-columns: 1fr 1fr; }
+  .imp-factores { gap: 0 5mm; }
+  .imp-factores div { padding: .6mm 0; }
+  .imp-ilus { width: 44%; margin: 0 0 2mm 4mm; }
+  .imp-ver .imp-ilus { width: 38%; }
+  .imp-ilus img { max-height: 6.2cm; }
+  .imp-ver .imp-ilus img { max-height: 4.8cm; }
+  .imp-renglones { --alto: 1.6em; }
+  .imp-dibujo { height: 5cm; }
   .imp-campo:focus, .imp-renglones:focus { background-color: transparent; }
 }
 

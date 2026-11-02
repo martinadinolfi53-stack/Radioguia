@@ -18,7 +18,8 @@ const K_LISTAS = "radioguia.listas", K_FAV_VIEJO = "radioguia.favoritos", K_PREF
 // Hacia afuera, cada lista trae `ids` (solo los de la fuente abierta, ids normales), `otras` ([{ fuente, id }]
 // de los otros libros) y `total`. Así el resto de la app (repaso, impresión, menús) sigue trabajando con la fuente abierta.
 // Siempre hay al menos una lista. La primera vez se migra el formato viejo (radioguia.favoritos, un arreglo de ids).
-const ref = (pid) => (fuenteId === "bontrager" ? pid : `${fuenteId}:${pid}`);
+// pid: id de la fuente abierta, o "<fuente>:<id>" para un enfoque de otro libro (por ejemplo, con "Ambos")
+const ref = (pid) => (pid.includes(":") ? (pid.startsWith("bontrager:") ? pid.slice(10) : pid) : fuenteId === "bontrager" ? pid : `${fuenteId}:${pid}`);
 const deRef = (r) => { const i = r.indexOf(":"); return i < 0 ? { fuente: "bontrager", id: r } : { fuente: r.slice(0, i), id: r.slice(i + 1) }; };
 export const COLORES = [
   ["amarillo", "Amarillo"], ["naranja", "Naranja"], ["rojo", "Rojo"], ["rosa", "Rosa"],

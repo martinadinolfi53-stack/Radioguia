@@ -6,7 +6,7 @@ import { esc, cabecera } from "./util.js";
 import * as nube from "./nube.js";
 
 const LADO = 160, GRANDE = 720;
-const K_GRANDE = "radioguia.foto.grande"; // { uid, dato }: la copia grande es de una cuenta; con otra cuenta no se muestra
+const K_GRANDE = "radioguia.foto.grande"; // { uid, chica, dato }: copia grande de la foto "chica" de esa cuenta; con otra cuenta u otra foto no se usa
 let elegida = null; // { url, img, ancho, alto, pos, dato } de la foto que se está por usar
 let error = "", guardando = false, opciones = {};
 
@@ -57,11 +57,18 @@ function cuadrada(px, calidad) {
 }
 function recortar() { elegida.dato = cuadrada(LADO, 0.82); }
 
-// foto de la portada: la copia grande de este dispositivo o, si no hay (la foto se eligió en otro lado), la de la cuenta
+// foto de la portada: la copia grande de este dispositivo o, si no hay (la foto se eligió en otro lado), la de la cuenta.
+// La portada se dibuja apenas abre la app (también al cambiar de libro, que recarga), antes de que llegue la cuenta:
+// mientras tanto se muestra la última foto guardada acá, así no aparece de golpe unos instantes después.
 export function fotoGrande() {
-  const { usuario, perfil } = nube.estado();
+  const { listo, usuario, perfil } = nube.estado();
+  let g = null;
+  try { g = JSON.parse(localStorage.getItem(K_GRANDE)); } catch {}
+  if (!listo) return g?.dato || "";
   if (!perfil?.foto) return "";
-  try { const g = JSON.parse(localStorage.getItem(K_GRANDE)); if (g?.uid === usuario?.uid && g.dato) return g.dato; } catch {}
+  // la copia vale si es de esta cuenta y de la foto que tiene ahora (si la cambió en otro celular, ya no)
+  if (g?.uid === usuario?.uid && g.chica === perfil.foto && g.dato) return g.dato;
+  try { localStorage.setItem(K_GRANDE, JSON.stringify({ uid: usuario.uid, chica: perfil.foto, dato: perfil.foto })); } catch {}
   return perfil.foto;
 }
 
@@ -84,7 +91,7 @@ export function iniciarFoto(app, rerender) {
     guardando = true; error = ""; rerender();
     try {
       await nube.guardarFoto(elegida.dato);
-      try { localStorage.setItem(K_GRANDE, JSON.stringify({ uid: nube.estado().usuario?.uid, dato: cuadrada(GRANDE, 0.8) })); } catch {}
+      try { localStorage.setItem(K_GRANDE, JSON.stringify({ uid: nube.estado().usuario?.uid, chica: elegida.dato, dato: cuadrada(GRANDE, 0.8) })); } catch {}
       URL.revokeObjectURL(elegida.url);
       elegida = null;
       opciones.listo?.();

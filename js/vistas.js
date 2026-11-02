@@ -7,7 +7,7 @@ import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { avatar, fotoGrande } from "./foto.js";
-import { FUENTES, fuenteId, elegida, ambos, AMBOS } from "./fuente.js";
+import { FUENTES, fuenteId, elegida, ambos, AMBOS, fuenteAnotada } from "./fuente.js";
 import { nombresDe, proyeccionesDe as proyeccionesDeOtra, gruposDe } from "./otras-fuentes.js";
 
 export const estado = { q: "", qFav: "", qFuente: "", filtro: {}, sel: null, favFuente: "", abiertas: {} }; // búsqueda, filtro de categoría por región, selección en Favoritos (Set o null), filtro por libro en Favoritos ("" = todos)
@@ -149,8 +149,8 @@ export function vistaPortada() {
       <a class="portada-op" href="#juegos"><span class="portada-img"><img src="iconos/juegos-512.jpg" alt="" width="512" height="512"></span><b>Juegos</b><small>Repaso, ranking y perfil</small></a>
     </div>
     <div class="portada-fuente" role="group" aria-label="Libro que estás consultando">${opcionesLibro().map((f) => {
-      const on = f.id === (ambos() ? "ambos" : fuenteId);
-      return `<button type="button" data-fuente="${f.id}" class="${on ? "on" : ""}" aria-pressed="${on}">${esc(f.nombre)}</button>`;
+      const on = f.id === fuenteAnotada();
+      return `<button type="button" data-fuente="${f.id}" data-portada class="${on ? "on" : ""}" aria-pressed="${on}">${esc(f.nombre)}</button>`;
     }).join("")}</div>
   </main>`;
 }

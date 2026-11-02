@@ -3,7 +3,7 @@
 import { regionPorId, proyeccionPorId, proyecciones } from "./datos.js";
 import { listas, preferencias, aplicarPreferencias } from "./almacen.js";
 import { tocarEstrella, hojaLista, quitarDeLista } from "./listas-ui.js";
-import { vistaImprimir, opcionesImpresion, preguntarEImprimir } from "./imprimir.js";
+import { vistaImprimir, vistaRellenar, opcionesImpresion, preguntarEImprimir, imprimir } from "./imprimir.js";
 import { estado, vistaElegirFuente, vistaPortada, vistaAyudaApp, vistaInicio, vistaRegion, vistaGrupo, vistaFavoritos, vistaAjustes, vistaFamilia } from "./vistas.js";
 import { vistaFicha } from "./ficha.js";
 import { vistaCalculadora, calcEstado, calcular, resultadoHTML } from "./calculadora.js";
@@ -11,7 +11,7 @@ import { mostrarTermino } from "./glosario.js";
 import { ampliar } from "./imagenes.js";
 import { pwa } from "./pwa.js";
 import { grupoPorId, grupoDeRegion, FAMILIAS } from "./menu.js";
-import { vistaRepaso, iniciarRepaso } from "./repaso.js";
+import { vistaRepaso, iniciarRepaso, armarRueda } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
 import { iniciarGrupos } from "./grupos.js";
 import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificacion } from "./identificacion.js";
@@ -21,6 +21,9 @@ import { vistaPrivacidad } from "./privacidad.js";
 import { elegida, elegirFuente, ambos, anotarFuente } from "./fuente.js";
 import { iniciarLente } from "./lente.js";
 import { iniciarSyncFavoritos, cerrarSesion, olvidarFavoritos } from "./sync-favoritos.js";
+
+// en el sitio viejo, con la mudanza activa, la app no arranca: js/mudanza.js lleva al sitio nuevo
+if (window.RG_MUDANDO) await new Promise(() => {});
 
 const app = document.getElementById("app");
 iniciarLente(app);
@@ -45,6 +48,8 @@ function ruta() {
   if (h.startsWith("#f-")) { const f = FAMILIAS.find((x) => x.id === h.slice(3)); if (f) return { tipo: "familia", f }; }
   if (h === "#favoritos") return { tipo: "favoritos" };
   if (h === "#imprimir") return { tipo: "imprimir" };
+  if (h === "#rellenar") return { tipo: "rellenar", p: null };
+  if (h.startsWith("#rellenar-") && proyeccionPorId[h.slice(10)]) return { tipo: "rellenar", p: proyeccionPorId[h.slice(10)] };
   if (h === "#ajustes" || h === "#ajustes-fuente") return { tipo: "ajustes" };
   if (h === "#ayuda-app") return { tipo: "ayuda-app" };
   if (h === "#privacidad") return { tipo: "privacidad" };
@@ -98,18 +103,19 @@ function render() {
       break;
     }
     case "imprimir": app.innerHTML = vistaImprimir(); break;
+    case "rellenar": app.innerHTML = vistaRellenar(r.p, r.p ? `#p-${r.p.id}` : "#enfoques"); break;
     case "ajustes": app.innerHTML = vistaAjustes(); break;
     case "ayuda-app": app.innerHTML = vistaAyudaApp(); break;
     case "privacidad": app.innerHTML = vistaPrivacidad("#ajustes"); break;
     case "calc": app.innerHTML = vistaCalculadora(r.id, vuelta); break;
-    case "repaso": app.innerHTML = vistaRepaso(r.h); break;
+    case "repaso": app.innerHTML = vistaRepaso(r.h); armarRueda(app); break;
     case "juegos": app.innerHTML = vistaJuegos(r.h); break;
     case "inicio": app.innerHTML = vistaInicio(); break;
     case "familia": app.innerHTML = vistaFamilia(r.f); break;
     default: app.innerHTML = vistaPortada();
   }
   // el título es el nombre sugerido del PDF
-  document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : r.tipo === "imprimir" ? `${listas.activa().nombre} · RadioGuía` : "RadioGuía";
+  document.title = r.tipo === "ficha" ? `${r.p.nombre} · RadioGuía` : r.tipo === "imprimir" ? `${listas.activa().nombre} · RadioGuía` : r.tipo === "rellenar" ? `${r.p ? r.p.nombre : "Ficha"} para rellenar · RadioGuía` : "RadioGuía";
   altoCabecera();
   if (location.hash === "#ajustes-fuente") document.getElementById("fuente")?.scrollIntoView();
 }
@@ -222,7 +228,7 @@ app.addEventListener("click", async (e) => {
 });
 
 app.addEventListener("click", async (e) => {
-  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir],[data-cerrar-sesion],[data-borrar-cuenta]");
+  const t = e.target.closest("[data-fav],[data-term],[data-ampliar],[data-filtro],[data-borrar],[data-pref],[data-instalar],[data-cerrar-aviso],[data-lista],[data-lista-nueva],[data-lista-editar],[data-imp-op],[data-imprimir],[data-imprimir-ya],[data-sel],[data-sel-entrar],[data-sel-todas],[data-sel-quitar],[data-sel-salir],[data-cerrar-sesion],[data-borrar-cuenta]");
   if (!t) return;
   const rehacer = () => { const y = scrollY; render(); scrollTo(0, y); };
   if (t.dataset.fav) { e.preventDefault(); tocarEstrella(t.dataset.fav, rehacer); }
@@ -241,7 +247,8 @@ app.addEventListener("click", async (e) => {
   else if ("listaNueva" in t.dataset) hojaLista(null, rehacer);
   else if (t.dataset.listaEditar) hojaLista(t.dataset.listaEditar, rehacer);
   else if (t.dataset.impOp) { opcionesImpresion[t.dataset.impOp] = !opcionesImpresion[t.dataset.impOp]; rehacer(); }
-  else if ("imprimir" in t.dataset) preguntarEImprimir(app, rehacer); else if (t.dataset.term) mostrarTermino(t.dataset.term);
+  else if ("imprimir" in t.dataset) preguntarEImprimir(app, rehacer);
+  else if ("imprimirYa" in t.dataset) imprimir(app); else if (t.dataset.term) mostrarTermino(t.dataset.term);
   else if (t.dataset.ampliar) ampliar(t.dataset.ampliar, t.dataset.alt);
   else if (t.dataset.filtro) { estado.filtro[t.dataset.filtro] = t.dataset.cat || undefined; const y = scrollY; render(); scrollTo(0, y); }
   else if (t.dataset.borrar) {

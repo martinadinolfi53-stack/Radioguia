@@ -61,6 +61,12 @@ export function iniciarIdentificacion(app, render) {
       navigator.clipboard?.writeText(c.dataset.copiarLink).then(listo, () => getSelection().selectAllChildren(c.previousElementSibling)) ?? getSelection().selectAllChildren(c.previousElementSibling);
     }
   });
+
+  // volvió de Google (iPhone con la app instalada, que va a Google y vuelve en lugar de abrir una ventana): se termina el ingreso
+  if (nube.googlePendiente()) {
+    if (!identificado()) entrar(async () => { if (!(await nube.terminarGoogle())) throw Object.assign(new Error("cancelado"), { code: "rg/google-cancelado" }); });
+    else nube.terminarGoogle().catch((e) => alert(mensaje(e)));
+  }
 }
 
 function mensaje(e) {
@@ -71,6 +77,7 @@ function mensaje(e) {
   if (c.includes("credential-already-in-use")) return "Esa cuenta de Google ya está usada por otro jugador. Recargá la app y entrá directamente con Google.";
   if (c.includes("unauthorized-domain")) return "Falta autorizar esta página en Firebase.";
   if (c === "rg/ios-instalada") return nube.IOS_INSTALADA;
+  if (c === "rg/google-cancelado") return "No se terminó el ingreso con Google. Probá otra vez.";
   if (c === "rg/google-sin-respuesta") return "Google no respondió. Si ya confirmaste en la ventana de Google, cerrala y probá otra vez.";
   if (c === "rg/sin-respuesta") return "El servidor no respondió. Revisá la conexión y probá otra vez.";
   if (/Failed to fetch|import/i.test(e?.message || "")) return "No hay conexión. La primera vez hace falta internet para identificarte.";

@@ -9,7 +9,7 @@ const cuenta = (n) => `${n} ${n === 1 ? "proyección" : "proyecciones"}`;
 // Tocar una lista donde ya está la saca, con confirmación.
 export function tocarEstrella(pid, alCambiar) {
   const filas = listas.todas().map((l) => {
-    const on = l.ids.includes(pid);
+    const on = listas.tiene(l.id, pid);
     return `<button class="lst-fila${on ? " on" : ""}" data-hl-lista="${esc(l.id)}" style="--lc: var(--lc-${l.color})">${estrella(l, on)}<span class="t">${esc(l.nombre)}<small>${cuenta(l.ids.length)}</small></span><span class="s">${on ? "Ya está · tocá para quitar" : ""}</span></button>`;
   }).join("");
   const { panel, cerrar } = abrirHoja("Agregar a una lista", `<div class="lst-elegir">${filas}
@@ -19,7 +19,7 @@ export function tocarEstrella(pid, alCambiar) {
     if (!t) return;
     if (t.dataset.hlLista) {
       const l = listas.porId(t.dataset.hlLista);
-      if (l.ids.includes(pid) && !confirm(`¿Quitar esta proyección de “${l.nombre}”?`)) return;
+      if (listas.tiene(l.id, pid) && !confirm(`¿Quitar esta proyección de “${l.nombre}”?`)) return;
       listas.alternar(l.id, pid);
       cerrar(); alCambiar();
     } else hojaLista(null, alCambiar, pid);

@@ -74,7 +74,7 @@ const detalle = (p, region) => esc([region, ...(p.categoria || []), p.tipo === "
 // un enfoque con la etiqueta de su libro: los del libro abierto abren la ficha; los de otro libro cambian a ese libro
 const filaLibro = (f, p, conRegion) => f.id === fuenteId
   ? `<div class="row res"><a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, conRegion && regionPorId[p.region]?.nombre)}</span>${enListas(p.id)}</a>${etiquetaFuente(f)}${botonFav(p.id)}</div>`
-  : `<div class="row res"><button class="res-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(p.id)}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, conRegion && p._region)}</span></button>${etiquetaFuente(f)}</div>`;
+  : `<div class="row res"><button class="res-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(p.id)}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, conRegion && p._region)}</span>${enListas(`${f.id}:${p.id}`)}</button>${etiquetaFuente(f)}${botonFav(`${f.id}:${p.id}`)}</div>`;
 
 // con "Ambos", los botones del menú de los otros libros (null si alguno todavía está cargando)
 function gruposOtros() {

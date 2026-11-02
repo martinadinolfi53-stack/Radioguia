@@ -23,6 +23,8 @@ class Puntos:
 
     # --- definiciones: nombre -> (segmento, función que da el punto en reposo) ---
     def definir(self, nombre):
+        ex = getattr(self.c, 'extra', None)       # puntos propios del cuerpo (p. ej. los del nene: nene.py)
+        if ex and nombre in ex: seg, p = ex[nombre]; return seg, (lambda p=p: p)
         m = __import__('re').match(r'(mcf|ifp|ifd|if|cmc)(\d)_([RL])$', nombre)
         if m:   # articulaciones de los dedos: centro articular, atado al segmento proximal
             k, d, s_ = m.groups(); seg = {'mcf': 'f%sa', 'ifp': 'f%sb', 'ifd': 'f%sc', 'if': 'f%sc', 'cmc': 'f%sm'}[k] % d + '_' + s_

@@ -147,11 +147,11 @@ partes['ropa']=body[sv[body].all(1)|(sv[body].sum(1)>=2)]
 R=V+nrm*0.003; R[:,1]=np.clip(R[:,1],Ya(-0.27),Ya(0.07)); verts['ropa']=R
 print({k:len(v) for k,v in partes.items()}, file=sys.stderr)
 # coordenadas de reposo para pintar el pelo (u = ángulo alrededor de la cabeza/180, 2 = oreja; v = altura sobre los ojos + 0.5)
-_ax=np.abs(V[:,0]-c0[0]); _yr=V[:,1]-ey
+_ax=np.abs(V[:,0]-c0[0])/KH; _yr=(V[:,1]-ey)/KH     # en el nene, en proporción a la cabeza (el pelo pintado usa medidas de adulto)
 UVr=np.stack([np.where((_ax>0.0755)&(_yr<0.040),2.0,th(V)/180), _yr+0.5],1)
 # datos de reposo para posar el avatar desde el esqueleto de BodyParts3D (herramientas/ilus3d/avatar.py)
 if os.environ.get('GUARDAR'):
-    import pickle; pickle.dump({'V':V,'partes':partes,'verts':verts,'UV':UVr}, open(os.environ['GUARDAR'],'wb')); sys.exit(0)
+    import pickle; pickle.dump({'V':V,'partes':partes,'verts':verts,'UV':UVr,'marcas':{'ombligo':nav,'pezon_R':nips[1],'pezon_L':nips[0]}}, open(os.environ['GUARDAR'],'wb')); sys.exit(0)
 # pose (opcional): POSE=archivo.py que define POSE={hueso:[(eje,grados),...]} y opcionalmente GIRO=[(eje,grados),...] del cuerpo entero
 if os.environ.get('POSE'):
     import pose as _p, runpy

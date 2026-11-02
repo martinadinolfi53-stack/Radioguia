@@ -1,0 +1,27 @@
+# Publica RadioGuía en Firebase Hosting (https://app-rx-188a6.web.app) cada vez que se fusiona algo en main.
+# Usa el secreto FIREBASE_SERVICE_ACCOUNT del repositorio: la clave JSON de una cuenta de servicio de Google Cloud
+# que solo puede publicar en Hosting (ver el PR de la mudanza). GitHub Pages sigue publicando el sitio viejo por su lado.
+name: Publicar en Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firebase-hosting
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: app-rx-188a6
+          channelId: live

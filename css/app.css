@@ -405,9 +405,17 @@ main.wrap:has(+ .pestanas) { padding-bottom: calc(env(safe-area-inset-bottom, 0p
 .aj-cuenta span { display: grid; min-width: 0; }
 .aj-cuenta small { color: var(--mute); overflow-wrap: anywhere; }
 /* botones de la cuenta: dos columnas parejas (los azules arriba, los rojos abajo) */
-.aj-acciones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.aj-acciones .opcion { margin: 0; width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; text-decoration: none; }
-.aj-acciones .opcion:last-child:nth-child(odd) { grid-column: 1 / -1; }
+/* filas grandes, como la app de Ajustes del celular: todo el renglón se toca */
+.aj-filas { display: grid; margin-top: 12px; border-radius: 14px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); }
+.aj-filas.peligro { margin-top: 14px; }
+.aj-fila { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 54px; padding: 0 14px; border: 0; background: transparent; color: var(--fg); font: inherit; font-size: 1.02em; text-align: left; text-decoration: none; cursor: pointer; }
+.aj-fila + .aj-fila { box-shadow: 0 -1px 0 var(--line); }
+.aj-fila span { flex: 1; }
+.aj-fila .aj-ic { flex: none; color: var(--accent); }
+.aj-fila .chev { flex: none; color: var(--mute); }
+.aj-fila:active { background: rgb(127 140 160 / .14); }
+.aj-fila.aj-salir, .aj-fila.aj-salir .aj-ic { color: var(--rojo, #ff6b6b); }
+.aj-cuenta .ft-av { width: 56px; height: 56px; font-size: 1.4em; }
 .aj-nota { color: var(--mute); font-size: .9em; margin: 0 0 12px; }
 .aj-salir { color: var(--rojo, #ff6b6b); }
 
@@ -477,3 +485,13 @@ a.row.fav-otra { display: flex; padding: 12px 16px; text-decoration: none; }
 .res-otra .s { font-size: .82em; color: var(--mute); }
 .res-otra:active { background: var(--surface-2); }
 #fuente { scroll-margin-top: calc(var(--top-h, 64px) + 12px); }
+
+/* Ajustes › Versión: botón para buscar una versión nueva; el ícono gira mientras busca */
+.btn-act { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 50px; margin-top: 10px; padding: 0 18px; border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink, #04121f); font: inherit; font-weight: 600; cursor: pointer; }
+.btn-act:active { transform: scale(.98); }
+.btn-act:disabled { opacity: .7; cursor: default; }
+.btn-act.buscando svg { animation: girar 1s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .btn-act.buscando svg { animation: none; } }
+.act-estado:empty { display: none; }
+.act-estado { margin: 10px 0 0; }

@@ -14,6 +14,8 @@ export const pwa = {
     // updateViaCache "none": al buscar versión nueva no se usa la caché HTTP (también para sw-archivos.js)
     navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((reg) => {
       registro = reg;
+      // una versión nueva que quedó descargada y esperando (por ejemplo, de una vez anterior en que se cerró la app antes de activarla)
+      if (reg.waiting && navigator.serviceWorker.controller) reg.waiting.postMessage("activar");
       navigator.serviceWorker.ready.then((r) => { listoOffline = true; alCambiar(); r.active?.postMessage("completar"); });
       // versión nueva instalada: se activa y se recarga una sola vez
       reg.addEventListener("updatefound", () => {
@@ -36,10 +38,23 @@ export const pwa = {
   },
   version: () => self.RG_VERSION || "",
   // busca una versión nueva; si la hay, se instala y la página se recarga sola (controllerchange)
-  async buscarActualizacion() {
+  // (avisa con "nueva" mientras descarga; si la descarga falla, termina en "error")
+  async buscarActualizacion(alAvisar = () => {}) {
     if (!registro) return "sin-sw";
     await registro.update();
-    return registro.installing || registro.waiting ? "nueva" : "al-dia";
+    if (registro.waiting) { registro.waiting.postMessage("activar"); return "nueva"; }
+    const nuevo = registro.installing;
+    if (!nuevo) return "al-dia";
+    alAvisar("nueva");
+    // se espera a que termine de bajar: si algún archivo no llega, la versión nueva se descarta ("redundant")
+    const fin = await new Promise((ok) => {
+      const ver = () => { if (nuevo.state !== "installing") ok(nuevo.state); };
+      nuevo.addEventListener("statechange", ver); ver();
+      setTimeout(() => ok("lento"), 120000);
+    });
+    if (fin === "redundant") throw new Error("descarga");
+    if (fin === "installed") nuevo.postMessage("activar");
+    return "nueva";
   },
   puedeInstalar: () => !!evtInstalar,
   instalada: () => standalone(),

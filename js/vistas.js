@@ -412,9 +412,25 @@ function cuenta() {
       <div class="aj-cuenta">${avatar(perfil?.foto, apodo)}<span><b>${esc(apodo)}</b><small>${detalle}</small></span></div>
       <p class="aj-nota">${conGoogle ? "Tus favoritos se guardan en tu cuenta de Google: los ves en cualquier dispositivo donde entres con ella."
         : "Tus favoritos se guardan solo en este dispositivo y se borran al cerrar sesión. Entrá con Google para tenerlos en todos lados."}</p>
-      <div class="aj-acciones"><a class="opcion" href="#juegos-cuenta">${!usuario ? "Entrar con Google" : conGoogle ? "Editar perfil" : "Perfil y Google"}</a><a class="opcion" href="#privacidad">Qué datos guarda</a>
-        <button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button>${usuario ? `<button class="opcion aj-salir" data-borrar-cuenta>Borrar mi cuenta</button>` : ""}</div></section>`;
+      <div class="aj-filas">
+        <a class="aj-fila" href="#juegos-cuenta">${IC.persona}<span>${!usuario ? "Entrar con Google" : conGoogle ? "Editar perfil" : "Perfil y Google"}</span>${icono.chev}</a>
+        ${usuario ? `<a class="aj-fila" href="#juegos-foto" data-foto-desde-ajustes>${IC.camara}<span>Cambiar foto</span>${icono.chev}</a>` : ""}
+        <a class="aj-fila" href="#privacidad">${IC.escudo}<span>Qué datos guarda</span>${icono.chev}</a>
+      </div>
+      <div class="aj-filas peligro">
+        <button type="button" class="aj-fila aj-salir" data-cerrar-sesion>${IC.salir}<span>Cerrar sesión</span></button>
+        ${usuario ? `<button type="button" class="aj-fila aj-salir" data-borrar-cuenta>${IC.tacho}<span>Borrar mi cuenta</span></button>` : ""}
+      </div></section>`;
 }
+// íconos de las filas de Tu cuenta
+const svg = (d) => `<svg class="aj-ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC = {
+  persona: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>'),
+  camara: svg('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
+  escudo: svg('<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>'),
+  salir: svg('<path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/>'),
+  tacho: svg('<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/>'),
+};
 
 export function vistaAjustes() {
   const op = (k, v, txt) => `<button class="opcion${preferencias.get(k) === v ? " on" : ""}" data-pref="${k}" data-val="${v}" aria-pressed="${preferencias.get(k) === v}">${txt}</button>`;
@@ -431,7 +447,7 @@ export function vistaAjustes() {
       <p>Las preguntas del repaso que reportaron todos los que usan la app. Solo las ve la cuenta de Martin.</p>
       <div class="opciones"><a class="opcion" href="#repaso-reportes">Ver reportes</a></div></section>
     <section class="panel"><h2>Versión</h2><p>Versión instalada: <b>${esc(pwa.version() || "sin datos")}</b></p>
-      <button class="opcion" data-buscar-act>Buscar actualización</button><p class="act-estado" aria-live="polite"></p></section>
+      <button type="button" class="btn-act" data-buscar-act><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg><span>Buscar actualización</span></button><p class="act-estado" aria-live="polite"></p></section>
 
     <p class="pie">Los ajustes se guardan solo en este dispositivo.</p>
   </main>` + barraPestanas("ajustes");

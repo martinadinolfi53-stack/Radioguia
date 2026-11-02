@@ -227,7 +227,7 @@ app.addEventListener("click", async (e) => {
     if (!confirm("¿Borrar tu cuenta? Se borran tu perfil, tu foto, tus favoritos y tu lugar en todos tus grupos, con sus puntos. No se puede deshacer.")) return;
     t.disabled = true; t.textContent = "Borrando…";
     try { await nube.borrarCuenta(); olvidarFavoritos(); }
-    catch (er) { alert(er?.code?.includes("popup") ? "Para borrar la cuenta, Google pide confirmar que sos vos. Probá otra vez y completá la ventana de Google." : "No se pudo borrar la cuenta. Revisá la conexión y probá otra vez."); t.disabled = false; t.textContent = "Borrar mi cuenta y mis datos"; return; }
+    catch (er) { alert(er?.code?.includes("popup") ? "Para borrar la cuenta, Google pide confirmar que sos vos. Probá otra vez y completá la ventana de Google." : "No se pudo borrar la cuenta. Revisá la conexión y probá otra vez."); t.disabled = false; t.textContent = "Borrar mi cuenta"; return; }
     location.hash = ""; location.reload();
   }
 });

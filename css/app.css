@@ -391,6 +391,10 @@ main.wrap:has(+ .pestanas) { padding-bottom: calc(env(safe-area-inset-bottom, 0p
 .aj-cuenta { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
 .aj-cuenta span { display: grid; min-width: 0; }
 .aj-cuenta small { color: var(--mute); overflow-wrap: anywhere; }
+/* botones de la cuenta: dos columnas parejas (los azules arriba, los rojos abajo) */
+.aj-acciones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.aj-acciones .opcion { margin: 0; width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; text-decoration: none; }
+.aj-acciones .opcion:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .aj-nota { color: var(--mute); font-size: .9em; margin: 0 0 12px; }
 .aj-salir { color: var(--rojo, #ff6b6b); }
 

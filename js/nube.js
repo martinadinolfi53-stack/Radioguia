@@ -30,9 +30,17 @@ const EMULADOR = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /[?&]em
 
 // una espera de la red que nunca termina deja la pantalla trabada: pasado el tiempo, falla con un código propio
 const conLimite = (promesa, ms, code) => Promise.race([promesa, new Promise((_, no) => setTimeout(() => no(Object.assign(new Error(code), { code })), ms))]);
-// la app instalada en la pantalla de inicio del iPhone no recibe la respuesta de la ventana de Google
+// La app instalada en la pantalla de inicio del iPhone no recibe la respuesta de la ventana de Google cuando la página
+// de ingreso (authDomain) es de otro sitio. En Firebase Hosting es del mismo sitio: ahí entra yendo a Google y volviendo
+// (redirección) en lugar de abrir una ventana aparte.
+const ios = () => /iphone|ipad|ipod/i.test(navigator.userAgent) && (navigator.standalone === true || matchMedia("(display-mode: standalone)").matches);
+const mismoSitio = () => location.hostname === firebaseConfig.authDomain;
 export const IOS_INSTALADA = "En el iPhone, la app instalada en la pantalla de inicio no puede terminar el ingreso con Google. Entrá con un apodo, o abrí RadioGuía en Safari para usar Google.";
-export const iosInstalada = () => /iphone|ipad|ipod/i.test(navigator.userAgent) && (navigator.standalone === true || matchMedia("(display-mode: standalone)").matches);
+export const iosInstalada = () => ios() && !mismoSitio();
+const conRedireccion = () => ios() && mismoSitio();
+// mientras se va a Google y se vuelve, la página se recarga: esta marca avisa que al volver hay que terminar el ingreso
+const PENDIENTE = "radioguia.google.pendiente";
+export const googlePendiente = () => { try { return Date.now() - Number(localStorage.getItem(PENDIENTE) || 0) < 10 * 60000; } catch { return false; } };
 
 // una sola carga aunque la pidan varias pantallas a la vez; si falla (sin internet) se puede volver a intentar
 let cargando = null;
@@ -73,16 +81,45 @@ export async function entrarGoogle() {
   if (iosInstalada()) throw Object.assign(new Error("ios-instalada"), { code: "rg/ios-instalada" });
   await iniciar();
   const prov = new fb.GoogleAuthProvider();
+  // si ya jugaba con apodo, se vincula la misma cuenta a Google para no perder grupos ni puntos
+  const anonimo = auth.currentUser?.isAnonymous;
+  if (conRedireccion()) {
+    try { localStorage.setItem(PENDIENTE, String(Date.now())); } catch {}
+    await (anonimo ? fb.linkWithRedirect(auth.currentUser, prov) : fb.signInWithRedirect(auth, prov));
+    return new Promise(() => {}); // la página se va a Google; al volver sigue terminarGoogle()
+  }
   let r;
   try {
-    // si ya jugaba con apodo, se vincula la misma cuenta a Google para no perder grupos ni puntos
-    r = await conLimite(auth.currentUser?.isAnonymous ? fb.linkWithPopup(auth.currentUser, prov) : fb.signInWithPopup(auth, prov), 120000, "rg/google-sin-respuesta");
+    r = await conLimite(anonimo ? fb.linkWithPopup(auth.currentUser, prov) : fb.signInWithPopup(auth, prov), 120000, "rg/google-sin-respuesta");
   } catch (e) {
-    // esa cuenta de Google ya tiene su propio jugador: se entra con ella (el jugador de solo apodo de este celular queda atrás)
-    const cred = e?.code === "auth/credential-already-in-use" && fb.GoogleAuthProvider.credentialFromError(e);
-    if (!cred) throw e;
-    r = await conLimite(fb.signInWithCredential(auth, cred), 30000, "rg/google-sin-respuesta");
+    r = await conCuentaExistente(e);
   }
+  await despuesDeGoogle(r);
+}
+
+// esa cuenta de Google ya tiene su propio jugador: se entra con ella (el jugador de solo apodo de este celular queda atrás)
+async function conCuentaExistente(e) {
+  const cred = e?.code === "auth/credential-already-in-use" && fb.GoogleAuthProvider.credentialFromError(e);
+  if (!cred) throw e;
+  return conLimite(fb.signInWithCredential(auth, cred), 30000, "rg/google-sin-respuesta");
+}
+
+// al volver de Google (iPhone con la app instalada): devuelve true si entró, false si no había nada que terminar
+let terminando = null;
+export function terminarGoogle() {
+  return (terminando ||= (async () => {
+    try { localStorage.removeItem(PENDIENTE); } catch {}
+    await iniciar();
+    let r;
+    try { r = await conLimite(fb.getRedirectResult(auth), 30000, "rg/google-sin-respuesta"); }
+    catch (e) { r = await conCuentaExistente(e); }
+    if (!r?.user) return false;
+    await despuesDeGoogle(r);
+    return true;
+  })());
+}
+
+async function despuesDeGoogle(r) {
   usuario = r.user;
   // el perfil de esa cuenta puede no haber llegado todavía: se lee antes de decidir si hace falta un apodo
   if (!perfil?.apodo) { try { const leido = (await conLimite(fb.getDoc(fb.doc(db, "usuarios", r.user.uid)), 20000, "rg/sin-respuesta")).data(); if (leido) perfil = { ...leido, ...(perfil || {}) }; } catch {} }

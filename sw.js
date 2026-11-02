@@ -1,7 +1,7 @@
 // Service worker de RadioGuía: guarda toda la app en el dispositivo para usarla sin conexión.
 // La lista de archivos y la versión salen de sw-archivos.js, que genera herramientas/preparar.mjs
 // (la versión cambia sola cuando cambia cualquier archivo, y eso dispara la actualización).
-// versión: 1e78dbb7e7 (la escribe herramientas/preparar.mjs; así este archivo cambia en cada versión y
+// versión: 372d135d5e (la escribe herramientas/preparar.mjs; así este archivo cambia en cada versión y
 // cualquier navegador, aunque solo compare sw.js y no sw-archivos.js, se entera de que hay una actualización)
 importScripts("sw-archivos.js"); // define self.RG_VERSION, self.RG_ARCHIVOS y self.RG_EXTRAS
 const CACHE = "radioguia-" + self.RG_VERSION;
@@ -48,7 +48,10 @@ self.addEventListener("message", (e) => {
 // primero lo guardado (rápido y sin internet); si algo no está guardado, se pide a la red
 self.addEventListener("fetch", (e) => {
   const req = e.request;
-  if (req.method !== "GET" || new URL(req.url).origin !== location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== "GET" || url.origin !== location.origin) return;
+  // /__/ son páginas de Firebase Hosting (por ejemplo la del ingreso con Google): siempre van a la red
+  if (url.pathname.startsWith("/__/")) return;
   e.respondWith((async () => {
     const extra = self.RG_EXTRAS[relativa(req.url)];
     const c = await caches.open(extra ? EXTRAS : CACHE);

@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "1e78dbb7e7";
+self.RG_VERSION = "372d135d5e";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -72,6 +72,7 @@ self.RG_ARCHIVOS = [
  "js/listas-ui.js",
  "js/main.js",
  "js/menu.js",
+ "js/mudanza.js",
  "js/nube.js",
  "js/otras-fuentes.js",
  "js/privacidad.js",

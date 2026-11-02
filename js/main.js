@@ -22,6 +22,9 @@ import { elegida, elegirFuente, ambos, anotarFuente } from "./fuente.js";
 import { iniciarLente } from "./lente.js";
 import { iniciarSyncFavoritos, cerrarSesion, olvidarFavoritos } from "./sync-favoritos.js";
 
+// en el sitio viejo, con la mudanza activa, la app no arranca: js/mudanza.js lleva al sitio nuevo
+if (window.RG_MUDANDO) await new Promise(() => {});
+
 const app = document.getElementById("app");
 iniciarLente(app);
 aplicarPreferencias();

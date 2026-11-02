@@ -2,6 +2,10 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="utf-8">
+<!-- Solo se cargan archivos de la propia app y se habla solo con los servicios de Google que usa Firebase (login y base de datos).
+     Si se suma otro servicio, hay que agregarlo acá o el navegador lo bloquea. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://apis.google.com https://www.gstatic.com https://www.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://content-firebaseappcheck.googleapis.com https://www.google.com http://127.0.0.1:9099 http://127.0.0.1:8080; frame-src https://app-rx-188a6.firebaseapp.com https://www.google.com https://apis.google.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RadioGuía</title>
 <meta name="description" content="Consulta rápida de técnicas y proyecciones radiológicas para estudiantes de Imagenología.">

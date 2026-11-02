@@ -92,7 +92,7 @@ export default {
         "No rotar la cabeza si hay posible fractura o patología degenerativa.",
         "Paciente en decúbito supino, plano medio sagital en la línea media de la rejilla, brazos a los costados, hombros nivelados y apoyo bajo las rodillas.",
         "RI en la bandeja del Bucky centrado en el plano medio sagital a la altura del vértice de la mastoides.",
-        "Rotar la cabeza 40 a 45° a un lado, con la LIOM perpendicular a la mesa; una exposición con la cabeza a la derecha y otra a la izquierda (imágenes de la odontoides a 90° entre sí).",
+        "Rotar la cabeza 40 a 45° a un lado, con la LIOM perpendicular a la mesa; una exposición con la cabeza a la derecha y otra a la izquierda (imágenes de la odontoides perpendiculares entre sí).",
         GONADAS,
       ],
       criterios: crit(["AP axial oblicua de la odontoides, para complementar la AP y la lateral."], ["Odontoides claramente visible."]),

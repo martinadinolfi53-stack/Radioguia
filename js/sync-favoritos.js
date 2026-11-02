@@ -79,6 +79,11 @@ export function iniciarSyncFavoritos(redibujar) {
 export async function cerrarSesion() {
   if (cuenta() && leerMarca().pendiente) await Promise.race([subir().catch(() => {}), new Promise((ok) => setTimeout(ok, 4000))]);
   try { if (nube.estado().usuario) await nube.salir(); } catch {}
+  olvidarFavoritos();
+}
+
+// borra los favoritos de este dispositivo (al cerrar sesión o al borrar la cuenta)
+export function olvidarFavoritos() {
   fav.borrar();
   try { localStorage.removeItem(K); } catch {}
   ultimaCuenta = null;

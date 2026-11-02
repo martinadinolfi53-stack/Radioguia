@@ -1,7 +1,7 @@
 // Pantallas de navegación: Portada (elegir Enfoques o Juegos), Inicio de enfoques, Región, Favoritos, resultados del buscador y Ajustes.
 import { capitulos, regiones, regionPorId, proyecciones, proyeccionesDe, CATEGORIAS, norm, FUENTE } from "./datos.js";
 import { listas, preferencias } from "./almacen.js";
-import { esc, icono, cabecera, botonFav, barraPestanas } from "./util.js";
+import { esc, icono, cabecera, botonFav, barraPestanas, RX_BORDE, AYUDA_ICONO } from "./util.js";
 import { pwa } from "./pwa.js";
 import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
@@ -130,20 +130,9 @@ export function vistaFamilia(f) {
 const todos = () => true;
 
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
-const AYUDA_ICONO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>';
 
 // la foto de perfil arriba, a todo el ancho, que se va difuminando hasta el saludo
 const fotoPortada = () => { const f = fotoGrande(); return f ? `<div class="portada-hero" aria-hidden="true"><img src="${esc(f)}" alt=""></div>` : ""; };
-
-// RX sobre la foto: relleno translúcido con borde. El borde sale de engordar la silueta de las letras (filtro SVG),
-// así no aparecen líneas donde se cruzan los trazos de la X, como pasa con -webkit-text-stroke.
-const RX_BORDE = `<svg class="rx-svg" viewBox="0 0 170 74" role="img" aria-label="RX"><defs><filter id="rx-borde" x="-10%" y="-10%" width="120%" height="120%">
-  <feMorphology in="SourceAlpha" operator="dilate" radius="2.2" result="gordo"/>
-  <feComposite in="gordo" in2="SourceAlpha" operator="out" result="borde"/>
-  <feFlood flood-color="#fff"/><feComposite in2="borde" operator="in" result="b"/>
-  <feFlood flood-color="#fff" flood-opacity=".22"/><feComposite in2="SourceAlpha" operator="in" result="r"/>
-  <feMerge><feMergeNode in="r"/><feMergeNode in="b"/></feMerge></filter></defs>
-  <text x="85" y="62" text-anchor="middle" filter="url(#rx-borde)">RX</text></svg>`;
 
 export function vistaPortada() {
   const hero = fotoPortada();

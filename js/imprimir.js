@@ -1,4 +1,4 @@
-// Impresión de una lista de favoritos (#imprimir): todas sus fichas completas, una por hoja, con el diálogo de
+// Impresión de una lista de favoritos (#imprimir): todas sus fichas completas, seguidas y sin cortar ninguna, con el diálogo de
 // impresión del navegador (desde ahí se guarda como PDF). Funciona sin conexión: no usa ninguna biblioteca externa.
 import { regionPorId, proyecciones, FUENTE } from "./datos.js";
 import { listas } from "./almacen.js";
@@ -19,21 +19,21 @@ function hoja(p, nombreLista) {
   const tags = [...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : "", p.metodo || "", p.estado !== "validado" ? "Pendiente de revisión" : ""].filter(Boolean);
   const ilusPorVersion = p.versiones?.length && p.versiones.every((x) => x.ilustracion?.src);
   const posicion = p.versiones
-    ? lista(p.comun) + p.versiones.map((x) => `<div class="imp-ver"><h4>${esc(x.nombre)}</h4>${lista(x.posicion)}${x.rc ? `<div class="imp-ver-rc"><b>Rayo central:</b> ${rcHTML(x.rc)}</div>` : ""}${o.ilustraciones ? figura(x.ilustracion, `${p.nombre} · ${x.nombre}`) : ""}</div>`).join("")
+    ? lista(p.comun) + p.versiones.map((x) => `<div class="imp-ver">${o.ilustraciones ? figura(x.ilustracion, `${p.nombre} · ${x.nombre}`) : ""}<h4>${esc(x.nombre)}</h4>${lista(x.posicion)}${x.rc ? `<div class="imp-ver-rc"><b>Rayo central:</b> ${rcHTML(x.rc)}</div>` : ""}</div>`).join("")
     : lista(p.posicion);
   return `<article class="imp-hoja">
     <header class="imp-cab"><p class="imp-region">${esc(r?.nombre || "")}${r?.detalle ? ` · ${esc(r.detalle)}` : ""}</p>
       <h2>${esc(p.nombre)}</h2>${tags.length ? `<p class="imp-tags">${tags.map(esc).join(" · ")}</p>` : ""}</header>
     ${factores ? `<section><h3>Factores técnicos</h3><dl class="imp-factores">${factores}</dl></section>` : ""}
+    ${o.ilustraciones && !ilusPorVersion ? figura(p.ilustracion, p.nombre) : ""}
     <section class="imp-rc"><h3>Rayo central</h3>${rcHTML(p.rc)}</section>
     <section><h3>Posición del paciente</h3>${posicion}</section>
     ${o.criterios && p.criterios?.length ? `<section><h3>Criterios de evaluación</h3>${p.criterios.map(([t, it]) => `<h4>${esc(t)}</h4>${lista(it)}`).join("")}</section>` : ""}
-    ${o.ilustraciones && !ilusPorVersion ? figura(p.ilustracion, p.nombre) : ""}
     <footer class="imp-pie">${esc(FUENTE.corto)}${p.fuente.volumen ? `, vol. ${p.fuente.volumen}` : ""}, pág${p.fuente.paginas.length > 1 ? "s" : ""}. ${p.fuente.paginas.join(", ")} · ${esc(nombreLista)} · RadioGuía</footer>
   </article>`;
 }
 
-// ficha para rellenar (a mano o escribiendo en la pantalla): los mismos títulos que la ficha impresa, con renglones vacíos.
+// ficha para rellenar (a mano o escribiendo en la pantalla): los mismos títulos que la ficha impresa, con espacios vacíos (sin renglones).
 // p = null es una ficha en blanco, sin el nombre del enfoque. Lo que se escribe en pantalla no se guarda: se imprime o se pasa a PDF.
 const renglones = (n) => `<div class="imp-renglones" contenteditable="true" spellcheck="false" style="--n: ${n}"></div>`;
 const campo = () => `<span class="imp-campo" contenteditable="true" spellcheck="false"></span>`;
@@ -53,7 +53,7 @@ function hojaRellenar(p, pie) {
   </article>`;
 }
 
-const AYUDA_RELLENAR = `<p class="ayuda">Imprimila para completarla a mano, o tocá los renglones y escribí acá mismo; después tocá Imprimir o guardar PDF para quedarte con lo que escribiste. Lo escrito no queda guardado en la app.</p>`;
+const AYUDA_RELLENAR = `<p class="ayuda">Imprimila para completarla a mano, o tocá los espacios en blanco y escribí acá mismo; después tocá Imprimir o guardar PDF para quedarte con lo que escribiste. Lo escrito no queda guardado en la app.</p>`;
 
 // #rellenar (ficha en blanco) o #rellenar-<id> (con el nombre de ese enfoque)
 export function vistaRellenar(p, volver) {
@@ -75,7 +75,7 @@ export function vistaImprimir() {
   const fichas = proyecciones.filter((p) => act.ids.includes(p.id));
   const o = opcionesImpresion;
   const op = (k, txt) => `<button class="opcion${o[k] ? " on" : ""}" data-imp-op="${k}" aria-pressed="${o[k]}">${txt}</button>`;
-  return cabecera({ titulo: `Imprimir ${act.nombre}`, sub: `${fichas.length} ${fichas.length === 1 ? "ficha" : "fichas"}, una por hoja`, atras: "#favoritos" }) + `
+  return cabecera({ titulo: `Imprimir ${act.nombre}`, sub: `${fichas.length} ${fichas.length === 1 ? "ficha" : "fichas"}`, atras: "#favoritos" }) + `
   <main class="wrap imprimir">
     <section class="panel imp-opciones">
       <h2>Incluir</h2>

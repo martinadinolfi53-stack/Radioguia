@@ -35,10 +35,10 @@ MED = (-1, 0, 0)       # cámara del lado medial
 PIES = (0, 1, 0)       # desde los pies hacia la cabeza
 
 # ---------- tobillo: decúbito supino, pierna extendida (vista de costado + vista desde los pies) ----------
-# En reposo el pie del modelo mira unos 23° hacia afuera: con la pierna rotada 20° hacia medial el eje del pie (talón → 3.er MT)
-# queda vertical (AP sin rotación) y la línea intermaleolar a unos 13° del RI. Mortaja: 15° más (línea intermaleolar paralela
+# En reposo el pie del modelo mira unos 23° hacia afuera: con la pierna rotada 26° hacia medial el eje del pie (talón → 3.er MT)
+# queda vertical (AP sin rotación) y la línea intermaleolar a unos 17° del RI. Mortaja: 15° más (línea intermaleolar paralela
 # al RI); oblicua: 45° más.
-R0P = 20
+R0P = 26      # medido en la vista desde los pies: con 26° el eje del pie (talón -> base del 3.er MT) queda vertical
 for _id, _rot in (('tobillo-ap', R0P), ('tobillo-ap-mortaja', R0P + 15), ('tobillo-ap-oblicua-45', R0P + 45)):
     F[_id] = (lambda i=_id, r=_rot: fig(i, Pose().cadera_rot_int('R', r), LAT, SUP, cortes=SOBRE_RODILLA))
     F[_id + '-pies'] = (lambda i=_id, r=_rot: fig(i + '-pies', Pose().cadera_rot_int('R', r), PIES, SUP, region=PIERNA, cortes=TOBILLO))
@@ -60,10 +60,12 @@ F['pie-ap-dorsoplantar'] = lambda: fig('pie-ap-dorsoplantar', _planta(), LAT, SU
 F['dedos-pie-ap'] = lambda: fig('dedos-pie-ap', _planta(), LAT, SUP, cortes=[('tobillo_R', 'distal', 0.10)])
 # oblicuas: la rodilla cae hacia medial (o lateral) y el pie queda a 30-45° del RI; vista desde los dedos
 # (con el pie apoyado, inclinar la rodilla hacia medial lleva el dorso del pie hacia medial: aducción de 30° ≈ 32° de oblicuidad)
+# g = aducción de cadera; la planta queda inclinada algo menos (medido con la normal de la planta respecto de la mesa):
+# g 40,6 -> 35° (centro de 30-40°, pie); g ±43,6 -> 37,5° (centro de 30-45°, dedos)
 _obl = lambda g: Pose().cadera_flex('R', 60).cadera_abd('R', -g).rodilla_flex('R', 110).tobillo_dorsi('R', -40)
-F['pie-ap-oblicua-medial'] = lambda: fig('pie-ap-oblicua-medial', _obl(35), desde_dedos(_obl(35)), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
-F['dedos-pie-ap-oblicua--v1'] = lambda: fig('dedos-pie-ap-oblicua--v1', _obl(37.5), desde_dedos(_obl(37.5)), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
-F['dedos-pie-ap-oblicua--v2'] = lambda: fig('dedos-pie-ap-oblicua--v2', _obl(-37.5), desde_dedos(_obl(-37.5)), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
+F['pie-ap-oblicua-medial'] = lambda: fig('pie-ap-oblicua-medial', _obl(40.6), desde_dedos(_obl(40.6)), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
+F['dedos-pie-ap-oblicua--v1'] = lambda: fig('dedos-pie-ap-oblicua--v1', _obl(43.6), desde_dedos(_obl(43.6)), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
+F['dedos-pie-ap-oblicua--v2'] = lambda: fig('dedos-pie-ap-oblicua--v2', _obl(-43.6), desde_dedos(_obl(-43.6)), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
 F['pie-plano-pies'] = lambda: fig('pie-plano-pies', _planta(), desde_dedos(_planta()), SUP, region=PIERNA, cortes=[('tobillo_R', 'distal', 0.20)])
 
 # ---------- calcáneo axial: supino, pierna extendida, pie en flexión dorsal ----------
@@ -78,10 +80,10 @@ F['dedos-pie-lateral--v1'] = lambda: fig('dedos-pie-lateral--v1', Pose(), LAT, r
 F['dedos-pie-lateral--v2'] = lambda: fig('dedos-pie-lateral--v2', Pose(), MED, region=['pie_R', 'dedos_pie_R'], cortes=[('base_mt3_R', (0, 0, 1), 0.02)])
 
 # ---------- sesamoideos ----------
-# v1 prono: rodilla apenas flexionada (la pierna sube hacia el tobillo), planta a 15-20° de la vertical, dedos en flexión dorsal
+# v1 prono: rodilla flexionada 20° (la pierna sube hacia el tobillo), planta a 17,8° de la vertical (medido con la normal),, dedos en flexión dorsal
 # apoyados en el RI. Vista desde medial (lado del 1.er dedo), con la espalda hacia arriba.
 F['dedos-pie-tangencial-sesamoideos--v1'] = lambda: fig('dedos-pie-tangencial-sesamoideos--v1',
-    Pose().rodilla_flex('R', 12).tobillo_dorsi('R', 5).dedos_pie_dorsi('R', 65), MED, (0, 0, -1), cortes=SOBRE_RODILLA)
+    Pose().rodilla_flex('R', 20).tobillo_dorsi('R', 3).dedos_pie_dorsi('R', 65), MED, (0, 0, -1), cortes=SOBRE_RODILLA)
 # v2 supino: pierna extendida, pie en flexión dorsal y dedos tirados hacia atrás con una gasa
 F['dedos-pie-tangencial-sesamoideos--v2'] = lambda: fig('dedos-pie-tangencial-sesamoideos--v2',
     Pose().cadera_rot_int('R', R0P).tobillo_dorsi('R', 10).dedos_pie_dorsi('R', 65), LAT, SUP, cortes=SOBRE_RODILLA)

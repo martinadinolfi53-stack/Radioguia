@@ -45,22 +45,25 @@ F['rodilla-ap-oblicuas--v2'] = lambda: _corte('rodilla-ap-oblicuas--v2', R0K - 4
 
 # ---------- de pie ----------
 # Rosenberg: PA de pie, rodillas flexionadas 45° (muslo 22,5° hacia adelante, pierna 22,5° hacia atrás), pies planos
-_ros = lambda: Pose().cadera_flex('R', 22.5).rodilla_flex('R', 45).tobillo_dorsi('R', 22.5)
+# (el ángulo entre las líneas cadera-rodilla y rodilla-tobillo queda en ~89% de la flexión del rig: 50,5 -> 45° medidos)
+_ros = lambda: Pose().cadera_flex('R', 25.25).rodilla_flex('R', 50.5).tobillo_dorsi('R', 25.25)
 F['rodilla-pa-axial-bilateral-rosenberg'] = lambda: fig('rodilla-pa-axial-bilateral-rosenberg', _ros(), LAT, cortes=MUSLO(0.24))
 F['rodilla-ap-pa-bilateral-carga--v1'] = lambda: fig('rodilla-ap-pa-bilateral-carga--v1', Pose(), LAT, cortes=MUSLO(0.24))
-_pa20 = lambda: Pose().cadera_flex('R', 10).rodilla_flex('R', 20).tobillo_dorsi('R', 10)
+_pa20 = lambda: Pose().cadera_flex('R', 11.5).rodilla_flex('R', 23).tobillo_dorsi('R', 11.5)      # 20° medidos
 F['rodilla-ap-pa-bilateral-carga--v2'] = lambda: fig('rodilla-ap-pa-bilateral-carga--v2', _pa20(), LAT, cortes=MUSLO(0.24))
 
 # ---------- rótula y fosa intercondílea ----------
 F['fosa-rotula-pa-rotula'] = lambda: fig('fosa-rotula-pa-rotula', Pose().cadera_rot_int('R', R0K), MED, PRONO, cortes=MUSLO(0.22))
 # Camp Coventry: prono, rodilla flexionada 40-50°
-F['fosa-rotula-tunel--v1'] = lambda: fig('fosa-rotula-tunel--v1', Pose().cadera_rot_int('R', R0K).rodilla_flex('R', 45), MED, PRONO, cortes=MUSLO(0.22))
+F['fosa-rotula-tunel--v1'] = lambda: fig('fosa-rotula-tunel--v1', Pose().cadera_rot_int('R', R0K).rodilla_flex('R', 50.5), MED, PRONO, cortes=MUSLO(0.22))
 # Holmblad: arrodillado, pierna apoyada en la mesa y muslo inclinado 20-30° hacia adelante (rodilla a unos 115°)
-F['fosa-rotula-tunel--v2'] = lambda: fig('fosa-rotula-tunel--v2', Pose().cadera_rot_int('R', R0K).rodilla_flex('R', 115).tobillo_dorsi('R', -35),
+F['fosa-rotula-tunel--v2'] = lambda: fig('fosa-rotula-tunel--v2', Pose().cadera_rot_int('R', R0K).rodilla_flex('R', 120.5).tobillo_dorsi('R', -35),
     LAT, horizontal=('tobillo_R', 'rodilla_R'), cortes=MUSLO(0.22))
+# (flexiones del rig ~11% mayores que el ángulo medido entre cadera-rodilla y rodilla-tobillo: 50,5 -> 45°, 120,5 -> muslo a
+# 25° de la vertical, 97 -> 90°, 61 -> 55°)
 # Settegast (rodilla a 90°) y Hughston (50-60°), en prono
-F['fosa-rotula-axial-settegast-hughston--v1'] = lambda: fig('fosa-rotula-axial-settegast-hughston--v1', Pose().cadera_rot_int('R', R0K).rodilla_flex('R', 90), MED, PRONO, cortes=MUSLO(0.22))
-F['fosa-rotula-axial-settegast-hughston--v2'] = lambda: fig('fosa-rotula-axial-settegast-hughston--v2', Pose().cadera_rot_int('R', R0K).rodilla_flex('R', 55).tobillo_dorsi('R', -20), MED, PRONO, cortes=MUSLO(0.22))
+F['fosa-rotula-axial-settegast-hughston--v1'] = lambda: fig('fosa-rotula-axial-settegast-hughston--v1', Pose().cadera_rot_int('R', R0K).rodilla_flex('R', 97), MED, PRONO, cortes=MUSLO(0.22))
+F['fosa-rotula-axial-settegast-hughston--v2'] = lambda: fig('fosa-rotula-axial-settegast-hughston--v2', Pose().cadera_rot_int('R', R0K).rodilla_flex('R', 61).tobillo_dorsi('R', -20), MED, PRONO, cortes=MUSLO(0.22))
 # Hobbs: sentado, rodillas flexionadas con los pies debajo de la silla; cuerpo entero visto de costado
 _sent = lambda: (Pose().cadera_flex('R', 90).cadera_flex('L', 90).rodilla_flex('R', 110).rodilla_flex('L', 110)
                  .hombro_flex('R', 5).codo_flex('R', 75).hombro_flex('L', 5).codo_flex('L', 75))

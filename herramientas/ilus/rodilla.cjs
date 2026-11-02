@@ -180,8 +180,9 @@ I["fosa-rotula-lateral-rotula"] = () => {
 // ---------- de pie ----------
 // punto de la interlínea: 1,25 cm por debajo del vértice de la rótula, a la altura del centro de la rodilla
 const interlinea = (f) => { const v = f.p("vertice_rotula_R"), k = f.p("rodilla_R"); return [k[0], v[1] + 1.25 * f.ppc]; };
+// flexión medida entre los ejes cadera-rodilla y rodilla-tobillo (los centros de los huesos recortados la falseaban)
 const flexion = (f, label) => {
-  const k = f.p("rodilla_R"), fe = f.p("centro:Right femur"), tb = f.p("centro:Right tibia");
+  const k = f.p("rodilla_R"), fe = f.p("cabeza_femur_R"), tb = f.p("tobillo_R");
   const eF = add(k, unit(fe, k), 70), eT = add(k, unit(k, tb), 70);
   return linea(k, eF) + arco(k, 50, angulo(k, eF), angulo(k, eT), label, BLUE, 20);
 };
@@ -310,7 +311,7 @@ I["fosa-rotula-tunel--v1"] = () => {
 // Holmblad: arrodillado sobre la mesa, la pierna apoyada y el muslo inclinado hacia adelante; vista de costado (pies a la izquierda)
 I["fosa-rotula-tunel--v2"] = () => {
   const f = E.figura("fosa-rotula-tunel--v2", { caja: [20, 40, 380, 210] });
-  const k = f.p("rodilla_R"), fe = f.p("centro:Right femur"), yMesa = f.abajo(f.x, f.x + f.w) + 1;
+  const k = f.p("rodilla_R"), fe = f.p("cabeza_femur_R"), yMesa = f.abajo(f.x, f.x + f.w) + 1;
   const vert = [k[0], k[1] - 110];
   return svg(
     view("Holmblad · arrodillado") +

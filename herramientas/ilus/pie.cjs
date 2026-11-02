@@ -158,28 +158,31 @@ I["pie-ap-dorsoplantar"] = () => {
   );
 };
 
-// oblicuas vistas desde los dedos: la rodilla cae hacia un lado y el pie queda inclinado sobre un bloque
-function desdeDedos(id, medial, caja) {
+// oblicuas vistas desde los dedos: la rodilla cae hacia un lado y el pie queda inclinado sobre un bloque. `incl` = inclinación real
+// de la planta respecto de la mesa en el modelo (figuras/pie.py la ajusta: 35° el pie, 37,5° los dedos). La vista mira a lo largo
+// del pie, en el plano de la planta, así que la planta se ve con esa misma inclinación: el bloque y el arco la dibujan tal cual.
+function desdeDedos(id, medial, caja, incl) {
   const f = E.figura(id, { caja });
   const m1 = f.p("cabeza_mt1_R"), m5 = f.p("base_mt5_R");
   const bajo = medial ? m1 : m5, alto = medial ? m5 : m1;       // borde que apoya y borde levantado
   const yRI = apoyo(f, bajo[0], 10) + 1;
-  // bloque bajo el borde levantado: triángulo desde el apoyo hasta debajo de ese borde
+  const dir = Math.sign(alto[0] - bajo[0]);                       // hacia dónde sube la planta en la imagen
   const sk = 1.0 * f.ppc;                                        // piel bajo el hueso
-  const top = [alto[0], alto[1] + sk];
-  const base0 = [bajo[0] + (medial ? -1 : 1) * 1.5 * f.ppc, yRI];
+  const top = [alto[0] + dir * 0.6 * f.ppc, alto[1] + sk];        // bloque bajo el borde levantado
+  const base0 = [top[0] - dir * (yRI - top[1]) / Math.tan(rad(incl)), yRI];   // donde la planta (a `incl`) toca el RI
   const wedge = `<path d="M${f1(base0[0])},${f1(yRI)} L${f1(top[0])},${f1(top[1])} L${f1(top[0])},${f1(yRI)} Z" fill="#dfe3ea" stroke="#8a8f9c" stroke-width="1.2"/>`;
-  return { f, yRI, base0, top, wedge };
+  const ang = dir > 0 ? -incl : -180 + incl, hor = dir > 0 ? 0 : -180;   // dirección de la planta y de la horizontal (SVG)
+  return { f, yRI, base0, top, wedge, ang, hor, dir };
 }
 I["pie-ap-oblicua-medial"] = () => {
-  const d = desdeDedos("pie-ap-oblicua-medial", true, [180, 30, 300, 230]), f = d.f;
-  const b3 = f.p("base_mt3_R"), ang = angulo(d.base0, d.top);
+  const d = desdeDedos("pie-ap-oblicua-medial", true, [180, 30, 300, 230], 35), f = d.f;
+  const b3 = f.p("base_mt3_R"), ang = d.ang;
   return svg(
     view("Vista desde los dedos · pie oblicuado hacia medial") +
     table(120, 600, f1(d.yRI + 9), "") + riBar(150, 560, d.yRI) + txt(566, f1(d.yRI + 9), "RI 24 × 30", 12, INK) +
     d.wedge + f.svg + crossP(b3) +
     refline(f1(d.base0[0]), f1(d.yRI), f1(d.base0[0] + 160 * Math.cos(rad(ang))), f1(d.yRI + 160 * Math.sin(rad(ang)))) +
-    arco(d.base0, 90, ang, 0, "30-40°") +
+    arco(d.base0, 90, d.hor, ang, "30-40°") +
     tube(b3[0], b3[1] - 12, 0, 120) +
     note(b3[0] + 4, 100, 530, 64, ["RC perpendicular al RI", "en la base del 3.er MT", "DFRI 100 cm"], RED) +
     note(f1(d.top[0] - 10), f1(d.yRI - 6), 560, 286, ["Bloque angular", "radiotransparente"], INK) +
@@ -267,16 +270,16 @@ const pieOblTxt = (medial) =>
   col(440, 206, [["RC perpendicular al RI, centrado", RED, 700], ["en las MTF de interés", RED, 700]]) +
   col(440, 290, [["RI 18 × 24 horiz. · DFRI 100 cm", MUTE, 400, 11], ["Varias tomas en un RI: cubrir con plomo el resto", MUTE, 400, 11]]);
 function dedosOblicua(v, medial) {
-  const d = desdeDedos("dedos-pie-ap-oblicua--" + v, medial, [70, 30, 300, 230]), f = d.f;
-  const j = f.p("mtf_pie_R"), ang = angulo(d.base0, d.top);
+  const d = desdeDedos("dedos-pie-ap-oblicua--" + v, medial, [70, 30, 300, 230], 37.5), f = d.f;
+  const j = f.p("mtf_pie_R"), ang = d.ang;
   const blanco = medial ? f.p("punta_dedo1_pie_R") : f.p("punta_dedo5_pie_R");
   return svg(
     view(medial ? "Dedos 1.º a 3.º · vista desde los dedos" : "Dedos 4.º y 5.º · vista desde los dedos") +
     table(30, 420, f1(d.yRI + 9), "") + riBar(50, 400, d.yRI) +
     d.wedge + f.svg + ringR(blanco, 3.4 * f.ppc) +
     refline(f1(d.base0[0]), f1(d.yRI), f1(d.base0[0] + 150 * Math.cos(rad(ang))), f1(d.yRI + 150 * Math.sin(rad(ang)))) +
-    arco(d.base0, 80, ang, medial ? 0 : 180, "") +
-    txt(f1(d.base0[0] + (medial ? 96 : -96)), f1(d.yRI - 8), "30-45°", 13, BLUE, medial ? "start" : "end", 700) +
+    arco(d.base0, 80, d.hor, ang, "") +
+    txt(f1(d.base0[0] + d.dir * 96), f1(d.yRI - 8), "30-45°", 13, BLUE, d.dir > 0 ? "start" : "end", 700) +
     tube(blanco[0], blanco[1] - 3.6 * f.ppc, 0, 110) +
     txt(f1(d.base0[0]), f1(d.yRI + 26), medial ? "medial" : "lateral", 10.5, MUTE, medial ? "start" : "end") +
     pieOblTxt(medial)

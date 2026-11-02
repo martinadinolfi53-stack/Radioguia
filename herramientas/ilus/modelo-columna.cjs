@@ -26,7 +26,8 @@ const SOBRE_SINF = "medio:sinfisis|eias_R+eias_L|0.55";
 // ---------- cervical ----------
 def({ id: "columna-cervical-ap-boca-abierta", blanco: "medio:centro:Atlas|centro:Axis", ri: "18 × 24", otra: "costado",
   rc: [R("RC perpendicular al RI"), "por el centro de la boca", "abierta (C1-C2)"],
-  pos: ["Supino o de pie", "Línea incisivos superiores-", "mastoides ⊥ al RI", "Abrir bien la boca sin", "mover la cabeza"] });
+  pos: ["Supino o de pie", "Línea incisivos superiores-", "mastoides ⊥ al RI", "Abrir bien la boca sin", "mover la cabeza"],
+  pie: [["Naranja: atlas (C1)", "#c27a12", 700], ["Azul: axis (C2) con la", "#2f6fc2", 700], ["apófisis odontoides", "#2f6fc2", 700]] });
 def({ id: "columna-cervical-odontoides-fuchs", blanco: "centro:Axis", ri: "18 × 24", otra: "costado",
   rc: [R("RC paralelo a la LMM"), "2,5 cm posteroinferior a las", "mastoides y a los ángulos", "de la mandíbula"],
   pos: ["Supino o de pie", "Mentón elevado hasta que la", "LMM quede casi ⊥ al RI", "RI centrado en la salida"] });

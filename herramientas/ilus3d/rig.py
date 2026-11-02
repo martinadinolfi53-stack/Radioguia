@@ -233,7 +233,9 @@ class Cuerpo:
                     Rh = rotm(ax, ang / 2); Mh = np.eye(4); Mh[:3, :3] = Rh; Mh[:3, 3] = c - Rh @ c
                     T['rotula_' + s] = Tm @ Mh
         if pose.get('mandibula'):     # boca abierta: la mandíbula (y los dientes de abajo) gira sobre los cóndilos
-            T['mandibula'] = T['cabeza'] @ self._boca(sum(g for _, g in pose['mandibula']))
+            g = sum(g for _, g in pose['mandibula'])
+            T['mandibula'] = T['cabeza'] @ self._boca(g)
+            T['comisuras'] = T['cabeza'] @ self._boca(g / 2)     # comisuras de la boca: acompañan a medias (piel del avatar)
         self.T = T
         return T
 

@@ -16,8 +16,10 @@ def par(id, pose, d, centro, ri, otra='costado', radio=0.15, encuadre=0.27, hues
     """las dos vistas de una ficha"""
     kt = {k: v for k, v in kw.items() if k not in ('desde', 'arriba_img', 'arriba_tubo')}
     if 'arriba_tubo' in kw: kt['arriba'] = kw.pop('arriba_tubo')
+    if 'region_tubo' in kw: kt['region'] = kw.pop('region_tubo'); kt.pop('region_tubo', None)
     F[id + '-tubo'] = lambda: tubo(id, pose(), d, centro, ri, radio=radio, encuadre=encuadre, huesos=huesos, **kt)
-    kw = {k: v for k, v in kw.items() if k != 'huesos_hasta'}
+    kw = {k: v for k, v in kw.items() if k not in ('huesos_hasta', 'piel_modelo')}
+    if 'region_otra' in kw: kw['region'] = kw.pop('region_otra'); kt.pop('region_otra', None)
     if otra == 'costado': F[id + '-otra'] = lambda: costado(id, pose(), d, centro, ri, huesos=huesos, encuadre=enc_otra, **kw)
     # desde la cabeza: el tronco cortado 4 cm por encima de la cresta, para ver el giro de la pelvis sin el tórax delante
     elif otra == 'arriba': F[id + '-otra'] = lambda: arriba(id, pose(), d, centro, ri, huesos=huesos, cortes=[('cresta_iliaca_R', (0, -1, 0), 0.04)], region=TRONCO_BAJO,
@@ -67,12 +69,16 @@ par('acetabulo-pa-oblicua-axial-teufel', Pose, angulado(oblicuo('PA', 37, 'R'), 
     (0.24, 0.30), normal=oblicuo('PA', 37, 'R'), radio=0.12, encuadre=0.24)
 # fémur: AP con ≈5° de rotación interna; lateral en decúbito lateral sobre el lado afectado, rodilla a 45° y la pierna sana
 # hacia atrás; lateral con haz horizontal en supino, RI entre las piernas
-par('femur-ap', lambda: Pose().cadera_rot_int('R', ROT(5)), AP, 'centro:Right femur', (0.35, 0.43), radio=0.27, encuadre=0.34, huesos=FEMUR, otra=None)
+# fémur: el avatar se ve semitransparente en toda la ventana (es larga), así que desde el tubo se dibuja solo la pierna
+# derecha y la pelvis (sin la mano ni la otra pierna, que se veían como fantasmas encima del muslo), con la piel del modelo
+# anatómico: la del avatar es más fina y el fémur distal asomaba por delante del muslo
+PIERNA_D = ['pelvis', 'muslo_R', 'rotula_R', 'pierna_R', 'pie_R', 'dedos_pie_R']
+par('femur-ap', lambda: Pose().cadera_rot_int('R', ROT(5)), AP, 'centro:Right femur', (0.35, 0.43), radio=0.27, encuadre=0.34, huesos=FEMUR, otra=None, piel_modelo=True)
 par('femur-lateral', lambda: Pose().rodilla_flex('R', 45).cadera_flex('R', 20).cadera_flex('L', -35), (-1, 0, 0), 'centro:Right femur', (0.35, 0.43),
-    radio=0.27, encuadre=0.34, huesos=FEMUR, otra=None, ri_radio=0.30)
-# haz horizontal: desde el tubo con el techo arriba (acostado) y una vista desde el techo con el RI parado entre las piernas
+    radio=0.27, encuadre=0.34, huesos=FEMUR, ri_radio=0.30, region_tubo=PIERNA_D, piel_modelo=True, otra=None)
 par('femur-lateral-haz-horizontal', lambda: Pose().cadera_flex('R', 8).cadera_abd('L', 12), (1, 0, 0), 'centro:Right femur', (0.35, 0.43), radio=0.27,
-    encuadre=0.34, huesos=FEMUR, ri_radio=0.12, arriba_tubo=(0, 0, 1), desde=(0, 0, -1), arriba_img=(0, 1, 0), enc_otra=0.75)
+    encuadre=0.34, huesos=FEMUR, ri_radio=0.12, arriba_tubo=(0, 0, 1), desde=(0, 0, -1), arriba_img=(0, 1, 0), enc_otra=0.75, region_tubo=PIERNA_D,
+    piel_modelo=True)
 
 if __name__ == '__main__':
     for k in (sys.argv[1:] or F):

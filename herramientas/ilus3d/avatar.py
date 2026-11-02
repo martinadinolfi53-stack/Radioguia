@@ -198,6 +198,7 @@ def posado(c, ajustado=None):
     for b, M in D['S'].items():
         seg = _seg(b); T = c.T.get(seg, c.T['pelvis'])
         if 'mandibula' in c.T and _de_mandibula(b): T = c.T['mandibula']      # boca abierta: mentón, labio inferior y lengua
+        elif 'comisuras' in c.T and b.startswith(('oris03', 'oris04', 'risorius')): T = c.T['comisuras']
         if seg.startswith('radio_') and seg in c.T:
             # la pronosupinación del modelo es un giro del radio alrededor de su eje: el antebrazo del avatar la reparte entre
             # lowerarm01 (nada) y lowerarm02 (todo), como el giro escalonado de rig.piel_posada

@@ -34,8 +34,13 @@ _hombros_abajo = lambda: Pose().hombro_elevar('R', -10).hombro_elevar('L', -10)
 SUP_H = dict(arriba_tubo=(0, 0, 1), desde=(0, 0, -1), arriba_img=(0, 1, 0))
 
 # ---------- cervical ----------
-_boca = lambda: Pose().boca_abrir(25)          # boca bien abierta: los incisivos se separan ≈4 cm
-par('columna-cervical-ap-boca-abierta', _boca, AP, 'medio:centro:Atlas|centro:Axis', (0.18, 0.24), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO, **DE_PIE)
+# boca bien abierta (los incisivos se separan ≈4 cm) y la cabeza extendida 14° para que la línea incisivos superiores-punta de
+# las mastoides quede perpendicular al RI: así los incisivos de arriba quedan a la altura de la base del occipital y C1-C2 (con
+# la apófisis odontoides) caen en el hueco de la boca. Atlas en naranja, axis en azul.
+_boca = lambda: Pose().cabeza_flex(-14).boca_abrir(25)
+_C1C2 = [('Atlas', 'centro:Atlas', 0.06, 'f0a640'), ('Axis', 'centro:Axis', 0.07, '4f8fe0')]
+par('columna-cervical-ap-boca-abierta', _boca, AP, 'medio:centro:Atlas|centro:Axis', (0.18, 0.24), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO,
+    destacar=_C1C2, **DE_PIE)
 _menton = lambda: Pose().cabeza_flex(-30)
 par('columna-cervical-odontoides-fuchs', _menton, AP, 'centro:Axis', (0.24, 0.18), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO)
 par('columna-cervical-odontoides-judd', _menton, PA, 'centro:Axis', (0.24, 0.18), radio=0.08, encuadre=0.18, huesos=CERV_CRANEO)

@@ -10,7 +10,7 @@
 (function () {
   // Interruptor: mientras esté en false el sitio viejo sigue funcionando igual que siempre.
   // Se pasa a true recién cuando el sitio nuevo esté publicado y probado.
-  var MUDANZA_ACTIVA = false;
+  var MUDANZA_ACTIVA = true;
   var NUEVA = "https://app-rx-188a6.web.app/";
   var MARCA = "#mudanza=";
 

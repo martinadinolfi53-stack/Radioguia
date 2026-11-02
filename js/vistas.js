@@ -340,18 +340,22 @@ export function vistaFavoritos() {
     : `<div class="vacio"><b>${todas.length > 1 ? `“${esc(act.nombre)}” está vacía.` : "Todavía no tenés favoritos."}</b><br>Abrí una proyección y tocá la estrella para guardarla${todas.length > 1 ? " en esta lista" : ""}; acá aparece ordenada por región.</div>`;
   else if (q && localVer.length) cuerpo = resultados(localVer, q);
   else cuerpo = menuFavoritos((p) => localVer.includes(p), otrasVer);
-  const selector = estado.sel ? "" : `<div class="lst-selector" role="group" aria-label="Listas de favoritos">${todas.map((l) =>
-      `<button class="lst-chip${l.id === act.id ? " on" : ""}" data-lista="${esc(l.id)}" aria-pressed="${l.id === act.id}" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}<span>${esc(l.nombre)}</span><b>${l.total}</b></button>`).join("")}
-    <button class="lst-chip nueva" data-lista-nueva>${icono.mas}<span>Nueva lista</span></button></div>
-    <div class="lst-acciones">
-      <button class="btn-sec" data-lista-editar="${esc(act.id)}">${icono.lapiz}<span>Nombre y color</span></button>
-      ${favs.length ? `<button class="btn-sec" data-sel-entrar>${icono.tilde}<span>Seleccionar</span></button>
-      <a class="btn-sec" href="#imprimir">${icono.imprimir}<span>Imprimir o PDF</span></a>
-      <a class="btn-sec" href="#repaso-l-${esc(act.id)}">${icono.repaso}<span>Repasar</span></a>` : ""}
-    </div>`;
-  return cabecera({ titulo: todas.length > 1 ? act.nombre : "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${todas.length > 1 ? "Favoritos · " : ""}${act.total} ${act.total === 1 ? "proyección" : "proyecciones"}`, atras: "#enfoques" }) +
+  // arriba, separados: las listas (una fila que se desliza de costado) y las herramientas de la lista elegida
+  const herr = (attr, ico, txt, ok = true) => ok ? `<${attr.startsWith("href") ? "a" : "button"} class="fav-herr" ${attr}><span class="fav-herr-ico">${ico}</span><span>${txt}</span></${attr.startsWith("href") ? "a" : "button"}>` : "";
+  const cabeza = estado.sel ? "" : `<div class="wrap fav-cabeza" style="--lc: var(--lc-${act.color})">
+    <h2 class="fav-tit">Mis listas</h2>
+    <div class="fav-listas" role="group" aria-label="Listas de favoritos">${todas.map((l) =>
+      `<button class="fav-lista${l.id === act.id ? " on" : ""}" data-lista="${esc(l.id)}" aria-pressed="${l.id === act.id}" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}<span class="t">${esc(l.nombre)}</span><span class="n">${l.total} ${l.total === 1 ? "enfoque" : "enfoques"}</span></button>`).join("")}
+      <button class="fav-lista nueva" data-lista-nueva>${icono.mas}<span class="t">Nueva lista</span></button></div>
+    <div class="fav-herrs" role="toolbar" aria-label="Herramientas de la lista">
+      ${herr(`data-lista-editar="${esc(act.id)}"`, icono.lapiz, "Editar")}
+      ${herr("data-sel-entrar", icono.tilde, "Elegir", favs.length > 0)}
+      ${herr('href="#imprimir"', icono.imprimir, "Imprimir", favs.length > 0)}
+      ${herr(`href="#repaso-l-${esc(act.id)}"`, icono.repaso, "Repasar", favs.length > 0)}
+    </div></div>`;
+  return cabecera({ titulo: "Favoritos", sub: estado.sel ? `${estado.sel.size} de ${favs.length} seleccionadas` : `${act.nombre} · ${act.total} ${act.total === 1 ? "enfoque" : "enfoques"}`, atras: "#enfoques" }) + cabeza +
     (favs.length && !estado.sel ? `<div class="buscar-barra"><div class="wrap">${buscador("q-fav", estado.qFav, `Buscar en ${act.nombre}`)}</div></div>` : "") +
-    `<main class="wrap" style="--lc: var(--lc-${act.color})">${selector}${filtroFuente}${cuerpo}</main>` + barraPestanas("favoritos");
+    `<main class="wrap" style="--lc: var(--lc-${act.color})">${filtroFuente}${cuerpo}</main>` + barraPestanas("favoritos");
 }
 
 // Ajustes > Apariencia: diseño (Clásico, Pompa de jabón o Liquid Glass); en Pompa, la paleta de colores y los detalles jugados; en los otros, el tema

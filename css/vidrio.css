@@ -154,3 +154,8 @@ a.opcion, .opciones .aj-salir { flex: 0 1 auto; }
 .aj-filas { border: 0; border-radius: 12px; background: var(--relleno); }
 .aj-fila + .aj-fila { box-shadow: 0 -.5px 0 var(--line); }
 .aj-fila { font-size: 17px; }
+
+/* Favoritos: tarjetas de listas y barra de herramientas en el mismo vidrio que las celdas */
+.fav-lista, .fav-herrs { background: var(--material); border-color: transparent; -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%); box-shadow: inset 0 0 0 .5px var(--material-borde); }
+.fav-lista.on { border-color: var(--lc); background: color-mix(in srgb, var(--lc) 22%, var(--material)); }
+.fav-lista.nueva { background: transparent; border-color: color-mix(in srgb, var(--accent) 45%, transparent); }

@@ -4,5 +4,6 @@
 //   npx esbuild firebase-entrada.js --bundle --format=esm --minify --legal-comments=none --outfile=<repo>/js/vendor/firebase.js
 // Siempre con una versión exacta de firebase, nunca "latest".
 export { initializeApp } from "firebase/app";
+export { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 export { getAuth, GoogleAuthProvider, signInAnonymously, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, linkWithPopup, linkWithRedirect, reauthenticateWithPopup, deleteUser, onAuthStateChanged, signOut, connectAuthEmulator } from "firebase/auth";
 export { initializeFirestore, persistentLocalCache, persistentSingleTabManager, connectFirestoreEmulator, terminate, clearIndexedDbPersistence, doc, collection, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, runTransaction, writeBatch, serverTimestamp, arrayUnion, arrayRemove, increment } from "firebase/firestore";

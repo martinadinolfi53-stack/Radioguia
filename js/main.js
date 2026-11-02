@@ -18,7 +18,7 @@ import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificaci
 import * as nube from "./nube.js";
 import { vistaFoto } from "./foto.js";
 import { vistaPrivacidad } from "./privacidad.js";
-import { elegida, elegirFuente, ambos } from "./fuente.js";
+import { elegida, elegirFuente, ambos, anotarFuente } from "./fuente.js";
 import { iniciarLente } from "./lente.js";
 import { iniciarSyncFavoritos, cerrarSesion, olvidarFavoritos } from "./sync-favoritos.js";
 
@@ -137,7 +137,10 @@ app.addEventListener("toggle", (e) => {
   if (d.dataset?.parte && r.tipo === "familia") { const s = (estado.abiertas[r.f.id] ||= new Set()); d.open ? s.add(d.dataset.parte) : s.delete(d.dataset.parte); }
 }, true);
 
+// se eligió otro libro en la portada: se recarga al salir de ella, ya con la pantalla de destino en la dirección
+let libroPendiente = false;
 addEventListener("hashchange", (e) => {
+  if (libroPendiente) { location.reload(); return; }
   const antes = new URL(e.oldURL).hash || "#", ahora = location.hash || "#";
   const volviendo = nivel(antes) > nivel(ahora) && posiciones[ahora] != null, y = posiciones[ahora];
   pantallaAnterior = antes;
@@ -162,7 +165,10 @@ function refrescarMain() {
 // elegir la fuente (al entrar, en Ajustes o desde un grupo de otro libro): si cambia, la app se recarga con esos datos
 app.addEventListener("click", (e) => {
   const b = e.target.closest("[data-fuente]");
-  if (b && elegirFuente(b.dataset.fuente, location.hash || "#") === false) render();
+  if (!b) return;
+  // en la portada el interruptor cambia al instante y el libro nuevo se carga al entrar a Enfoques o Juegos
+  if ("portada" in b.dataset) { libroPendiente = anotarFuente(b.dataset.fuente); render(); return; }
+  if (elegirFuente(b.dataset.fuente, location.hash || "#") === false) render();
 });
 
 // enfoque de otro libro (Favoritos, buscador, menú con Ambos): cambia a ese libro y abre la ficha.

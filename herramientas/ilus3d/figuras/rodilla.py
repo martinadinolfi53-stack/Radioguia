@@ -56,7 +56,9 @@ F['rodilla-ap-pa-bilateral-carga--v2'] = lambda: fig('rodilla-ap-pa-bilateral-ca
 # segunda vista de las bilaterales en carga: las dos rodillas como las ve el tubo (PA: desde atrás; AP: desde adelante)
 _DOS = [('rodilla_R', 'distal', 0.24), ('rodilla_L', 'distal', 0.24)]
 _PD = ['rodilla_R', 'rodilla_L', 'vertice_rotula_R', 'vertice_rotula_L']
-_tubo2 = lambda id, pose, d: figura(id, pose, dir=d, arriba=(0, 1, 0), huesos=AMBAS, region=AMBAS, cortes=_DOS, puntos=_PD)
+# ventana transparente centrada entre las dos rodillas y que abarca las dos (la automática se centra en la rótula derecha)
+_V2 = dict(punto='medio:rodilla_R|rodilla_L|0.5', radio=0.20, encuadre=0, piel_dentro=0.12, borde=0.06, piel_modelo=True, muestras=64)
+_tubo2 = lambda id, pose, d: figura(id, pose, dir=d, arriba=(0, 1, 0), huesos=AMBAS, region=AMBAS, cortes=_DOS, puntos=_PD, ventana=_V2)
 F['rodilla-pa-axial-bilateral-rosenberg-tubo'] = lambda: _tubo2('rodilla-pa-axial-bilateral-rosenberg-tubo', _ros(), (0, 0, 1))
 F['rodilla-ap-pa-bilateral-carga--v1-tubo'] = lambda: _tubo2('rodilla-ap-pa-bilateral-carga--v1-tubo', Pose(), (0, 0, -1))
 F['rodilla-ap-pa-bilateral-carga--v2-tubo'] = lambda: _tubo2('rodilla-ap-pa-bilateral-carga--v2-tubo', _pa20(), (0, 0, 1))

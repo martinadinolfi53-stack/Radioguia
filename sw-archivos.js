@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "ea6700fa97";
+self.RG_VERSION = "5d58eafa67";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -295,11 +295,11 @@ self.RG_EXTRAS = {
  "ilustraciones/pulgar-pa-oblicua.svg": "3d7eeb30",
  "ilustraciones/rodilla-ap-oblicuas--v1.svg": "06cb5a68",
  "ilustraciones/rodilla-ap-oblicuas--v2.svg": "8a70c789",
- "ilustraciones/rodilla-ap-pa-bilateral-carga--v1.svg": "893601e2",
- "ilustraciones/rodilla-ap-pa-bilateral-carga--v2.svg": "4bf52382",
+ "ilustraciones/rodilla-ap-pa-bilateral-carga--v1.svg": "316a54ce",
+ "ilustraciones/rodilla-ap-pa-bilateral-carga--v2.svg": "bc8ade22",
  "ilustraciones/rodilla-ap.svg": "1c385320",
  "ilustraciones/rodilla-lateral.svg": "e377c814",
- "ilustraciones/rodilla-pa-axial-bilateral-rosenberg.svg": "dd8c3936",
+ "ilustraciones/rodilla-pa-axial-bilateral-rosenberg.svg": "e340dd29",
  "ilustraciones/senos-lateral.svg": "6e76086a",
  "ilustraciones/senos-pa-caldwell--v1.svg": "cd430ef7",
  "ilustraciones/senos-pa-caldwell--v2.svg": "01689900",

@@ -5,7 +5,7 @@ import { listas } from "./almacen.js";
 import { esc, icono, cabecera, abrirHoja } from "./util.js";
 import { FACTORES_FICHA, RC_ETIQUETA } from "./ficha.js";
 
-export const opcionesImpresion = { ilustraciones: true, criterios: true };
+export const opcionesImpresion = { ilustraciones: true, criterios: true, rellenar: false };
 
 const lista = (items) => (items?.length ? `<ul>${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : "");
 const rcHTML = (rc) => `${RC_ETIQUETA[rc?.direccion] ? `<p class="imp-rc-dir">${esc(RC_ETIQUETA[rc.direccion])}${rc.angulo ? ` · ${esc(rc.angulo)}` : ""}</p>` : ""}<p>${esc(rc?.texto || "Sin dato en la fuente.")}</p>`;
@@ -33,6 +33,42 @@ function hoja(p, nombreLista) {
   </article>`;
 }
 
+// ficha para rellenar (a mano o escribiendo en la pantalla): los mismos títulos que la ficha impresa, con renglones vacíos.
+// p = null es una ficha en blanco, sin el nombre del enfoque. Lo que se escribe en pantalla no se guarda: se imprime o se pasa a PDF.
+const renglones = (n) => `<div class="imp-renglones" contenteditable="true" spellcheck="false" style="--n: ${n}"></div>`;
+const campo = () => `<span class="imp-campo" contenteditable="true" spellcheck="false"></span>`;
+function hojaRellenar(p, pie) {
+  const r = p && regionPorId[p.region];
+  const o = opcionesImpresion;
+  return `<article class="imp-hoja rellenar">
+    <header class="imp-cab">${p
+      ? `<p class="imp-region">${esc(r?.nombre || "")}${r?.detalle ? ` · ${esc(r.detalle)}` : ""}</p><h2>${esc(p.nombre)}</h2>`
+      : `<p class="imp-region">Región ${campo()}</p><h2 class="imp-h-campo">Proyección ${campo()}</h2>`}</header>
+    <section><h3>Factores técnicos</h3><dl class="imp-factores">${FACTORES_FICHA.map(([, n]) => `<div><dt>${esc(n)}</dt><dd>${campo()}</dd></div>`).join("")}</dl></section>
+    <section class="imp-rc"><h3>Rayo central</h3>${renglones(3)}</section>
+    <section><h3>Posición del paciente</h3>${renglones(p?.versiones ? 9 : 7)}</section>
+    ${o.criterios ? `<section><h3>Criterios de evaluación</h3>${renglones(5)}</section>` : ""}
+    <section><h3>Esquema</h3><div class="imp-dibujo" aria-label="Recuadro para dibujar"></div></section>
+    <footer class="imp-pie">${pie} · RadioGuía</footer>
+  </article>`;
+}
+
+const AYUDA_RELLENAR = `<p class="ayuda">Imprimila para completarla a mano, o tocá los renglones y escribí acá mismo; después tocá Imprimir o guardar PDF para quedarte con lo que escribiste. Lo escrito no queda guardado en la app.</p>`;
+
+// #rellenar (ficha en blanco) o #rellenar-<id> (con el nombre de ese enfoque)
+export function vistaRellenar(p, volver) {
+  return cabecera({ titulo: "Ficha para rellenar", sub: p ? p.nombre : "En blanco", atras: volver }) + `
+  <main class="wrap imprimir">
+    <section class="panel imp-opciones">
+      <h2>Incluir</h2>
+      <div class="opciones"><button class="opcion${opcionesImpresion.criterios ? " on" : ""}" data-imp-op="criterios" aria-pressed="${opcionesImpresion.criterios}">Criterios de evaluación</button></div>
+      <button class="btn pri" data-imprimir-ya>${icono.imprimir}<span>Imprimir o guardar PDF</span></button>
+      ${AYUDA_RELLENAR}
+    </section>
+    <div class="imp-hojas">${hojaRellenar(p, p ? esc(FUENTE.corto) : "Ficha en blanco")}</div>
+  </main>`;
+}
+
 export function vistaImprimir() {
   const act = listas.activa();
   // en el orden del manual, no en el orden en que se guardaron
@@ -43,11 +79,11 @@ export function vistaImprimir() {
   <main class="wrap imprimir">
     <section class="panel imp-opciones">
       <h2>Incluir</h2>
-      <div class="opciones">${op("criterios", "Criterios de evaluación")}</div>
-      <button class="btn pri" data-imprimir ${fichas.length ? "" : "disabled"}>${icono.imprimir}<span>Imprimir o guardar PDF</span></button>
-      <p class="ayuda">Se abre el menú de impresión. Para tener el PDF, en el iPad tocá el botón Compartir de la vista previa y elegí Guardar en Archivos; en la computadora elegí «Guardar como PDF» como impresora.</p>
+      <div class="opciones">${op("rellenar", "Para rellenar")}${op("criterios", "Criterios de evaluación")}</div>
+      <button class="btn pri" ${o.rellenar ? "data-imprimir-ya" : "data-imprimir"} ${fichas.length ? "" : "disabled"}>${icono.imprimir}<span>Imprimir o guardar PDF</span></button>
+      ${o.rellenar ? AYUDA_RELLENAR + `<a class="btn-sec" href="#rellenar">${icono.imprimir}<span>Una ficha en blanco, sin nombre</span></a>` : `<p class="ayuda">Se abre el menú de impresión. Para tener el PDF, en el iPad tocá el botón Compartir de la vista previa y elegí Guardar en Archivos; en la computadora elegí «Guardar como PDF» como impresora.</p>`}
     </section>
-    ${fichas.length ? `<p class="label">Vista previa</p><div class="imp-hojas">${fichas.map((p) => hoja(p, act.nombre)).join("")}</div>` : `<div class="vacio">Esta lista está vacía.</div>`}
+    ${fichas.length ? `<p class="label">Vista previa</p><div class="imp-hojas">${fichas.map((p) => (o.rellenar ? hojaRellenar(p, `${esc(act.nombre)} · para rellenar`) : hoja(p, act.nombre))).join("")}</div>` : `<div class="vacio">Esta lista está vacía.</div>`}
   </main>`;
 }
 
@@ -65,7 +101,7 @@ export function preguntarEImprimir(raiz, rehacer) {
 }
 
 // espera a que carguen las ilustraciones para que no salgan hojas en blanco
-async function imprimir(raiz) {
+export async function imprimir(raiz) {
   await Promise.all([...raiz.querySelectorAll(".imp-hojas img")].map((img) => (img.complete ? null : img.decode().catch(() => {}))));
   print();
 }

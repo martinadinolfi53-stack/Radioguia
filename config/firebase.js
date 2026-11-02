@@ -9,3 +9,8 @@ export const firebaseConfig = {
   messagingSenderId: "1021511412577",
   appId: "1:1021511412577:web:12106e9ebe4cd2ab913320",
 };
+
+// App Check: clave del sitio de reCAPTCHA v3 (pública, como las de arriba; la clave secreta queda solo en la consola de Firebase).
+// Vacía = App Check apagado. Con clave, cada pedido a Firebase lleva una prueba de que viene de esta app y no de un script ajeno.
+// Mientras en la consola esté en "sin aplicar" solo se mide; recién al tocar "Aplicar" se rechaza lo que no la traiga.
+export const appCheckClave = "";

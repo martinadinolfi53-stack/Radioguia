@@ -15,7 +15,7 @@
 //   grupos/{gid}/partidas/{fecha}_{uid}    { uid, apodo, fecha, semana, correctas, respondidas, vidas, sinVidas, puntos, bonus, duracionMs, terminada, detalle, creado }
 //   reportes/{id}                          { uid, apodo, creado, ficha, fichaNombre, campo, enunciado, opciones, correcta, elegida, motivo, comentario }
 //                                          preguntas reportadas en el repaso; los escribe cualquiera y solo los lee quien figura en ADMINS de las reglas
-import { firebaseConfig } from "../config/firebase.js";
+import { firebaseConfig, appCheckClave } from "../config/firebase.js";
 
 export const DESAFIO = { preguntas: 15, vidas: 5, puntosPorAcierto: 10, bonusPorDia: 2, bonusMax: 10 };
 
@@ -42,6 +42,8 @@ export function iniciar() {
 async function cargar() {
   fb = await import("./vendor/firebase.js");
   app = fb.initializeApp(firebaseConfig);
+  // App Check va antes que Auth y Firestore para que sus pedidos ya salgan con la prueba; en el emulador no hace falta
+  if (appCheckClave && !EMULADOR) { try { fb.initializeAppCheck(app, { provider: new fb.ReCaptchaV3Provider(appCheckClave), isTokenAutoRefreshEnabled: true }); } catch (e) { console.warn("App Check no arrancó", e); } }
   auth = fb.getAuth(app);
   try { db = fb.initializeFirestore(app, { localCache: fb.persistentLocalCache({ tabManager: fb.persistentSingleTabManager() }) }); }
   catch { db = fb.initializeFirestore(app, {}); }

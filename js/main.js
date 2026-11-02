@@ -196,18 +196,23 @@ document.addEventListener("rx-rehacer", () => {
   const y = scrollY; render(); scrollTo(0, y);
 });
 
+// Ajustes → Tu cuenta → Cambiar foto: al terminar, vuelve a Ajustes
+app.addEventListener("click", (e) => {
+  if (e.target.closest("[data-foto-desde-ajustes]")) try { localStorage.setItem("radioguia.juegos.despues", JSON.stringify("#ajustes")); } catch {}
+});
+
 // Ajustes → Buscar actualización
 app.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-buscar-act]");
   if (!b) return;
   const est = b.nextElementSibling;
-  b.disabled = true; est.textContent = "Buscando…";
-  const r = await pwa.buscarActualizacion().catch(() => "error");
+  b.disabled = true; b.classList.add("buscando"); est.textContent = "Buscando…";
+  const r = await pwa.buscarActualizacion((x) => { est.textContent = "Hay una versión nueva: se está descargando y la app se va a recargar sola."; }).catch(() => "error");
   est.textContent = r === "nueva" ? "Hay una versión nueva: se está descargando y la app se va a recargar sola."
     : r === "al-dia" ? "Ya tenés la última versión."
     : r === "sin-sw" ? "Esta vista no usa el modo sin conexión: recargá la página para ver lo último."
     : "No se pudo comprobar. Revisá la conexión a internet.";
-  b.disabled = false;
+  b.disabled = false; b.classList.remove("buscando");
 });
 
 app.addEventListener("click", async (e) => {

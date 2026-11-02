@@ -135,12 +135,22 @@ const AYUDA_ICONO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none"
 // la foto de perfil arriba, a todo el ancho, que se va difuminando hasta el saludo
 const fotoPortada = () => { const f = fotoGrande(); return f ? `<div class="portada-hero" aria-hidden="true"><img src="${esc(f)}" alt=""></div>` : ""; };
 
+// RX sobre la foto: relleno translúcido con borde. El borde sale de engordar la silueta de las letras (filtro SVG),
+// así no aparecen líneas donde se cruzan los trazos de la X, como pasa con -webkit-text-stroke.
+const RX_BORDE = `<svg class="rx-svg" viewBox="0 0 170 74" role="img" aria-label="RX"><defs><filter id="rx-borde" x="-10%" y="-10%" width="120%" height="120%">
+  <feMorphology in="SourceAlpha" operator="dilate" radius="2.2" result="gordo"/>
+  <feComposite in="gordo" in2="SourceAlpha" operator="out" result="borde"/>
+  <feFlood flood-color="#fff"/><feComposite in2="borde" operator="in" result="b"/>
+  <feFlood flood-color="#fff" flood-opacity=".22"/><feComposite in2="SourceAlpha" operator="in" result="r"/>
+  <feMerge><feMergeNode in="r"/><feMergeNode in="b"/></feMerge></filter></defs>
+  <text x="85" y="62" text-anchor="middle" filter="url(#rx-borde)">RX</text></svg>`;
+
 export function vistaPortada() {
   const hero = fotoPortada();
   return `<main class="portada${hero ? " con-foto" : ""}">${hero}
     <div class="portada-barra">
       <a class="portada-boton" href="#ayuda-app" aria-label="Cómo usarla como app en el celular">${AYUDA_ICONO}<span>Usarla como app</span></a>
-      <h1 class="portada-rx">RX</h1>
+      <h1 class="portada-rx">${hero ? RX_BORDE : "RX"}</h1>
       <a class="portada-boton" href="#ajustes" aria-label="Ajustes">${icono.ajustes}<span>Ajustes</span></a>
     </div>
     <p class="portada-hola">Hola ${esc(nombreUsuario())}, ¿qué quieres hacer hoy?</p>

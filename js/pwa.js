@@ -14,7 +14,7 @@ export const pwa = {
     // updateViaCache "none": al buscar versión nueva no se usa la caché HTTP (también para sw-archivos.js)
     navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((reg) => {
       registro = reg;
-      navigator.serviceWorker.ready.then(() => { listoOffline = true; alCambiar(); });
+      navigator.serviceWorker.ready.then((r) => { listoOffline = true; alCambiar(); r.active?.postMessage("completar"); });
       // versión nueva instalada: se activa y se recarga una sola vez
       reg.addEventListener("updatefound", () => {
         const nuevo = reg.installing;

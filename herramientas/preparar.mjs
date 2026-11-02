@@ -96,9 +96,15 @@ const lista = archivos.filter((f) => !/README|\.md$|\.DS_Store/.test(f)).map((f)
 const hash = createHash("sha256");
 for (const f of lista) hash.update(f).update(readFileSync(join(raiz, f)));
 const version = hash.digest("hex").slice(0, 10);
-writeFileSync(join(raiz, "sw-archivos.js"), `// Generado por herramientas/preparar.mjs. No editar a mano.\nself.RG_VERSION = "${version}";\nself.RG_ARCHIVOS = ${JSON.stringify(["./", ...lista], null, 1)};\n`);
+// la versión también va en sw.js: hay navegadores que solo buscan actualización si cambia ese archivo
+const sw = readFileSync(join(raiz, "sw.js"), "utf8");
+writeFileSync(join(raiz, "sw.js"), sw.replace(/^\/\/ versión: \S+/m, `// versión: ${version}`));
+// las ilustraciones no se guardan al instalar (son casi todo el peso): el service worker las baja después, cada una con su hash
+const esExtra = (f) => f.startsWith("ilustraciones/");
+const extras = Object.fromEntries(lista.filter(esExtra).map((f) => [f, createHash("sha256").update(readFileSync(join(raiz, f))).digest("hex").slice(0, 8)]));
+writeFileSync(join(raiz, "sw-archivos.js"), `// Generado por herramientas/preparar.mjs. No editar a mano.\nself.RG_VERSION = "${version}";\nself.RG_ARCHIVOS = ${JSON.stringify(["./", ...lista.filter((f) => !esExtra(f))], null, 1)};\nself.RG_EXTRAS = ${JSON.stringify(extras, null, 1)};\n`);
 
 console.log(resumen.join("\n") + ` · glosario: ${GLOSARIO.length} términos`);
-console.log(`sw-archivos.js: ${lista.length} archivos, versión ${version}`);
+console.log(`sw-archivos.js: ${lista.length} archivos (${Object.keys(extras).length} ilustraciones aparte), versión ${version}`);
 if (problemas.length) { console.error("\nPROBLEMAS:\n" + problemas.join("\n")); process.exit(1); }
 console.log("Datos sin problemas.");

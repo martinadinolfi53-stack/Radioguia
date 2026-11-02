@@ -31,8 +31,8 @@ body::after { content: ""; position: fixed; inset: -60px; z-index: -1; pointer-e
 /* ---------- barra de arriba: botones de vidrio flotando y título grande debajo ---------- */
 .top { background: transparent; border-bottom: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
 .top::before { content: ""; position: absolute; inset: calc(-1 * env(safe-area-inset-top, 0px)) 0 -16px; z-index: -1; pointer-events: none;
-  background: color-mix(in srgb, var(--bg) 40%, transparent); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
-  -webkit-mask-image: linear-gradient(#000 75%, transparent); mask-image: linear-gradient(#000 75%, transparent); }
+  background: color-mix(in srgb, var(--bg) 82%, transparent); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 16px), transparent); mask-image: linear-gradient(#000 calc(100% - 16px), transparent); }
 .top-row { flex-wrap: wrap; row-gap: 2px; padding-block: 6px 4px; }
 .top .titulo { order: 3; flex-basis: 100%; padding-left: 2px; }
 .top h1 { font-size: 34px; font-weight: 700; letter-spacing: .01em; line-height: 1.2; }
@@ -107,7 +107,7 @@ body::after { content: ""; position: fixed; inset: -60px; z-index: -1; pointer-e
 .opcion.on { color: var(--fg); font-weight: 600; background: var(--segm); box-shadow: 0 3px 8px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .04); }
 a.opcion, .opciones .aj-salir { flex: 0 1 auto; }
 .panel > .opciones:has(a.opcion), .panel > .opciones:has(.aj-salir) { background: none; padding: 0; gap: 10px; }
-.panel > .opciones:has(a.opcion) .opcion, .panel > .opciones:has(.aj-salir) .opcion { background: var(--relleno); min-height: 36px; padding: 6px 16px; color: var(--accent); }
+.aj-acciones .opcion, .panel > .opciones:has(a.opcion) .opcion, .panel > .opciones:has(.aj-salir) .opcion { background: var(--relleno); min-height: 36px; padding: 6px 16px; color: var(--accent); }
 .aj-salir { color: var(--rojo) !important; }
 .ap-op { border: 0; background: var(--relleno); border-radius: 18px; }
 .ap-op.on { box-shadow: inset 0 0 0 2px var(--accent); }

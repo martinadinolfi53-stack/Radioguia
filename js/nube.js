@@ -7,6 +7,8 @@
 //   usuarios/{uid}                         { apodo, foto, grupos: [gid] }   foto: JPEG cuadrado chico como data URL; solo lo lee su dueño
 //   usuarios/{uid}/privado/favoritos       { datos, actualizado }  listas de favoritos (JSON de js/almacen.js), solo cuentas con Google;
 //                                          solo las lee y escribe el dueño (ver js/sync-favoritos.js)
+//   usuarios/{uid}/privado/foto            { datos, actualizado }  copia grande de la foto para la portada (JSON { h, dato }: h es la huella
+//                                          de la foto chica de la que es copia); cualquier cuenta, solo la lee y escribe el dueño (ver js/foto.js)
 //   codigos/{CODIGO}                       { gid, creador, nombre, enfoques }  invitación: con el código se ve el nombre del grupo y se puede entrar
 //   grupos/{gid}                           { nombre, codigo, creador, creado, fichas, aspectos, excluir, origen }  solo lo leen sus miembros
 //   grupos/{gid}/miembros/{uid}            { uid, apodo, foto, puntos, partidas, racha, ultimaFecha, codigo }  acumulado para el ranking histórico
@@ -114,6 +116,7 @@ export async function borrarCuenta() {
   }
   // Firestore no borra las subcolecciones solo: los favoritos sincronizados van aparte
   await fb.deleteDoc(fb.doc(db, "usuarios", u.uid, "privado", "favoritos")).catch(() => {});
+  await fb.deleteDoc(fb.doc(db, "usuarios", u.uid, "privado", "foto")).catch(() => {});
   await fb.deleteDoc(fb.doc(db, "usuarios", u.uid));
   try { await fb.deleteUser(u); }
   catch (e) {
@@ -160,6 +163,23 @@ export async function leerFavoritos() {
 export async function guardarFavoritos(datos, actualizado) {
   await iniciar();
   await fb.setDoc(refFavoritos(), { datos: JSON.stringify(datos), actualizado });
+}
+
+// copia grande de la foto de perfil, para que la portada se vea nítida en cualquier celular y aunque se borre la copia local.
+// Va con la huella de la foto chica: si la foto se cambió desde una versión vieja de la app (que no sube la grande), la copia ya no vale.
+export const huella = (s) => { let h = 5381; for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) >>> 0; return `${s.length}-${h.toString(36)}`; };
+const refFotoGrande = () => fb.doc(db, "usuarios", auth.currentUser.uid, "privado", "foto");
+export async function guardarFotoGrande(chica, dato) {
+  await iniciar();
+  if (!auth.currentUser) return;
+  await fb.setDoc(refFotoGrande(), { datos: JSON.stringify({ h: huella(chica), dato }), actualizado: Date.now() });
+}
+// la copia grande de esa foto chica, o "" si no hay o es de otra foto
+export async function leerFotoGrande(chica) {
+  await iniciar();
+  if (!auth.currentUser) return "";
+  const d = await fb.getDoc(refFotoGrande());
+  try { const { h, dato } = JSON.parse(d.data()?.datos || "{}"); return h === huella(chica) && typeof dato === "string" ? dato : ""; } catch { return ""; }
 }
 
 // ---------- grupos ----------

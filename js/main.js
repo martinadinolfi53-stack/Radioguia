@@ -11,7 +11,7 @@ import { mostrarTermino } from "./glosario.js";
 import { ampliar } from "./imagenes.js";
 import { pwa } from "./pwa.js";
 import { grupoPorId, grupoDeRegion, FAMILIAS } from "./menu.js";
-import { vistaRepaso, iniciarRepaso } from "./repaso.js";
+import { vistaRepaso, iniciarRepaso, armarRueda } from "./repaso.js";
 import { vistaJuegos, iniciarJuegos } from "./juegos.js";
 import { iniciarGrupos } from "./grupos.js";
 import { identificado, recordarDestino, vistaIdentificacion, iniciarIdentificacion } from "./identificacion.js";
@@ -102,7 +102,7 @@ function render() {
     case "ayuda-app": app.innerHTML = vistaAyudaApp(); break;
     case "privacidad": app.innerHTML = vistaPrivacidad("#ajustes"); break;
     case "calc": app.innerHTML = vistaCalculadora(r.id, vuelta); break;
-    case "repaso": app.innerHTML = vistaRepaso(r.h); break;
+    case "repaso": app.innerHTML = vistaRepaso(r.h); armarRueda(app); break;
     case "juegos": app.innerHTML = vistaJuegos(r.h); break;
     case "inicio": app.innerHTML = vistaInicio(); break;
     case "familia": app.innerHTML = vistaFamilia(r.f); break;

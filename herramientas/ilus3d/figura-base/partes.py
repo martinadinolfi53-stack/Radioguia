@@ -10,6 +10,11 @@ V=np.array(V)
 import os
 _R={'mezcla':(1/3,1/3,1/3),'norte':(0.8,0.1,0.1)}[os.environ.get('RAZA','mezcla')]
 TG={'caucasian-male-young':_R[0],'african-male-young':_R[1],'asian-male-young':_R[2],'universal-male-young-maxmuscle-averageweight':float(os.environ.get('MUSC','0.6')),'universal-male-young-averagemuscle-minweight':float(os.environ.get('MAGRO','0.25'))}
+# EDAD=años (1 a 11): nene para las fichas pediátricas. MakeHuman interpola entre bebé (1 año) y niño (11 años); los targets
+# macro de esas edades son de rasgos caucásicos y contextura media (CC0, bajados del repositorio de MakeHuman).
+if os.environ.get('EDAD'):
+    _e=min(max((float(os.environ['EDAD'])-1)/10,0),1)
+    TG={'caucasian-male-baby':1-_e,'caucasian-male-child':_e,'universal-male-baby-averagemuscle-averageweight':1-_e,'universal-male-child-averagemuscle-averageweight':_e}
 for s_ in 'lr':
     TG[f'{s_}-eye-height2-incr']=float(os.environ.get('OJO2','0.7')); TG[f'{s_}-eye-height1-incr']=float(os.environ.get('OJO1','0.3')); TG[f'{s_}-eye-scale-incr']=float(os.environ.get('OJOS','0.2'))
 # variantes de cara (targets de MakeHuman, CC0), elegidas con CARA=
@@ -27,6 +32,8 @@ for k,w in TG.items():
         if l[0]=='#' or not l.strip(): continue
         i,dx,dy,dz=l.split(); V[int(i)]+=w*np.array([float(dx),float(dy),float(dz)])
 V=V*0.1   # dm -> m
+K=(V[:,1].max()-V[:,1].min())/1.78 if os.environ.get('EDAD') else 1.0     # medidas del tronco proporcionales a la altura
+_y0=V[:,1].min(); Ya=lambda y: _y0+K*(y-_y0)      # altura del adulto (pies en _y0) llevada a la del nene
 F={k:np.array(v) for k,v in G.items()}
 cen=lambda f: V[f].mean(1)
 body=F['body']; cb=cen(body)
@@ -37,63 +44,64 @@ for s in ('l','r'):
     d=cen(e)-c; d/=np.linalg.norm(d,axis=1,keepdims=True)
     iris=d[:,2]>0.80; partes[f'iris_{s}']=e[iris]; partes[f'ojo_{s}']=e[~iris]
 eyes=np.array(eyes); ex=np.abs(eyes[:,0]).mean(); ey=eyes[:,1].mean(); ez=eyes[:,2].mean()
+KH=ex/0.029308 if os.environ.get('EDAD') else 1.0     # medidas de la cara y el pelo proporcionales a la cabeza
 # cejas: arco fino sobre cada ojo
 xr=np.abs(cb[:,0])-ex; dy=cb[:,1]-ey
-arc=0.0215-0.006*(xr/0.024)**2
-ceja=(xr>-0.019)&(xr<0.026)&(np.abs(dy-arc)<0.0024)&(cb[:,2]>ez-0.005)
+arc=0.0215*KH-0.006*(xr/(0.024*KH))**2
+ceja=(xr>-0.019*KH)&(xr<0.026*KH)&(np.abs(dy-arc)<0.0024*KH)&(cb[:,2]>ez-0.005*KH)
 # labios (superior e inferior), forma de lente
-my=ey-0.0695
-lab=(np.abs(cb[:,0])<0.023)&(np.abs(cb[:,1]-my)<0.0065*np.clip(1-(cb[:,0]/0.024)**2,0,1))&(cb[:,2]>ez-0.012)
+my=ey-0.0695*KH
+lab=(np.abs(cb[:,0])<0.023*KH)&(np.abs(cb[:,1]-my)<0.0065*KH*np.clip(1-(cb[:,0]/(0.024*KH))**2,0,1))&(cb[:,2]>ez-0.012*KH)
 def zona(dentro, borde):
     f_=body[dentro[body].any(1)]; P=V.copy(); i_=np.unique(f_); o_=i_[~dentro[i_]]; P[o_]=borde(V[o_]); return f_, P
-xv=np.abs(V[:,0])-ex; dyv=V[:,1]-ey; av=0.0215-0.006*(xv/0.024)**2
-cv=(xv>-0.019)&(xv<0.026)&(np.abs(dyv-av)<0.0024)&(V[:,2]>ez-0.005)
+xv=np.abs(V[:,0])-ex; dyv=V[:,1]-ey; av=0.0215*KH-0.006*(xv/(0.024*KH))**2
+cv=(xv>-0.019*KH)&(xv<0.026*KH)&(np.abs(dyv-av)<0.0024*KH)&(V[:,2]>ez-0.005*KH)
 def bc(P):
-    x_=np.abs(P[:,0])-ex; a_=0.0215-0.006*(x_/0.024)**2; Q=P.copy(); d_=Q[:,1]-ey-a_; Q[:,1]=ey+a_+np.clip(d_,-0.0024,0.0024); return Q
+    x_=np.abs(P[:,0])-ex; a_=0.0215*KH-0.006*(x_/(0.024*KH))**2; Q=P.copy(); d_=Q[:,1]-ey-a_; Q[:,1]=ey+a_+np.clip(d_,-0.0024*KH,0.0024*KH); return Q
 partes['cejas'], verts['cejas'] = zona(cv, bc)
-hw=lambda x: 0.0045*np.clip(1-(x/0.021)**2,0,1)
-lv=(np.abs(V[:,0])<0.02)&(np.abs(V[:,1]-my)<hw(V[:,0]))&(V[:,2]>ez-0.012)
+hw=lambda x: 0.0045*KH*np.clip(1-(x/(0.021*KH))**2,0,1)
+lv=(np.abs(V[:,0])<0.02*KH)&(np.abs(V[:,1]-my)<hw(V[:,0]))&(V[:,2]>ez-0.012*KH)
 def bl(P):
-    Q=P.copy(); Q[:,0]=np.clip(Q[:,0],-0.02,0.02); h_=hw(Q[:,0]); Q[:,1]=my+np.clip(Q[:,1]-my,-h_,h_); return Q
+    Q=P.copy(); Q[:,0]=np.clip(Q[:,0],-0.02*KH,0.02*KH); h_=hw(Q[:,0]); Q[:,1]=my+np.clip(Q[:,1]-my,-h_,h_); return Q
 partes['labios'], verts['labios'] = zona(lv, bl)
-for k in ('cejas','labios'): verts[k]=verts[k]+np.array([0,0,0.0008])
-bv0=np.unique(body); BV0=V[bv0]; m_=(np.abs(BV0[:,0])<0.006)&(BV0[:,1]>0.08)&(BV0[:,1]<0.30)&(BV0[:,2]>0.05)
-P_=BV0[m_]; ys=np.arange(0.09,0.29,0.004); zp=np.array([P_[np.abs(P_[:,1]-y)<0.003,2].max() if (np.abs(P_[:,1]-y)<0.003).any() else np.nan for y in ys])
+for k in ('cejas','labios'): verts[k]=verts[k]+np.array([0,0,0.0008*KH])
+bv0=np.unique(body); BV0=V[bv0]; m_=(np.abs(BV0[:,0])<0.006*max(K,0.6))&(BV0[:,1]>Ya(0.08))&(BV0[:,1]<Ya(0.30))&(BV0[:,2]>0.05*K)
+P_=BV0[m_]; ys=np.arange(Ya(0.09),Ya(0.29),0.004*K); zp=np.array([P_[np.abs(P_[:,1]-y)<0.003*K,2].max() if (np.abs(P_[:,1]-y)<0.003*K).any() else np.nan for y in ys])
 dip=np.nan_to_num(np.convolve(np.nan_to_num(zp),np.ones(9)/9,'same')-zp,nan=-1); dip[:5]=dip[-5:]=-1; k_=int(np.argmax(dip))
 nav=np.array([0,ys[k_],zp[k_]]); print('ombligo',nav,file=sys.stderr); bv=np.unique(body); BV=V[bv]
 def _nip(sx):
-    m=(np.abs(BV[:,0]-sx*0.09)<0.02)&(np.abs(BV[:,1]-nav[1]-0.166)<0.02); P=BV[m]; return P[P[:,2].argmax()]
+    m=(np.abs(BV[:,0]-sx*0.09*K)<(0.02 if K==1 else 0.03*K))&(np.abs(BV[:,1]-nav[1]-0.166*K)<(0.02 if K==1 else 0.04*K)); P=BV[m]; return P[P[:,2].argmax()]
 nips=[_nip(1),_nip(-1)]
-om=np.linalg.norm(cb-nav,axis=1)<0.0075
+om=np.linalg.norm(cb-nav,axis=1)<0.0075*KH
 pv=np.zeros(len(V),bool)
-for q in nips: pv|=np.linalg.norm(V-q,axis=1)<0.0075
+for q in nips: pv|=np.linalg.norm(V-q,axis=1)<0.0075*KH
 pz=pv[body].sum(1)>=2
 partes['ombligo']=body[om]; partes['pezon']=body[pz]
 partes['piel']=body[~om&~pz]
 # pelo corto: casco sobre el cuero cabelludo con línea del pelo según el ángulo alrededor de la cabeza (0 = frente, 180 = nuca)
-c0=np.array([0,ey,ez-0.09])
+c0=np.array([0,ey,ez-0.09*KH])
 def th(P): return np.degrees(np.arctan2(np.abs(P[:,0]-c0[0]), P[:,2]-c0[2]))
 TH=[0,25,45,62,70,78,84,100,112,125,150,180]
-HH=[0.064,0.060,0.052,0.040,0.030,-0.004,0.022,0.022,0.012,-0.010,-0.035,-0.042]
-if os.environ.get('PELO')=='flequillo': HH=[0.038,0.041,0.047]+HH[3:]
+HH=[0.064*KH,0.060*KH,0.052*KH,0.040*KH,0.030*KH,-0.004*KH,0.022*KH,0.022*KH,0.012*KH,-0.010*KH,-0.035*KH,-0.042*KH]
+if os.environ.get('PELO')=='flequillo': HH=[0.038*KH,0.041*KH,0.047*KH]+HH[3:]
 hl=lambda P: np.interp(th(P),TH,HH)
-cab=(np.linalg.norm(V-c0,axis=1)<0.155)&(V[:,1]>ey-0.10)
+cab=(np.linalg.norm(V-c0,axis=1)<0.155*KH)&(V[:,1]>ey-0.10*KH)
 den=cab&((V[:,1]-ey)>hl(V))
 pf=body[den[body].any(1)]; partes['pelo']=pf
 PEL=V.copy(); idx=np.unique(pf); fuera=idx[~den[idx]]
 PEL[fuera,1]=ey+hl(V[fuera])
 n=PEL-c0; n/=np.maximum(np.linalg.norm(n,axis=1,keepdims=True),1e-6)
 ESTILO=os.environ.get('PELO','actual')
-alto=np.clip((PEL[:,1]-ey-hl(PEL))/0.05,0,1); fr=(PEL[:,2]-c0[2])/0.09; lado=np.abs(PEL[:,0])
+alto=np.clip((PEL[:,1]-ey-hl(PEL))/(0.05*KH),0,1); fr=(PEL[:,2]-c0[2])/(0.09*KH); lado=np.abs(PEL[:,0])
 if ESTILO=='volumen':
     # laterales cortos, volumen arriba que crece hacia la frente (copete suave peinado hacia atrás)
-    arriba_=np.clip((PEL[:,1]-ey-0.045)/0.05,0,1)*np.clip(1-(lado-0.045)/0.04,0,1)
+    arriba_=np.clip((PEL[:,1]-ey-0.045*KH)/(0.05*KH),0,1)*np.clip(1-(lado-0.045*KH)/(0.04*KH),0,1)
     grosor=0.002+0.005*alto+0.030*arriba_*np.clip(0.45+0.55*fr,0.2,1.0)
     PELd=PEL+n*grosor[:,None]; PELd[:,2]+=0.012*arriba_*np.clip(fr,0,1)**1.5
     verts['pelo']=PELd
 elif ESTILO=='flequillo':
     # flequillo corto que cae sobre la frente, peinado hacia adelante; laterales y nuca prolijos
-    frente=np.clip(fr,0,1)**2*np.clip(1-(lado-0.02)/0.05,0,1)
+    frente=np.clip(fr,0,1)**2*np.clip(1-(lado-0.02*KH)/(0.05*KH),0,1)
     grosor=0.002+0.012*alto+0.006*frente
     PELd=PEL+n*grosor[:,None]; PELd[:,2]+=0.007*frente*alto; PELd[:,1]-=0.004*frente
     verts['pelo']=PELd
@@ -101,12 +109,12 @@ elif ESTILO=='degrade':
     # degradé real: un solo casco; el color pasa de piel a pelo en rend.py según la altura (ver degrade.json)
     TB=[0,45,60,90,130,180]; YB=[0.0,0.0,0.040,0.042,0.030,0.020]
     lb=lambda P: ey+np.interp(th(P),TB,YB)
-    ft=np.clip((PEL[:,1]-(lb(PEL)-0.035))/0.035,0,1)
+    ft=np.clip((PEL[:,1]-(lb(PEL)-0.035*KH))/(0.035*KH),0,1)
     grosor=0.0004+0.0018*ft*np.clip(alto*4,0.1,1); verts['pelo']=PEL+n*grosor[:,None]
     # pelo pintado sobre la piel (para el render realista): factor por vértice, sin orejas
-    sinoreja=~((np.abs(V[:,0])>0.068)&(V[:,1]<ey+0.045))
-    borde=np.clip((V[:,1]-ey-hl(V))/0.006,0,1)
-    ftv=np.clip((V[:,1]-(lb(V)-0.035))/0.035,0,1)**1.3
+    sinoreja=~((np.abs(V[:,0])>0.068*KH)&(V[:,1]<ey+0.045*KH))
+    borde=np.clip((V[:,1]-ey-hl(V))/(0.006*KH),0,1)
+    ftv=np.clip((V[:,1]-(lb(V)-0.035*KH))/(0.035*KH),0,1)**1.3
     fac=np.where(cab&sinoreja,borde*ftv,0.0); mk=cab
     np.savez('/tmp/claude-0/mh/pelo_fac.npz',P=V[mk],f=fac[mk])
     import json; json.dump({'ey':float(ey),'c0':[float(x) for x in c0],'TB':TB,'YB':YB,'TH':TH,'HH':HH},open('/tmp/claude-0/mh/degrade.json','w'))
@@ -118,9 +126,9 @@ elif ESTILO=='militar':
     # pelo2 = casco completo al ras; pelo = capa de arriba encima (sin huecos entre zonas)
     sup=(PEL[pf][:,:,1]>lb(PEL[pf].reshape(-1,3)).reshape(pf.shape)).any(1)
     partes['pelo']=pf[sup]; partes['pelo2']=pf
-    arr=np.clip((PEL[:,1]-lb(PEL))/0.015,0,1)
-    if ESTILO=='degrade': g1=0.0024+0.0006*alto; g2=0.0004+0.0006*alto
-    else: g1=0.0012+0.0058*arr*np.clip(0.6+0.4*fr,0.3,1)+0.0012; g2=0.0012+0.0004*alto
+    arr=np.clip((PEL[:,1]-lb(PEL))/(0.015*KH),0,1)
+    if ESTILO=='degrade': g1=0.0024*KH+0.0006*alto; g2=0.0004*KH+0.0006*alto
+    else: g1=0.0012*KH+0.0058*arr*np.clip(0.6+0.4*fr,0.3,1)+0.0012*KH; g2=0.0012*KH+0.0004*alto
     A=PEL.copy(); B=PEL.copy(); yl=lb(PEL); m=yl>ey-0.5
     A[m,1]=np.maximum(A[m,1],yl[m])
     verts['pelo']=A+n*g1[:,None]; verts['pelo2']=B+n*g2[:,None]
@@ -134,9 +142,9 @@ nrm=np.zeros_like(V)
 for f_ in body:
     a_,b_,c_=V[f_[0]],V[f_[1]],V[f_[2]]; n_=np.cross(b_-a_,c_-a_); nrm[f_]+=n_
 nrm/=np.maximum(np.linalg.norm(nrm,axis=1,keepdims=True),1e-9)
-sv=(V[:,1]>-0.27)&(V[:,1]<0.07)&(np.abs(V[:,0])<0.24)
+sv=(V[:,1]>Ya(-0.27))&(V[:,1]<Ya(0.07))&(np.abs(V[:,0])<0.24*K)
 partes['ropa']=body[sv[body].all(1)|(sv[body].sum(1)>=2)]
-R=V+nrm*0.003; R[:,1]=np.clip(R[:,1],-0.27,0.07); verts['ropa']=R
+R=V+nrm*0.003; R[:,1]=np.clip(R[:,1],Ya(-0.27),Ya(0.07)); verts['ropa']=R
 print({k:len(v) for k,v in partes.items()}, file=sys.stderr)
 # coordenadas de reposo para pintar el pelo (u = ángulo alrededor de la cabeza/180, 2 = oreja; v = altura sobre los ojos + 0.5)
 _ax=np.abs(V[:,0]-c0[0]); _yr=V[:,1]-ey

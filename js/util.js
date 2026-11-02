@@ -41,6 +41,14 @@ export function botonFav(id, clase = "starb") {
   return `<button class="${clase}${on ? " on" : ""}" data-fav="${esc(id)}"${on ? ` style="--lc: var(--lc-${de[0].color})"` : ""} aria-label="${on ? `En ${esc(nombres)}. Cambiar listas` : "Agregar a favoritos"}">${icono.estrella(on)}</button>`;
 }
 
+// en qué listas está una proyección: el nombre de cada una con su estrella de color (solo si hay dos o más listas)
+export function enListas(id) {
+  const de = listas.de(id);
+  if (!de.length || listas.todas().length < 2) return "";
+  return `<span class="en-listas" aria-label="En las listas: ${esc(de.map((l) => l.nombre).join(", "))}">${de.map((l) =>
+    `<span class="en-lista" style="--lc: var(--lc-${l.color})">${icono.estrella(true)}${esc(l.nombre)}</span>`).join("")}</span>`;
+}
+
 // hoja inferior (glosario, listas de favoritos); no cambia la posición de lectura. Devuelve { panel, cerrar }.
 let hojaAbierta;
 export function abrirHoja(titulo, cuerpo, alCerrar) {

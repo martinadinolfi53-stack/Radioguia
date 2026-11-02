@@ -1,7 +1,7 @@
 // Pantallas de navegación: Portada (elegir Enfoques o Juegos), Inicio de enfoques, Región, Favoritos, resultados del buscador y Ajustes.
 import { capitulos, regiones, regionPorId, proyecciones, proyeccionesDe, CATEGORIAS, norm, FUENTE } from "./datos.js";
 import { listas, preferencias } from "./almacen.js";
-import { esc, icono, cabecera, botonFav, barraPestanas } from "./util.js";
+import { esc, icono, cabecera, botonFav, enListas, barraPestanas } from "./util.js";
 import { pwa } from "./pwa.js";
 import { GRUPOS, FAMILIAS } from "./menu.js";
 import { nombre as nombreUsuario } from "./identificacion.js";
@@ -15,7 +15,7 @@ export const estado = { q: "", qFav: "", qFuente: "", filtro: {}, sel: null, fav
 
 const filaProyeccion = (p, conRegion) => `<div class="row">
   <a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span>
-    <span class="s">${conRegion ? esc(regionPorId[p.region]?.nombre) + " · " : ""}${esc([...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "))}</span></a>
+    <span class="s">${conRegion ? esc(regionPorId[p.region]?.nombre) + " · " : ""}${esc([...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "))}</span>${enListas(p.id)}</a>
   ${botonFav(p.id)}</div>`;
 
 const buscador = (id, valor, placeholder) => `<div class="search"><span class="lupa" aria-hidden="true">${icono.lupa}</span>
@@ -73,7 +73,7 @@ const etiquetaFuente = (f) => `<span class="fuente-tag f-${esc(f.id)}">${esc(f.n
 const detalle = (p, region) => esc([region, ...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "));
 // un enfoque con la etiqueta de su libro: los del libro abierto abren la ficha; los de otro libro cambian a ese libro
 const filaLibro = (f, p, conRegion) => f.id === fuenteId
-  ? `<div class="row res"><a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, conRegion && regionPorId[p.region]?.nombre)}</span></a>${etiquetaFuente(f)}${botonFav(p.id)}</div>`
+  ? `<div class="row res"><a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, conRegion && regionPorId[p.region]?.nombre)}</span>${enListas(p.id)}</a>${etiquetaFuente(f)}${botonFav(p.id)}</div>`
   : `<div class="row res"><button class="res-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(p.id)}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, conRegion && p._region)}</span></button>${etiquetaFuente(f)}</div>`;
 
 // con "Ambos", los botones del menú de los otros libros (null si alguno todavía está cargando)

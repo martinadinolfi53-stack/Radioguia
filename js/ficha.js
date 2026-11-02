@@ -4,7 +4,7 @@
 import { regionPorId, proyeccionesDe, FUENTE } from "./datos.js";
 import { marcar, terminosDe, definicionHTML } from "./glosario.js";
 import { bloqueIlustracion } from "./imagenes.js";
-import { esc, icono, cabecera, botonFav } from "./util.js";
+import { esc, icono, cabecera, botonFav, enListas } from "./util.js";
 
 export const RC_ETIQUETA = { perpendicular: "Perpendicular", "cefálico": "Cefálico", caudal: "Caudal", horizontal: "Horizontal", angulado: "Angulado", variable: "Variable", "sin-dato": "" };
 // flecha que muestra hacia dónde apunta el RC: abajo = perpendicular, inclinada hacia la cabeza o hacia los pies
@@ -45,6 +45,7 @@ export function vistaFicha(p, volver) {
         
         ${p.estado !== "validado" ? `<span class="tag pend">Pendiente de revisión</span>` : ""}
       </div>
+      ${enListas(p.id)}
     </div>
 
     ${sec("Factores técnicos", () => `<dl class="tabla">${FACTORES_FICHA.filter(([k]) => p.factores?.[k] || (p.factores && k in p.factores && p.factores[k] === null))

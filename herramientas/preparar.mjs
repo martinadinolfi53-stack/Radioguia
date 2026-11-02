@@ -96,6 +96,9 @@ const lista = archivos.filter((f) => !/README|\.md$|\.DS_Store/.test(f)).map((f)
 const hash = createHash("sha256");
 for (const f of lista) hash.update(f).update(readFileSync(join(raiz, f)));
 const version = hash.digest("hex").slice(0, 10);
+// la versión también va en sw.js: hay navegadores que solo buscan actualización si cambia ese archivo
+const sw = readFileSync(join(raiz, "sw.js"), "utf8");
+writeFileSync(join(raiz, "sw.js"), sw.replace(/^\/\/ versión: \S+/m, `// versión: ${version}`));
 writeFileSync(join(raiz, "sw-archivos.js"), `// Generado por herramientas/preparar.mjs. No editar a mano.\nself.RG_VERSION = "${version}";\nself.RG_ARCHIVOS = ${JSON.stringify(["./", ...lista], null, 1)};\n`);
 
 console.log(resumen.join("\n") + ` · glosario: ${GLOSARIO.length} términos`);

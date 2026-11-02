@@ -364,8 +364,8 @@ function cuenta() {
       <div class="aj-cuenta">${avatar(perfil?.foto, apodo)}<span><b>${esc(apodo)}</b><small>${detalle}</small></span></div>
       <p class="aj-nota">${conGoogle ? "Tus favoritos se guardan en tu cuenta de Google: los ves en cualquier dispositivo donde entres con ella."
         : "Tus favoritos se guardan solo en este dispositivo y se borran al cerrar sesión. Entrá con Google para tenerlos en todos lados."}</p>
-      <div class="opciones">${usuario ? `<a class="opcion" href="#juegos-cuenta">${conGoogle ? "Editar perfil" : "Perfil y Google"}</a>` : `<a class="opcion" href="#juegos-cuenta">Entrar con Google</a>`}<button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button></div>
-      <div class="opciones"><a class="opcion" href="#privacidad">Qué datos guarda RadioGuía</a>${usuario ? `<button class="opcion aj-salir" data-borrar-cuenta>Borrar mi cuenta y mis datos</button>` : ""}</div></section>`;
+      <div class="aj-acciones"><a class="opcion" href="#juegos-cuenta">${!usuario ? "Entrar con Google" : conGoogle ? "Editar perfil" : "Perfil y Google"}</a><a class="opcion" href="#privacidad">Qué datos guarda</a>
+        <button class="opcion aj-salir" data-cerrar-sesion>Cerrar sesión</button>${usuario ? `<button class="opcion aj-salir" data-borrar-cuenta>Borrar mi cuenta</button>` : ""}</div></section>`;
 }
 
 export function vistaAjustes() {

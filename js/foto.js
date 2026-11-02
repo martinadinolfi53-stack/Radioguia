@@ -2,7 +2,8 @@
 // se recorta cuadrada en el teléfono y se guarda chiquita (JPEG de 160 px) en la cuenta, ver nube.guardarFoto.
 // Una copia grande (720 px) va aparte en la cuenta (privado/foto) y en este dispositivo, para la portada, donde ocupa todo el ancho.
 // Uso: vistaFoto({ titulo, sub, atras, listo }) dibuja la pantalla; listo() se llama cuando la foto quedó guardada.
-import { esc, cabecera } from "./util.js";
+import { esc, cabecera, icono, RX_BORDE, AYUDA_ICONO } from "./util.js";
+import { nombre } from "./identificacion.js";
 import * as nube from "./nube.js";
 
 const LADO = 160, GRANDE = 720;
@@ -27,6 +28,7 @@ export function vistaFoto(op = {}) {
     <section class="panel ft-panel">
       <div class="ft-marco">${muestra ? `<img src="${esc(muestra)}" alt="Tu foto">` : `<span>Sin foto</span>`}</div>
       <p class="jg-nota">${actual && !elegida ? "Así te ven tus compañeros en los grupos y el ranking." : "Tus compañeros te van a ver con esta foto en los grupos y el ranking. Elegí una de la galería o sacate una."}</p>
+      ${elegida ? vistaPrevia() : ""}
       ${elegida && vertical ? `<label class="ft-mover">Mover <input type="range" id="ft-pos" min="0" max="100" value="${Math.round(elegida.pos * 100)}"></label>` : ""}
       <label class="btn ft-elegir">${muestra ? "Elegir otra foto" : "Elegir o sacar una foto"}<input type="file" id="ft-archivo" accept="image/*" hidden></label>
       ${elegida ? `<button class="rp-empezar" data-ft="usar" ${guardando ? "disabled" : ""}>${guardando ? "Guardando…" : "Usar esta foto"}</button>` : ""}
@@ -58,7 +60,19 @@ function cuadrada(px, calidad) {
   ctx.drawImage(img, (ancho - lado) * (ancho > alto ? pos : 0.5), (alto - lado) * (alto > ancho ? pos : 0.5), lado, lado, 0, 0, n, n);
   return c.toDataURL("image/jpeg", calidad);
 }
-function recortar() { elegida.dato = cuadrada(LADO, 0.82); }
+function recortar() { elegida.dato = cuadrada(LADO, 0.82); elegida.vista = cuadrada(480, 0.75); }
+
+// cómo va a quedar la portada con esta foto: la misma composición, achicada (RX y los botones van arriba de la foto)
+function vistaPrevia() {
+  const apodo = nube.estado().perfil?.apodo || nombre() || "";
+  return `<figure class="ft-vista" aria-label="Así se va a ver tu portada"><div class="fv-in">
+      <img class="fv-foto" src="${esc(elegida.vista)}" alt="">
+      <div class="fv-barra"><span class="fv-boton">${AYUDA_ICONO}</span><span class="fv-rx">${RX_BORDE.replace(/rx-borde/g, "rx-borde-vista")}</span><span class="fv-boton">${icono.ajustes}</span></div>
+      <p class="fv-hola">Hola ${esc(apodo)}, ¿qué quieres hacer hoy?</p>
+      <div class="fv-ops"><img src="iconos/icono-512.png" alt=""><img src="iconos/juegos-512.jpg" alt=""></div>
+    </div></figure>
+    <p class="jg-nota">Así se va a ver tu portada.</p>`;
+}
 // la grande, achicando la calidad (y si hace falta el tamaño) hasta que entre en la cuenta
 function grande() {
   for (const [px, q] of [[GRANDE, 0.8], [GRANDE, 0.7], [GRANDE, 0.6], [600, 0.6], [480, 0.6]]) {
@@ -116,6 +130,8 @@ export function iniciarFoto(app, rerender) {
     recortar();
     const img = app.querySelector(".ft-marco img");
     if (img) img.src = elegida.dato;
+    const vista = app.querySelector(".fv-foto");
+    if (vista) vista.src = elegida.vista;
   });
   app.addEventListener("click", async (e) => {
     if (!e.target.closest("[data-ft=usar]") || !elegida || guardando) return;

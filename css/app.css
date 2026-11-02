@@ -382,7 +382,9 @@ button.sel-fila { width: 100%; text-align: left; padding: 10px 14px; gap: 12px; 
 .portada-hero img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; }
 .portada.con-foto > :not(.portada-hero) { position: relative; }
 .portada.con-foto .portada-barra { margin-bottom: max(16px, calc(var(--hero) - 190px)); }
-.portada.con-foto .portada-rx { color: #fff; text-shadow: 0 2px 18px rgb(0 0 0 / .55); }
+/* la barra va pegada arriba, así tapa lo menos posible la foto; RX grande, de vidrio (relleno translúcido) con borde marcado */
+.portada.con-foto { padding-top: calc(env(safe-area-inset-top, 0px) + 6px); }
+.portada.con-foto .portada-rx { font-size: 4.6em; font-weight: 900; color: rgb(255 255 255 / .22); -webkit-text-stroke: 2px #fff; text-shadow: 0 2px 16px rgb(0 0 0 / .35); }
 .portada.con-foto .portada-boton { border-color: transparent; background: rgb(0 0 0 / .35); color: #fff; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 .portada.con-foto .portada-hola { margin-top: 0; font-size: 1.3em; font-weight: 600; text-shadow: 0 1px 12px var(--bg, #000), 0 0 2px var(--bg, #000); }
 

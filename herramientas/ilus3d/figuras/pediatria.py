@@ -50,8 +50,8 @@ _rana_d = lambda: Pose().cadera_flex('R', 40).cadera_abd('R', 55).rodilla_flex('
 par('ped-ext-inf-lateral', _rana_d, AP, 'rodilla_R', (0.30, 0.40), encuadre=0.30)
 # Kite (pág. 168): AP con la rodilla flexionada y la planta sobre el RI; lateral con la pierna de costado, lado afectado abajo
 # AP: sentado sobre un apoyo, la pierna inclinada hacia adelante (rodilla a 60°) y la planta apoyada en el RI del piso (tobillo
-# en flexión dorsal de 30°): el pie queda por delante de la rodilla y se ve desde arriba; rayo vertical hacia abajo
-_kite_ap = lambda: Pose().cadera_flex('R', 90).rodilla_flex('R', 60).tobillo_dorsi('R', 30).cadera_flex('L', 90).rodilla_flex('L', 90)
+# en flexión plantar de 30°, así la planta queda plana: la pierna baja a 60° y el pie, a 90° de ella, subiría 30°); rayo vertical hacia abajo
+_kite_ap = lambda: Pose().cadera_flex('R', 90).rodilla_flex('R', 60).tobillo_dorsi('R', -30).cadera_flex('L', 90).rodilla_flex('L', 90)
 par('ped-pie-ap-mediolateral-kite--v1', _kite_ap, (0, -1, 0), 'mediotarso_R', (0.18, 0.24), encuadre=0.20, arriba_tubo=(0, 0, 1),
     arriba_ri=(0, 0, 1), arriba_img=(0, 1, 0), ri_radio=0.10, region=['pelvis', 'muslo_R', 'pierna_R', 'pie_R', 'dedos_pie_R'],
     region_otra=None, puntos=['caderas'])     # de costado: el nene entero sentado en el apoyo

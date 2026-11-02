@@ -31,7 +31,7 @@ const bloque = (medial, incl, label) => (g) => {
 };
 
 const OBL = (v, medial) => def({ id: "dedos-pie-ap-oblicua--" + v, blanco: "mtf_pie_R", ri: "18 × 24", otra: "costado",
-  otraTitulo: "Desde los dedos", extraOtra: bloque(medial, medial ? 37.3 : 37.2, "30-45°"),
+  otraTitulo: "Desde los dedos", extraOtra: bloque(medial, medial ? 37.8 : 37.2, "30-45°"),
   rc: [R("RC ⊥ al RI, centrado"), R("en las MTF de interés")],
   pos: ["Decúbito supino o sentado,", "rodilla flexionada, planta", "sobre el RI", medial ? "Rotar pie y pierna 30-45°" : "Rotar pie y pierna 30-45°",
     medial ? "hacia medial (rodilla adentro)" : "hacia lateral (rodilla afuera)", "Bloque bajo el borde levantado"],

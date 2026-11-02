@@ -46,11 +46,20 @@ F['rodilla-ap-oblicuas--v2'] = lambda: _corte('rodilla-ap-oblicuas--v2', R0K - 4
 # ---------- de pie ----------
 # Rosenberg: PA de pie, rodillas flexionadas 45° (muslo 22,5° hacia adelante, pierna 22,5° hacia atrás), pies planos
 # (el ángulo entre las líneas cadera-rodilla y rodilla-tobillo queda en ~89% de la flexión del rig: 50,5 -> 45° medidos)
-_ros = lambda: Pose().cadera_flex('R', 25.25).rodilla_flex('R', 50.5).tobillo_dorsi('R', 25.25)
+_ros = lambda: (Pose().cadera_flex('R', 25.25).rodilla_flex('R', 50.5).tobillo_dorsi('R', 25.25)
+                .cadera_flex('L', 25.25).rodilla_flex('L', 50.5).tobillo_dorsi('L', 25.25))      # las dos rodillas
 F['rodilla-pa-axial-bilateral-rosenberg'] = lambda: fig('rodilla-pa-axial-bilateral-rosenberg', _ros(), LAT, cortes=MUSLO(0.24))
 F['rodilla-ap-pa-bilateral-carga--v1'] = lambda: fig('rodilla-ap-pa-bilateral-carga--v1', Pose(), LAT, cortes=MUSLO(0.24))
-_pa20 = lambda: Pose().cadera_flex('R', 11.5).rodilla_flex('R', 23).tobillo_dorsi('R', 11.5)      # 20° medidos
+_pa20 = lambda: (Pose().cadera_flex('R', 11.5).rodilla_flex('R', 23).tobillo_dorsi('R', 11.5)
+                 .cadera_flex('L', 11.5).rodilla_flex('L', 23).tobillo_dorsi('L', 11.5))      # 20° medidos, las dos
 F['rodilla-ap-pa-bilateral-carga--v2'] = lambda: fig('rodilla-ap-pa-bilateral-carga--v2', _pa20(), LAT, cortes=MUSLO(0.24))
+# segunda vista de las bilaterales en carga: las dos rodillas como las ve el tubo (PA: desde atrás; AP: desde adelante)
+_DOS = [('rodilla_R', 'distal', 0.24), ('rodilla_L', 'distal', 0.24)]
+_PD = ['rodilla_R', 'rodilla_L', 'vertice_rotula_R', 'vertice_rotula_L']
+_tubo2 = lambda id, pose, d: figura(id, pose, dir=d, arriba=(0, 1, 0), huesos=AMBAS, region=AMBAS, cortes=_DOS, puntos=_PD)
+F['rodilla-pa-axial-bilateral-rosenberg-tubo'] = lambda: _tubo2('rodilla-pa-axial-bilateral-rosenberg-tubo', _ros(), (0, 0, 1))
+F['rodilla-ap-pa-bilateral-carga--v1-tubo'] = lambda: _tubo2('rodilla-ap-pa-bilateral-carga--v1-tubo', Pose(), (0, 0, -1))
+F['rodilla-ap-pa-bilateral-carga--v2-tubo'] = lambda: _tubo2('rodilla-ap-pa-bilateral-carga--v2-tubo', _pa20(), (0, 0, 1))
 
 # ---------- rótula y fosa intercondílea ----------
 F['fosa-rotula-pa-rotula'] = lambda: fig('fosa-rotula-pa-rotula', Pose().cadera_rot_int('R', R0K), MED, PRONO, cortes=MUSLO(0.22))

@@ -186,49 +186,62 @@ const flexion = (f, label) => {
   const eF = add(k, unit(fe, k), 70), eT = add(k, unit(k, tb), 70);
   return linea(k, eF) + arco(k, 50, angulo(k, eF), angulo(k, eT), label, BLUE, 20);
 };
+// segunda vista de las bilaterales en carga: las dos rodillas como las ve el tubo, con el RI 35 × 43 horizontal y el RC en el
+// punto medio entre las rodillas, 1,25 cm por debajo del vértice de las rótulas
+const sep = (x) => `<line x1="${x}" y1="34" x2="${x}" y2="316" stroke="#e3e5ea" stroke-width="1.5"/>`;
+const dosRodillas = (id, titulo) => {
+  const g = E.figura(id + "-tubo", { caja: [430, 70, 124, 230] });
+  const R = g.p("rodilla_R"), L = g.p("rodilla_L"), vr = g.p("vertice_rotula_R"), vl = g.p("vertice_rotula_L");
+  const m = [(R[0] + L[0]) / 2, (vr[1] + vl[1]) / 2 + 1.25 * g.ppc], w = 43 * g.ppc, h = 35 * g.ppc;
+  return sep(422) + sep(564) + txt(430, 50, titulo[0], 10.5, MUTE, "start", 700) + txt(430, 63, titulo[1], 10.5, MUTE, "start", 700) +
+    `<rect x="${f1(m[0] - w / 2)}" y="${f1(m[1] - h / 2)}" width="${f1(w)}" height="${f1(h)}" fill="#e9ebf0" fill-opacity=".55" stroke="${INK}" stroke-width="1.4"/>` +
+    g.svg + crossP(m);
+};
 I["rodilla-pa-axial-bilateral-rosenberg"] = () => {
-  const f = E.figura("rodilla-pa-axial-bilateral-rosenberg", { caja: [150, 30, 200, 270] });
+  const f = E.figura("rodilla-pa-axial-bilateral-rosenberg", { caja: [130, 30, 190, 270] });
   const j = interlinea(f), yP = f.abajo(f.x, f.x + f.w) + 1, xB = f.x + f.w + 10;
   return svg(
-    view("PA de rodillas · paciente parado, de frente al bucky (visto de costado)") +
-    piso(60, 600, yP) + bucky(xB, 34, yP - 30) + riV(xB - 6, j[1] - 17 * f.ppc, j[1] + 17 * f.ppc) +
+    view("PA de rodillas en carga (Rosenberg) · paciente parado") + txt(12, 36, "De costado", 10.5, MUTE, "start", 700) +
+    piso(20, 410, yP) + bucky(xB, 34, yP - 30) + riV(xB - 6, j[1] - 17 * f.ppc, j[1] + 17 * f.ppc) +
     f.svg + flexion(f, "45°") +
-    beam(j[0], j[1], 10, 190, { ref: 0, angLabel: "10°" }) + redDot(j, 3.5) +
-    note(...add(j, [-Math.cos(rad(10)), -Math.sin(rad(10))], 110), 420, 70, ["RC 10° caudal (hacia los pies)", "a la mitad de las articulaciones,", "1,25 cm por debajo del", "vértice de la rótula"], RED) +
-    txt(f1(xB + 18), f1(j[1] + 17 * f.ppc + 14), "RI 35 × 43 horiz.", 11, INK) +
-    note(...f.p("centro:Right patella"), 420, 180, ["rótula (contra el bucky)"], BONEO) +
-    txt(420, 220, "Rodillas flexionadas 45°, rótulas", 11.5, BLUE, "start", 700) + txt(420, 236, "apoyadas en el bucky", 11.5, BLUE) +
-    txt(420, 276, "Peso repartido por igual entre los dos pies", 11.5, MUTE) +
-    txt(420, 292, "DFRI 100 cm · parrilla", 11.5, MUTE)
+    beam(j[0], j[1], 10, 150, { ref: 0, angLabel: "10°" }) + redDot(j, 3.5) +
+    txt(f1(xB + 18), 52, "RI 35 × 43", 10.5, INK) + txt(f1(xB + 18), 65, "horiz.", 10.5, INK) +
+    dosRodillas("rodilla-pa-axial-bilateral-rosenberg", ["Desde el tubo", "(por detrás)"]) +
+    col(574, 60, [["RC 10° caudal, en el", RED, 700], ["punto medio entre las", RED, 700], ["rodillas, 1,25 cm por", RED, 700], ["debajo del vértice de", RED, 700], ["las rótulas", RED, 700]]) +
+    col(574, 150, [["Parado, de frente al", INK, 700], ["bucky, las dos rodillas", INK, 700], ["flexionadas 45° y las", INK, 700], ["rótulas apoyadas en él", INK, 700]]) +
+    col(574, 228, [["Peso repartido por igual", INK], ["entre los dos pies", INK]]) +
+    col(574, 290, [["DFRI 100 cm · parrilla", MUTE, 400, 11]])
   );
 };
 
 I["rodilla-ap-pa-bilateral-carga--v1"] = () => {
-  const f = E.figura("rodilla-ap-pa-bilateral-carga--v1", { caja: [130, 40, 200, 248] });
+  const f = E.figura("rodilla-ap-pa-bilateral-carga--v1", { caja: [120, 40, 190, 248] });
   const j = interlinea(f), yP = f.abajo(f.x, f.x + f.w) + 1, xB = f.x - 30;
   return svg(
-    view("AP · vista de costado, parado") +
+    view("AP de rodillas en carga · paciente parado") + txt(12, 36, "De costado", 10.5, MUTE, "start", 700) +
     escalon(xB - 10, yP, 230) + txt(f1(xB - 10), f1(yP + 30), "escalón, si hace falta", 11, MUTE) +
     bucky(xB, 34, yP) + riV(xB + 12, j[1] - 17 * f.ppc, j[1] + 17 * f.ppc) +
-    f.svg + beam(j[0], j[1], 180, 170, { ref: 180 }) + redDot(j, 3.5) + rayo(j, [xB + 20, j[1]]) +
+    f.svg + beam(j[0], j[1], 180, 120, { ref: 180 }) + redDot(j, 3.5) + rayo(j, [xB + 20, j[1]]) +
     txt(f1(xB - 6), f1(j[1] - 6), "RI 35 × 43", 11, INK, "end") + txt(f1(xB - 6), f1(j[1] + 8), "horiz.", 11, INK, "end") +
-    note(j[0] + 120, j[1] - 26, 430, 60, ["RC horizontal, ⟂ al RI (contextura", "media), en el punto medio entre las", "rodillas, 1,25 cm distal al vértice", "de las rótulas"], RED) +
-    col(430, 150, [["De pie, de espaldas al bucky, subido a un", INK, 700], ["escalón si hace falta para usar un rayo", INK, 700], ["horizontal", INK, 700]]) +
-    col(430, 210, [["Pies rectos hacia adelante, rodillas", INK], ["extendidas, peso repartido por igual", INK], ["Se sostiene de los agarraderos de la mesa", INK]]) +
-    col(430, 300, [["DFRI 100 cm · parrilla", MUTE, 400, 11]])
+    dosRodillas("rodilla-ap-pa-bilateral-carga--v1", ["Desde el tubo", "(por delante)"]) +
+    col(574, 60, [["RC horizontal, ⟂ al RI,", RED, 700], ["en el punto medio entre", RED, 700], ["las rodillas, 1,25 cm", RED, 700], ["distal al vértice de las", RED, 700], ["rótulas", RED, 700]]) +
+    col(574, 150, [["Parado, de espaldas al", INK, 700], ["bucky (sobre un escalón", INK, 700], ["si hace falta)", INK, 700]]) +
+    col(574, 212, [["Pies rectos hacia adelante,", INK], ["rodillas extendidas, peso", INK], ["repartido por igual", INK]]) +
+    col(574, 290, [["DFRI 100 cm · parrilla", MUTE, 400, 11]])
   );
 };
 I["rodilla-ap-pa-bilateral-carga--v2"] = () => {
-  const f = E.figura("rodilla-ap-pa-bilateral-carga--v2", { caja: [120, 40, 200, 258] });
+  const f = E.figura("rodilla-ap-pa-bilateral-carga--v2", { caja: [120, 40, 190, 258] });
   const j = interlinea(f), yP = f.abajo(f.x, f.x + f.w) + 1, xB = f.x + f.w + 8;
   return svg(
-    view("PA (alternativa) · paciente parado, de frente al bucky") +
-    piso(30, 400, yP) + bucky(xB, 34, yP - 30) + riV(xB - 6, j[1] - 17 * f.ppc, j[1] + 17 * f.ppc) +
-    f.svg + flexion(f, "20°") + beam(j[0], j[1], 10, 190, { ref: 0, angLabel: "10°" }) + redDot(j, 3.5) +
-    txt(f1(xB + 18), f1(j[1] + 17 * f.ppc), "RI 35 × 43 horiz.", 11, INK) +
-    note(...add(j, [-Math.cos(rad(10)), -Math.sin(rad(10))], 110), 470, 60, ["RC 10° caudal, en el punto medio", "entre las rodillas, 1,25 cm distal", "al vértice de las rótulas"], RED) +
-    col(470, 140, [["Mira hacia la mesa o el soporte", INK, 700], ["del RI, con las rodillas apoyadas", INK, 700], ["en él y flexionadas unos 20°", INK, 700]]) +
-    col(470, 300, [["DFRI 100 cm · parrilla", MUTE, 400, 11]])
+    view("PA de rodillas en carga (alternativa) · paciente parado") + txt(12, 36, "De costado", 10.5, MUTE, "start", 700) +
+    piso(20, 410, yP) + bucky(xB, 34, yP - 30) + riV(xB - 6, j[1] - 17 * f.ppc, j[1] + 17 * f.ppc) +
+    f.svg + flexion(f, "20°") + beam(j[0], j[1], 10, 150, { ref: 0, angLabel: "10°" }) + redDot(j, 3.5) +
+    txt(f1(xB + 18), 52, "RI 35 × 43", 10.5, INK) + txt(f1(xB + 18), 65, "horiz.", 10.5, INK) +
+    dosRodillas("rodilla-ap-pa-bilateral-carga--v2", ["Desde el tubo", "(por detrás)"]) +
+    col(574, 60, [["RC 10° caudal, en el", RED, 700], ["punto medio entre las", RED, 700], ["rodillas, 1,25 cm distal", RED, 700], ["al vértice de las rótulas", RED, 700]]) +
+    col(574, 140, [["Parado, de frente al", INK, 700], ["soporte del RI, las dos", INK, 700], ["rodillas apoyadas en él", INK, 700], ["y flexionadas unos 20°", INK, 700]]) +
+    col(574, 290, [["DFRI 100 cm · parrilla", MUTE, 400, 11]])
   );
 };
 

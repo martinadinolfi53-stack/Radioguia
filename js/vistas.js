@@ -8,7 +8,7 @@ import { nombre as nombreUsuario } from "./identificacion.js";
 import * as nube from "./nube.js";
 import { avatar } from "./foto.js";
 import { FUENTES, fuenteId, elegida } from "./fuente.js";
-import { nombresDe } from "./otras-fuentes.js";
+import { nombresDe, proyeccionesDe as proyeccionesDeOtra } from "./otras-fuentes.js";
 
 export const estado = { q: "", qFav: "", filtro: {}, sel: null, favFuente: "" }; // búsqueda, filtro de categoría por región, selección en Favoritos (Set o null) y filtro por libro en Favoritos ("" = todos)
 
@@ -32,21 +32,40 @@ function contiene(texto, t) {
 // si una palabra es región, proyección o método de alguna ficha ("hombro"), se busca solo en el título:
 // así no aparecen las de tórax o columna que nombran el hombro en la posición del paciente.
 // Las demás palabras ("sentado", "Bucky") se buscan en toda la ficha.
-export function buscar(lista, q) {
+export function buscar(lista, q, base = proyecciones) {
   const todas = norm(q).split(/\s+/).filter(Boolean);
   const terms = todas.filter((t) => !VACIAS.has(t));
   if (!terms.length) terms.push(...todas);
-  const deTitulo = new Set(terms.filter((t) => proyecciones.some((p) => contiene(p._titulo, t))));
+  const deTitulo = new Set(terms.filter((t) => base.some((p) => contiene(p._titulo, t))));
   return lista.filter((p) => terms.every((t) => contiene(deTitulo.has(t) ? p._titulo : p._todo, t)))
     .map((p) => ({ p, s: terms.filter((t) => contiene(p._titulo, t)).length }))
     .sort((a, b) => b.s - a.s).map((x) => x.p);
 }
 
-function resultados(lista, q) {
-  const res = buscar(lista, q);
-  if (!res.length) return `<div class="vacio">No hay proyecciones que coincidan con <b>“${esc(q)}”</b>. Probá con la región (por ejemplo “tórax”), la proyección (“lateral”) o el método (“Pigg-O-Stat”).</div>`;
-  return `<p class="label">${res.length} ${res.length === 1 ? "resultado" : "resultados"}</p><div class="lista">${res.map((p) => filaProyeccion(p, true)).join("")}</div>`;
+// resultados del buscador de Enfoques con todos los libros: cada fila lleva la etiqueta de su libro;
+// las del libro abierto abren la ficha y las de otro libro cambian a ese libro (como en Favoritos)
+function resultados(q) {
+  const abierta = FUENTES.find((f) => f.id === fuenteId);
+  const todas = proyecciones.map((p) => ({ f: abierta, p }));
+  let cargando = false;
+  for (const f of FUENTES.filter((x) => x.lista && x.id !== fuenteId)) {
+    const suyas = proyeccionesDeOtra(f.id);
+    if (suyas) todas.push(...suyas.map((p) => ({ f, p }))); else cargando = true;
+  }
+  const deFicha = new Map(todas.map((x) => [x.p, x.f]));
+  // a igual coincidencia, primero el libro abierto (buscar ordena sin mover los empates)
+  const res = buscar(todas.map((x) => x.p), q, todas.map((x) => x.p)).map((p) => ({ f: deFicha.get(p), p }));
+  const espera = cargando ? `<div class="vacio">Buscando en los otros libros…</div>` : "";
+  if (!res.length) return espera || `<div class="vacio">No hay proyecciones que coincidan con <b>“${esc(q)}”</b>. Probá con la región (por ejemplo “tórax”), la proyección (“lateral”) o el método (“Pigg-O-Stat”).</div>`;
+  const cuantos = FUENTES.filter((f) => res.some((x) => x.f === f)).map((f) => `${res.filter((x) => x.f === f).length} ${esc(f.nombre)}`).join(" · ");
+  return `<p class="label">${res.length} ${res.length === 1 ? "resultado" : "resultados"} · ${cuantos}</p><div class="lista">${res.map(filaResultado).join("")}</div>` + espera;
 }
+
+const etiquetaFuente = (f) => `<span class="fuente-tag f-${esc(f.id)}">${esc(f.nombre)}</span>`;
+const detalle = (p, region) => esc([region, ...(p.categoria || []), p.tipo === "R" ? "Rutina" : p.tipo === "E" ? "Especial" : ""].filter(Boolean).join(" · "));
+const filaResultado = ({ f, p }) => f.id === fuenteId
+  ? `<div class="row res"><a href="#p-${p.id}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, regionPorId[p.region]?.nombre)}</span></a>${etiquetaFuente(f)}${botonFav(p.id)}</div>`
+  : `<div class="row res"><button class="res-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(p.id)}"><span class="t">${esc(p.nombre)}</span><span class="s">${detalle(p, p._region)}</span></button>${etiquetaFuente(f)}</div>`;
 
 // menú principal: botones por zona agrupados por región, con su color (ver js/menu.js); "filtro" deja solo las proyecciones que cumplen (favoritos)
 function menuRegiones(filtro) {
@@ -67,7 +86,7 @@ function menuRegiones(filtro) {
 export function vistaFamilia(f) {
   const partes = GRUPOS.filter((g) => g.familia === f).map((g) => ({ g, lista: g.regiones.flatMap((id) => proyeccionesDe(id)) })).filter((x) => x.lista.length);
   const total = partes.reduce((a, x) => a + x.lista.length, 0);
-  return cabecera({ titulo: f.nombre, sub: `${total} enfoques · ${FUENTE.corto}`, atras: "#enfoques" }) + `
+  return cabecera({ titulo: f.nombre, sub: `${total} enfoques`, atras: "#enfoques" }) + `
   <main class="wrap" style="--c:${f.color}">
     ${partes.map(({ g, lista }, i) => `<details class="sec region"${i === 0 ? " open" : ""}><summary><span class="t">${esc(g.nombre)}</span><span class="s">${lista.length}</span>${icono.chev}</summary>
       <div class="lista">${lista.map((p) => filaProyeccion(p)).join("")}</div></details>`).join("")}
@@ -157,11 +176,13 @@ export function vistaAyudaApp() {
 
 export function vistaInicio() {
   const q = estado.q.trim();
+  // los otros libros se van cargando apenas se abre Enfoques, así el buscador ya los tiene cuando se escribe
+  for (const f of FUENTES) if (f.lista && f.id !== fuenteId) proyeccionesDeOtra(f.id);
   const act = listas.activa();
-  return cabecera({ titulo: "Enfoques", sub: `Técnicas y proyecciones · ${FUENTE.corto}`, atras: "#" }) + `
+  return cabecera({ titulo: "Enfoques", sub: "Técnicas y proyecciones", atras: "#" }) + `
   <div class="buscar-barra"><div class="wrap">${buscador("q-inicio", estado.q, "Región, proyección o método")}</div></div>
   <main class="wrap">
-    ${q ? resultados(proyecciones, q) : `
+    ${q ? resultados(q) : `
       <div class="accesos">
         <a class="acceso fav" href="#favoritos" style="--lc: var(--lc-${act.color})">${icono.estrella(true)}<span>${listas.todas().length > 1 ? esc(act.nombre) : "Favoritos"}</span><b>${act.total}</b></a>
         <a class="acceso" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
@@ -232,7 +253,7 @@ function seleccionLista(favs) {
 // y los de otro libro como filas con su etiqueta; al tocar una de esas filas se cambia de libro y se abre la ficha
 function menuFavoritos(filtro, otras) {
   // cada enfoque es una fila con la etiqueta de su libro (un color por libro); los del libro abierto abren la ficha directo
-  const etiqueta = (f) => `<span class="fuente-tag f-${esc(f.id)}">${esc(f.nombre)}</span>`;
+  const etiqueta = etiquetaFuente;
   const fila = ({ f, id, nombre, region }) => f.id === fuenteId
     ? `<a class="row fav-otra" href="#p-${esc(id)}"><span class="sel-txt"><span class="t">${esc(nombre)}</span><span class="s">${esc(region)}</span></span>${etiqueta(f)}</a>`
     : `<button class="row fav-otra" data-ir-fuente="${esc(f.id)}" data-ir-ficha="${esc(id)}"><span class="sel-txt"><span class="t">${esc(nombre)}</span><span class="s">${esc(region)}</span></span>${etiqueta(f)}</button>`;
@@ -245,7 +266,7 @@ function menuFavoritos(filtro, otras) {
   for (const f of FUENTES.filter((x) => x.id !== fuenteId)) {
     const suyas = otras.filter((x) => x.fuente === f.id);
     if (!suyas.length) continue;
-    const nombres = nombresDe(f.id, () => { if (location.hash === "#favoritos") document.dispatchEvent(new Event("rx-rehacer")); });
+    const nombres = nombresDe(f.id);
     if (!nombres) { cargando = true; continue; }
     for (const x of suyas) if (nombres[x.id]) agregar(nombres[x.id].familia, { f, id: x.id, ...nombres[x.id] });
   }

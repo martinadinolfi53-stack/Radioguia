@@ -414,16 +414,17 @@ I["pulgar-pa-oblicua"] = () => {
   );
 };
 I["pulgar-lateral"] = () => {
-  const f = E.figura("pulgar-lateral", { en: ["mcf1_R", 230, 130], ppc: 13 });
+  const f = E.figura("pulgar-lateral", { en: ["mcf1_R", 280, 175], ppc: 13 });
   const m1 = f.p("mcf1_R"), t = f.p("punta_dedo1_R"), c1 = f.p("cmc1_R");
   return svg(
     view("Vista desde el tubo · mano arqueada y rotada hacia medial") +
     riTop(110, 34, 240, 280) + txt(116, 306, "RI 18 x 24 vertical", 11.5, INK) +
     f.svg + colPulgar(f, false) + crossP(m1) +
-    note(m1[0] + 8, m1[1] - 6, 520, 62, ["RC perpendicular al RI", "en la 1.ª articulación MCF"], RED) +
-    note(...t, 520, 126, ["Pulgar en lateral verdadera"]) +
-    note(f1(f.x + f.w - 2 * f.ppc), f1(f.y + f.h - 2 * f.ppc), 520, 172, ["Desde la pronación, mano un", "poco arqueada y rotada hacia", "medial"]) +
-    note(f1(c1[0] + 2.5 * f.ppc), f1(c1[1] + 2.5 * f.ppc), 520, 236, ["Colimar el pulgar, con todo", "el 1.er metacarpiano y el carpo"], AMB) +
+    // rótulos en el mismo orden (de arriba abajo) que los puntos a los que apuntan, así las líneas no se cruzan
+    note(...f.p("mcf3_R"), 520, 62, ["Desde la pronación, mano un", "poco arqueada y rotada hacia", "medial"]) +
+    note(m1[0] + 8, m1[1] + 2, 520, 136, ["RC perpendicular al RI", "en la 1.ª articulación MCF"], RED) +
+    note(...t, 520, 196, ["Pulgar en lateral verdadera"]) +
+    note(f1(t[0] + 1 * f.ppc), f1(t[1] + 2.3 * f.ppc), 520, 236, ["Colimar el pulgar, con todo", "el 1.er metacarpiano y el carpo"], AMB) +
     txt(520, 296, "Sentado · DFRI 100 cm · sin parrilla", 11, MUTE)
   );
 };

@@ -116,12 +116,15 @@ F['pulgar-ap-costado'] = lambda: figura(
 F['pulgar-pa-oblicua'] = lambda: figura(
     'pulgar-pa-oblicua', plana(Pose().codo_flex('R', 90).prono('R', 180)).pulgar('R', abd_radial=15), dir=(0, -1, 0),
     horizontal=('grande_R', 'mcf3_R'), huesos=MANO, region=MANO, cortes=[('estiloides_radio_R', 'distal', 0.10)], puntos=_PULG)
-# Lateral: desde la pronación, mano un poco arqueada (dedos algo flexionados) y rotada hacia medial (45°: con eso el pulpejo
-# del pulgar queda horizontal, es decir, el pulgar en lateral verdadera).
+# Lateral (Bontrager pág. 30, fig. 2.11): mano en pronación apoyada y un poco arqueada (dedos algo flexionados, con las
+# puntas sobre el RI), pulgar separado de los otros dedos y apoyado de costado, alineado con el eje largo del RI. Pose medida
+# en el modelo: el plano de flexión del pulgar queda a 7° del RI (lateral verdadera) y su eje a 7° de la horizontal.
+# Vista desde el tubo con el pulgar vertical, como en la foto del libro (antebrazo arriba, pulgar hacia abajo).
+# (Martin 4/11: la anterior, con la mano rotada 45° y los dedos cerrados, tapaba el pulgar y no se parecía a la foto.)
 F['pulgar-lateral'] = lambda: figura(
-    'pulgar-lateral', plana(Pose().hombro_flex('R', 90).prono('R', 180).hombro_rot_ext('R', -45)).dedos_flex('R', 30, 30),
-    dir=(0, -1, 0), horizontal=('grande_R', 'mcf3_R'), huesos=MANO, region=MANO, cortes=[('estiloides_radio_R', 'distal', 0.10)],
-    puntos=_PULG)
+    'pulgar-lateral', Pose().codo_flex('R', 90).prono('R', 180).pulgar('R', abd_radial=25, abd_palmar=-15, rot=15).dedos_flex('R', 20, 20),
+    dir=(0, -1, 0), vertical=('punta_dedo1_R', 'cmc1_R'), huesos=MANO, region=MANO, cortes=[('estiloides_radio_R', 'distal', 0.05)],
+    puntos=_PULG + ['mcf2_R', 'mcf3_R'])
 
 # Muñeca. PA: pronación, dedos flexionados y mano un poco arqueada (la muñeca apoya de lleno); vista desde el tubo y de costado
 # (desde lateral, el codo a la izquierda). Oblicua: rotada 45° hacia lateral, dedos flexionados para sostenerla. Lateral:

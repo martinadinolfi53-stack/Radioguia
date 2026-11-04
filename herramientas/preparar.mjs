@@ -60,7 +60,8 @@ for (const { id: fid, lista: fLista } of FUENTES) {
   }
 
   // esquemas presentes en la carpeta de la fuente → datos/<fuente>/ilustraciones.js (la app los asigna a cada ficha o a cada versión: <id>--v<N>.svg)
-  const conEsquema = readdirSync(join(raiz, FUENTE.ilustraciones)).filter((f) => f.endsWith(".svg")).map((f) => f.slice(0, -4)).sort();
+  const ext = FUENTE.formato || "svg";
+  const conEsquema = readdirSync(join(raiz, FUENTE.ilustraciones)).filter((f) => f.endsWith("." + ext)).map((f) => f.slice(0, -ext.length - 1)).sort();
   for (const id of conEsquema) {
     const m = id.match(/^(.+)--v(\d+)$/);
     if (!m) { if (!proyecciones.some((p) => p.id === id)) problemas.push(`${FUENTE.ilustraciones}${id}.svg no corresponde a ninguna proyección`); continue; }
@@ -76,9 +77,9 @@ for (const { id: fid, lista: fLista } of FUENTES) {
   }
   writeFileSync(join(raiz, dir, "ilustraciones.js"), `// Generado por herramientas/preparar.mjs: fichas con esquema en ${FUENTE.ilustraciones}<id>.svg. No editar a mano.\nexport default ${JSON.stringify(conEsquema)};\n`);
   for (const p of proyecciones) {
-    if (!p.ilustracion?.src && conEsquema.includes(p.id)) p.ilustracion = { src: `${FUENTE.ilustraciones}${p.id}.svg` };
+    if (!p.ilustracion?.src && conEsquema.includes(p.id)) p.ilustracion = { src: `${FUENTE.ilustraciones}${p.id}.${ext}` };
     const v = VERSIONES[p.id];
-    if (v) p.versiones = v.versiones.map((x, i) => ({ ...x, ilustracion: conEsquema.includes(`${p.id}--v${i + 1}`) ? { src: `${FUENTE.ilustraciones}${p.id}--v${i + 1}.svg` } : null }));
+    if (v) p.versiones = v.versiones.map((x, i) => ({ ...x, ilustracion: conEsquema.includes(`${p.id}--v${i + 1}`) ? { src: `${FUENTE.ilustraciones}${p.id}--v${i + 1}.${ext}` } : null }));
     // con un esquema por versión, la ficha cuenta como ilustrada
     if (!p.ilustracion?.src && p.versiones?.every((x) => x.ilustracion)) p.ilustracion = { src: p.versiones[0].ilustracion.src };
   }

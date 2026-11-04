@@ -20,9 +20,10 @@ export function armar({ CAPITULOS, FUENTE, CON_ESQUEMA, ANG_ROT, VERSIONES }) {
   const proyecciones = capitulos.flatMap((c) => c.proyecciones.map((p) => ({ ...p, capitulo: c.capitulo })));
   // angulación del rayo y rotación de la región (sacadas de los pasos y del RC de cada ficha)
   for (const p of proyecciones) if (ANG_ROT[p.id]) p.factores = { ...p.factores, ...Object.fromEntries(Object.entries(ANG_ROT[p.id]).filter(([k]) => !(k in (p.factores || {})))) };
-  // esquemas didácticos generados (<carpeta de la fuente>/<id>.svg), sin verificar por un docente
+  // esquemas didácticos generados (<carpeta de la fuente>/<id>.svg, o .webp si la fuente lo indica), sin verificar por un docente
+  const ext = FUENTE.formato || "svg";
   const esquemas = new Set(CON_ESQUEMA);
-  for (const p of proyecciones) if (!p.ilustracion?.src && esquemas.has(p.id)) p.ilustracion = { src: `${FUENTE.ilustraciones}${p.id}.svg`, alt: `Esquema: ${p.nombre}`, verificada: false };
+  for (const p of proyecciones) if (!p.ilustracion?.src && esquemas.has(p.id)) p.ilustracion = { src: `${FUENTE.ilustraciones}${p.id}.${ext}`, alt: `Esquema: ${p.nombre}`, verificada: false };
   // fichas con varias posiciones del paciente (datos/versiones.js): pasos comunes + una versión por posición, cada una con su esquema
   for (const p of proyecciones) {
     const v = VERSIONES[p.id];
@@ -30,7 +31,7 @@ export function armar({ CAPITULOS, FUENTE, CON_ESQUEMA, ANG_ROT, VERSIONES }) {
     p.comun = [...(v.comun || [])];
     p.versiones = v.versiones.map((x, i) => {
       const id = `${p.id}--v${i + 1}`;
-      return { ...x, posicion: [...x.posicion], ilustracion: esquemas.has(id) ? { src: `${FUENTE.ilustraciones}${id}.svg`, alt: `Esquema: ${p.nombre} · ${x.nombre}`, verificada: false } : null };
+      return { ...x, posicion: [...x.posicion], ilustracion: esquemas.has(id) ? { src: `${FUENTE.ilustraciones}${id}.${ext}`, alt: `Esquema: ${p.nombre} · ${x.nombre}`, verificada: false } : null };
     });
   }
 

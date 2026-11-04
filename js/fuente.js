@@ -17,7 +17,8 @@ export const fuenteInfo = FUENTES.find((f) => f.id === fuenteId);
 // se lee una vez al abrir, como el libro: entrar o salir de Ambos recarga (el repaso y los juegos arman sus fichas al cargar)
 const enAmbos = leer(KA) === "1";
 export const ambos = () => enAmbos;
-export const AMBOS = { id: "ambos", nombre: "Ambos" };
+// se sigue guardando como "ambos" para no perder lo que ya estaba (grupos, repaso); desde que hay tres fuentes se llama "Todos"
+export const AMBOS = { id: "ambos", nombre: "Todos" };
 
 // los datos de la fuente se cargan una sola vez al abrir: cambiar de fuente recarga la app
 // destino: a dónde ir después de recargar (por ejemplo, la ficha de un favorito del otro libro);

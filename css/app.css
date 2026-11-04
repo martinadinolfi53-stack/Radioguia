@@ -486,9 +486,10 @@ a.ident-nota { color: var(--accent); text-decoration: underline; }
 .panel .fuente-op small { color: var(--mute); }
 .panel .fuente-op.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
 /* interruptor de libro debajo de Enfoques y Juegos: el libro activo queda resaltado; tocar el otro cambia de fuente */
-.portada-fuente { display: inline-flex; gap: 4px; margin-top: 36px; padding: 4px; border: 1px solid rgb(127 140 160 / .35); border-radius: 999px; }
-.portada-fuente button { min-height: 40px; min-width: 96px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; color: inherit; opacity: .7; font: inherit; font-size: .95em; font-weight: 600; cursor: pointer; }
+.portada-fuente { display: inline-flex; max-width: 100%; gap: 2px; margin-top: 36px; padding: 4px; border: 1px solid rgb(127 140 160 / .35); border-radius: 999px; }
+.portada-fuente button { min-height: 40px; min-width: 64px; padding: 0 12px; white-space: nowrap; border: 0; border-radius: 999px; background: transparent; color: inherit; opacity: .7; font: inherit; font-size: .9em; font-weight: 600; cursor: pointer; }
 .portada-fuente button.on { background: #5cc8ff; color: #04121f; opacity: 1; cursor: default; }
+@media (max-width: 400px) { .portada-fuente button { min-width: 0; padding: 0 9px; font-size: .82em; } }
 /* Favoritos compartidos: filtro por libro y etiqueta en los enfoques de otro libro */
 .fav-otras { margin-top: 10px; }
 .fav-filtro { margin: 14px 0 4px; }
@@ -500,9 +501,11 @@ a.ident-nota { color: var(--accent); text-decoration: underline; }
 .fuente-tag { --fc: var(--mute); flex: none; padding: 3px 10px; border: 1px solid var(--fc); border-radius: 999px; background: color-mix(in srgb, var(--fc) 16%, transparent); font-size: .78em; font-weight: 700; color: var(--fc); }
 .fuente-tag.f-bontrager { --fc: #4fa3ff; }
 .fuente-tag.f-merrill { --fc: #f0a23a; }
+.fuente-tag.f-uy { --fc: #3ec98a; }
 .fuente-tag.f-ambos { --fc: #5cc8ff; }
 :root[data-theme="light"] .fuente-tag.f-bontrager { --fc: #1565c0; }
 :root[data-theme="light"] .fuente-tag.f-merrill { --fc: #b25d00; }
+:root[data-theme="light"] .fuente-tag.f-uy { --fc: #127a4a; }
 :root[data-theme="light"] .fuente-tag.f-ambos { --fc: #0b7bb5; }
 .q-filtro { margin: 4px 0 12px; }
 .rp-libro { display: inline-block; margin-bottom: 8px; }

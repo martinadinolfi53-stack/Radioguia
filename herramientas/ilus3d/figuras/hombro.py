@@ -58,7 +58,9 @@ def caudal(d, g):
     d = np.asarray(d, float); a = np.radians(g); return tuple(np.cos(a) * d + np.sin(a) * np.array([0, -1, 0]))
 # Vista desde el tubo con la cara o la nuca (cara=True) y el RI real detrás (ancho x alto en m, centrado en el punto)
 def tubo(id, pose, d, centro, ri, cortes=SOBRE_XIFOIDES, huesos=BRAZO, capas=True, normal=None, **kw):
+    enc = kw.pop('encuadre', None)
     if capas: kw.setdefault('ventana', dict(ventana(*next(v for k, v in VENT if id.startswith(k))), punto=centro))
+    if enc and 'ventana' in kw: kw['ventana']['encuadre'] = enc
     return fig(id, pose, d, cortes=cortes, huesos=huesos, cara=True, capas=capas, extra=ri_detras(pose, d, centro, *ri, debajo_de='xifoides', normal=normal), **kw)
 def _antes(pose, centro, d):
     from escena import cuerpo; from puntos import Puntos
@@ -191,7 +193,8 @@ F['hombro-garth-tubo2'] = lambda: tubo('hombro-garth-tubo2', _garth(), caudal(ra
 F['hombro-y-escapula-neer-tubo2'] = lambda: tubo('hombro-y-escapula-neer-tubo2', _neer(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))
 F['escapula-lateral--v1-tubo2'] = lambda: tubo('escapula-lateral--v1-tubo2', _garth(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))
 F['escapula-lateral--v2-tubo2'] = lambda: tubo('escapula-lateral--v2-tubo2', _esc2(), rayo('PA', 52), 'centro:Right scapula', (0.24, 0.30))
-F['humero-lateral-rotacion--v1-tubo2'] = lambda: tubo('humero-lateral-rotacion--v1-tubo2', _latrot(), rayo('PA', 17.5), 'centro:Right humerus', (0.35, 0.43), cortes=SOBRE_CADERA, suavizar=AX)
+F['humero-lateral-rotacion--v1-tubo2'] = lambda: tubo('humero-lateral-rotacion--v1-tubo2', _latrot(), rayo('PA', 17.5), 'centro:Right humerus', (0.35, 0.43), cortes=SOBRE_CADERA, suavizar=AX,
+                                                                 encuadre=0.36)   # que el codo se vea dentro del RI (región completa)
 # Lawrence: vista cenital (el paciente acostado visto desde el techo: es la AP del modelo de pie), con la camilla, el RI de canto
 # sobre el hombro y el RC horizontal que entra por la axila con 25-30° hacia medial; y vista desde el tubo (en el sentido del RC)
 def _mesa_borde(pose, ancho=0.62):

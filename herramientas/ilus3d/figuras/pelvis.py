@@ -73,10 +73,16 @@ par('acetabulo-pa-oblicua-axial-teufel', Pose, angulado(oblicuo('PA', 37, 'R'), 
 # derecha y la pelvis (sin la mano ni la otra pierna, que se veían como fantasmas encima del muslo), con la piel del modelo
 # anatómico: la del avatar es más fina y el fémur distal asomaba por delante del muslo
 PIERNA_D = ['pelvis', 'muslo_R', 'rotula_R', 'pierna_R', 'pie_R', 'dedos_pie_R']
-par('femur-ap', lambda: Pose().cadera_rot_int('R', ROT(5)), AP, 'centro:Right femur', (0.35, 0.43), radio=0.27, encuadre=0.34, huesos=FEMUR, otra=None, piel_modelo=True)
-par('femur-lateral', lambda: Pose().rodilla_flex('R', 45).cadera_flex('R', 20).cadera_flex('L', -35), (-1, 0, 0), 'centro:Right femur', (0.35, 0.43),
-    radio=0.27, encuadre=0.34, huesos=FEMUR, ri_radio=0.30, region_tubo=PIERNA_D, piel_modelo=True, otra=None)
-par('femur-lateral-haz-horizontal', lambda: Pose().cadera_flex('R', 8).cadera_abd('L', 12), (1, 0, 0), 'centro:Right femur', (0.35, 0.43), radio=0.27,
+# RI de 43 cm con el borde inferior ≈5 cm por debajo de la interlínea de la rodilla (Bontrager pág. 152): en el modelo, la
+# interlínea queda 2,7 cm debajo del punto rodilla_R (entre epicóndilos), así que el centro del RI (y el RC, "a la parte media
+# del RI") va 13,8 cm por encima de rodilla_R: 0,335 del camino hacia la cabeza femoral. La cadera no entra en un adulto: el
+# libro suma un 2.º RI más chico en la cadera (CADERA2 = su centro, como en la AP unilateral de cadera).
+FEMUR_RC = 'medio:rodilla_R|cabeza_femur_R|0.335'
+CADERA2 = 'medio:cabeza_femur_R+trocanter_mayor_R|rodilla_R|0.08'
+par('femur-ap', lambda: Pose().cadera_rot_int('R', ROT(5)), AP, FEMUR_RC, (0.35, 0.43), radio=0.27, encuadre=0.42, huesos=FEMUR, otra=None, piel_modelo=True, puntos=[CADERA2])
+par('femur-lateral', lambda: Pose().rodilla_flex('R', 45).cadera_flex('R', 20).cadera_flex('L', -35), (-1, 0, 0), FEMUR_RC, (0.35, 0.43),
+    radio=0.27, encuadre=0.42, huesos=FEMUR, ri_radio=0.30, region_tubo=PIERNA_D, piel_modelo=True, otra=None, puntos=[CADERA2])
+par('femur-lateral-haz-horizontal', lambda: Pose().cadera_flex('R', 8).cadera_abd('L', 12), (1, 0, 0), FEMUR_RC, (0.35, 0.43), radio=0.27,
     encuadre=0.34, huesos=FEMUR, ri_radio=0.12, arriba_tubo=(0, 0, 1), desde=(0, 0, -1), arriba_img=(0, 1, 0), enc_otra=0.75, region_tubo=PIERNA_D,
     piel_modelo=True)
 

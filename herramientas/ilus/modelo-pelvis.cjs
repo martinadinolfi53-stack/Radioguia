@@ -85,15 +85,25 @@ def({ id: "acetabulo-pa-oblicua-axial-teufel", blanco: "medio:cabeza_femur_R|cre
   rc: [R("RC 12° cefálico"), "2,5 cm por encima del", "trocánter mayor y ≈5 cm", "lateral al plano medio"],
   pos: ["Semidecúbito prono, lado", "afectado abajo", "Oblicua anterior 35-40°"] });
 
-def({ id: "femur-ap", blanco: "centro:Right femur", ri: "35 × 43",
+// fémur: el RI de 43 cm entra con la rodilla (borde inferior ≈5 cm por debajo); en un adulto la cadera no entra, y el libro
+// suma un 2.º RI más chico en la cadera: se dibuja punteado en azul (24 × 30 centrado como en la AP unilateral de cadera)
+const FEMUR_RC = "medio:rodilla_R|cabeza_femur_R|0.335";
+const cadera2 = (f) => {
+  const c = f.p("medio:cabeza_femur_R+trocanter_mayor_R|rodilla_R|0.08"), w = 24 * f.ppc, h = 30 * f.ppc, x = c[0] - w / 2, y = c[1] - h / 2;
+  return `<rect x="${r1(x)}" y="${r1(y)}" width="${r1(w)}" height="${r1(h)}" fill="none" stroke="${BLUE}" stroke-width="2" stroke-dasharray="7 4"/>` +
+    E.txt(r1(x + 4), r1(y + 13), "2.º RI 24 × 30 (cadera)", 10.5, BLUE, "start", 700);
+};
+def({ id: "femur-ap", blanco: FEMUR_RC, ri: "35 × 43", extra: cadera2,
   rc: [R("RC perpendicular al fémur"), "a la parte media del RI"],
-  pos: ["Decúbito supino, fémur en la línea media", "Rotación interna ≈5° (15° si incluye la cadera)", "RI ≈5 cm por debajo de la rodilla", "Cadera hacia el cátodo"] });
+  pos: ["Decúbito supino, fémur en la línea media", "Rotación interna ≈5° (15° si incluye la cadera)", "RI ≈5 cm por debajo de la rodilla", "Cadera hacia el cátodo"],
+  pie: [[ "Adulto: las dos articulaciones", BLUE, 700], ["no entran en un RI; 2.º RI", BLUE, 700], ["en la cadera (punteado azul)", BLUE, 700]] });
 
-def({ id: "femur-lateral", blanco: "centro:Right femur", ri: "35 × 43",
+def({ id: "femur-lateral", blanco: FEMUR_RC, ri: "35 × 43", extra: cadera2,
   rc: [R("RC perpendicular al fémur"), "a la parte media del RI"],
-  pos: ["Decúbito lateral sobre el lado afectado", "Rodilla flexionada ≈45°", "Pierna sana llevada hacia atrás", "Cadera hacia el cátodo"] });
+  pos: ["Decúbito lateral sobre el lado afectado", "Rodilla flexionada ≈45°", "Pierna sana llevada hacia atrás", "Cadera hacia el cátodo"],
+  pie: [[ "Adulto: las dos articulaciones", BLUE, 700], ["no entran en un RI; 2.º RI", BLUE, 700], ["en la cadera (punteado azul)", BLUE, 700]] });
 
-def({ id: "femur-lateral-haz-horizontal", blanco: "centro:Right femur", ri: "35 × 43", otra: "costado",
+def({ id: "femur-lateral-haz-horizontal", blanco: FEMUR_RC, ri: "35 × 43", otra: "costado",
   otraTitulo: "Vista desde el techo", tubo: "Desde el tubo (al costado)",
   rc: [R("RC horizontal"), "perpendicular al fémur,", "al punto medio del RI"],
   pos: ["Acostado boca arriba, sin moverlo", "Pierna lesionada apenas elevada,", "con un apoyo bajo la rodilla", "RI parado entre las piernas,", "incluyendo la rodilla, sujeto", "con cinta adhesiva para que", "no se caiga"],

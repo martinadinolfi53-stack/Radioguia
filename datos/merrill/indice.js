@@ -28,6 +28,7 @@ export const FUENTE = {
   editorial: "Elsevier España, 2010",
   corto: "Merrill 11ª ed.",
   ilustraciones: "ilustraciones/merrill/",
+  formato: "webp", // ilustraciones en estilo holograma (renders 3D), no esquemas SVG
 };
 
 export const CAPITULOS = [cap04, cap05, cap06, cap07, cap08, cap09, cap10, cap16, cap17, cap18, cap20, cap21, cap22, cap27, cap29];

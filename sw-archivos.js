@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "1454b2bf72";
+self.RG_VERSION = "763bc8e8bf";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -267,6 +267,21 @@ self.RG_EXTRAS = {
  "ilustraciones/manos-ap-oblicua-norgaard--v1.svg": "180dc657",
  "ilustraciones/manos-ap-oblicua-norgaard--v2.svg": "e31cc980",
  "ilustraciones/merrill/.gitkeep": "e3b0c442",
+ "ilustraciones/merrill/antebrazo-ap.webp": "caeb02ba",
+ "ilustraciones/merrill/antebrazo-lateral.webp": "1dc7c1c3",
+ "ilustraciones/merrill/codo-ap.webp": "d7b69f50",
+ "ilustraciones/merrill/codo-lateral.webp": "bbe7f71a",
+ "ilustraciones/merrill/dedos-lateral.webp": "da50f914",
+ "ilustraciones/merrill/dedos-pa.webp": "a7481f90",
+ "ilustraciones/merrill/hombro-ap.webp": "d9fe234d",
+ "ilustraciones/merrill/humero-ap-vertical.webp": "0fb42cdb",
+ "ilustraciones/merrill/humero-lateral-vertical.webp": "e99245a4",
+ "ilustraciones/merrill/mano-pa-oblicua.webp": "277425b4",
+ "ilustraciones/merrill/mano-pa.webp": "ec65dd90",
+ "ilustraciones/merrill/muneca-lateral.webp": "487b397c",
+ "ilustraciones/merrill/muneca-pa.webp": "91ad594f",
+ "ilustraciones/merrill/pulgar-ap.webp": "30ca022c",
+ "ilustraciones/merrill/pulgar-lateral.webp": "847563dc",
  "ilustraciones/muneca-desviacion-cubital--v1.svg": "d4a5b829",
  "ilustraciones/muneca-desviacion-cubital--v2.svg": "96e3c9a8",
  "ilustraciones/muneca-desviacion-radial.svg": "71e6512e",

@@ -38,6 +38,8 @@ def tubo(id, pose, d, centro, ri, radio=0.12, encuadre=0.26, cortes=(), region=N
     if piel_modelo: v['piel_modelo'] = True     # piel del modelo anatómico: con la rodilla flexionada el avatar no acompaña a los huesos
     if kw.get('huesos_hasta'): v['huesos_hasta'] = kw.pop('huesos_hasta')
     kw.pop('huesos_hasta', None)
+    if kw.get('hueso_cerca'): v['hueso_cerca'] = kw.pop('hueso_cerca')
+    kw.pop('hueso_cerca', None)
     return figura(id + '-tubo', pose, dir=vista if vista is not None else d, arriba=arriba, huesos=huesos, region=region, cortes=cortes, ventana=v,
                   puntos=[centro] + list(puntos) + _extra(pose, d, centro, ri, normal, debajo_de, arriba_ri, kw.pop('ri_radio', None)), **kw)
 

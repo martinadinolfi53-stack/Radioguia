@@ -181,6 +181,8 @@ def figura(id, pose, dir=(0, 0, -1), arriba=(0, 1, 0), huesos=(), region=None, c
     for k, (P, Ih) in c.huesos_posados().items():
         if c.huesos[k]['seg'] not in segs_h: continue
         if hasta: Ih = Ih[np.linalg.norm(P[Ih].mean(1) - q_h, axis=1) < hasta]
+        for seg_, pto_, dist_ in (ventana or {}).get('hueso_cerca', ()):      # p. ej. de la pelvis solo el acetábulo
+            if c.huesos[k]['seg'] == seg_: Ih = Ih[np.linalg.norm(P[Ih].mean(1) - pts.posado(pto_), axis=1) < dist_]
         for p, n in planos: Ih = Ih[((P[Ih].mean(1) - p) @ n) > -0.002]
         if k in dest and len(Ih):
             q, r_, col = dest[k]; fd = (np.linalg.norm(P - q, axis=1) < r_)[Ih].all(1)

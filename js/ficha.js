@@ -20,6 +20,14 @@ const FACTORES = [["ri", "Tamaño del RI"], ["dfri", "DFRI"], ["respiracion", "R
 const FACTORES_EXTRA = [["parrilla", "Parrilla (Bucky)"], ["colimacion", "Colimación"], ["tecnica", "Técnica"]];
 export const FACTORES_FICHA = [...FACTORES, ...FACTORES_EXTRA];
 
+// guía rápida (datos/<fuente>/guia-rapida.js): dónde incide el RC, angulación, rotación y flexión en pocas palabras
+function guiaRapida(g) {
+  if (!g) return "";
+  const dato = (t, x) => (x ? `<div class="gr-dato${x === "No" ? " no" : ""}"><dt>${t}</dt><dd>${esc(x)}</dd></div>` : "");
+  return `<section class="guia-rapida" aria-label="Guía rápida"><dl>
+    ${dato("RC incide en", g.rc)}${dato("Angulación", g.angulacion)}${dato("Rotación", g.rotacion)}${dato("Flexión", g.flexion)}</dl></section>`;
+}
+
 export function vistaFicha(p, volver) {
   const r = regionPorId[p.region];
   const v = new Set(); // términos ya marcados en la sección actual
@@ -59,6 +67,7 @@ export function vistaFicha(p, volver) {
       </div>
       <p class="rc-txt">${(v.clear(), m(p.rc?.texto || "Sin dato en la fuente."))}</p>
     </section>
+    ${guiaRapida(p.guia)}
 
     ${sec("Posición del paciente", () => p.versiones ? (p.comun?.length ? lista(p.comun) : "") + `<div class="versiones">${p.versiones.map(version).join("")}</div>` : lista(p.posicion || []))}
 

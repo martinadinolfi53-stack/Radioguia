@@ -1,7 +1,7 @@
 // Service worker de RadioGuía: guarda toda la app en el dispositivo para usarla sin conexión.
 // La lista de archivos y la versión salen de sw-archivos.js, que genera herramientas/preparar.mjs
 // (la versión cambia sola cuando cambia cualquier archivo, y eso dispara la actualización).
-// versión: 4f7090f6e7 (la escribe herramientas/preparar.mjs; así este archivo cambia en cada versión y
+// versión: 763bc8e8bf (la escribe herramientas/preparar.mjs; así este archivo cambia en cada versión y
 // cualquier navegador, aunque solo compare sw.js y no sw-archivos.js, se entera de que hay una actualización)
 importScripts("sw-archivos.js"); // define self.RG_VERSION, self.RG_ARCHIVOS y self.RG_EXTRAS
 const CACHE = "radioguia-" + self.RG_VERSION;

@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "4f7090f6e7";
+self.RG_VERSION = "763bc8e8bf";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -21,6 +21,7 @@ self.RG_ARCHIVOS = [
  "datos/bontrager/cap08-craneo-cara-senos.js",
  "datos/bontrager/cap09-abdomen-contraste.js",
  "datos/bontrager/cap10-portatiles.js",
+ "datos/bontrager/guia-rapida.js",
  "datos/bontrager/ilustraciones.js",
  "datos/bontrager/indice.js",
  "datos/bontrager/menu.js",
@@ -43,6 +44,7 @@ self.RG_ARCHIVOS = [
  "datos/merrill/cap22-senos.js",
  "datos/merrill/cap27-pediatria.js",
  "datos/merrill/cap29-radiologia-movil.js",
+ "datos/merrill/guia-rapida.js",
  "datos/merrill/ilustraciones.js",
  "datos/merrill/indice.js",
  "datos/merrill/menu.js",
@@ -50,6 +52,7 @@ self.RG_ARCHIVOS = [
  "datos/uy/angulacion-rotacion.js",
  "datos/uy/cap01-miembro-superior.js",
  "datos/uy/cap02-miembro-inferior.js",
+ "datos/uy/guia-rapida.js",
  "datos/uy/ilustraciones.js",
  "datos/uy/indice.js",
  "datos/uy/menu.js",

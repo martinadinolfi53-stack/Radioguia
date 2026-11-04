@@ -5,6 +5,7 @@ import cap02 from "./cap02-miembro-inferior.js";
 export { default as MENU } from "./menu.js";
 export { default as ANG_ROT } from "./angulacion-rotacion.js";
 export { default as VERSIONES } from "./versiones.js";
+export { default as GUIA } from "./guia-rapida.js";
 export { default as CON_ESQUEMA } from "./ilustraciones.js";
 
 export const FUENTE = {

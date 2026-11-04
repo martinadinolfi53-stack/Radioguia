@@ -169,22 +169,26 @@ I["humero-lateral-rotacion--v2"] = () => {
 I["humero-lateral-trauma"] = () => {
   const f = E.figura("humero-lateral-trauma", { caja: [20, 40, 420, 270] });
   const h = f.p("cabeza_humero_R"), e = f.p("codo_R"), t = lerp(e, h, 1 / 3);
-  const w = Math.abs(e[0] - h[0]) * 0.75, x0 = Math.min(e[0], h[0]) + Math.abs(e[0] - h[0]) * 0.05;
+  // RI 30 × 24 horizontal (Bontrager pág. 69): borde superior en la axila (≈3 cm distal a la cabeza humeral) y a lo largo
+  // del húmero, así entran húmero medio y distal, el codo y el antebrazo proximal; centrado en el eje del húmero
+  const L = Math.hypot(e[0] - h[0], e[1] - h[1]), u = [(e[0] - h[0]) / L, (e[1] - h[1]) / L];
+  const ax = add(h, u, 3 * f.ppc), cy = ax[1] + u[1] * 15 * f.ppc;
+  // el borde de abajo no pasa de la espalda del paciente (el RI se apoya en la mesa)
+  const x0 = Math.min(ax[0], ax[0] + u[0] * 30 * f.ppc), w = 30 * f.ppc, hh = 24 * f.ppc, y0 = Math.min(cy - hh / 2, f.y + f.h - hh);
+  const caja = (relleno, trazo) => `<rect x="${f1(x0)}" y="${f1(y0)}" width="${f1(w)}" height="${f1(hh)}" ${relleno} stroke="${INK}" ${trazo}/>`;
   return svg(
     titulo(12, "", "Desde el tubo · decúbito supino, rayo horizontal") +
-    // RI detrás del brazo (entre brazo y tórax): placa gris con borde negro, debajo del dibujo
-    `<rect x="${f1(x0)}" y="${f1(t[1] - 12 * f.ppc)}" width="${f1(w)}" height="${f1(15 * f.ppc)}" fill="#d9dce3" stroke="${INK}" stroke-width="2.5"/>` + f.svg +
-    // contorno del RI por encima (punteado negro): queda tapado por el brazo
-    `<rect x="${f1(x0)}" y="${f1(t[1] - 12 * f.ppc)}" width="${f1(w)}" height="${f1(15 * f.ppc)}" fill="none" stroke="${INK}" stroke-width="2" stroke-dasharray="7 5"/>` +
-    txt(f1(f.x + 4), f1(t[1] - 12 * f.ppc - 14), "RI detrás del brazo (entre brazo y tórax)", 11, INK) + crossP(t) +
+    // RI detrás del brazo (entre brazo y tórax): placa gris con borde negro, debajo del dibujo; encima, el contorno punteado
+    caja(`fill="#d9dce3"`, `stroke-width="2.5"`) + f.svg + caja(`fill="none"`, `stroke-width="2" stroke-dasharray="7 5"`) +
+    txt(f1(x0 + 5), f1(y0 + 14), "RI 24 × 30", 11, INK, "start", 700) + crossP(t) +
     txt(f1(f.x + 4), f1(f.y + f.h + 14), "← cabeza", 11, MUTE) +
-    note(t[0] + 6, t[1] + 8, 470, 92, ["RC horizontal, ⟂ al RI,", "en el tercio distal del húmero"], RED) +
-    note(f1(x0 + w), f1(t[1] - 6 * f.ppc), 470, 150, ["RI paralelo al húmero, entre", "brazo y tórax, borde superior", "en la axila"]) +
-    note(...f.p("grande_R"), 470, 222, ["Codo flexionado, mano en", "lateral verdadera del codo"]) +
+    note(...f.p("grande_R"), 470, 92, ["Codo flexionado, mano en", "lateral verdadera del codo"]) +
+    note(f1(x0 + w), f1(y0 + 4 * f.ppc), 470, 160, ["RI paralelo al húmero, entre", "brazo y tórax, borde superior", "en la axila"]) +
+    note(t[0] + 6, t[1] + 8, 470, 228, ["RC horizontal, ⟂ al RI,", "en el tercio distal del húmero"], RED) +
     txt(470, 270, "Brazo elevado con suavidad sobre un bloque de apoyo", 11, INK) +
-    txt(470, 288, "RI 30 x 35 o 24 x 30 horizontal · sin parrilla", 11, MUTE) +
+    txt(470, 288, "RI 30 × 35 o 24 × 30 horizontal · sin parrilla", 11, MUTE) +
     txt(470, 302, "Protección entre RI y paciente · DFRI 100 cm", 11, MUTE) +
-    txt(470, 316, "Colimar: húmero medio y distal, codo y antebrazo", 11, AMB)
+    txt(470, 316, "Colimar: húmero medio y distal, codo y antebrazo proximal", 11, AMB)
   );
 };
 

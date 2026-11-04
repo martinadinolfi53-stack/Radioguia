@@ -17,7 +17,7 @@ const RC_FLECHA = {
   variable: '<path d="M16 3v22M9 18l7 7 7-7"/>',
 };
 const FACTORES = [["ri", "Tamaño del RI"], ["dfri", "DFRI"], ["respiracion", "Respiración"], ["angulacion", "Angulación del rayo"], ["rotacion", "Rotación de la región"]];
-const FACTORES_EXTRA = [["parrilla", "Parrilla (Bucky)"], ["colimacion", "Colimación"]];
+const FACTORES_EXTRA = [["parrilla", "Parrilla (Bucky)"], ["colimacion", "Colimación"], ["tecnica", "Técnica"]];
 export const FACTORES_FICHA = [...FACTORES, ...FACTORES_EXTRA];
 
 export function vistaFicha(p, volver) {

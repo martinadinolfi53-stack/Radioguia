@@ -4,7 +4,7 @@
 // Las preguntas salen de js/repaso-preguntas.js. Los resultados se guardan en este dispositivo con un formato pensado
 // para mandarlos después a un ranking de grupo (ver guardarResultado).
 import { CATEGORIAS } from "./datos.js";
-import { proyecciones, proyeccionPorId, regionPorId, GRUPOS, grupoDeRegion, generarPreguntas, clave, linkFicha, etiquetaLibro } from "./juego-datos.js";
+import { proyecciones, proyeccionPorId, regionPorId, GRUPOS, grupoDeRegion, generarPreguntas, clave, linkFicha, etiquetaLibro, mezcla } from "./juego-datos.js";
 import * as almacen from "./almacen.js";
 import { esc, icono, cabecera } from "./util.js";
 import { ASPECTOS, CAMPOS } from "./repaso-preguntas.js";
@@ -22,7 +22,8 @@ const zonaDe = (region) => [grupoDeRegion[region]?.id || "", grupoDeRegion[regio
 
 // listas de favoritos: las arma el módulo de favoritos (almacen.listas); mientras no exista, la lista única de favoritos
 function listas() {
-  try { const l = almacen.listas?.todas?.(); if (Array.isArray(l) && l.length) return l; } catch {}
+  // en "Todos" la lista juega también con los enfoques de las otras fuentes ("<fuente>:<id>", como en juego-datos.js)
+  try { const l = almacen.listas?.todas?.(); if (Array.isArray(l) && l.length) return mezcla ? l.map((x) => ({ ...x, ids: [...x.ids, ...(x.otras || []).map((o) => `${o.fuente}:${o.id}`)] })) : l; } catch {}
   let ids = [];
   try { ids = almacen.favoritos?.lista?.() || []; } catch {}
   return [{ id: "favoritos", nombre: "Favoritos", ids }];

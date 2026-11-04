@@ -10,13 +10,13 @@ import * as nube from "./nube.js";
 import { cerrarSesion } from "./sync-favoritos.js";
 import { registrarDesafio } from "./juegos.js";
 import { vistaFoto, avatar, iniciarFoto } from "./foto.js";
-import { FUENTES } from "./fuente.js";
+import { FUENTES, AMBOS } from "./fuente.js";
 
 // cada grupo juega con las fichas de una fuente o de "ambos" (mezcladas); los grupos de antes de que hubiera varias son del Bontrager
 const fuenteDe = (g) => g.fuente || "bontrager";
-const nombreFuente = (id) => (id === "ambos" ? "los dos libros" : `el ${FUENTES.find((f) => f.id === id)?.nombre || id}`);
+const nombreFuente = (id) => (id === "ambos" ? "todas las fuentes" : `el ${FUENTES.find((f) => f.id === id)?.nombre || id}`);
 const avisoOtraFuente = (g) => `<div class="jg-hecho"><b>Este grupo usa ${esc(nombreFuente(fuenteDe(g)))}</b><small>Ahora estás consultando ${esc(nombreFuente(libroJuego))}. Para jugar, cambiá de fuente.</small></div>
-  <button class="rp-empezar jg-centro" data-fuente="${esc(fuenteDe(g))}">${fuenteDe(g) === "ambos" ? "Cambiar a Ambos" : `Cambiar al ${esc(FUENTES.find((f) => f.id === fuenteDe(g))?.nombre || fuenteDe(g))}`}</button>`;
+  <button class="rp-empezar jg-centro" data-fuente="${esc(fuenteDe(g))}">${fuenteDe(g) === "ambos" ? `Cambiar a ${esc(AMBOS.nombre)}` : `Cambiar al ${esc(FUENTES.find((f) => f.id === fuenteDe(g))?.nombre || fuenteDe(g))}`}</button>`;
 
 let rerender = () => {};
 const local = (() => { try { return localStorage; } catch { return null; } })();
@@ -144,7 +144,7 @@ function vistaCuenta() {
 function vistaListaGrupos() {
   const c = dato("grupos", () => nube.misGrupos());
   const cuerpo = c.error ? `<div class="vacio">${esc(c.error)}</div>` : !c.ok ? `<div class="vacio">Cargando…</div>`
-    : c.datos.length ? `<div class="jg-lista">${c.datos.map((g) => `<a class="jg-tarjeta" href="#juegos-grupo-${esc(g.id)}"><span><b>${esc(g.nombre)}</b><small>${g.fichas.length} enfoques · ${esc(fuenteDe(g) === "ambos" ? "Ambos" : FUENTES.find((f) => f.id === fuenteDe(g))?.nombre || fuenteDe(g))} · código ${esc(g.codigo)}</small></span>${icono.chev}</a>`).join("")}</div>`
+    : c.datos.length ? `<div class="jg-lista">${c.datos.map((g) => `<a class="jg-tarjeta" href="#juegos-grupo-${esc(g.id)}"><span><b>${esc(g.nombre)}</b><small>${g.fichas.length} enfoques · ${esc(fuenteDe(g) === "ambos" ? AMBOS.nombre : FUENTES.find((f) => f.id === fuenteDe(g))?.nombre || fuenteDe(g))} · código ${esc(g.codigo)}</small></span>${icono.chev}</a>`).join("")}</div>`
     : `<div class="vacio"><b>Todavía no estás en ningún grupo.</b> Creá uno e invitá a tus compañeros, o unite con el código que te pasaron.</div>`;
   return cabecera({ titulo: "Grupos", sub: nube.estado().perfil?.apodo, atras: "#juegos", derecha: `<a class="ico" href="#juegos-cuenta" aria-label="Tu cuenta">${icono.ajustes}</a>` }) + `
   <main class="wrap juegos">

@@ -141,11 +141,13 @@ export function vistaFamilia(f) {
   <main class="wrap" style="--c:${f.color}">
     ${conLista.map(({ g, lista }) => `<details class="sec region" data-parte="${esc(g.id)}"${abiertas.has(g.id) ? " open" : ""}><summary><span class="t">${esc(g.nombre)}</span><span class="s">${lista.length}</span>${icono.chev}</summary>
       <div class="lista">${lista.map(fila).join("")}</div></details>`).join("")}
-    ${otros ? "" : `<div class="vacio">Cargando el otro libro…</div>`}
+    ${otros ? "" : `<div class="vacio">Cargando las otras fuentes…</div>`}
   </main>` + barraPestanas("enfoques");
 }
 
 const todos = () => true;
+// "Bontrager, Merrill y Enfoques UY"
+const lista = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} y ${xs.at(-1)}` : xs.join(""));
 
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha
 
@@ -172,11 +174,11 @@ export function vistaPortada() {
   </main>`;
 }
 
-// interruptor de la portada: un libro, "Ambos" en el medio y el otro libro
-const opcionesLibro = () => { const l = FUENTES.filter((f) => f.lista); return l.length > 1 ? [l[0], AMBOS, ...l.slice(1)] : l; };
+// interruptor de la portada: cada fuente y, al final, "Todos" (las tres mezcladas)
+const opcionesLibro = () => { const l = FUENTES.filter((f) => f.lista); return l.length > 1 ? [...l, AMBOS] : l; };
 
 // botones para elegir la fuente (al entrar y en Ajustes); las que todavía no tienen fichas aparecen "en preparación"
-const botonesFuente = () => [...FUENTES, { ...AMBOS, detalle: "Los dos libros juntos en el menú y el buscador, cada enfoque con su etiqueta", lista: true }].map((f) => {
+const botonesFuente = () => [...FUENTES, { ...AMBOS, detalle: "Todas las fuentes juntas en el menú, el buscador y los juegos, cada enfoque con su etiqueta", lista: true }].map((f) => {
   const on = elegida() && f.id === (ambos() ? "ambos" : fuenteId);
   return `<button class="fuente-op${on ? " on" : ""}" data-fuente="${f.id}" ${f.lista ? "" : "disabled"} aria-pressed="${on}">
     <b>${esc(f.nombre)}</b><small>${esc(f.detalle)}</small>${f.lista ? "" : "<em>En preparación</em>"}</button>`;
@@ -244,7 +246,7 @@ export function vistaInicio() {
         <a class="acceso" href="#calc">${icono.calc}<span>Calculadora de técnica</span></a>
       </div>
       ${menuRegiones(todos)}`}
-    <p class="pie">${ambos() ? `${proyecciones.length + (gruposOtros() || []).reduce((n, g) => n + g.lista.length, 0)} proyecciones · Fuentes: ${FUENTES.filter((f) => f.lista).map((f) => esc(f.nombre)).join(" y ")}` : `${proyecciones.length} proyecciones · ${regiones.length} regiones · Fuente: ${esc(FUENTE.corto)}`}</p>
+    <p class="pie">${ambos() ? `${proyecciones.length + (gruposOtros() || []).reduce((n, g) => n + g.lista.length, 0)} proyecciones · Fuentes: ${lista(FUENTES.filter((f) => f.lista).map((f) => esc(f.nombre)))}` : `${proyecciones.length} proyecciones · ${regiones.length} regiones · Fuente: ${esc(FUENTE.corto)}`}</p>
   </main>` + barraPestanas("enfoques");
 }
 

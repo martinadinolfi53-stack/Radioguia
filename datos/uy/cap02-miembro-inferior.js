@@ -41,7 +41,7 @@ export default {
       "categoria": [
         "AP"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -89,66 +89,13 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "dedos-pie-lateral",
-      "region": "dedos-pie",
-      "nombre": "Lateral de dedos del pie (mediolateral o lateromedial)",
-      "categoria": [
-        "Perfil"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular penetrando por la articulación IF del dedo gordo o por la articulación IFP de los otros dedos."
-      },
-      "posicion": [
-        "Se hace al paciente tumbarse en posición de decúbito lateral sobre el lado no afectado.",
-        "1.er y 2.º dedo: se coloca al paciente en decúbito lateral poniendo el lado medial sobre la mesa. 3.er, 4.º y 5.º dedo: apoya el lado lateral sobre la mesa radiográfica."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Falanges en su totalidad y parte distal de los metatarsianos."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Las falanges de perfil.",
-            "Las falanges sin la superposición de los dedos adyacentes.",
-            "Los espacios articulares IF abiertos.",
-            "Las articulaciones MTF quedarían superpuestas, pero resultan visibles en algunos pacientes."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          119,
-          120
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/dedos-pie-lateral.webp",
-        "alt": "Fotos de posición y resultado: Lateral de dedos del pie (mediolateral o lateromedial)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "dedos-pie-oblicua",
       "region": "dedos-pie",
       "nombre": "Oblicua AP de dedos del pie (rotación medial)",
       "categoria": [
         "Oblicuas"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -198,13 +145,13 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "pie-lateral",
-      "region": "pie",
-      "nombre": "Lateral de pie en decúbito (mediolateral)",
+      "id": "dedos-pie-lateral",
+      "region": "dedos-pie",
+      "nombre": "Lateral de dedos del pie (mediolateral o lateromedial)",
       "categoria": [
         "Perfil"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -214,51 +161,50 @@ export default {
       },
       "rc": {
         "direccion": "perpendicular",
-        "texto": "Perpendicular a la base del tercer metatarsiano."
+        "texto": "Perpendicular penetrando por la articulación IF del dedo gordo o por la articulación IFP de los otros dedos."
       },
       "posicion": [
-        "Se coloca al paciente tumbado sobre la mesa radiográfica y se le gira hacia el lado afectado hasta que la pierna y el pie queden en lateral.",
-        "Se coloca la pierna contraria detrás del paciente.",
-        "Se realiza una flexión dorsal (dorsiflexión) del pie para que forme un ángulo de 90° con la parte inferior de la pierna."
+        "Se hace al paciente tumbarse en posición de decúbito lateral sobre el lado no afectado.",
+        "1.er y 2.º dedo: se coloca al paciente en decúbito lateral poniendo el lado medial sobre la mesa. 3.er, 4.º y 5.º dedo: apoya el lado lateral sobre la mesa radiográfica."
       ],
       "criterios": [
         [
           "Región a incluir",
           [
-            "Todo el pie de perfil, la articulación del tobillo y los extremos distales de tibia y peroné."
+            "Falanges en su totalidad y parte distal de los metatarsianos."
           ]
         ],
         [
           "Criterios de evaluación",
           [
-            "Los metatarsianos casi superpuestos entre sí.",
-            "La zona distal de la pierna.",
-            "El peroné superpuesto a la parte posterior de la pierna.",
-            "La articulación tibioastragalina."
+            "Las falanges de perfil.",
+            "Las falanges sin la superposición de los dedos adyacentes.",
+            "Los espacios articulares IF abiertos.",
+            "Las articulaciones MTF quedarían superpuestas, pero resultan visibles en algunos pacientes."
           ]
         ]
       ],
       "fuente": {
         "paginas": [
-          123,
-          124
+          119,
+          120
         ]
       },
       "ilustracion": {
-        "src": "ilustraciones/uy/pie-lateral.webp",
-        "alt": "Fotos de posición y resultado: Lateral de pie en decúbito (mediolateral)",
+        "src": "ilustraciones/uy/dedos-pie-lateral.webp",
+        "alt": "Fotos de posición y resultado: Lateral de dedos del pie (mediolateral o lateromedial)",
         "verificada": true
       },
       "estado": "pendiente-revision"
     },
     {
-      "id": "pie-oblicua-lateral",
+      "id": "pie-ap",
       "region": "pie",
-      "nombre": "Oblicua AP de pie (rotación lateral)",
+      "nombre": "AP de pie",
       "categoria": [
-        "Oblicuas"
+        "AP"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -267,39 +213,39 @@ export default {
         "tecnica": "Homogeneizada"
       },
       "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la base del tercer metatarsiano."
+        "direccion": "caudal",
+        "texto": "10° hacia el talón entrando por la base del tercer metatarsiano.",
+        "angulo": "10°"
       },
       "posicion": [
-        "Se coloca al paciente tumbado sobre la mesa radiográfica y se le gira hacia el lado afectado hasta que la pierna y el pie queden en lateral.",
-        "Se coloca la pierna contraria detrás del paciente.",
-        "Apoyar toda la superficie plantar sobre el RI y rotar la pierna del paciente en sentido lateral hasta que la superficie plantar forme un ángulo de 30° con el plano del RI."
+        "Se coloca al paciente en decúbito supino y se flexiona la rodilla del lado afectado para que apoye la planta del pie sobre la mesa.",
+        "Apoyar toda la superficie plantar sobre el RI y este estará centrado en la base del tercer metatarsiano."
       ],
       "criterios": [
         [
           "Región a incluir",
           [
-            "Todo el pie de perfil, la articulación del tobillo y los extremos distales de tibia y peroné."
+            "Desde falanges distales hasta retropié y partes blandas adyacentes."
           ]
         ],
         [
           "Criterios de evaluación",
           [
-            "Las bases de los metatarsianos primero y segundo separadas.",
-            "Ausencia de superposición entre las cuñas medial e intermedia.",
-            "Se demuestra mejor el escafoides que en una rotación medial."
+            "Ausencia de rotación del pie.",
+            "Superposición de las bases de los metatarsianos segundo al quinto.",
+            "Apertura del espacio articular entre las cuñas medial e intermedia."
           ]
         ]
       ],
       "fuente": {
         "paginas": [
-          125,
-          126
+          129,
+          130
         ]
       },
       "ilustracion": {
-        "src": "ilustraciones/uy/pie-oblicua-lateral.webp",
-        "alt": "Fotos de posición y resultado: Oblicua AP de pie (rotación lateral)",
+        "src": "ilustraciones/uy/pie-ap.webp",
+        "alt": "Fotos de posición y resultado: AP de pie",
         "verificada": true
       },
       "estado": "pendiente-revision"
@@ -311,7 +257,7 @@ export default {
       "categoria": [
         "Oblicuas"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -361,13 +307,13 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "pie-ap",
+      "id": "pie-lateral",
       "region": "pie",
-      "nombre": "AP de pie",
+      "nombre": "Lateral de pie en decúbito (mediolateral)",
       "categoria": [
-        "AP"
+        "Perfil"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -376,39 +322,476 @@ export default {
         "tecnica": "Homogeneizada"
       },
       "rc": {
-        "direccion": "caudal",
-        "texto": "10° hacia el talón entrando por la base del tercer metatarsiano.",
-        "angulo": "10°"
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la base del tercer metatarsiano."
       },
       "posicion": [
-        "Se coloca al paciente en decúbito supino y se flexiona la rodilla del lado afectado para que apoye la planta del pie sobre la mesa.",
-        "Apoyar toda la superficie plantar sobre el RI y este estará centrado en la base del tercer metatarsiano."
+        "Se coloca al paciente tumbado sobre la mesa radiográfica y se le gira hacia el lado afectado hasta que la pierna y el pie queden en lateral.",
+        "Se coloca la pierna contraria detrás del paciente.",
+        "Se realiza una flexión dorsal (dorsiflexión) del pie para que forme un ángulo de 90° con la parte inferior de la pierna."
       ],
       "criterios": [
         [
           "Región a incluir",
           [
-            "Desde falanges distales hasta retropié y partes blandas adyacentes."
+            "Todo el pie de perfil, la articulación del tobillo y los extremos distales de tibia y peroné."
           ]
         ],
         [
           "Criterios de evaluación",
           [
-            "Ausencia de rotación del pie.",
-            "Superposición de las bases de los metatarsianos segundo al quinto.",
-            "Apertura del espacio articular entre las cuñas medial e intermedia."
+            "Los metatarsianos casi superpuestos entre sí.",
+            "La zona distal de la pierna.",
+            "El peroné superpuesto a la parte posterior de la pierna.",
+            "La articulación tibioastragalina."
           ]
         ]
       ],
       "fuente": {
         "paginas": [
-          129,
-          130
+          123,
+          124
         ]
       },
       "ilustracion": {
-        "src": "ilustraciones/uy/pie-ap.webp",
-        "alt": "Fotos de posición y resultado: AP de pie",
+        "src": "ilustraciones/uy/pie-lateral.webp",
+        "alt": "Fotos de posición y resultado: Lateral de pie en decúbito (mediolateral)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "calcaneo-axial-plantodorsal",
+      "region": "calcaneo",
+      "nombre": "Axial plantodorsal de calcáneo",
+      "categoria": [
+        "Axiales"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "cefálico",
+        "texto": "Angulación cefálica de 40° entrando a través de la base del 3.er metatarsiano.",
+        "angulo": "40°"
+      },
+      "posicion": [
+        "Paciente en decúbito supino o en sedestación con las piernas lo más extendidas posibles.",
+        "Se coloca una tira de gasa larga alrededor de la zona convexa de la cabeza de los metatarsianos.",
+        "Se indica al paciente que tire de la gasa con el fin de mantener el tobillo en una flexión dorsal."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Todo el calcáneo en su extensión y mediopié."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "El calcáneo y la articulación subastragalina.",
+            "Ausencia de rotación del calcáneo (no se proyectan el 1.º o el 5.º metatarsiano).",
+            "La parte anterior del calcáneo sin una densidad excesiva en la parte posterior."
+          ]
+        ]
+      ],
+      "notas": [
+        "En el cuaderno la región a incluir y el rayo central están escritos en la fila cambiada; acá van cada uno en su lugar."
+      ],
+      "fuente": {
+        "paginas": [
+          139,
+          140
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/calcaneo-axial-plantodorsal.webp",
+        "alt": "Fotos de posición y resultado: Axial plantodorsal de calcáneo",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "calcaneo-lateral",
+      "region": "calcaneo",
+      "nombre": "Lateral de calcáneo (mediolateral)",
+      "categoria": [
+        "Perfil"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular al calcáneo. Se centra aprox. 2,5 cm distal al maléolo medial. El rayo pasa por la articulación subastragalina."
+      },
+      "posicion": [
+        "Paciente en decúbito supino girado hacia el lado afectado hasta que la pierna quede aproximadamente en lateral.",
+        "Se ajusta el calcáneo en el centro del RI.",
+        "Se ajusta el RI de forma que su eje longitudinal sea paralelo a la superficie plantar del talón."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Todo el calcáneo en su extensión y mediopié.",
+            "(En el cuaderno este texto está escrito en la fila del RC y el del RC en la de región; acá van en su lugar.)"
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Ausencia de rotación del calcáneo.",
+            "La densidad del sustentaculum tali, de la tuberosidad tibial y de las partes blandas.",
+            "El seno del tarso.",
+            "La articulación del tobillo y los huesos del tarso adyacentes."
+          ]
+        ]
+      ],
+      "notas": [
+        "Para DC espina calcánea puede hacerse bilateral para la comparación o no."
+      ],
+      "fuente": {
+        "paginas": [
+          143,
+          144
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/calcaneo-lateral.webp",
+        "alt": "Fotos de posición y resultado: Lateral de calcáneo (mediolateral)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "tobillo-ap",
+      "region": "tobillo",
+      "nombre": "AP de tobillo",
+      "categoria": [
+        "AP"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a través de la articulación del tobillo y por un punto a medio camino entre ambos maléolos."
+      },
+      "posicion": [
+        "Se coloca al paciente en decúbito supino con el miembro afectado completamente extendido.",
+        "Se rota medialmente el pie aprox. 15° para desplegar la mortaja."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Articulación del tobillo, extremos distales de la tibia y peroné y la parte proximal del astrágalo."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "El espacio articular tibioastragalino.",
+            "Los maléolos medial y lateral.",
+            "Ausencia de superposición de la articulación astragalomaleolar."
+          ]
+        ]
+      ],
+      "notas": [
+        "El F de tobillo se realiza con una rotación medial de 15°; el frente estricto es solicitado específicamente."
+      ],
+      "fuente": {
+        "paginas": [
+          149,
+          150
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/tobillo-ap.webp",
+        "alt": "Fotos de posición y resultado: AP de tobillo",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "tobillo-oblicuas",
+      "region": "tobillo",
+      "nombre": "AP oblicuas de tobillo (rotación medial y lateral)",
+      "categoria": [
+        "Oblicuas"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular en un punto al centro de los maléolos."
+      },
+      "posicion": [
+        "Se sienta al paciente sobre la mesa radiográfica con la pierna afectada extendida.",
+        "Se coloca la superficie plantar del pie del paciente en posición vertical y se rotan en sentido lateral o medial la pierna y el pie 45°."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Tercio distal de tibia y peroné, astrágalo y huesos del tarso superpuestos."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Lateral: la articulación subastragalina; el surco calcáneo (parte superior del calcáneo).",
+            "Medial: toda la articulación de la mortaja del tobillo; el espacio articular peroneoastragalino de perfil."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          155,
+          156
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/tobillo-oblicuas.webp",
+        "alt": "Fotos de posición y resultado: AP oblicuas de tobillo (rotación medial y lateral)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "tobillo-lateral",
+      "region": "tobillo",
+      "nombre": "Lateral de tobillo (mediolateral)",
+      "categoria": [
+        "Perfil"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular al maléolo medial."
+      },
+      "posicion": [
+        "Se coloca al paciente en posición de decúbito supino girado hacia el lado afectado hasta que el tobillo se sitúe en lateral.",
+        "Se flexiona dorsalmente el pie y se le ajusta en posición lateral.",
+        "Se requiere dorsiflexión para evitar la rotación lateral del tobillo."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Tercio inferior de tibia y peroné, articulación del tobillo y los huesos del tarso incluyendo la base del quinto."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "El peroné sobre la mitad posterior de la tibia.",
+            "Debe poder verse el 5.º metatarsiano para descartar fractura de Jones.",
+            "La articulación tibioastragalina bien visualizada con las cúpulas astragalinas medial y lateral superpuestas entre sí."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          151,
+          152
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/tobillo-lateral.webp",
+        "alt": "Fotos de posición y resultado: Lateral de tobillo (mediolateral)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "pierna-ap",
+      "region": "pierna",
+      "nombre": "AP de pierna",
+      "categoria": [
+        "AP"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "35 × 43 cm",
+        "dfri": "1 m / 1,20 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular al centro de la pierna."
+      },
+      "posicion": [
+        "Se coloca al paciente en posición de decúbito supino sobre la mesa.",
+        "Se ajusta el cuerpo del paciente de forma que la pelvis no esté rotada.",
+        "Ajustar los cóndilos paralelos al RI.",
+        "Se flexiona el tobillo para que el pie quede en una posición vertical.",
+        "Rotación interna de pie 15°."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Articulación del tobillo, articulación de la rodilla, tibia, peroné y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Ambas articulaciones en proyección AP y sin rotación.",
+            "La zona media diafisaria del peroné libre de superposición tibial."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          175,
+          176
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/pierna-ap.webp",
+        "alt": "Fotos de posición y resultado: AP de pierna",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "pierna-lateral",
+      "region": "pierna",
+      "nombre": "Lateral de pierna (mediolateral)",
+      "categoria": [
+        "Perfil"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "35 × 43 cm",
+        "dfri": "1 m / 1,20 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular al punto central de la pierna."
+      },
+      "posicion": [
+        "Se coloca al paciente en posición de decúbito supino sobre la mesa.",
+        "Se gira al paciente hacia el lado afectado con la pierna sobre el RI.",
+        "Se ajusta la rotación del cuerpo para situar la rótula y los cóndilos perpendicular al RI.",
+        "Se puede flexionar la rodilla si ayuda a lograr la posición."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Articulación del tobillo, articulación de la rodilla, tibia, peroné y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "El peroné distal superpuesto a la mitad posterior de la tibia.",
+            "Separación moderada de cuerpo o diáfisis de tibia y peroné excepto en los extremos articulares.",
+            "Las articulaciones sin rotación.",
+            "Ambas articulaciones en una o más imágenes."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          177,
+          178
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/pierna-lateral.webp",
+        "alt": "Fotos de posición y resultado: Lateral de pierna (mediolateral)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "pie-oblicua-lateral",
+      "region": "pie",
+      "nombre": "Oblicua AP de pie (rotación lateral)",
+      "categoria": [
+        "Oblicuas"
+      ],
+      "tipo": "E",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la base del tercer metatarsiano."
+      },
+      "posicion": [
+        "Se coloca al paciente tumbado sobre la mesa radiográfica y se le gira hacia el lado afectado hasta que la pierna y el pie queden en lateral.",
+        "Se coloca la pierna contraria detrás del paciente.",
+        "Apoyar toda la superficie plantar sobre el RI y rotar la pierna del paciente en sentido lateral hasta que la superficie plantar forme un ángulo de 30° con el plano del RI."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Todo el pie de perfil, la articulación del tobillo y los extremos distales de tibia y peroné."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Las bases de los metatarsianos primero y segundo separadas.",
+            "Ausencia de superposición entre las cuñas medial e intermedia.",
+            "Se demuestra mejor el escafoides que en una rotación medial."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          125,
+          126
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/pie-oblicua-lateral.webp",
+        "alt": "Fotos de posición y resultado: Oblicua AP de pie (rotación lateral)",
         "verificada": true
       },
       "estado": "pendiente-revision"
@@ -421,7 +804,7 @@ export default {
         "Tangenciales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Lewis y Holly",
       "factores": {
         "ri": "24 × 30 cm",
@@ -479,7 +862,7 @@ export default {
         "Axiales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Causton",
       "factores": {
         "ri": "24 × 30 cm",
@@ -533,7 +916,7 @@ export default {
         "AP",
         "Axiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": null,
         "dfri": "1,20 m",
@@ -590,7 +973,7 @@ export default {
       "categoria": [
         "Perfil"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": null,
         "dfri": "1 m",
@@ -636,70 +1019,13 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "calcaneo-axial-plantodorsal",
-      "region": "calcaneo",
-      "nombre": "Axial plantodorsal de calcáneo",
-      "categoria": [
-        "Axiales"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "cefálico",
-        "texto": "Angulación cefálica de 40° entrando a través de la base del 3.er metatarsiano.",
-        "angulo": "40°"
-      },
-      "posicion": [
-        "Paciente en decúbito supino o en sedestación con las piernas lo más extendidas posibles.",
-        "Se coloca una tira de gasa larga alrededor de la zona convexa de la cabeza de los metatarsianos.",
-        "Se indica al paciente que tire de la gasa con el fin de mantener el tobillo en una flexión dorsal."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Todo el calcáneo en su extensión y mediopié."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "El calcáneo y la articulación subastragalina.",
-            "Ausencia de rotación del calcáneo (no se proyectan el 1.º o el 5.º metatarsiano).",
-            "La parte anterior del calcáneo sin una densidad excesiva en la parte posterior."
-          ]
-        ]
-      ],
-      "notas": [
-        "En el cuaderno la región a incluir y el rayo central están escritos en la fila cambiada; acá van cada uno en su lugar."
-      ],
-      "fuente": {
-        "paginas": [
-          139,
-          140
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/calcaneo-axial-plantodorsal.webp",
-        "alt": "Fotos de posición y resultado: Axial plantodorsal de calcáneo",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "calcaneo-axial-dorsoplantar",
       "region": "calcaneo",
       "nombre": "Axial dorsoplantar de calcáneo",
       "categoria": [
         "Axiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -748,64 +1074,6 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "calcaneo-lateral",
-      "region": "calcaneo",
-      "nombre": "Lateral de calcáneo (mediolateral)",
-      "categoria": [
-        "Perfil"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular al calcáneo. Se centra aprox. 2,5 cm distal al maléolo medial. El rayo pasa por la articulación subastragalina."
-      },
-      "posicion": [
-        "Paciente en decúbito supino girado hacia el lado afectado hasta que la pierna quede aproximadamente en lateral.",
-        "Se ajusta el calcáneo en el centro del RI.",
-        "Se ajusta el RI de forma que su eje longitudinal sea paralelo a la superficie plantar del talón."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Todo el calcáneo en su extensión y mediopié.",
-            "(En el cuaderno este texto está escrito en la fila del RC y el del RC en la de región; acá van en su lugar.)"
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Ausencia de rotación del calcáneo.",
-            "La densidad del sustentaculum tali, de la tuberosidad tibial y de las partes blandas.",
-            "El seno del tarso.",
-            "La articulación del tobillo y los huesos del tarso adyacentes."
-          ]
-        ]
-      ],
-      "notas": [
-        "Para DC espina calcánea puede hacerse bilateral para la comparación o no."
-      ],
-      "fuente": {
-        "paginas": [
-          143,
-          144
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/calcaneo-lateral.webp",
-        "alt": "Fotos de posición y resultado: Lateral de calcáneo (mediolateral)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "subastragalina-isherwood-oblicua",
       "region": "calcaneo",
       "nombre": "Subastragalina: oblicua lateromedial (rotación medial)",
@@ -813,7 +1081,7 @@ export default {
         "Oblicuas",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Isherwood",
       "factores": {
         "ri": "24 × 30 cm",
@@ -869,7 +1137,7 @@ export default {
         "Oblicuas",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Isherwood",
       "factores": {
         "ri": "24 × 30 cm",
@@ -919,114 +1187,6 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "tobillo-ap",
-      "region": "tobillo",
-      "nombre": "AP de tobillo",
-      "categoria": [
-        "AP"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a través de la articulación del tobillo y por un punto a medio camino entre ambos maléolos."
-      },
-      "posicion": [
-        "Se coloca al paciente en decúbito supino con el miembro afectado completamente extendido.",
-        "Se rota medialmente el pie aprox. 15° para desplegar la mortaja."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Articulación del tobillo, extremos distales de la tibia y peroné y la parte proximal del astrágalo."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "El espacio articular tibioastragalino.",
-            "Los maléolos medial y lateral.",
-            "Ausencia de superposición de la articulación astragalomaleolar."
-          ]
-        ]
-      ],
-      "notas": [
-        "El F de tobillo se realiza con una rotación medial de 15°; el frente estricto es solicitado específicamente."
-      ],
-      "fuente": {
-        "paginas": [
-          149,
-          150
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/tobillo-ap.webp",
-        "alt": "Fotos de posición y resultado: AP de tobillo",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "tobillo-lateral",
-      "region": "tobillo",
-      "nombre": "Lateral de tobillo (mediolateral)",
-      "categoria": [
-        "Perfil"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular al maléolo medial."
-      },
-      "posicion": [
-        "Se coloca al paciente en posición de decúbito supino girado hacia el lado afectado hasta que el tobillo se sitúe en lateral.",
-        "Se flexiona dorsalmente el pie y se le ajusta en posición lateral.",
-        "Se requiere dorsiflexión para evitar la rotación lateral del tobillo."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Tercio inferior de tibia y peroné, articulación del tobillo y los huesos del tarso incluyendo la base del quinto."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "El peroné sobre la mitad posterior de la tibia.",
-            "Debe poder verse el 5.º metatarsiano para descartar fractura de Jones.",
-            "La articulación tibioastragalina bien visualizada con las cúpulas astragalinas medial y lateral superpuestas entre sí."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          151,
-          152
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/tobillo-lateral.webp",
-        "alt": "Fotos de posición y resultado: Lateral de tobillo (mediolateral)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "tobillo-carga",
       "region": "tobillo",
       "nombre": "AP y lateral de tobillo en carga",
@@ -1034,7 +1194,7 @@ export default {
         "AP",
         "Perfil"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1082,57 +1242,6 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "tobillo-oblicuas",
-      "region": "tobillo",
-      "nombre": "AP oblicuas de tobillo (rotación medial y lateral)",
-      "categoria": [
-        "Oblicuas"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular en un punto al centro de los maléolos."
-      },
-      "posicion": [
-        "Se sienta al paciente sobre la mesa radiográfica con la pierna afectada extendida.",
-        "Se coloca la superficie plantar del pie del paciente en posición vertical y se rotan en sentido lateral o medial la pierna y el pie 45°."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Tercio distal de tibia y peroné, astrágalo y huesos del tarso superpuestos."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Lateral: la articulación subastragalina; el surco calcáneo (parte superior del calcáneo).",
-            "Medial: toda la articulación de la mortaja del tobillo; el espacio articular peroneoastragalino de perfil."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          155,
-          156
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/tobillo-oblicuas.webp",
-        "alt": "Fotos de posición y resultado: AP oblicuas de tobillo (rotación medial y lateral)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "tobillo-estres",
       "region": "tobillo",
       "nombre": "Tobillo en estrés: inversión y eversión",
@@ -1140,7 +1249,7 @@ export default {
         "AP",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1186,7 +1295,7 @@ export default {
         "Oblicuas",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Slomann",
       "factores": {
         "ri": "24 × 30 cm",
@@ -1245,7 +1354,7 @@ export default {
         "Oblicuas",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1289,7 +1398,7 @@ export default {
         "Axiales",
         "Tangenciales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1338,7 +1447,7 @@ export default {
         "AP",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1384,7 +1493,7 @@ export default {
         "Oblicuas",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Broden",
       "factores": {
         "ri": "24 × 30 cm",
@@ -1438,7 +1547,7 @@ export default {
         "Axiales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Proyección de Harris",
       "factores": {
         "ri": "24 × 30 cm",
@@ -1491,7 +1600,7 @@ export default {
       "categoria": [
         "Axiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1549,7 +1658,7 @@ export default {
         "Axiales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Enfoque de Saltzman",
       "factores": {
         "ri": "24 × 30 cm",
@@ -1601,122 +1710,13 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "pierna-ap",
-      "region": "pierna",
-      "nombre": "AP de pierna",
-      "categoria": [
-        "AP"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "35 × 43 cm",
-        "dfri": "1 m / 1,20 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular al centro de la pierna."
-      },
-      "posicion": [
-        "Se coloca al paciente en posición de decúbito supino sobre la mesa.",
-        "Se ajusta el cuerpo del paciente de forma que la pelvis no esté rotada.",
-        "Ajustar los cóndilos paralelos al RI.",
-        "Se flexiona el tobillo para que el pie quede en una posición vertical.",
-        "Rotación interna de pie 15°."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Articulación del tobillo, articulación de la rodilla, tibia, peroné y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Ambas articulaciones en proyección AP y sin rotación.",
-            "La zona media diafisaria del peroné libre de superposición tibial."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          175,
-          176
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/pierna-ap.webp",
-        "alt": "Fotos de posición y resultado: AP de pierna",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "pierna-lateral",
-      "region": "pierna",
-      "nombre": "Lateral de pierna (mediolateral)",
-      "categoria": [
-        "Perfil"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "35 × 43 cm",
-        "dfri": "1 m / 1,20 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular al punto central de la pierna."
-      },
-      "posicion": [
-        "Se coloca al paciente en posición de decúbito supino sobre la mesa.",
-        "Se gira al paciente hacia el lado afectado con la pierna sobre el RI.",
-        "Se ajusta la rotación del cuerpo para situar la rótula y los cóndilos perpendicular al RI.",
-        "Se puede flexionar la rodilla si ayuda a lograr la posición."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Articulación del tobillo, articulación de la rodilla, tibia, peroné y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "El peroné distal superpuesto a la mitad posterior de la tibia.",
-            "Separación moderada de cuerpo o diáfisis de tibia y peroné excepto en los extremos articulares.",
-            "Las articulaciones sin rotación.",
-            "Ambas articulaciones en una o más imágenes."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          177,
-          178
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/pierna-lateral.webp",
-        "alt": "Fotos de posición y resultado: Lateral de pierna (mediolateral)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "pierna-oblicuas",
       "region": "pierna",
       "nombre": "AP oblicuas de pierna (rotación medial y lateral)",
       "categoria": [
         "Oblicuas"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "35 × 43 cm",
         "dfri": "1 m / 1,20 m",

@@ -71,7 +71,7 @@ export default {
       "categoria": [
         "PA"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -118,13 +118,65 @@ export default {
       "estado": "pendiente-revision"
     },
     {
+      "id": "dedos-oblicua-pa",
+      "region": "dedos-mano",
+      "nombre": "Oblicua PA de dedos (rotación lateral)",
+      "categoria": [
+        "Oblicuas"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la articulación IF proximal del dedo afectado."
+      },
+      "posicion": [
+        "Paciente sentado en el extremo de la mesa con todas las articulaciones de hombro, codo y muñeca a la misma altura.",
+        "Se rota la mano externamente hasta que los dedos queden separados y apoyados sobre una cuña de esponja a 45° o sin cuña."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Desde la cabeza del MC hasta la falange distal y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Todo el dedo rotado a 45° incluyendo la parte distal del MC correspondiente.",
+            "Ausencia de superposición de dedos adyacentes.",
+            "Espacios articulares IF y MCF abiertos."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          11,
+          12
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/dedos-oblicua-pa.webp",
+        "alt": "Fotos de posición y resultado: Oblicua PA de dedos (rotación lateral)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
       "id": "dedos-perfil",
       "region": "dedos-mano",
       "nombre": "Perfil de dedos (2.º a 5.º)",
       "categoria": [
         "Perfil"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -180,7 +232,7 @@ export default {
         "Perfil",
         "Oblicuas"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -230,120 +282,13 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "pulgar-cmc-robert",
-      "region": "pulgar",
-      "nombre": "Primera articulación CMC",
-      "categoria": [
-        "AP",
-        "Métodos especiales"
-      ],
-      "tipo": null,
-      "metodo": "Método de Robert y modificación de Long y Rafert",
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "variable",
-        "texto": "Método de Robert: perpendicular a la 1.ª articulación CMC. Modificación: 15° proximal pasando por la articulación CMC."
-      },
-      "posicion": [
-        "Paciente sentado en el extremo de la mesa con todas las articulaciones de hombro, codo y muñeca a la misma altura.",
-        "Miembro extendido sobre la mesa, rotación interna situando la parte posterior del pulgar sobre el RI y mano hiperextendida de forma que las partes blandas de la zona cubital no ocultan la articulación CMC."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Región del carpo (trapecio)."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Articulación CMC del pulgar libre.",
-            "Simetría de los lados cóncavos de las falanges y MTC.",
-            "Articulaciones CMC y MCF abiertas.",
-            "Superposición de eminencia hipotenar."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          9,
-          10
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/pulgar-cmc-robert.webp",
-        "alt": "Fotos de posición y resultado: Primera articulación CMC",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "dedos-oblicua-pa",
-      "region": "dedos-mano",
-      "nombre": "Oblicua PA de dedos (rotación lateral)",
-      "categoria": [
-        "Oblicuas"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la articulación IF proximal del dedo afectado."
-      },
-      "posicion": [
-        "Paciente sentado en el extremo de la mesa con todas las articulaciones de hombro, codo y muñeca a la misma altura.",
-        "Se rota la mano externamente hasta que los dedos queden separados y apoyados sobre una cuña de esponja a 45° o sin cuña."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Desde la cabeza del MC hasta la falange distal y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Todo el dedo rotado a 45° incluyendo la parte distal del MC correspondiente.",
-            "Ausencia de superposición de dedos adyacentes.",
-            "Espacios articulares IF y MCF abiertos."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          11,
-          12
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/dedos-oblicua-pa.webp",
-        "alt": "Fotos de posición y resultado: Oblicua PA de dedos (rotación lateral)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "mano-pa",
       "region": "mano",
       "nombre": "PA de mano",
       "categoria": [
         "PA"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -402,7 +347,7 @@ export default {
       "categoria": [
         "Oblicuas"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -456,7 +401,7 @@ export default {
       "categoria": [
         "Perfil"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -503,67 +448,13 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "mano-norgaard",
-      "region": "mano",
-      "nombre": "AP oblicua de ambas manos (rotación medial)",
-      "categoria": [
-        "Oblicuas",
-        "Métodos especiales"
-      ],
-      "tipo": null,
-      "metodo": "Método de Norgaard",
-      "factores": {
-        "ri": "24 × 30 cm transversal",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a un punto a mitad de camino entre ambas manos a la altura de las articulaciones MCF para ambas posiciones."
-      },
-      "posicion": [
-        "Paciente sentado en el extremo de la mesa.",
-        "Se hace que el paciente coloque las palmas de las manos juntas, se rotan las manos del paciente hacia una posición de semisupinación (45°).",
-        "Se extienden los dedos del paciente y se abducen los pulgares."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Ambas manos desde radio y cúbito distales hasta falanges distales, incluidas partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Ambas manos desde la zona del carpo hasta la punta de los dedos.",
-            "Cabezas de los metacarpianos libres de superposición."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          19,
-          20
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/mano-norgaard.webp",
-        "alt": "Fotos de posición y resultado: AP oblicua de ambas manos (rotación medial)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "muneca-pa",
       "region": "muneca",
       "nombre": "PA de muñeca (puño)",
       "categoria": [
         "PA"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -614,13 +505,65 @@ export default {
       "estado": "pendiente-revision"
     },
     {
+      "id": "muneca-oblicua-pa",
+      "region": "muneca",
+      "nombre": "Oblicua PA de muñeca (rotación lateral)",
+      "categoria": [
+        "Oblicuas"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la zona media del carpo; penetra inmediatamente distal al radio."
+      },
+      "posicion": [
+        "Paciente sentado en el extremo de la mesa.",
+        "Desde la posición de pronación, se rota en sentido lateral (externo) la muñeca hasta que forme un ángulo de aprox. 45° con el RI."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Bien visualizados trapecio y mitad distal del escafoides.",
+            "Espacios articulares trapeciotrapezoideo y escafotrapecial abiertos.",
+            "Un espacio interóseo pequeño entre las diáfisis de los metacarpianos tercero-cuarto y cuarto-quinto."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          25,
+          26
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/muneca-oblicua-pa.webp",
+        "alt": "Fotos de posición y resultado: Oblicua PA de muñeca (rotación lateral)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
       "id": "muneca-lateral",
       "region": "muneca",
       "nombre": "Lateral de muñeca (lateromedial)",
       "categoria": [
         "Perfil"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -667,501 +610,13 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "muneca-oblicua-pa",
-      "region": "muneca",
-      "nombre": "Oblicua PA de muñeca (rotación lateral)",
-      "categoria": [
-        "Oblicuas"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona media del carpo; penetra inmediatamente distal al radio."
-      },
-      "posicion": [
-        "Paciente sentado en el extremo de la mesa.",
-        "Desde la posición de pronación, se rota en sentido lateral (externo) la muñeca hasta que forme un ángulo de aprox. 45° con el RI."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Bien visualizados trapecio y mitad distal del escafoides.",
-            "Espacios articulares trapeciotrapezoideo y escafotrapecial abiertos.",
-            "Un espacio interóseo pequeño entre las diáfisis de los metacarpianos tercero-cuarto y cuarto-quinto."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          25,
-          26
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/muneca-oblicua-pa.webp",
-        "alt": "Fotos de posición y resultado: Oblicua PA de muñeca (rotación lateral)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "muneca-oblicua-ap",
-      "region": "muneca",
-      "nombre": "Oblicua AP de muñeca (rotación medial)",
-      "categoria": [
-        "Oblicuas"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona media del carpo. Penetra por la superficie anterior de la muñeca a mitad de camino entre los bordes medial y lateral."
-      },
-      "posicion": [
-        "Paciente sentado en el extremo de la mesa.",
-        "Se pide al paciente que apoye el antebrazo sobre la mesa en posición supina.",
-        "Se rota la muñeca en sentido medial hasta lograr una posición de semisupinación aprox. 45° con respecto al RI."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Los huesos del carpo de la zona medial de la muñeca.",
-            "El piramidal, el gancho del ganchoso y el pisiforme libres de superposiciones y de perfil.",
-            "El radio y cúbito distales, los huesos del carpo y la mitad proximal de los metacarpianos."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          27,
-          28
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/muneca-oblicua-ap.webp",
-        "alt": "Fotos de posición y resultado: Oblicua AP de muñeca (rotación medial)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "muneca-desviacion-cubital",
-      "region": "muneca",
-      "nombre": "PA de muñeca en desviación cubital",
-      "categoria": [
-        "PA"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular al escafoides. Una delimitación clara en ocasiones requiere una angulación del RC de 10° a 15° en sentido proximal o distal."
-      },
-      "posicion": [
-        "Paciente sentado en el extremo de la mesa.",
-        "Con una mano sobre la articulación para fijarla, se desplaza el codo alejándolo del cuerpo del paciente y luego se inclina la mano hacia fuera hasta que la muñeca se encuentre en desviación cubital extrema."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "El escafoides y sus articulaciones adyacentes abiertas.",
-            "Ausencia de rotación de la muñeca.",
-            "Desviación cubital extrema, como se manifiesta por el ángulo formado entre los ejes longitudinales del antebrazo y los ejes longitudinales de los metacarpianos."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          29,
-          30
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/muneca-desviacion-cubital.webp",
-        "alt": "Fotos de posición y resultado: PA de muñeca en desviación cubital",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "muneca-desviacion-radial",
-      "region": "muneca",
-      "nombre": "PA de muñeca en desviación radial",
-      "categoria": [
-        "PA"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona media del carpo."
-      },
-      "posicion": [
-        "Paciente sentado en el extremo de la mesa.",
-        "Se sitúa una mano en la articulación de la muñeca para fijarla en posición.",
-        "Se desplaza entonces el codo hacia el cuerpo del paciente y se inclina la mano en sentido medial hasta que la muñeca se sitúe en desviación radial extrema."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Los huesos del carpo y sus articulaciones en el lado medial de la muñeca.",
-            "Ausencia de rotación de la muñeca.",
-            "Una desviación radial extrema, como se manifiesta por el ángulo formado entre los ejes longitudinales del antebrazo y los de los metacarpianos."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          31,
-          32
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/muneca-desviacion-radial.webp",
-        "alt": "Fotos de posición y resultado: PA de muñeca en desviación radial",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "muneca-estres",
-      "region": "muneca",
-      "nombre": "Muñeca en estrés: laterales en flexión y extensión",
-      "categoria": [
-        "Perfil",
-        "Métodos especiales"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a mitad de región."
-      },
-      "posicion": [
-        "Paciente sentado en el extremo de la mesa.",
-        "Se le pide al paciente que coloque la mano en posición lateral y que flexione (anterior) o extienda (posterior) la mano."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Extensión y flexión de la muñeca que se reconoce por la observación del eje largo del 3.er metacarpiano extendido dorsalmente y flexionado anteriormente, respectivamente, en relación con el eje largo del radio y cúbito."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          33,
-          34
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/muneca-estres.webp",
-        "alt": "Fotos de posición y resultado: Muñeca en estrés: laterales en flexión y extensión",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "muneca-correccion-angular",
-      "region": "muneca",
-      "nombre": "Muñeca con corrección angular (control posquirúrgico)",
-      "categoria": [
-        "PA",
-        "Perfil"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular al centro de la articulación."
-      },
-      "posicion": [
-        "Mismos criterios que frente y perfil.",
-        "Se debe angular la región a explorar con respecto al RI.",
-        "Frente (PA): 11°.",
-        "Perfil: 22°."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Incluimos toda la región.",
-            "Incluimos la placa colocada en su totalidad."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          35,
-          36
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/muneca-correccion-angular.webp",
-        "alt": "Fotos de posición y resultado: Muñeca con corrección angular (control posquirúrgico)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "muneca-gaynor-hart",
-      "region": "muneca",
-      "nombre": "Canal carpiano tangencial",
-      "categoria": [
-        "Tangenciales",
-        "Métodos especiales"
-      ],
-      "tipo": null,
-      "metodo": "Método de Gaynor-Hart",
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "angulado",
-        "texto": "Dirigido a la palma de la mano hacia un punto aprox. 2,5 cm distal a la base del 3.er metacarpiano y con una angulación de 25° a 30° con respecto al eje longitudinal de la mano.",
-        "angulo": "25° a 30°"
-      },
-      "posicion": [
-        "Se sienta al paciente en el extremo de la mesa de forma que se pueda ajustar el antebrazo para que quede paralelo con el eje longitudinal de la mesa.",
-        "Se hiperextiende la muñeca; para evitar la superposición de las sombras del ganchoso y el pisiforme, se rota ligeramente la mano hacia el lado radial.",
-        "Se hace que el paciente sujete los dedos con la mano contraria."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Trapecio, escafoides, grande, gancho del ganchoso, piramidal y todo el pisiforme con partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Huesos del carpo dispuestos en arco.",
-            "El pisiforme de perfil y libre de superposiciones.",
-            "El gancho del ganchoso.",
-            "Todos los huesos del carpo."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          37,
-          38
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/muneca-gaynor-hart.webp",
-        "alt": "Fotos de posición y resultado: Canal carpiano tangencial",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "muneca-canal-carpiano-inferosuperior",
-      "region": "muneca",
-      "nombre": "Canal carpiano inferosuperior",
-      "categoria": [
-        "Tangenciales"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "angulado",
-        "texto": "Tangencial al canal carpiano al punto medio de la muñeca, 20° a 35° hacia la mano en relación con el eje longitudinal del antebrazo.",
-        "angulo": "20° a 35°"
-      },
-      "posicion": [
-        "El paciente parado en el borde de la mesa flexiona dorsalmente la muñeca y se inclina hacia delante con el fin de situar el canal carpiano tangente al RI.",
-        "Palma de la mano apoyada sobre el RI y en flexión dorsal con respecto al antebrazo."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Trapecio, escafoides, grande, gancho del ganchoso, piramidal y todo el pisiforme con partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Huesos del carpo dispuestos en arco.",
-            "El pisiforme de perfil y libre de superposiciones.",
-            "El gancho del ganchoso.",
-            "Todos los huesos del carpo."
-          ]
-        ]
-      ],
-      "notas": [
-        "En la página de fotos del cuaderno dice: «El RC de la foto no coincide con la descripción»."
-      ],
-      "fuente": {
-        "paginas": [
-          39,
-          40
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/muneca-canal-carpiano-inferosuperior.webp",
-        "alt": "Fotos de posición y resultado: Canal carpiano inferosuperior",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "muneca-escafoides-rafert-long",
-      "region": "muneca",
-      "nombre": "Serie del escafoides en desviación cubital",
-      "categoria": [
-        "PA",
-        "Axiales",
-        "Métodos especiales"
-      ],
-      "tipo": null,
-      "metodo": "Método de Rafert-Long",
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "cefálico",
-        "texto": "Perpendicular y con múltiples angulaciones cefálicas a través del escafoides: 0°, 10°, 20° y 30°.",
-        "angulo": "0°, 10°, 20° y 30°"
-      },
-      "posicion": [
-        "Paciente sentado en el extremo de la mesa radiográfica con el brazo y el antebrazo apoyados sobre ella.",
-        "Muñeca en PA; sin mover el antebrazo, se inclina la mano en sentido externo hasta que la muñeca se encuentre en desviación cubital extrema."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Tercio distal de radio y cúbito, tercio proximal de metacarpianos, todos los huesos del carpo y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Ausencia de rotación de la muñeca.",
-            "El escafoides con las áreas articulares adyacentes abiertas.",
-            "Una desviación cubital máxima."
-          ]
-        ]
-      ],
-      "notas": [
-        "La colimación debe ser estrecha para mejorar la calidad de imagen."
-      ],
-      "fuente": {
-        "paginas": [
-          41,
-          42
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/muneca-escafoides-rafert-long.webp",
-        "alt": "Fotos de posición y resultado: Serie del escafoides en desviación cubital",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "antebrazo-ap",
       "region": "antebrazo",
       "nombre": "AP de antebrazo",
       "categoria": [
         "AP"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1220,7 +675,7 @@ export default {
       "categoria": [
         "Perfil"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": null,
         "dfri": "1 m",
@@ -1277,7 +732,7 @@ export default {
       "categoria": [
         "AP"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1328,13 +783,121 @@ export default {
       "estado": "pendiente-revision"
     },
     {
+      "id": "codo-oblicua-medial",
+      "region": "codo",
+      "nombre": "Oblicua AP de codo (rotación medial)",
+      "categoria": [
+        "Oblicuas"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la articulación del codo."
+      },
+      "posicion": [
+        "Se sienta al paciente en el extremo de la mesa con el brazo extendido y en contacto con la misma.",
+        "Se extiende el brazo como para una proyección AP y se rota en sentido medial (interno) o se prona la mano para que su superficie anterior quede a un ángulo de 45°.",
+        "Esto separa la apófisis coronoides de la cabeza radial."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Articulación del codo, húmero distal, radio y cúbito proximal y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "La apófisis coronoides de perfil.",
+            "La tróclea.",
+            "El epicóndilo humeral elongado medialmente.",
+            "El cúbito superpuesto a la cabeza y el cuello radiales.",
+            "El olécranon dentro de la fosa olecraneana."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          53,
+          54
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/codo-oblicua-medial.webp",
+        "alt": "Fotos de posición y resultado: Oblicua AP de codo (rotación medial)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "codo-oblicua-lateral",
+      "region": "codo",
+      "nombre": "Oblicua AP de codo (rotación lateral)",
+      "categoria": [
+        "Oblicuas"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la articulación del codo."
+      },
+      "posicion": [
+        "Se sienta al paciente en el extremo de la mesa con el brazo extendido y en contacto con la misma.",
+        "Se extiende el brazo como para una proyección AP y se rota la mano en sentido lateral hasta que los dedos 1.º y 2.º toquen la mesa.",
+        "Esto nos deja el codo a 45°."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Articulación del codo, húmero distal, radio y cúbito proximal y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "La cabeza, el cuello y la tuberosidad radial proyectados sin la superposición del cúbito.",
+            "El cóndilo humeral.",
+            "La articulación del codo abierta."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          51,
+          52
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/codo-oblicua-lateral.webp",
+        "alt": "Fotos de posición y resultado: Oblicua AP de codo (rotación lateral)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
       "id": "codo-lateral",
       "region": "codo",
       "nombre": "Lateral de codo (lateromedial)",
       "categoria": [
         "Perfil"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1385,66 +948,850 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "codo-oblicua-lateral",
-      "region": "codo",
-      "nombre": "Oblicua AP de codo (rotación lateral)",
+      "id": "humero-ap-bipedestacion",
+      "region": "humero",
+      "nombre": "AP de húmero en bipedestación",
       "categoria": [
-        "Oblicuas"
+        "AP"
       ],
-      "tipo": null,
+      "tipo": "R",
       "factores": {
-        "ri": "24 × 30 cm",
+        "ri": "35 × 43 cm",
         "dfri": "1 m",
-        "respiracion": null,
-        "parrilla": "No",
+        "respiracion": "Respiración suspendida. ¡No se mueva!",
+        "parrilla": "Sí",
         "tecnica": "Homogeneizada"
       },
       "rc": {
         "direccion": "perpendicular",
-        "texto": "Perpendicular a la articulación del codo."
+        "texto": "Perpendicular a la zona central del húmero."
       },
       "posicion": [
-        "Se sienta al paciente en el extremo de la mesa con el brazo extendido y en contacto con la misma.",
-        "Se extiende el brazo como para una proyección AP y se rota la mano en sentido lateral hasta que los dedos 1.º y 2.º toquen la mesa.",
-        "Esto nos deja el codo a 45°."
+        "Paciente en sedestación o bipedestación frente al tubo de rayos X.",
+        "Borde superior del RI situado 4 cm por encima de la cabeza humeral.",
+        "Se abduce ligeramente el brazo y se supina la mano.",
+        "Epicóndilo y epitróclea paralelos al RI."
       ],
       "criterios": [
         [
           "Región a incluir",
           [
-            "Articulación del codo, húmero distal, radio y cúbito proximal y partes blandas adyacentes."
+            "Húmero en toda su longitud incluyendo ambas articulaciones y partes blandas adyacentes."
           ]
         ],
         [
           "Criterios de evaluación",
           [
-            "La cabeza, el cuello y la tuberosidad radial proyectados sin la superposición del cúbito.",
-            "El cóndilo humeral.",
-            "La articulación del codo abierta."
+            "Articulaciones de codo y hombro.",
+            "Epicóndilo y epitróclea sin rotaciones.",
+            "La cabeza humeral y troquíter de perfil.",
+            "Troquín entre cabeza humeral y troquíter.",
+            "La divergencia del haz cierra parcialmente la articulación del codo."
           ]
         ]
       ],
+      "notas": [
+        "Par radiológico: F y P."
+      ],
       "fuente": {
         "paginas": [
-          51,
-          52
+          69,
+          70
         ]
       },
       "ilustracion": {
-        "src": "ilustraciones/uy/codo-oblicua-lateral.webp",
-        "alt": "Fotos de posición y resultado: Oblicua AP de codo (rotación lateral)",
+        "src": "ilustraciones/uy/humero-ap-bipedestacion.webp",
+        "alt": "Fotos de posición y resultado: AP de húmero en bipedestación",
         "verificada": true
       },
       "estado": "pendiente-revision"
     },
     {
-      "id": "codo-oblicua-medial",
-      "region": "codo",
-      "nombre": "Oblicua AP de codo (rotación medial)",
+      "id": "humero-lateral-bipedestacion",
+      "region": "humero",
+      "nombre": "Lateral de húmero en bipedestación (lateromedial o mediolateral)",
+      "categoria": [
+        "Perfil"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "35 × 43 cm",
+        "dfri": "1 m",
+        "respiracion": "Respiración suspendida. No se mueva.",
+        "parrilla": "Sí",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la zona central del húmero."
+      },
+      "posicion": [
+        "Paciente en sedestación o en bipedestación frente al tubo de rayos X.",
+        "Misma ubicación del RI.",
+        "Se rota el brazo internamente, se flexiona el codo a 90° aprox. y se coloca la mano del paciente sobre la cadera (proyección lateromedial).",
+        "Mediolateral: se oblicua el tórax lo necesario para alinear el húmero; se pide al paciente que sostenga la mano del brazo roto."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Húmero en toda su longitud incluyendo ambas articulaciones y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Ambas articulaciones.",
+            "Epicóndilo y epitróclea superpuestos entre sí.",
+            "Tuberosidad menor de perfil.",
+            "Troquíter superpuesto a la cabeza humeral.",
+            "La divergencia del haz que posiblemente cierra parcialmente la articulación del codo."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          73,
+          74
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/humero-lateral-bipedestacion.webp",
+        "alt": "Fotos de posición y resultado: Lateral de húmero en bipedestación (lateromedial o mediolateral)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "humero-ap-decubito",
+      "region": "humero",
+      "nombre": "AP de húmero en decúbito",
+      "categoria": [
+        "AP",
+        "Decúbitos"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "35 × 43 cm",
+        "dfri": "1 m",
+        "respiracion": "Respiración suspendida. No se mueva.",
+        "parrilla": "Sí",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la zona media del húmero."
+      },
+      "posicion": [
+        "Con el paciente en posición de decúbito supino se ajusta el RI para incluir ambas articulaciones.",
+        "Misma ubicación del RI.",
+        "Se eleva el hombro contralateral para dejar el otro contra el RI.",
+        "Se supina la mano para dejar epicóndilo y epitróclea paralelos al RI (de no estar contraindicado)."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Húmero en toda su longitud incluyendo ambas articulaciones y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Articulaciones de codo y hombro.",
+            "Epicóndilo y epitróclea sin rotaciones.",
+            "La cabeza humeral y troquíter de perfil.",
+            "Troquín entre cabeza humeral y troquíter.",
+            "La divergencia del haz cierra parcialmente la articulación del codo."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          71,
+          72
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/humero-ap-decubito.webp",
+        "alt": "Fotos de posición y resultado: AP de húmero en decúbito",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "humero-lateral-decubito",
+      "region": "humero",
+      "nombre": "Lateral de húmero en decúbito (lateromedial)",
+      "categoria": [
+        "Perfil",
+        "Decúbitos"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "35 × 43 cm",
+        "dfri": "1 m",
+        "respiracion": "Respiración suspendida. No se mueva.",
+        "parrilla": "Sí",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la zona central del húmero."
+      },
+      "posicion": [
+        "Paciente en posición de decúbito supino con el húmero centrado en el RI.",
+        "Misma ubicación del RI.",
+        "Se abduce ligeramente el brazo, se rota el antebrazo en sentido medial y se apoya el dorso de la mano sobre el lado del paciente."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Húmero en toda su longitud incluyendo ambas articulaciones y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Ambas articulaciones.",
+            "Epicóndilo y epitróclea superpuestos entre sí.",
+            "Tuberosidad menor de perfil.",
+            "Troquíter superpuesto a la cabeza humeral.",
+            "La divergencia del haz que posiblemente cierra parcialmente la articulación del codo."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          75,
+          76
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/humero-lateral-decubito.webp",
+        "alt": "Fotos de posición y resultado: Lateral de húmero en decúbito (lateromedial)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "hombro-ap-rotaciones",
+      "region": "hombro",
+      "nombre": "AP de hombro con rotación externa, neutra e interna",
+      "categoria": [
+        "AP"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm transversal",
+        "dfri": "1 m",
+        "respiracion": "No respire, no se mueva.",
+        "parrilla": "Sí",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "caudal",
+        "texto": "Angulado de 15° a 20° caudal, 2,5 cm por debajo de la apófisis coracoides.",
+        "angulo": "15° a 20°"
+      },
+      "posicion": [
+        "En bipedestación o decúbito supino (siempre que se pueda se realiza en bipedestación).",
+        "Se rota el hombro opuesto a radiografiar a 45° con respecto al RI.",
+        "Rotaciones de la mano, interna, externa o neutra según DC (diagnóstico clínico) para la visualización de troquín y troquíter."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Clavícula, húmero proximal, acromion, coracoides y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Troquín o troquíter desplegados según rotación.",
+            "Apófisis coracoides superpuesta a la cabeza humeral.",
+            "Rebordes glenoideos anterior y posterior superpuestos (glena de perfil).",
+            "Tejadillo subacromial desplegado."
+          ]
+        ]
+      ],
+      "notas": [
+        "Par radiológico: Hombro traumático: frente neutro y perfil escapular. Hombro doloroso: frente con rotaciones y desfiladero."
+      ],
+      "fuente": {
+        "paginas": [
+          81,
+          82
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/hombro-ap-rotaciones.webp",
+        "alt": "Fotos de posición y resultado: AP de hombro con rotación externa, neutra e interna",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "hombro-perfil-escapular",
+      "region": "hombro",
+      "nombre": "Perfil escapular",
+      "categoria": [
+        "Perfil",
+        "Oblicuas"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": "No respire, no se mueva.",
+        "parrilla": "Sí",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "caudal",
+        "texto": "Angulado 25° caudal a nivel de la cabeza humeral.",
+        "angulo": "25°"
+      },
+      "posicion": [
+        "Paciente en bipedestación frente al RI.",
+        "Paciente apoyando la parte anterior del hombro afectado sobre el RI.",
+        "Se rota al paciente de forma que el plano mediocoronal forme un ángulo de 45° a 60° con el RI.",
+        "Se palpa la escápula y se coloca su superficie plana perpendicular al RI."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Acromion, apófisis coracoides y el cuerpo de la escápula en su totalidad."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "La cabeza humeral y la cavidad glenoidea superpuestos entre sí.",
+            "Diáfisis humeral y el cuerpo de la escápula superpuestos.",
+            "Acromion lateral y libre de superposición.",
+            "Coracoides superpuesto o por debajo de la clavícula.",
+            "La escápula en un perfil lateral con sus bordes laterales y vertebrales superpuestos."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          83,
+          84
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/hombro-perfil-escapular.webp",
+        "alt": "Fotos de posición y resultado: Perfil escapular",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "hombro-axilar",
+      "region": "hombro",
+      "nombre": "Perfil axilar (vuelo de pájaro)",
+      "categoria": [
+        "Axiales"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm longitudinal",
+        "dfri": "1 m",
+        "respiracion": "No respire, no se mueva.",
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "angulado",
+        "texto": "Angulado entre 5° y 15° hacia el codo en el hueco del deltoides.",
+        "angulo": "5° a 15°"
+      },
+      "posicion": [
+        "Se sienta al paciente sobre una silla en el extremo de la mesa, lo suficientemente elevado como para permitir una buena extensión del hombro en estudio.",
+        "El paciente se inclina en sentido lateral sobre el RI.",
+        "Se apoya el codo sobre la mesa y se flexiona a 90° con la mano en pronación.",
+        "Se indica al paciente que incline la cabeza hacia el lado no lesionado."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Cabeza humeral, tercio proximal de húmero, clavícula y escápula vistos desde arriba."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "La articulación escapulohumeral abierta (excepto en los pacientes con flexibilidad limitada).",
+            "La apófisis coracoides proyectada por encima de la clavícula."
+          ]
+        ]
+      ],
+      "notas": [
+        "Sustituye el perfil escapular en hombro traumático."
+      ],
+      "fuente": {
+        "paginas": [
+          87,
+          88
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/hombro-axilar.webp",
+        "alt": "Fotos de posición y resultado: Perfil axilar (vuelo de pájaro)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "escapula-ap",
+      "region": "escapula",
+      "nombre": "AP de escápula",
+      "categoria": [
+        "AP"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": "No respire, no se mueva.",
+        "parrilla": "Sí",
+        "tecnica": "Intermedia"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la zona media escapular, por un punto aprox. 5 cm inferior a la apófisis coracoides."
+      },
+      "posicion": [
+        "Paciente en bipedestación o supino frente al RI o sobre la mesa radiográfica.",
+        "Se abduce el brazo en ángulo recto respecto al cuerpo para dirigir la escápula lateralmente.",
+        "Se flexiona el codo y se apoya la mano en una posición cómoda."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Toda la escápula en su extensión, clavícula distal y húmero proximal."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "La parte lateral de la escápula libre de la superposición de las costillas.",
+            "La escápula horizontal, no oblicuada.",
+            "El acromion y el ángulo inferior.",
+            "El detalle escapular a través del pulmón y las costillas superpuestos."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          101,
+          102
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/escapula-ap.webp",
+        "alt": "Fotos de posición y resultado: AP de escápula",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "escapula-lateral-oai-oad",
+      "region": "escapula",
+      "nombre": "Lateral de escápula en OAI u OAD",
+      "categoria": [
+        "Perfil",
+        "Oblicuas"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": "No respire, no se mueva.",
+        "parrilla": "Sí",
+        "tecnica": null
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la zona media del borde medial de la escápula."
+      },
+      "posicion": [
+        "Paciente en posición OAD u OAI, de pie o sentado, frente al RI.",
+        "Se rota al paciente entre 45°-60° para dejar la escápula de perfil.",
+        "Se pide al paciente que flexione el codo y coloque el dorso de la mano sobre la parte posterior del tórax para evaluar acromion y apófisis coracoides.",
+        "Para la demostración del cuerpo de la escápula se pide al paciente que extienda el brazo hacia arriba y que apoye el antebrazo sobre la cabeza."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Acromion, apófisis coracoides, ángulo inferior de la escápula y todo el cuerpo en su extensión."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Bordes medial y lateral superpuestos.",
+            "Ausencia de superposición del cuerpo escapular sobre las costillas.",
+            "Ausencia de superposición del húmero sobre el área de interés.",
+            "Inclusión del acromion y del ángulo inferior."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          103,
+          104
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/escapula-lateral-oai-oad.webp",
+        "alt": "Fotos de posición y resultado: Lateral de escápula en OAI u OAD",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "escapula-lateral-opd-opi",
+      "region": "escapula",
+      "nombre": "Lateral de escápula en OPD u OPI",
+      "categoria": [
+        "Perfil",
+        "Oblicuas"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": "No respire, no se mueva.",
+        "parrilla": "Sí",
+        "tecnica": null
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular al borde externo del omóplato."
+      },
+      "posicion": [
+        "Paciente en posición OAD u OAI, de pie o sentado, frente al RI.",
+        "Se pide al paciente que extienda el brazo en sentido superior.",
+        "Se gira en sentido contrario al lado afectado entre 15° y 25°, o para una oblicua más pronunciada entre 25° y 35°."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Acromion, apófisis coracoides, ángulo inferior de la escápula y todo el cuerpo en su extensión."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "La escápula en oblicuo.",
+            "El borde lateral adyacente a las costillas.",
+            "El acromion y el ángulo inferior."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          105,
+          106
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/escapula-lateral-opd-opi.webp",
+        "alt": "Fotos de posición y resultado: Lateral de escápula en OPD u OPI",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "ac-pearson",
+      "region": "acromioclaviculares",
+      "nombre": "AP de articulaciones acromioclaviculares",
+      "categoria": [
+        "AP",
+        "Métodos especiales"
+      ],
+      "tipo": "R",
+      "metodo": "Método de Pearson",
+      "factores": {
+        "ri": null,
+        "dfri": "1,80 m / 2 m",
+        "respiracion": "No respire, no se mueva.",
+        "parrilla": "Sí",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la línea media del cuerpo a la altura de las articulaciones AC."
+      },
+      "posicion": [
+        "Se coloca al paciente incorporado / bipedestación o bien sentado frente al RI.",
+        "Con los brazos del paciente colgando a ambos lados, se ajustan los hombros para que queden en un mismo plano horizontal.",
+        "Se hacen 2 exposiciones: la 1.ª sin pesas y la 2.ª con pesas."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Ambas articulaciones AC, ambas clavículas, ambos húmeros proximales."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Ausencia de rotación o de inclinación del paciente.",
+            "Las articulaciones AC visualizadas con algunos tejidos blandos y sin una densidad excesiva.",
+            "Ambas articulaciones incluidas.",
+            "La separación, cuando existe, debe ser claramente apreciable en las imágenes con peso."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          109,
+          110
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/ac-pearson.webp",
+        "alt": "Fotos de posición y resultado: AP de articulaciones acromioclaviculares",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "clavicula-ap-pa",
+      "region": "clavicula",
+      "nombre": "AP / PA de clavícula",
+      "categoria": [
+        "AP",
+        "PA"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": "Suspendida al final de la espiración.",
+        "parrilla": "Sí",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la zona media de la clavícula."
+      },
+      "posicion": [
+        "Paciente en decúbito supino o bipedestación.",
+        "Se ajusta el cuerpo para centrar la clavícula en la línea media de la mesa o del dispositivo de rejilla vertical.",
+        "Se sitúa al paciente en AP / PA con los brazos a los lados del cuerpo y se ajustan los hombros para que queden en un mismo plano horizontal."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Ambas articulaciones de la clavícula y la misma en toda su extensión."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Toda la clavícula centrada en la imagen.",
+            "Una densidad uniforme.",
+            "La mitad lateral de la clavícula por encima de la escápula y la mitad medial superpuesta al tórax."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          113,
+          114
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/clavicula-ap-pa.webp",
+        "alt": "Fotos de posición y resultado: AP / PA de clavícula",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "clavicula-axial-lordotica",
+      "region": "clavicula",
+      "nombre": "AP axial de clavícula (posición lordótica)",
+      "categoria": [
+        "Axiales"
+      ],
+      "tipo": "R",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": "Suspendida al final de una inspiración máxima con el fin de elevar más y angular la clavícula.",
+        "parrilla": "Sí",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "cefálico",
+        "texto": "AP lordótica: 15° cefálico. Sin lordótica o decúbito supino: 30° cefálico. PA: 15° a 30° en sentido caudal, bipedestación o decúbito prono.",
+        "angulo": "15° a 30°"
+      },
+      "posicion": [
+        "Se sienta, se acuesta o se coloca de pie al paciente 30 cm por delante de un dispositivo RI.",
+        "Se hace al paciente inclinarse hacia atrás en una posición de lordosis máxima, apoyando el cuello y los hombros sobre el dispositivo de rejilla vertical (cuello en flexión máxima)."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Ambas articulaciones de la clavícula y la misma en toda su extensión."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "La mayor parte de la clavícula proyectada por encima de las costillas y la escápula con el extremo medial superpuesto a la primera o segunda costilla.",
+            "La clavícula con una disposición horizontal.",
+            "Toda la clavícula conjuntamente con las articulaciones AC y EC."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          115,
+          116
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/clavicula-axial-lordotica.webp",
+        "alt": "Fotos de posición y resultado: AP axial de clavícula (posición lordótica)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "pulgar-cmc-robert",
+      "region": "pulgar",
+      "nombre": "Primera articulación CMC",
+      "categoria": [
+        "AP",
+        "Métodos especiales"
+      ],
+      "tipo": "E",
+      "metodo": "Método de Robert y modificación de Long y Rafert",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "variable",
+        "texto": "Método de Robert: perpendicular a la 1.ª articulación CMC. Modificación: 15° proximal pasando por la articulación CMC."
+      },
+      "posicion": [
+        "Paciente sentado en el extremo de la mesa con todas las articulaciones de hombro, codo y muñeca a la misma altura.",
+        "Miembro extendido sobre la mesa, rotación interna situando la parte posterior del pulgar sobre el RI y mano hiperextendida de forma que las partes blandas de la zona cubital no ocultan la articulación CMC."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Región del carpo (trapecio)."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Articulación CMC del pulgar libre.",
+            "Simetría de los lados cóncavos de las falanges y MTC.",
+            "Articulaciones CMC y MCF abiertas.",
+            "Superposición de eminencia hipotenar."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          9,
+          10
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/pulgar-cmc-robert.webp",
+        "alt": "Fotos de posición y resultado: Primera articulación CMC",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "mano-norgaard",
+      "region": "mano",
+      "nombre": "AP oblicua de ambas manos (rotación medial)",
+      "categoria": [
+        "Oblicuas",
+        "Métodos especiales"
+      ],
+      "tipo": "E",
+      "metodo": "Método de Norgaard",
+      "factores": {
+        "ri": "24 × 30 cm transversal",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a un punto a mitad de camino entre ambas manos a la altura de las articulaciones MCF para ambas posiciones."
+      },
+      "posicion": [
+        "Paciente sentado en el extremo de la mesa.",
+        "Se hace que el paciente coloque las palmas de las manos juntas, se rotan las manos del paciente hacia una posición de semisupinación (45°).",
+        "Se extienden los dedos del paciente y se abducen los pulgares."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Ambas manos desde radio y cúbito distales hasta falanges distales, incluidas partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Ambas manos desde la zona del carpo hasta la punta de los dedos.",
+            "Cabezas de los metacarpianos libres de superposición."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          19,
+          20
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/mano-norgaard.webp",
+        "alt": "Fotos de posición y resultado: AP oblicua de ambas manos (rotación medial)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "muneca-oblicua-ap",
+      "region": "muneca",
+      "nombre": "Oblicua AP de muñeca (rotación medial)",
       "categoria": [
         "Oblicuas"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1454,40 +1801,421 @@ export default {
       },
       "rc": {
         "direccion": "perpendicular",
-        "texto": "Perpendicular a la articulación del codo."
+        "texto": "Perpendicular a la zona media del carpo. Penetra por la superficie anterior de la muñeca a mitad de camino entre los bordes medial y lateral."
       },
       "posicion": [
-        "Se sienta al paciente en el extremo de la mesa con el brazo extendido y en contacto con la misma.",
-        "Se extiende el brazo como para una proyección AP y se rota en sentido medial (interno) o se prona la mano para que su superficie anterior quede a un ángulo de 45°.",
-        "Esto separa la apófisis coronoides de la cabeza radial."
+        "Paciente sentado en el extremo de la mesa.",
+        "Se pide al paciente que apoye el antebrazo sobre la mesa en posición supina.",
+        "Se rota la muñeca en sentido medial hasta lograr una posición de semisupinación aprox. 45° con respecto al RI."
       ],
       "criterios": [
         [
           "Región a incluir",
           [
-            "Articulación del codo, húmero distal, radio y cúbito proximal y partes blandas adyacentes."
+            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
           ]
         ],
         [
           "Criterios de evaluación",
           [
-            "La apófisis coronoides de perfil.",
-            "La tróclea.",
-            "El epicóndilo humeral elongado medialmente.",
-            "El cúbito superpuesto a la cabeza y el cuello radiales.",
-            "El olécranon dentro de la fosa olecraneana."
+            "Los huesos del carpo de la zona medial de la muñeca.",
+            "El piramidal, el gancho del ganchoso y el pisiforme libres de superposiciones y de perfil.",
+            "El radio y cúbito distales, los huesos del carpo y la mitad proximal de los metacarpianos."
           ]
         ]
       ],
       "fuente": {
         "paginas": [
-          53,
-          54
+          27,
+          28
         ]
       },
       "ilustracion": {
-        "src": "ilustraciones/uy/codo-oblicua-medial.webp",
-        "alt": "Fotos de posición y resultado: Oblicua AP de codo (rotación medial)",
+        "src": "ilustraciones/uy/muneca-oblicua-ap.webp",
+        "alt": "Fotos de posición y resultado: Oblicua AP de muñeca (rotación medial)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "muneca-desviacion-cubital",
+      "region": "muneca",
+      "nombre": "PA de muñeca en desviación cubital",
+      "categoria": [
+        "PA"
+      ],
+      "tipo": "E",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular al escafoides. Una delimitación clara en ocasiones requiere una angulación del RC de 10° a 15° en sentido proximal o distal."
+      },
+      "posicion": [
+        "Paciente sentado en el extremo de la mesa.",
+        "Con una mano sobre la articulación para fijarla, se desplaza el codo alejándolo del cuerpo del paciente y luego se inclina la mano hacia fuera hasta que la muñeca se encuentre en desviación cubital extrema."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "El escafoides y sus articulaciones adyacentes abiertas.",
+            "Ausencia de rotación de la muñeca.",
+            "Desviación cubital extrema, como se manifiesta por el ángulo formado entre los ejes longitudinales del antebrazo y los ejes longitudinales de los metacarpianos."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          29,
+          30
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/muneca-desviacion-cubital.webp",
+        "alt": "Fotos de posición y resultado: PA de muñeca en desviación cubital",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "muneca-desviacion-radial",
+      "region": "muneca",
+      "nombre": "PA de muñeca en desviación radial",
+      "categoria": [
+        "PA"
+      ],
+      "tipo": "E",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a la zona media del carpo."
+      },
+      "posicion": [
+        "Paciente sentado en el extremo de la mesa.",
+        "Se sitúa una mano en la articulación de la muñeca para fijarla en posición.",
+        "Se desplaza entonces el codo hacia el cuerpo del paciente y se inclina la mano en sentido medial hasta que la muñeca se sitúe en desviación radial extrema."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Los huesos del carpo y sus articulaciones en el lado medial de la muñeca.",
+            "Ausencia de rotación de la muñeca.",
+            "Una desviación radial extrema, como se manifiesta por el ángulo formado entre los ejes longitudinales del antebrazo y los de los metacarpianos."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          31,
+          32
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/muneca-desviacion-radial.webp",
+        "alt": "Fotos de posición y resultado: PA de muñeca en desviación radial",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "muneca-estres",
+      "region": "muneca",
+      "nombre": "Muñeca en estrés: laterales en flexión y extensión",
+      "categoria": [
+        "Perfil",
+        "Métodos especiales"
+      ],
+      "tipo": "E",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular a mitad de región."
+      },
+      "posicion": [
+        "Paciente sentado en el extremo de la mesa.",
+        "Se le pide al paciente que coloque la mano en posición lateral y que flexione (anterior) o extienda (posterior) la mano."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Extensión y flexión de la muñeca que se reconoce por la observación del eje largo del 3.er metacarpiano extendido dorsalmente y flexionado anteriormente, respectivamente, en relación con el eje largo del radio y cúbito."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          33,
+          34
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/muneca-estres.webp",
+        "alt": "Fotos de posición y resultado: Muñeca en estrés: laterales en flexión y extensión",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "muneca-correccion-angular",
+      "region": "muneca",
+      "nombre": "Muñeca con corrección angular (control posquirúrgico)",
+      "categoria": [
+        "PA",
+        "Perfil"
+      ],
+      "tipo": "E",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "perpendicular",
+        "texto": "Perpendicular al centro de la articulación."
+      },
+      "posicion": [
+        "Mismos criterios que frente y perfil.",
+        "Se debe angular la región a explorar con respecto al RI.",
+        "Frente (PA): 11°.",
+        "Perfil: 22°."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Desde tercio distal de radio y cúbito hasta cabezas de metacarpianos o bases de falanges proximales y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Incluimos toda la región.",
+            "Incluimos la placa colocada en su totalidad."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          35,
+          36
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/muneca-correccion-angular.webp",
+        "alt": "Fotos de posición y resultado: Muñeca con corrección angular (control posquirúrgico)",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "muneca-gaynor-hart",
+      "region": "muneca",
+      "nombre": "Canal carpiano tangencial",
+      "categoria": [
+        "Tangenciales",
+        "Métodos especiales"
+      ],
+      "tipo": "E",
+      "metodo": "Método de Gaynor-Hart",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "angulado",
+        "texto": "Dirigido a la palma de la mano hacia un punto aprox. 2,5 cm distal a la base del 3.er metacarpiano y con una angulación de 25° a 30° con respecto al eje longitudinal de la mano.",
+        "angulo": "25° a 30°"
+      },
+      "posicion": [
+        "Se sienta al paciente en el extremo de la mesa de forma que se pueda ajustar el antebrazo para que quede paralelo con el eje longitudinal de la mesa.",
+        "Se hiperextiende la muñeca; para evitar la superposición de las sombras del ganchoso y el pisiforme, se rota ligeramente la mano hacia el lado radial.",
+        "Se hace que el paciente sujete los dedos con la mano contraria."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Trapecio, escafoides, grande, gancho del ganchoso, piramidal y todo el pisiforme con partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Huesos del carpo dispuestos en arco.",
+            "El pisiforme de perfil y libre de superposiciones.",
+            "El gancho del ganchoso.",
+            "Todos los huesos del carpo."
+          ]
+        ]
+      ],
+      "fuente": {
+        "paginas": [
+          37,
+          38
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/muneca-gaynor-hart.webp",
+        "alt": "Fotos de posición y resultado: Canal carpiano tangencial",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "muneca-canal-carpiano-inferosuperior",
+      "region": "muneca",
+      "nombre": "Canal carpiano inferosuperior",
+      "categoria": [
+        "Tangenciales"
+      ],
+      "tipo": "E",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "angulado",
+        "texto": "Tangencial al canal carpiano al punto medio de la muñeca, 20° a 35° hacia la mano en relación con el eje longitudinal del antebrazo.",
+        "angulo": "20° a 35°"
+      },
+      "posicion": [
+        "El paciente parado en el borde de la mesa flexiona dorsalmente la muñeca y se inclina hacia delante con el fin de situar el canal carpiano tangente al RI.",
+        "Palma de la mano apoyada sobre el RI y en flexión dorsal con respecto al antebrazo."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Trapecio, escafoides, grande, gancho del ganchoso, piramidal y todo el pisiforme con partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Huesos del carpo dispuestos en arco.",
+            "El pisiforme de perfil y libre de superposiciones.",
+            "El gancho del ganchoso.",
+            "Todos los huesos del carpo."
+          ]
+        ]
+      ],
+      "notas": [
+        "En la página de fotos del cuaderno dice: «El RC de la foto no coincide con la descripción»."
+      ],
+      "fuente": {
+        "paginas": [
+          39,
+          40
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/muneca-canal-carpiano-inferosuperior.webp",
+        "alt": "Fotos de posición y resultado: Canal carpiano inferosuperior",
+        "verificada": true
+      },
+      "estado": "pendiente-revision"
+    },
+    {
+      "id": "muneca-escafoides-rafert-long",
+      "region": "muneca",
+      "nombre": "Serie del escafoides en desviación cubital",
+      "categoria": [
+        "PA",
+        "Axiales",
+        "Métodos especiales"
+      ],
+      "tipo": "E",
+      "metodo": "Método de Rafert-Long",
+      "factores": {
+        "ri": "24 × 30 cm",
+        "dfri": "1 m",
+        "respiracion": null,
+        "parrilla": "No",
+        "tecnica": "Homogeneizada"
+      },
+      "rc": {
+        "direccion": "cefálico",
+        "texto": "Perpendicular y con múltiples angulaciones cefálicas a través del escafoides: 0°, 10°, 20° y 30°.",
+        "angulo": "0°, 10°, 20° y 30°"
+      },
+      "posicion": [
+        "Paciente sentado en el extremo de la mesa radiográfica con el brazo y el antebrazo apoyados sobre ella.",
+        "Muñeca en PA; sin mover el antebrazo, se inclina la mano en sentido externo hasta que la muñeca se encuentre en desviación cubital extrema."
+      ],
+      "criterios": [
+        [
+          "Región a incluir",
+          [
+            "Tercio distal de radio y cúbito, tercio proximal de metacarpianos, todos los huesos del carpo y partes blandas adyacentes."
+          ]
+        ],
+        [
+          "Criterios de evaluación",
+          [
+            "Ausencia de rotación de la muñeca.",
+            "El escafoides con las áreas articulares adyacentes abiertas.",
+            "Una desviación cubital máxima."
+          ]
+        ]
+      ],
+      "notas": [
+        "La colimación debe ser estrecha para mejorar la calidad de imagen."
+      ],
+      "fuente": {
+        "paginas": [
+          41,
+          42
+        ]
+      },
+      "ilustracion": {
+        "src": "ilustraciones/uy/muneca-escafoides-rafert-long.webp",
+        "alt": "Fotos de posición y resultado: Serie del escafoides en desviación cubital",
         "verificada": true
       },
       "estado": "pendiente-revision"
@@ -1499,7 +2227,7 @@ export default {
       "categoria": [
         "AP"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1554,7 +2282,7 @@ export default {
       "categoria": [
         "AP"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1608,7 +2336,7 @@ export default {
         "AP",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Jones",
       "factores": {
         "ri": "24 × 30 cm",
@@ -1663,7 +2391,7 @@ export default {
         "PA",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Jones",
       "factores": {
         "ri": "24 × 30 cm",
@@ -1718,7 +2446,7 @@ export default {
         "Perfil",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -1772,7 +2500,7 @@ export default {
         "Axiales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Coyle",
       "factores": {
         "ri": "24 × 30 cm",
@@ -1834,7 +2562,7 @@ export default {
         "Axiales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Coyle",
       "factores": {
         "ri": "24 × 30 cm",
@@ -1888,234 +2616,6 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "humero-ap-bipedestacion",
-      "region": "humero",
-      "nombre": "AP de húmero en bipedestación",
-      "categoria": [
-        "AP"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "35 × 43 cm",
-        "dfri": "1 m",
-        "respiracion": "Respiración suspendida. ¡No se mueva!",
-        "parrilla": "Sí",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona central del húmero."
-      },
-      "posicion": [
-        "Paciente en sedestación o bipedestación frente al tubo de rayos X.",
-        "Borde superior del RI situado 4 cm por encima de la cabeza humeral.",
-        "Se abduce ligeramente el brazo y se supina la mano.",
-        "Epicóndilo y epitróclea paralelos al RI."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Húmero en toda su longitud incluyendo ambas articulaciones y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Articulaciones de codo y hombro.",
-            "Epicóndilo y epitróclea sin rotaciones.",
-            "La cabeza humeral y troquíter de perfil.",
-            "Troquín entre cabeza humeral y troquíter.",
-            "La divergencia del haz cierra parcialmente la articulación del codo."
-          ]
-        ]
-      ],
-      "notas": [
-        "Par radiológico: F y P."
-      ],
-      "fuente": {
-        "paginas": [
-          69,
-          70
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/humero-ap-bipedestacion.webp",
-        "alt": "Fotos de posición y resultado: AP de húmero en bipedestación",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "humero-ap-decubito",
-      "region": "humero",
-      "nombre": "AP de húmero en decúbito",
-      "categoria": [
-        "AP",
-        "Decúbitos"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "35 × 43 cm",
-        "dfri": "1 m",
-        "respiracion": "Respiración suspendida. No se mueva.",
-        "parrilla": "Sí",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona media del húmero."
-      },
-      "posicion": [
-        "Con el paciente en posición de decúbito supino se ajusta el RI para incluir ambas articulaciones.",
-        "Misma ubicación del RI.",
-        "Se eleva el hombro contralateral para dejar el otro contra el RI.",
-        "Se supina la mano para dejar epicóndilo y epitróclea paralelos al RI (de no estar contraindicado)."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Húmero en toda su longitud incluyendo ambas articulaciones y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Articulaciones de codo y hombro.",
-            "Epicóndilo y epitróclea sin rotaciones.",
-            "La cabeza humeral y troquíter de perfil.",
-            "Troquín entre cabeza humeral y troquíter.",
-            "La divergencia del haz cierra parcialmente la articulación del codo."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          71,
-          72
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/humero-ap-decubito.webp",
-        "alt": "Fotos de posición y resultado: AP de húmero en decúbito",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "humero-lateral-bipedestacion",
-      "region": "humero",
-      "nombre": "Lateral de húmero en bipedestación (lateromedial o mediolateral)",
-      "categoria": [
-        "Perfil"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "35 × 43 cm",
-        "dfri": "1 m",
-        "respiracion": "Respiración suspendida. No se mueva.",
-        "parrilla": "Sí",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona central del húmero."
-      },
-      "posicion": [
-        "Paciente en sedestación o en bipedestación frente al tubo de rayos X.",
-        "Misma ubicación del RI.",
-        "Se rota el brazo internamente, se flexiona el codo a 90° aprox. y se coloca la mano del paciente sobre la cadera (proyección lateromedial).",
-        "Mediolateral: se oblicua el tórax lo necesario para alinear el húmero; se pide al paciente que sostenga la mano del brazo roto."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Húmero en toda su longitud incluyendo ambas articulaciones y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Ambas articulaciones.",
-            "Epicóndilo y epitróclea superpuestos entre sí.",
-            "Tuberosidad menor de perfil.",
-            "Troquíter superpuesto a la cabeza humeral.",
-            "La divergencia del haz que posiblemente cierra parcialmente la articulación del codo."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          73,
-          74
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/humero-lateral-bipedestacion.webp",
-        "alt": "Fotos de posición y resultado: Lateral de húmero en bipedestación (lateromedial o mediolateral)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "humero-lateral-decubito",
-      "region": "humero",
-      "nombre": "Lateral de húmero en decúbito (lateromedial)",
-      "categoria": [
-        "Perfil",
-        "Decúbitos"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "35 × 43 cm",
-        "dfri": "1 m",
-        "respiracion": "Respiración suspendida. No se mueva.",
-        "parrilla": "Sí",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona central del húmero."
-      },
-      "posicion": [
-        "Paciente en posición de decúbito supino con el húmero centrado en el RI.",
-        "Misma ubicación del RI.",
-        "Se abduce ligeramente el brazo, se rota el antebrazo en sentido medial y se apoya el dorso de la mano sobre el lado del paciente."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Húmero en toda su longitud incluyendo ambas articulaciones y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Ambas articulaciones.",
-            "Epicóndilo y epitróclea superpuestos entre sí.",
-            "Tuberosidad menor de perfil.",
-            "Troquíter superpuesto a la cabeza humeral.",
-            "La divergencia del haz que posiblemente cierra parcialmente la articulación del codo."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          75,
-          76
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/humero-lateral-decubito.webp",
-        "alt": "Fotos de posición y resultado: Lateral de húmero en decúbito (lateromedial)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "humero-lateral-distal-decubito",
       "region": "humero",
       "nombre": "Lateral de húmero distal en decúbito supino o lateral",
@@ -2123,7 +2623,7 @@ export default {
         "Perfil",
         "Decúbitos"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "35 × 43 cm",
         "dfri": "1 m",
@@ -2175,7 +2675,7 @@ export default {
         "Perfil",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "35 × 43 cm",
         "dfri": "1 m",
@@ -2223,122 +2723,6 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "hombro-ap-rotaciones",
-      "region": "hombro",
-      "nombre": "AP de hombro con rotación externa, neutra e interna",
-      "categoria": [
-        "AP"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm transversal",
-        "dfri": "1 m",
-        "respiracion": "No respire, no se mueva.",
-        "parrilla": "Sí",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "caudal",
-        "texto": "Angulado de 15° a 20° caudal, 2,5 cm por debajo de la apófisis coracoides.",
-        "angulo": "15° a 20°"
-      },
-      "posicion": [
-        "En bipedestación o decúbito supino (siempre que se pueda se realiza en bipedestación).",
-        "Se rota el hombro opuesto a radiografiar a 45° con respecto al RI.",
-        "Rotaciones de la mano, interna, externa o neutra según DC (diagnóstico clínico) para la visualización de troquín y troquíter."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Clavícula, húmero proximal, acromion, coracoides y partes blandas adyacentes."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Troquín o troquíter desplegados según rotación.",
-            "Apófisis coracoides superpuesta a la cabeza humeral.",
-            "Rebordes glenoideos anterior y posterior superpuestos (glena de perfil).",
-            "Tejadillo subacromial desplegado."
-          ]
-        ]
-      ],
-      "notas": [
-        "Par radiológico: Hombro traumático: frente neutro y perfil escapular. Hombro doloroso: frente con rotaciones y desfiladero."
-      ],
-      "fuente": {
-        "paginas": [
-          81,
-          82
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/hombro-ap-rotaciones.webp",
-        "alt": "Fotos de posición y resultado: AP de hombro con rotación externa, neutra e interna",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "hombro-perfil-escapular",
-      "region": "hombro",
-      "nombre": "Perfil escapular",
-      "categoria": [
-        "Perfil",
-        "Oblicuas"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": "No respire, no se mueva.",
-        "parrilla": "Sí",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "caudal",
-        "texto": "Angulado 25° caudal a nivel de la cabeza humeral.",
-        "angulo": "25°"
-      },
-      "posicion": [
-        "Paciente en bipedestación frente al RI.",
-        "Paciente apoyando la parte anterior del hombro afectado sobre el RI.",
-        "Se rota al paciente de forma que el plano mediocoronal forme un ángulo de 45° a 60° con el RI.",
-        "Se palpa la escápula y se coloca su superficie plana perpendicular al RI."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Acromion, apófisis coracoides y el cuerpo de la escápula en su totalidad."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "La cabeza humeral y la cavidad glenoidea superpuestos entre sí.",
-            "Diáfisis humeral y el cuerpo de la escápula superpuestos.",
-            "Acromion lateral y libre de superposición.",
-            "Coracoides superpuesto o por debajo de la clavícula.",
-            "La escápula en un perfil lateral con sus bordes laterales y vertebrales superpuestos."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          83,
-          84
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/hombro-perfil-escapular.webp",
-        "alt": "Fotos de posición y resultado: Perfil escapular",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "hombro-desfiladero",
       "region": "hombro",
       "nombre": "Desfiladero (salida del supraespinoso)",
@@ -2346,7 +2730,7 @@ export default {
         "Perfil",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -2397,63 +2781,6 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "hombro-axilar",
-      "region": "hombro",
-      "nombre": "Perfil axilar (vuelo de pájaro)",
-      "categoria": [
-        "Axiales"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm longitudinal",
-        "dfri": "1 m",
-        "respiracion": "No respire, no se mueva.",
-        "parrilla": "No",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "angulado",
-        "texto": "Angulado entre 5° y 15° hacia el codo en el hueco del deltoides.",
-        "angulo": "5° a 15°"
-      },
-      "posicion": [
-        "Se sienta al paciente sobre una silla en el extremo de la mesa, lo suficientemente elevado como para permitir una buena extensión del hombro en estudio.",
-        "El paciente se inclina en sentido lateral sobre el RI.",
-        "Se apoya el codo sobre la mesa y se flexiona a 90° con la mano en pronación.",
-        "Se indica al paciente que incline la cabeza hacia el lado no lesionado."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Cabeza humeral, tercio proximal de húmero, clavícula y escápula vistos desde arriba."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "La articulación escapulohumeral abierta (excepto en los pacientes con flexibilidad limitada).",
-            "La apófisis coracoides proyectada por encima de la clavícula."
-          ]
-        ]
-      ],
-      "notas": [
-        "Sustituye el perfil escapular en hombro traumático."
-      ],
-      "fuente": {
-        "paginas": [
-          87,
-          88
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/hombro-axilar.webp",
-        "alt": "Fotos de posición y resultado: Perfil axilar (vuelo de pájaro)",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "hombro-stryker",
       "region": "hombro",
       "nombre": "AP axial de la muesca",
@@ -2461,7 +2788,7 @@ export default {
         "Axiales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Stryker",
       "factores": {
         "ri": "24 × 30 cm",
@@ -2518,7 +2845,7 @@ export default {
       "categoria": [
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Enfoque de Patte",
       "factores": {
         "ri": "24 × 30 cm",
@@ -2561,7 +2888,7 @@ export default {
         "Axiales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -2602,7 +2929,7 @@ export default {
         "AP",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -2650,7 +2977,7 @@ export default {
       "categoria": [
         "Tangenciales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": null,
@@ -2704,7 +3031,7 @@ export default {
         "Tangenciales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Modificación de Fisk",
       "factores": {
         "ri": "24 × 30 cm",
@@ -2753,177 +3080,13 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "escapula-ap",
-      "region": "escapula",
-      "nombre": "AP de escápula",
-      "categoria": [
-        "AP"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": "No respire, no se mueva.",
-        "parrilla": "Sí",
-        "tecnica": "Intermedia"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona media escapular, por un punto aprox. 5 cm inferior a la apófisis coracoides."
-      },
-      "posicion": [
-        "Paciente en bipedestación o supino frente al RI o sobre la mesa radiográfica.",
-        "Se abduce el brazo en ángulo recto respecto al cuerpo para dirigir la escápula lateralmente.",
-        "Se flexiona el codo y se apoya la mano en una posición cómoda."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Toda la escápula en su extensión, clavícula distal y húmero proximal."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "La parte lateral de la escápula libre de la superposición de las costillas.",
-            "La escápula horizontal, no oblicuada.",
-            "El acromion y el ángulo inferior.",
-            "El detalle escapular a través del pulmón y las costillas superpuestos."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          101,
-          102
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/escapula-ap.webp",
-        "alt": "Fotos de posición y resultado: AP de escápula",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "escapula-lateral-oai-oad",
-      "region": "escapula",
-      "nombre": "Lateral de escápula en OAI u OAD",
-      "categoria": [
-        "Perfil",
-        "Oblicuas"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": "No respire, no se mueva.",
-        "parrilla": "Sí",
-        "tecnica": null
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona media del borde medial de la escápula."
-      },
-      "posicion": [
-        "Paciente en posición OAD u OAI, de pie o sentado, frente al RI.",
-        "Se rota al paciente entre 45°-60° para dejar la escápula de perfil.",
-        "Se pide al paciente que flexione el codo y coloque el dorso de la mano sobre la parte posterior del tórax para evaluar acromion y apófisis coracoides.",
-        "Para la demostración del cuerpo de la escápula se pide al paciente que extienda el brazo hacia arriba y que apoye el antebrazo sobre la cabeza."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Acromion, apófisis coracoides, ángulo inferior de la escápula y todo el cuerpo en su extensión."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Bordes medial y lateral superpuestos.",
-            "Ausencia de superposición del cuerpo escapular sobre las costillas.",
-            "Ausencia de superposición del húmero sobre el área de interés.",
-            "Inclusión del acromion y del ángulo inferior."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          103,
-          104
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/escapula-lateral-oai-oad.webp",
-        "alt": "Fotos de posición y resultado: Lateral de escápula en OAI u OAD",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "escapula-lateral-opd-opi",
-      "region": "escapula",
-      "nombre": "Lateral de escápula en OPD u OPI",
-      "categoria": [
-        "Perfil",
-        "Oblicuas"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": "No respire, no se mueva.",
-        "parrilla": "Sí",
-        "tecnica": null
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular al borde externo del omóplato."
-      },
-      "posicion": [
-        "Paciente en posición OAD u OAI, de pie o sentado, frente al RI.",
-        "Se pide al paciente que extienda el brazo en sentido superior.",
-        "Se gira en sentido contrario al lado afectado entre 15° y 25°, o para una oblicua más pronunciada entre 25° y 35°."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Acromion, apófisis coracoides, ángulo inferior de la escápula y todo el cuerpo en su extensión."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "La escápula en oblicuo.",
-            "El borde lateral adyacente a las costillas.",
-            "El acromion y el ángulo inferior."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          105,
-          106
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/escapula-lateral-opd-opi.webp",
-        "alt": "Fotos de posición y resultado: Lateral de escápula en OPD u OPI",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "escapula-coracoides-axial",
       "region": "escapula",
       "nombre": "AP axial de coracoides",
       "categoria": [
         "Axiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "factores": {
         "ri": "24 × 30 cm",
         "dfri": "1 m",
@@ -2970,62 +3133,6 @@ export default {
       "estado": "pendiente-revision"
     },
     {
-      "id": "ac-pearson",
-      "region": "acromioclaviculares",
-      "nombre": "AP de articulaciones acromioclaviculares",
-      "categoria": [
-        "AP",
-        "Métodos especiales"
-      ],
-      "tipo": null,
-      "metodo": "Método de Pearson",
-      "factores": {
-        "ri": null,
-        "dfri": "1,80 m / 2 m",
-        "respiracion": "No respire, no se mueva.",
-        "parrilla": "Sí",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la línea media del cuerpo a la altura de las articulaciones AC."
-      },
-      "posicion": [
-        "Se coloca al paciente incorporado / bipedestación o bien sentado frente al RI.",
-        "Con los brazos del paciente colgando a ambos lados, se ajustan los hombros para que queden en un mismo plano horizontal.",
-        "Se hacen 2 exposiciones: la 1.ª sin pesas y la 2.ª con pesas."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Ambas articulaciones AC, ambas clavículas, ambos húmeros proximales."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Ausencia de rotación o de inclinación del paciente.",
-            "Las articulaciones AC visualizadas con algunos tejidos blandos y sin una densidad excesiva.",
-            "Ambas articulaciones incluidas.",
-            "La separación, cuando existe, debe ser claramente apreciable en las imágenes con peso."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          109,
-          110
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/ac-pearson.webp",
-        "alt": "Fotos de posición y resultado: AP de articulaciones acromioclaviculares",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
       "id": "ac-alexander",
       "region": "acromioclaviculares",
       "nombre": "AP axial de articulación acromioclavicular",
@@ -3033,7 +3140,7 @@ export default {
         "Axiales",
         "Métodos especiales"
       ],
-      "tipo": null,
+      "tipo": "E",
       "metodo": "Método de Alexander",
       "factores": {
         "ri": "24 × 30 cm",
@@ -3080,113 +3187,6 @@ export default {
       "ilustracion": {
         "src": "ilustraciones/uy/ac-alexander.webp",
         "alt": "Fotos de posición y resultado: AP axial de articulación acromioclavicular",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "clavicula-ap-pa",
-      "region": "clavicula",
-      "nombre": "AP / PA de clavícula",
-      "categoria": [
-        "AP",
-        "PA"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": "Suspendida al final de la espiración.",
-        "parrilla": "Sí",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "perpendicular",
-        "texto": "Perpendicular a la zona media de la clavícula."
-      },
-      "posicion": [
-        "Paciente en decúbito supino o bipedestación.",
-        "Se ajusta el cuerpo para centrar la clavícula en la línea media de la mesa o del dispositivo de rejilla vertical.",
-        "Se sitúa al paciente en AP / PA con los brazos a los lados del cuerpo y se ajustan los hombros para que queden en un mismo plano horizontal."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Ambas articulaciones de la clavícula y la misma en toda su extensión."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "Toda la clavícula centrada en la imagen.",
-            "Una densidad uniforme.",
-            "La mitad lateral de la clavícula por encima de la escápula y la mitad medial superpuesta al tórax."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          113,
-          114
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/clavicula-ap-pa.webp",
-        "alt": "Fotos de posición y resultado: AP / PA de clavícula",
-        "verificada": true
-      },
-      "estado": "pendiente-revision"
-    },
-    {
-      "id": "clavicula-axial-lordotica",
-      "region": "clavicula",
-      "nombre": "AP axial de clavícula (posición lordótica)",
-      "categoria": [
-        "Axiales"
-      ],
-      "tipo": null,
-      "factores": {
-        "ri": "24 × 30 cm",
-        "dfri": "1 m",
-        "respiracion": "Suspendida al final de una inspiración máxima con el fin de elevar más y angular la clavícula.",
-        "parrilla": "Sí",
-        "tecnica": "Homogeneizada"
-      },
-      "rc": {
-        "direccion": "cefálico",
-        "texto": "AP lordótica: 15° cefálico. Sin lordótica o decúbito supino: 30° cefálico. PA: 15° a 30° en sentido caudal, bipedestación o decúbito prono.",
-        "angulo": "15° a 30°"
-      },
-      "posicion": [
-        "Se sienta, se acuesta o se coloca de pie al paciente 30 cm por delante de un dispositivo RI.",
-        "Se hace al paciente inclinarse hacia atrás en una posición de lordosis máxima, apoyando el cuello y los hombros sobre el dispositivo de rejilla vertical (cuello en flexión máxima)."
-      ],
-      "criterios": [
-        [
-          "Región a incluir",
-          [
-            "Ambas articulaciones de la clavícula y la misma en toda su extensión."
-          ]
-        ],
-        [
-          "Criterios de evaluación",
-          [
-            "La mayor parte de la clavícula proyectada por encima de las costillas y la escápula con el extremo medial superpuesto a la primera o segunda costilla.",
-            "La clavícula con una disposición horizontal.",
-            "Toda la clavícula conjuntamente con las articulaciones AC y EC."
-          ]
-        ]
-      ],
-      "fuente": {
-        "paginas": [
-          115,
-          116
-        ]
-      },
-      "ilustracion": {
-        "src": "ilustraciones/uy/clavicula-axial-lordotica.webp",
-        "alt": "Fotos de posición y resultado: AP axial de clavícula (posición lordótica)",
         "verificada": true
       },
       "estado": "pendiente-revision"

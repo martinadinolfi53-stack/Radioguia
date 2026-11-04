@@ -1,4 +1,4 @@
-// Miembro inferior · Enfoques en UY (cuaderno «Enfoques TÉC 1 y 2») (págs. 117-180).
+// Miembro inferior · Enfoques UY (cuaderno «Enfoques TÉC 1 y 2») (págs. 117-180).
 // Transcripción del cuaderno manuscrito (/mnt/project-files/enfoques-tec/transcripcion.md); «〃» se reemplazó por el texto de la ficha anterior.
 // Las ilustraciones son las páginas de fotos de posición y resultado de cada enfoque (ilustraciones/uy/<id>.webp).
 // Técnica = la que anota el cuaderno (homogeneizada, intermedia). Cuando una fila está vacía, el dato va en null.

@@ -1,4 +1,4 @@
-// Menú de Enfoques en UY por zona (familias y colores en js/menu.js). Extremidades de proximal a distal, como en los libros.
+// Menú de Enfoques UY por zona (familias y colores en js/menu.js). Extremidades de proximal a distal, como en los libros.
 export default [
   { id: "hombro", nombre: "Hombro", familia: "superior", regiones: ["hombro"] },
   { id: "acromioclaviculares", nombre: "Articulaciones acromioclaviculares", familia: "superior", regiones: ["acromioclaviculares"] },

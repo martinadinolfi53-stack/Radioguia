@@ -146,7 +146,7 @@ export function vistaFamilia(f) {
 }
 
 const todos = () => true;
-// "Bontrager, Merrill y Enfoques en UY"
+// "Bontrager, Merrill y Enfoques UY"
 const lista = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} y ${xs.at(-1)}` : xs.join(""));
 
 // lo primero al abrir la app (la pantalla del pulgar): elegir Enfoques (fichas y calculadora) o Juegos; cada parte vuelve acá con su flecha

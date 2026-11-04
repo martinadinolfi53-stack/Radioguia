@@ -1,4 +1,4 @@
-// Angulación del rayo y rotación de la región por ficha, sacadas del RC y de la posición de cada ficha de Enfoques en UY.
+// Angulación del rayo y rotación de la región por ficha, sacadas del RC y de la posición de cada ficha de Enfoques UY.
 // «Sí · grados» o «No». Se muestran en Factores técnicos.
 export default {
  "dedos-pa": {

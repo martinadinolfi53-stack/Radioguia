@@ -48,10 +48,11 @@ service cloud.firestore {
       allow delete: if yo(uid);
     }
 
-    // favoritos de cada cuenta de Google (js/sync-favoritos.js): solo los ve y los cambia el dueño
+    // favoritos de cada cuenta de Google (js/sync-favoritos.js) y copia grande de la foto (js/foto.js): solo los ve y los cambia el dueño.
+    // Solo esos dos documentos: con cualquier nombre, una cuenta podría guardar sin límite (300 KB por documento).
     match /usuarios/{uid}/privado/{doc} {
       allow read, delete: if yo(uid);
-      allow create, update: if yo(uid) && request.resource.data.keys().hasOnly(['datos', 'actualizado'])
+      allow create, update: if yo(uid) && doc in ['favoritos', 'foto'] && request.resource.data.keys().hasOnly(['datos', 'actualizado'])
         && request.resource.data.datos is string && request.resource.data.datos.size() <= 300000
         && request.resource.data.actualizado is int;
     }

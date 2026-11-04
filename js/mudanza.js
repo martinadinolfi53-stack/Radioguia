@@ -14,6 +14,15 @@
   var NUEVA = "https://app-rx-188a6.web.app/";
   var MARCA = "#mudanza=";
 
+  // Cualquiera puede armar un link "#mudanza=..." a mano y mandárselo a otro, así que lo que llega se trata con cuidado:
+  //  - solo vale un rato después de armado (el sitio viejo lo arma y lo abre en el momento);
+  //  - solo se copian los datos de la app (favoritos, repaso, ajustes, apodo), nunca adónde ir ni marcas internas;
+  //  - la sesión solo se lleva si es de una cuenta con apodo (sin Google) y la persona confirma que es la suya:
+  //    sin eso, un link armado por otro podría dejarla jugando en la cuenta de él (y él vería lo que ella guarda).
+  //    Con Google no hace falta: en el sitio nuevo se entra con Google desde cualquier lado.
+  var VALE_MS = 30 * 60000;
+  var COPIABLES = /^radioguia\.(listas|favoritos|preferencias|fuente|ambos|nombre|repaso\.|juegos\.(stats|desafio))/;
+
   var viejo = /(^|\.)github\.io$/.test(location.hostname);
   if (!viejo) { if (location.hash.indexOf(MARCA) === 0) importar(); return; }
   if (!MUDANZA_ACTIVA) return;
@@ -28,7 +37,8 @@
   });
 
   function armarLink() {
-    var datos = { v: 1, hash: location.hash || "", ls: {}, auth: null };
+    // t: cuándo se armó el link; el sitio nuevo no acepta links viejos (ver importar)
+    var datos = { v: 1, t: Date.now(), hash: location.hash || "", ls: {}, auth: null };
     try {
       for (var i = 0; i < localStorage.length; i++) {
         var k = localStorage.key(i);
@@ -93,16 +103,29 @@
   function importar() {
     try {
       var datos = JSON.parse(deBase64(location.hash.slice(MARCA.length)));
+      // los links sin fecha son de la versión anterior de este archivo (puede seguir en la app vieja instalada hasta que se
+      // actualice): se aceptan, pero con las mismas condiciones para la sesión
+      var edad = datos && typeof datos.t === "number" ? Date.now() - datos.t : 0;
       // si este navegador ya usa la app nueva, no se pisa nada
-      if (datos && datos.v === 1 && !localStorage.getItem("radioguia.nombre")) {
-        for (var k in datos.ls) if (k.indexOf("radioguia.") === 0 && localStorage.getItem(k) === null) localStorage.setItem(k, datos.ls[k]);
+      if (datos && datos.v === 1 && edad > -5 * 60000 && edad < VALE_MS && datos.ls && typeof datos.ls === "object" && !localStorage.getItem("radioguia.nombre")) {
+        var a = datos.auth, apodo = String(datos.ls["radioguia.nombre"] || "").slice(0, 40);
+        var conSesion = !!(a && /^firebase:authUser:/.test(a.clave) && a.valor && a.valor.isAnonymous === true && apodo);
+        if (conSesion && !confirm("RadioGuía se mudó de dirección. ¿Seguís con tu cuenta «" + apodo + "»?\n\nTocá Cancelar si este link te lo mandó otra persona.")) return limpiar(datos);
+        for (var k in datos.ls) if (COPIABLES.test(k) && typeof datos.ls[k] === "string" && localStorage.getItem(k) === null) localStorage.setItem(k, datos.ls[k]);
         // Firebase busca la sesión primero en IndexedDB y después en localStorage; si la encuentra acá la pasa sola a IndexedDB
-        if (datos.auth && /^firebase:authUser:/.test(datos.auth.clave)) localStorage.setItem(datos.auth.clave, JSON.stringify(datos.auth.valor));
+        if (conSesion) localStorage.setItem(a.clave, JSON.stringify(a.valor));
+        // sin la sesión, el apodo solo no sirve (la app lo vuelve a pedir): se saca para que se pueda entrar de nuevo
+        else localStorage.removeItem("radioguia.nombre");
       }
-      history.replaceState(null, "", location.pathname + location.search + (datos && /^#[^#]*$/.test(datos.hash) && datos.hash.indexOf(MARCA) !== 0 ? datos.hash : ""));
+      limpiar(datos);
     } catch (e) {
       history.replaceState(null, "", location.pathname + location.search);
     }
+  }
+  // se borra el "#mudanza" de la dirección (y del historial) y se vuelve a la pantalla en la que estaba
+  function limpiar(datos) {
+    var h = datos && typeof datos.hash === "string" && /^#[^#]*$/.test(datos.hash) && datos.hash.indexOf(MARCA) !== 0 ? datos.hash : "";
+    history.replaceState(null, "", location.pathname + location.search + h);
   }
 
   // base64 apta para direcciones, con acentos y eñes

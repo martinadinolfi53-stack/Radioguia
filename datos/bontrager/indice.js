@@ -13,6 +13,7 @@ import cap10 from "./cap10-portatiles.js";
 export { default as MENU } from "./menu.js";
 export { default as ANG_ROT } from "./angulacion-rotacion.js";
 export { default as VERSIONES } from "./versiones.js";
+export { default as GUIA } from "./guia-rapida.js";
 export { default as CON_ESQUEMA } from "./ilustraciones.js";
 
 export const FUENTE = {

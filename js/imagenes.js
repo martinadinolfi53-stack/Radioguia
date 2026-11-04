@@ -22,7 +22,8 @@ export function ampliar(src, alt) {
   const caja = () => lienzo.getBoundingClientRect();
   const medir = () => {
     const { width: W, height: H } = caja(), nw = img.naturalWidth || 760, nh = img.naturalHeight || 354;
-    const k = Math.min((W * 0.96) / nw, (H * 0.9) / nh); w0 = nw * k; h0 = nh * k; aplicar();
+    const arriba = v.querySelector(".visor-cerrar").getBoundingClientRect().bottom + 8; // deja libre la franja de la cruz
+    const k = Math.min((W * 0.96) / nw, Math.min(H * 0.9, H - 2 * arriba) / nh); w0 = nw * k; h0 = nh * k; aplicar();
   };
   const limitar = () => {
     const { width: W, height: H } = caja(), mx = Math.max(0, (w0 * escala - W) / 2 + 24), my = Math.max(0, (h0 * escala - H) / 2 + 24);

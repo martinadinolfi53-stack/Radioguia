@@ -168,3 +168,4 @@ a.opcion, .opciones .aj-salir { flex: 0 1 auto; }
 .rp-tipo.on { background: color-mix(in srgb, var(--accent) 20%, transparent); }
 .rp-modo { border: 0; background: var(--relleno); box-shadow: inset 0 0 0 1.5px transparent; }
 .rp-modo.on { background: color-mix(in srgb, var(--accent) 16%, transparent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.gr-dato { background: var(--material); border: 0; border-radius: 16px; -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); }

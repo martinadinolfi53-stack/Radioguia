@@ -1,5 +1,5 @@
 // Generado por herramientas/preparar.mjs. No editar a mano.
-self.RG_VERSION = "5e49d4de54";
+self.RG_VERSION = "c1e22fc82e";
 self.RG_ARCHIVOS = [
  "./",
  "config/calculadora.js",
@@ -21,6 +21,7 @@ self.RG_ARCHIVOS = [
  "datos/bontrager/cap08-craneo-cara-senos.js",
  "datos/bontrager/cap09-abdomen-contraste.js",
  "datos/bontrager/cap10-portatiles.js",
+ "datos/bontrager/guia-rapida.js",
  "datos/bontrager/ilustraciones.js",
  "datos/bontrager/indice.js",
  "datos/bontrager/menu.js",

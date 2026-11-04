@@ -14,11 +14,12 @@ export const CATEGORIAS = ["AP", "PA", "Perfil", "Oblicuas", "Axiales", "Tangenc
 export const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 // arma las fichas de una fuente a partir de su indice.js; también lo usa js/otras-fuentes.js para buscar en el otro libro
-export function armar({ CAPITULOS, FUENTE, CON_ESQUEMA, ANG_ROT, VERSIONES }) {
+export function armar({ CAPITULOS, FUENTE, CON_ESQUEMA, ANG_ROT, VERSIONES, GUIA = {} }) {
   const capitulos = CAPITULOS.map((c) => ({ ...c, regiones: c.regiones.map((r) => ({ ...r, capitulo: c.capitulo })) }));
   const regiones = capitulos.flatMap((c) => c.regiones);
   const proyecciones = capitulos.flatMap((c) => c.proyecciones.map((p) => ({ ...p, capitulo: c.capitulo })));
   // angulación del rayo y rotación de la región (sacadas de los pasos y del RC de cada ficha)
+  for (const p of proyecciones) if (GUIA[p.id]) p.guia = GUIA[p.id];
   for (const p of proyecciones) if (ANG_ROT[p.id]) p.factores = { ...p.factores, ...Object.fromEntries(Object.entries(ANG_ROT[p.id]).filter(([k]) => !(k in (p.factores || {})))) };
   // esquemas didácticos generados (<carpeta de la fuente>/<id>.svg), sin verificar por un docente
   const esquemas = new Set(CON_ESQUEMA);

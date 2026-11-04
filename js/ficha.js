@@ -19,6 +19,8 @@ const RC_FLECHA = {
 const FACTORES = [["ri", "Tamaño del RI"], ["dfri", "DFRI"], ["respiracion", "Respiración"], ["angulacion", "Angulación del rayo"], ["rotacion", "Rotación de la región"]];
 const FACTORES_EXTRA = [["parrilla", "Parrilla (Bucky)"], ["colimacion", "Colimación"], ["tecnica", "Técnica"]];
 export const FACTORES_FICHA = [...FACTORES, ...FACTORES_EXTRA];
+// en la ficha, angulación y rotación se ven afuera de Factores técnicos, junto al rayo central
+const JUNTO_AL_RC = ["angulacion", "rotacion"];
 
 export function vistaFicha(p, volver) {
   const r = regionPorId[p.region];
@@ -29,6 +31,8 @@ export function vistaFicha(p, volver) {
   const hermanas = proyeccionesDe(p.region);
   const terminos = terminosDe(p);
   const dir = p.rc?.direccion || "perpendicular";
+  const hay = (k) => p.factores?.[k] || (p.factores && k in p.factores && p.factores[k] === null);
+  const factor = ([k, n]) => `<div class="it"><dt>${m(n)}</dt><dd>${p.factores[k] === null ? "" : m(p.factores[k]).replace(/^(Sí|No)(?=\s|;|$)/, "<b>$1</b>")}</dd></div>`;
   // una versión de la posición (datos/versiones.js): sus pasos, su RC si difiere del general y su esquema
   const version = (x) => `<details class="sec ver"><summary><span>${esc(x.nombre)}</span>${icono.chev}</summary><div class="body">
     ${x.posicion.length ? lista(x.posicion) : ""}
@@ -48,8 +52,7 @@ export function vistaFicha(p, volver) {
       ${enListas(p.id)}
     </div>
 
-    ${sec("Factores técnicos", () => `<dl class="tabla">${FACTORES_FICHA.filter(([k]) => p.factores?.[k] || (p.factores && k in p.factores && p.factores[k] === null))
-      .map(([k, n]) => `<div class="it"><dt>${m(n)}</dt><dd>${p.factores[k] === null ? "" : m(p.factores[k]).replace(/^(Sí|No)(?=\s|;|$)/, "<b>$1</b>")}</dd></div>`).join("")}</dl>`)}
+    ${sec("Factores técnicos", () => `<dl class="tabla">${FACTORES_FICHA.filter(([k]) => !JUNTO_AL_RC.includes(k) && hay(k)).map(factor).join("")}</dl>`)}
 
     <section class="rc rc-${dir === "cefálico" ? "cefalico" : dir}" aria-labelledby="rc-t">
       <div class="rc-cab">
@@ -58,6 +61,7 @@ export function vistaFicha(p, volver) {
           <p class="rc-dir">${esc(RC_ETIQUETA[dir] || dir)}${p.rc?.angulo ? ` <b>${esc(p.rc.angulo)}</b>` : ""}</p></div>
       </div>
       <p class="rc-txt">${(v.clear(), m(p.rc?.texto || "Sin dato en la fuente."))}</p>
+      ${JUNTO_AL_RC.some(hay) ? `<dl class="tabla rc-extra">${FACTORES_FICHA.filter(([k]) => JUNTO_AL_RC.includes(k) && hay(k)).map(factor).join("")}</dl>` : ""}
     </section>
 
     ${sec("Posición del paciente", () => p.versiones ? (p.comun?.length ? lista(p.comun) : "") + `<div class="versiones">${p.versiones.map(version).join("")}</div>` : lista(p.posicion || []))}

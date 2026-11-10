@@ -44,7 +44,7 @@ function hojaRellenar(p, pie) {
     <header class="imp-cab">${p
       ? `<p class="imp-region">${esc(r?.nombre || "")}${r?.detalle ? ` · ${esc(r.detalle)}` : ""}</p><h2>${esc(p.nombre)}</h2>`
       : `<p class="imp-region">Región ${campo()}</p><h2 class="imp-h-campo">Proyección ${campo()}</h2>`}</header>
-    <section><h3>Factores técnicos</h3><dl class="imp-factores">${FACTORES_FICHA.map(([, n]) => `<div><dt>${esc(n)}</dt><dd>${campo()}</dd></div>`).join("")}</dl></section>
+    <section><h3>Factores técnicos</h3><dl class="imp-factores">${FACTORES_FICHA.filter(([k]) => k !== "foco").map(([, n]) => `<div><dt>${esc(n)}</dt><dd>${campo()}</dd></div>`).join("")}</dl></section>
     <section class="imp-rc"><h3>Rayo central</h3>${renglones(3)}</section>
     <section><h3>Posición del paciente</h3>${renglones(p?.versiones ? 9 : 7)}</section>
     ${o.criterios ? `<section><h3>Criterios de evaluación</h3>${renglones(5)}</section>` : ""}

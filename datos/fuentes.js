@@ -4,4 +4,5 @@ export default [
   { id: "bontrager", nombre: "Bontrager", detalle: "Manual de posiciones y técnicas radiológicas · 9ª ed.", lista: true },
   { id: "merrill", nombre: "Merrill", detalle: "Atlas de posiciones radiográficas y procedimientos radiológicos · 11ª ed.", lista: true },
   { id: "uy", nombre: "Enfoques UY", detalle: "Enfoques TÉC 1 y 2 · fichas con fotos de posición y resultado (miembro superior e inferior)", lista: true },
+  { id: "chelo", nombre: "Enfoques Chelo", detalle: "Resúmenes de clase de Chelo · miembro superior e inferior, columna y abdomen, con lámina de placas", lista: true },
 ];
